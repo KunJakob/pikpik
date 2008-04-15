@@ -1,0 +1,40 @@
+.Sprite "Logo-SAPIAN"
+{
+	.Surface "Logo-SAPIAN"
+}
+
+.Sprite "Map-Tiles"
+{
+	.Surface "Map-Tiles"
+}
+
+.Sprite "Menu-Background"
+{
+	.Surface "Menu-Background"
+}
+
+.Sprite "Cursor"
+{
+	.Surface "Cursor"
+}
+
+.Sprite "Player-PacMan"
+{
+	.Surface "Player-PacMan"
+	.Animation "Move"
+	
+	.Animation "Idle"
+	{
+		.Frame { .Area "F2" }
+	}
+	
+	.Animation "Move"
+	{
+		.Delay 50
+		
+		.Frame { .Area "F3" }
+		.Frame { .Area "F2" }
+		.Frame { .Area "F1" .Event "Eat" }
+		.Frame { .Area "F2" }
+	}
+}
