@@ -34,6 +34,7 @@ enum t_PlayerType
 // The possible player states.
 enum t_PlayerState
 {
+	PlayerState_None,
 	PlayerState_Idle,
 	PlayerState_Move,
 	PlayerState_Die,
@@ -51,6 +52,9 @@ enum t_PlayerState
 class CPlayer : public CRenderable
 {
 public:
+	// Friends.
+	friend CMap;
+
 	/**
 	* Destructor.
 	*/
@@ -88,6 +92,24 @@ protected:
 	*/
 	CPlayer(t_PlayerType iType, const XCHAR* pSpriteName);
 
+	/**
+	* Called to change the state of the player object.
+	*/
+	virtual void SetState(t_PlayerState iState);
+
+	/**
+	* Check if the specified block is passable.
+	*/
+	virtual XBOOL IsPassable(CMapBlock* pBlock)
+	{
+		return !pBlock->IsWall();
+	}
+
+	/**
+	* Called when an animation event occurs.
+	*/
+	static void OnAnimationEvent(const XCHAR* pEvent, void* pObject);
+
 	// The type of the derived class.
 	t_PlayerType m_iType;
 
@@ -95,7 +117,7 @@ protected:
 	t_PlayerState m_iState;
 
 	// The player sprite.
-	CSprite* m_pSprite;
+	CAnimatedSprite* m_pSprite;
 
 	// The current map block.
 	CMapBlock* m_pCurrentBlock;
@@ -103,8 +125,14 @@ protected:
 	// The target map block.
 	CMapBlock* m_pTargetBlock;
 
-	// The time elapsed so far in the existing state.
+	// The current time set for the operation.
 	XUINT m_iTime;
+
+	// The total time set for the move.
+	XUINT m_iMoveTime;
+
+	// The transition distance between two blocks clamped to the range 0.0 to 1.0.
+	XFLOAT m_fTransition;
 
 	// The transition direction.
 	t_AdjacentDir m_iTransitionDir;
@@ -126,7 +154,7 @@ protected:
 //##############################################################################
 #pragma endregion
 
-#pragma region Pacman
+#pragma region PacMan
 //##############################################################################
 //
 //                                   PACMAN
@@ -143,12 +171,68 @@ public:
 	/**
 	* Update the object ready for rendering.
 	*/
+	virtual void Update() { m_pSprite->SetAlpha(m_pCurrentBlock->fVisibility); }
+
+	/**
+	* Render the object.
+	*/
+	//virtual void Render();
+
+protected:
+	/**
+	* Check if the specified block is passable.
+	*/
+	virtual XBOOL IsPassable(CMapBlock* pBlock)
+	{
+		return CPlayer::IsPassable(pBlock) && pBlock->cChar != '=';
+	}
+
+	/**
+	* Called to change the state of the player object.
+	*/
+	virtual void SetState(t_PlayerState iState);
+};
+
+//##############################################################################
+#pragma endregion
+
+#pragma region Ghost
+//##############################################################################
+//
+//                                   GHOST
+//
+//##############################################################################
+class CGhost : public CPlayer
+{
+public:
+	/**
+	* Constructor.
+	*/
+	CGhost();
+
+	/**
+	* Destructor.
+	*/
+	~CGhost();
+
+	/**
+	* Update the object ready for rendering.
+	*/
 	virtual void Update();
 
 	/**
 	* Render the object.
 	*/
-	//virtual void Render() {}
+	virtual void Render();
+
+	/**
+	* Called to change the state of the player object.
+	*/
+	virtual void SetState(t_PlayerState iState);
+
+protected:
+	// The ghost's eyes.
+	CSprite* m_pEyes;
 };
 
 //##############################################################################

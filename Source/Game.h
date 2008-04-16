@@ -22,6 +22,7 @@
 // Other.
 #include <Map.h>
 #include <Player.h>
+#include <Background.h>
 
 //##############################################################################
 #pragma endregion
@@ -49,11 +50,15 @@ public:
 	virtual void Unload();
 
 protected:
+	// The map background.
+	CBackground m_Background;
+
 	// The current map being played.
 	CMap* m_pMap;
 
 	// The player characters.
 	CPacMan* m_pPacMan;
+	CGhost* m_pGhost;
 };
 
 //##############################################################################

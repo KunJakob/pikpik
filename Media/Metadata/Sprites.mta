@@ -21,7 +21,6 @@
 .Sprite "Player-PacMan"
 {
 	.Surface "Player-PacMan"
-	.Animation "Move"
 	
 	.Animation "Idle"
 	{
@@ -30,11 +29,29 @@
 	
 	.Animation "Move"
 	{
-		.Delay 50
+		.Delay 60
 		
+		.Frame { .Area "F2" }
 		.Frame { .Area "F3" }
 		.Frame { .Area "F2" }
-		.Frame { .Area "F1" .Event "Eat" }
-		.Frame { .Area "F2" }
+		.Frame { .Area "F1" .Loop } //.Event "Eat" }
 	}
+}
+
+.Sprite "Player-Ghost"
+{
+	.Surface "Player-Ghost"
+	
+	.Animation "Idle"
+	{
+		.Delay 120
+	
+		.Frame { .Area "F1" }
+		.Frame { .Area "F2" .Loop }
+	}
+}
+
+.Sprite "Player-Ghost-Eyes"
+{
+	.Surface "Player-Ghost-Eyes"
 }

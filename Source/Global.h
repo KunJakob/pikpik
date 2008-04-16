@@ -63,7 +63,7 @@
 #define _TERMINATE			Application::Terminate()
 #define _TIMEDELTA			Application::GetTimeDelta()
 #define _TIMEDELTAF			_HGE->Timer_GetDelta()
-#define _MAP						MapManager::GetCurrentMap()
+#define _MAP						MapManager::GetMap()
 
 // Colour manipulations.
 #define COLOURF(COLF) \
@@ -109,6 +109,7 @@ enum t_LayerIndex
 // Renderable types.
 enum t_RenderableType
 {
+	RenderableType_Background,
 	RenderableType_Sprite,
 	RenderableType_Map,
 	RenderableType_Player,

@@ -75,17 +75,28 @@ public:
 	friend CMap;
 
 	/**
+	* Check if the block is a wall tile.
+	*/
+	XBOOL IsWall()
+	{
+		return cChar == '#';
+	}
+
+	/**
+	* Check if the block is part of a ghost base.
+	*/
+	XBOOL IsBase()
+	{
+		return iType == TileType_Entrance || iType == TileType_Base;
+	}
+
+	/**
 	* Get the screen position of a block.
 	*/
 	XPOINT GetScreenPosition()
 	{
 		return xPosition * 48;
 	}
-
-	/**
-	* Check if the block is passable.
-	*/
-	XBOOL IsPassable(CPlayer* pPlayer) { return false; }
 
 	// The original map char.
 	XCHAR cChar;
@@ -98,6 +109,9 @@ public:
 
 	// The map block position.
 	XPOINT xPosition;
+
+	// The block visibility.
+	XFLOAT fVisibility;
 
 	//CTrap* m_pTrap;
 	//CPower* m_pPower;
@@ -136,6 +150,11 @@ public:
 	* Clean up the map data on destruction.
 	*/
 	virtual ~CMap();
+
+	/**
+	* Update the map.
+	*/
+	virtual void Update();
 
 	/**
 	* Render the map.
@@ -201,16 +220,16 @@ public:
 	/**
 	* Get a random player spawn block.
 	*/
-	CMapBlock* GetRandomSpawnBlock()
+	CMapBlock* GetSpawnBlock()
 	{
 		return m_lpSpawnBlocks[rand() % m_lpSpawnBlocks.size()];
 	}
 
 protected:
 	/**
-	* Generate an optimised map format from the map metadata.
+	* Add the specified visibility to all valid paths from the specified block.
 	*/
-	void ProcessMap();
+	void AddVisibility(CMapBlock* pStartingBlock, XFLOAT fVisibility);
 
 	// The map name.
 	const XCHAR* m_pName;
@@ -219,14 +238,17 @@ protected:
 	XUINT m_iWidth;
 	XUINT m_iHeight;
 
+	// The total number of blocks in the map.
+	XUINT m_iBlockCount;
+
 	// The processed map data.
 	CMapBlock* m_xBlocks;
 
+	// The list of player spawn positions.
+	t_MapBlockList m_lpSpawnBlocks;	
+
 	// The current map offset in pixels.
 	XPOINT m_xOffset;
-
-	// The list of player spawn positions.
-	t_MapBlockList m_lpSpawnBlocks;
 };
 
 //##############################################################################
@@ -240,14 +262,20 @@ protected:
 //##############################################################################
 namespace MapManager
 {
-	// Initialise(MAPMETADATA);
-	// GetCurrentMap();
-	// GetNextMap();
-	// GetMapCount();
-	// GetCurrentMapIndex();
+	/**
+	* Set the currently active map.
+	*/
+	void SetMap(CMap* pMap);
 
-	void SetCurrentMap(CMap* pMap);
-	CMap* GetCurrentMap();
+	/**
+	* Get the currently active map.
+	*/
+	CMap* GetMap();
+
+	/**
+	* Set the currently active player.
+	*/
+	void SetPlayer(CPlayer* pPlayer);
 }
 
 //##############################################################################

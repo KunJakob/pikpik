@@ -183,6 +183,10 @@
 			Name="Source"
 			>
 			<File
+				RelativePath="..\Source\Background.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\Collision.cpp"
 				>
 			</File>

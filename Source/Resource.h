@@ -36,15 +36,16 @@
 * Pre-declarations.
 */
 class CSprite;
+class CAnimatedSprite;
 
 /**
 * List of supported resource types.
 */
 enum t_ResourceType
 {
-  ResourceType_Unknown,       // The resource type is unknown.
-  ResourceType_Surface,       // The resource is a surface.
-  ResourceType_Sprite,        // The resource is a sprite.
+	ResourceType_Unknown,       // The resource type is unknown.
+	ResourceType_Surface,       // The resource is a surface.
+	ResourceType_Sprite,        // The resource is a sprite.
 };
 
 //##############################################################################
@@ -63,11 +64,11 @@ enum t_ResourceType
 class CResourceTemplate
 {
 public:
-  // The type of the resource template.
-  t_ResourceType iResourceType;
+	// The type of the resource template.
+	t_ResourceType iResourceType;
 
-  // The name of the resource template.
-  const XCHAR* pResourceName;
+	// The name of the resource template.
+	const XCHAR* pResourceName;
 };
 
 /**
@@ -76,13 +77,13 @@ public:
 class CResource
 {
 public:
-  /**
-  * Get the resource type specified within the resource class constructor.
-  */
-  t_ResourceType GetResourceType()
-  {
-    return m_iResourceType;
-  }
+	/**
+	* Get the resource type specified within the resource class constructor.
+	*/
+	t_ResourceType GetResourceType()
+	{
+		return m_iResourceType;
+	}
 
 	/**
 	* Destructor: Ensure any derived object is properly destroyed.
@@ -90,14 +91,14 @@ public:
 	virtual ~CResource() {}
 
 protected:
-  /**
-  * Constructor: Initialise the resource type.
-  */
-  CResource(t_ResourceType iType) : m_iResourceType(iType) {}
+	/**
+	* Constructor: Initialise the resource type.
+	*/
+	CResource(t_ResourceType iType) : m_iResourceType(iType) {}
 
 private:
-  // The resource type.
-  t_ResourceType m_iResourceType;
+	// The resource type.
+	t_ResourceType m_iResourceType;
 };
 
 //##############################################################################
@@ -116,25 +117,30 @@ namespace ResourceManager
 	*/
 	void Reset();
 
-  /**
-  * Load a metadata file and any resources associated with it. 
-  */
-  void LoadMetadata(CMetadata* pMetadata);
+	/**
+	* Load a metadata file and any resources associated with it. 
+	*/
+	void LoadMetadata(CMetadata* pMetadata);
 
-  /**
-  * Unload a loaded metadata file and any resources associated with it.
-  */
-  void UnloadMetadata(CMetadata* pMetadata);
+	/**
+	* Unload a loaded metadata file and any resources associated with it.
+	*/
+	void UnloadMetadata(CMetadata* pMetadata);
 
-  /**
-  * Create a new sprite by name as it appears in the metadata.
-  */
-  CSprite* CreateSprite(const XCHAR* pName);
+	/**
+	* Create a new sprite by name as it appears in the metadata.
+	*/
+	CSprite* CreateSprite(const XCHAR* pName);
 
-  /**
-  * Free a resource of any type.
-  */
-  void FreeResource(CResource* pResource);
+	/**
+	* Create an animated sprite by name as it appears in the metadata.
+	*/
+	CAnimatedSprite* CreateAnimatedSprite(const XCHAR* pName);
+
+	/**
+	* Free a resource of any type.
+	*/
+	void FreeResource(CResource* pResource);
 }
 
 //##############################################################################

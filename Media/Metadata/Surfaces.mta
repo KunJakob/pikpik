@@ -53,10 +53,10 @@
 {
 	.File "Surfaces\Player-Ghost-Eyes.png"
 	
-	.Area "Left"			{ .Rect 0   0 46  46 }
-	.Area "Right"			{ .Rect 46  0 92  46 }
-	.Area "Up"				{ .Rect 92  0 138 46 }
-	.Area "Down"			{ .Rect 138 0 184 46 }
+	.Area "F1"				{ .Rect 0   0 46  46 }
+	.Area "F3"				{ .Rect 46  0 92  46 }
+	.Area "F2"				{ .Rect 92  0 138 46 }
+	.Area "F4"				{ .Rect 138 0 184 46 }
 }
 
 .Surface "Power-Icons"

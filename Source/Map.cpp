@@ -14,6 +14,7 @@
 // Other.
 #include <Renderer.h>
 #include <Resource.h>
+#include <Player.h>
 
 //##############################################################################
 #pragma endregion
@@ -79,6 +80,9 @@ static const XFLOAT s_fRotationAngleLookup[] =
 // The current and next maps.
 static CMap* s_pCurrentMap = NULL;
 static CMap* s_pNextMap = NULL;
+
+// The player to track on the map.
+static CPlayer* s_pPlayer = NULL;
 
 //##############################################################################
 #pragma endregion
@@ -160,8 +164,8 @@ CMap::CMap(const XCHAR* pID) : CRenderable(RenderableType_Map)
 	m_iHeight = pDataset->GetProperty("Size")->GetInt(1);
 
 	// Allocate the map block memory.
-	XUINT iBlockCount = m_iHeight * m_iWidth;
-	m_xBlocks = new CMapBlock[iBlockCount];
+	m_iBlockCount = m_iHeight * m_iWidth;
+	m_xBlocks = new CMapBlock[m_iBlockCount];
 
 	// Process the map blocks.
 	CProperty* pProperty = pDataset->GetProperty("Data");
@@ -175,17 +179,18 @@ CMap::CMap(const XCHAR* pID) : CRenderable(RenderableType_Map)
 
 			pBlock->cChar = pProperty->GetChar(iIndex);
 			pBlock->iType = TileType_Blank;
-			pBlock->fRotation = 0.0f;
+			pBlock->fRotation = 0.f;
 			pBlock->xPosition = XPOINT(iX, iY);
+			pBlock->fVisibility = 0.f;
 
 			pBlock->pAdjacents[AdjacentDir_Left]		= (iIndex % m_iWidth > 0) ? &m_xBlocks[iIndex - 1] : NULL;
 			pBlock->pAdjacents[AdjacentDir_Up]			= (iIndex >= m_iWidth) ? &m_xBlocks[iIndex - m_iWidth] : NULL;
 			pBlock->pAdjacents[AdjacentDir_Right]		= (iIndex % m_iWidth < m_iWidth - 1) ? &m_xBlocks[iIndex + 1] : NULL;
-			pBlock->pAdjacents[AdjacentDir_Down]		= (iIndex < iBlockCount - m_iWidth) ? &m_xBlocks[iIndex + m_iWidth] : NULL;
+			pBlock->pAdjacents[AdjacentDir_Down]		= (iIndex < m_iBlockCount - m_iWidth) ? &m_xBlocks[iIndex + m_iWidth] : NULL;
 		}
 	}
 
-	for (XUINT iA = 0; iA < iBlockCount; ++iA)
+	for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
 	{
 		CMapBlock* pBlock = &m_xBlocks[iA];
 		
@@ -230,12 +235,60 @@ CMap::~CMap()
 }
 
 // =============================================================================
+// Nat Ryall                                                         16-Apr-2008
+// =============================================================================
+void CMap::Update()
+{
+	if (s_pPlayer->m_iType == PlayerType_Ghost)
+	{
+		for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
+			m_xBlocks[iA].fVisibility = m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsBase() ? 1.f : .0f;
+		
+		AddVisibility(s_pPlayer->m_pCurrentBlock, 1.0f - s_pPlayer->m_fTransition);
+		AddVisibility(s_pPlayer->m_pTargetBlock, s_pPlayer->m_fTransition);
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         16-Apr-2008
+// =============================================================================
+void CMap::AddVisibility(CMapBlock* pBase, XFLOAT fVisibility)
+{
+	pBase->fVisibility += fVisibility;
+
+	/*for (XUINT iA = 0; iA < AdjacentDir_Max; ++iA)
+	{
+		if (pBase->pAdjacents[iA] && pBase->pAdjacents[iA]->IsWall())
+			pBase->pAdjacents[iA]->fVisibility += fVisibility;
+	}*/
+
+	for (XUINT iA = 0; iA < AdjacentDir_Max; ++iA)
+	{
+		CMapBlock* pBlock = pBase;
+
+		while (pBlock->pAdjacents[iA] && !pBlock->pAdjacents[iA]->IsBase() && !pBlock->pAdjacents[iA]->IsWall())
+		{
+			pBlock = pBlock->pAdjacents[iA];
+			pBlock->fVisibility += fVisibility;
+
+			/*for (XUINT iB = 0; iB < AdjacentDir_Max; ++iB)
+			{
+				if (pBlock->pAdjacents[iB] && pBlock->pAdjacents[iB]->IsWall())
+					pBlock->pAdjacents[iB]->fVisibility += fVisibility;
+			}*/
+		}
+	}
+}
+
+// =============================================================================
 // Nat Ryall                                                         10-Apr-2008
 // =============================================================================
 void CMap::Render()
 {
-	for (XUINT iA = 0; iA < (m_iWidth * m_iHeight); ++iA)
+	for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
 	{
+		s_pTiles->SetAlpha(m_xBlocks[iA].fVisibility);
+
 		s_pTiles->SetRotation(m_xBlocks[iA].fRotation, true);
 		s_pTiles->SetArea(s_pTileAreas[m_xBlocks[iA].iType]);
 		s_pTiles->SetPosition(m_xBlocks[iA].GetScreenPosition() - m_xOffset);
@@ -256,7 +309,7 @@ void CMap::Render()
 // =============================================================================
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
-void MapManager::SetCurrentMap(CMap* pMap)
+void MapManager::SetMap(CMap* pMap)
 {
 	s_pCurrentMap = pMap;
 }
@@ -264,10 +317,19 @@ void MapManager::SetCurrentMap(CMap* pMap)
 // =============================================================================
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
-CMap* MapManager::GetCurrentMap()
+CMap* MapManager::GetMap()
 {
 	return s_pCurrentMap;
 }
+
+// =============================================================================
+// Nat Ryall                                                         16-Apr-2008
+// =============================================================================
+void MapManager::SetPlayer(CPlayer* pPlayer)
+{
+	s_pPlayer = pPlayer;
+}
+
 
 //##############################################################################
 #pragma endregion

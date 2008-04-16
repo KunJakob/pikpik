@@ -14,27 +14,21 @@
 //##############################################################################
 #pragma endregion
 
-#pragma region Definition
+#pragma region Sprite
 //##############################################################################
 //
-//                                 DEFINITION
+//                                   SPRITE
 //
 //##############################################################################
 
 // =============================================================================
 // Author: Nat Ryall                                           Date: 19-Feb-2008
 // =============================================================================
-CSprite::CSprite(CSpriteTemplate* pTemplate) :
-	CRenderable(RenderableType_Sprite),
-  CResource(ResourceType_Sprite),
-  m_pSpriteTemplate(pTemplate),
+CSprite::CSprite(CSpriteTemplate* pTemplate) : CRenderable(RenderableType_Sprite), CResource(ResourceType_Sprite),
+	m_pSpriteTemplate(pTemplate),
 	m_fAlpha(1.0f),
 	m_fRotation(0.0f),
-  m_iTimer(0),
-  m_bPlaying(false),
-	m_pArea(NULL),
-	m_pFrame(NULL),
-  m_pAnimation(NULL)
+	m_pArea(NULL)
 {
 }
 
@@ -43,40 +37,12 @@ CSprite::CSprite(CSpriteTemplate* pTemplate) :
 // =============================================================================
 void CSprite::Render()
 {
-	// Process the current frame.
-  if (m_bPlaying)
-  {
-    if (m_pFrame->iDelay)
-      m_iTimer += _TIMEDELTA;
-
-    if (m_iTimer >= m_pFrame->iDelay)
-    {
-      if (m_pFrame->pNextFrame)
-      {
-        m_iTimer %= m_pFrame->iDelay;
-        m_pFrame = m_pFrame->pNextFrame;
-
-				//if (m_pFrame->pEvent)
-				//	ExecuteEvent(m_pFrame->pEvent);
-      }
-      else
-        m_bPlaying = false;
-    }
-  }
-  
-	// Determine the surface area to render.
-	XRECT xRect(0, 0, GetWidth(), GetHeight());
-		
-	if (m_pAnimation && m_pFrame->pArea)
-		xRect = m_pFrame->pArea->xRect;
-	else if (m_pArea)
-		xRect = m_pArea->xRect;
-
-	// Render the sprite.
 	hgeSprite* pSurface = GetSurfaceTemplate()->pSurface;
-	pSurface->SetColor(SETA(pSurface->GetColor(), (XCHAR)(m_fAlpha * 255.f)));
+
+	XRECT xRect = m_pArea ? m_pArea->xRect : XRECT(0, 0, GetWidth(), GetHeight());
 
 	pSurface->SetHotSpot((float)xRect.GetWidth() / 2.f, (float)xRect.GetHeight() / 2.f);
+	pSurface->SetColor(SETA(pSurface->GetColor(), (XCHAR)(m_fAlpha * 255.f)));
 	pSurface->SetTextureRect((float)xRect.iLeft, (float)xRect.iTop, (float)xRect.GetWidth(), (float)xRect.GetHeight());
 
 	if (m_fRotation)
@@ -99,57 +65,130 @@ CSurfaceTemplate::CArea* CSprite::FindArea(CSurfaceTemplate* pTemplate, const XC
 	return NULL;
 }
 
-// =============================================================================
-// Author: Nat Ryall                                           Date: 12-Feb-2008
-// =============================================================================
-CSpriteTemplate::CAnimation* CSprite::FindAnimation(const XCHAR* pName)
-{
-  XEN_LIST_FOREACH(CSpriteTemplate::t_AnimationList, ppAnimation, m_pSpriteTemplate->lpAnimations)
-  {
-    if (strcmp((*ppAnimation)->pName, pName) == 0)
-      return *ppAnimation;
-  }
+//##############################################################################
+#pragma endregion
 
-  return NULL;
+#pragma region Animated Sprite
+//##############################################################################
+//
+//                               ANIMATED SPRITE
+//
+//##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                         16-Apr-2008
+// =============================================================================
+CAnimatedSprite::CAnimatedSprite(CSpriteTemplate* pTemplate) : CSprite(pTemplate),
+	m_iTimer(0),
+	m_bPlaying(false),
+	m_fpEvent(NULL),
+	m_pEventObject(NULL),
+	m_pFrame(NULL),
+	m_pAnimation(NULL)
+{
+}
+
+// =============================================================================
+// Nat Ryall                                                         16-Apr-2008
+// =============================================================================
+void CAnimatedSprite::Render()
+{
+	if (m_bPlaying)
+	{
+		if (m_pFrame->iDelay)
+			m_iTimer += _TIMEDELTA;
+
+		if (m_iTimer >= m_pFrame->iDelay)
+		{
+			if (m_pFrame->pNextFrame)
+			{
+				m_iTimer %= m_pFrame->iDelay;
+				SetFrame(m_pFrame->pNextFrame);
+			}
+			else
+				m_bPlaying = false;
+		}
+	}
+
+	CSprite::Render();
 }
 
 // =============================================================================
 // Author: Nat Ryall                                           Date: 12-Feb-2008
 // =============================================================================
-CSpriteTemplate::CFrame* CSprite::FindFrame(CSpriteTemplate::CAnimation* pAnimation, const XCHAR* pName)
+CSpriteTemplate::CAnimation* CAnimatedSprite::FindAnimation(CSpriteTemplate* pTemplate, const XCHAR* pName)
 {
-  XEN_LIST_FOREACH(CSpriteTemplate::t_FrameList, ppFrame, pAnimation->lpFrames)
-  {
-    if (strcmp((*ppFrame)->pName, pName) == 0)
-      return *ppFrame;
-  }
+	XEN_LIST_FOREACH(CSpriteTemplate::t_AnimationList, ppAnimation, pTemplate->lpAnimations)
+	{
+		if (strcmp((*ppAnimation)->pName, pName) == 0)
+			return *ppAnimation;
+	}
 
-  return NULL;
+	return NULL;
+}
+
+// =============================================================================
+// Nat Ryall                                                         16-Apr-2008
+// =============================================================================
+void CAnimatedSprite::SetAnimation(CSpriteTemplate::CAnimation* pAnimation)
+{
+	m_pAnimation = pAnimation;
+	SetFrame(pAnimation->lpFrames.front());
 }
 
 // =============================================================================
 // Author: Nat Ryall                                           Date: 19-Feb-2008
 // =============================================================================
-void CSprite::Play(CSpriteTemplate::CAnimation* pAnimation)
+void CAnimatedSprite::Play(CSpriteTemplate::CAnimation* pAnimation)
 {
-	m_pArea = NULL;
-  m_pAnimation = pAnimation;
-  m_pFrame = pAnimation->lpFrames.front();
+	SetAnimation(pAnimation);
+	Play();
+}
 
-  m_iTimer = 0;
-  m_bPlaying = true;
+// =============================================================================
+// Nat Ryall                                                         16-Apr-2008
+// =============================================================================
+void CAnimatedSprite::Play()
+{
+	m_iTimer = 0;
+	m_bPlaying = true;
 }
 
 // =============================================================================
 // Author: Nat Ryall                                           Date: 19-Feb-2008
 // =============================================================================
-void CSprite::Stop()
+void CAnimatedSprite::Stop()
 {
-  m_pAnimation = NULL;
-	m_pFrame = NULL;
+	SetFrame(m_pAnimation->lpFrames.front());
 
-  m_iTimer = 0;
-  m_bPlaying = false;
+	m_iTimer = 0;
+	m_bPlaying = false;
+}
+
+// =============================================================================
+// Author: Nat Ryall                                           Date: 12-Feb-2008
+// =============================================================================
+CSpriteTemplate::CFrame* CAnimatedSprite::FindFrame(CSpriteTemplate::CAnimation* pAnimation, const XCHAR* pName)
+{
+	XEN_LIST_FOREACH(CSpriteTemplate::t_FrameList, ppFrame, pAnimation->lpFrames)
+	{
+		if (strcmp((*ppFrame)->pName, pName) == 0)
+			return *ppFrame;
+	}
+
+	return NULL;
+}
+
+// =============================================================================
+// Nat Ryall                                                         16-Apr-2008
+// =============================================================================
+void CAnimatedSprite::SetFrame(CSpriteTemplate::CFrame* pFrame)
+{
+	m_pFrame = pFrame;
+	m_pArea = m_pFrame->pArea;
+
+	if (m_pFrame->pEvent && m_fpEvent)
+		m_fpEvent(m_pFrame->pEvent, m_pEventObject);
 }
 
 //##############################################################################

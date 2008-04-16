@@ -27,6 +27,19 @@
 //##############################################################################
 #pragma endregion
 
+#pragma region Types
+//##############################################################################
+//
+//                                   TYPES
+//
+//##############################################################################
+
+// Callbacks.
+typedef void (*t_AnimationEventCallback)(const XCHAR* /*Event*/, void* /*Object*/);
+
+//##############################################################################
+#pragma endregion
+
 #pragma region Templates
 //##############################################################################
 //
@@ -76,97 +89,137 @@ public:
 class CSpriteTemplate : public CResourceTemplate
 {
 public:
-  // Describes a single frame of an animation.
-  class CFrame
-  {
-  public:
-    // The named identifier for the frame.
-    const XCHAR* pName;
+	// Describes a single frame of an animation.
+	class CFrame
+	{
+	public:
+		// The named identifier for the frame.
+		const XCHAR* pName;
 
-    // The area to render for the animation frame.
-    CSurfaceTemplate::CArea* pArea;
+		// The area to render for the animation frame.
+		CSurfaceTemplate::CArea* pArea;
 
-    // The amount of time to hold the animation frame.
-    XUINT iDelay;
+		// The amount of time to hold the animation frame.
+		XUINT iDelay;
 
-    // The next frame in the animation sequence. If this is NULL, the animation stops here.
-    CFrame* pNextFrame;
-  };
+		// The event string for this frame. This is NULL unless an event is set.
+		const XCHAR* pEvent;
 
-  // Type shortcut for a frame list.
-  typedef XLIST<CFrame*> t_FrameList;
+		// The next frame in the animation sequence. If this is NULL, the animation stops here.
+		CFrame* pNextFrame;
+	};
 
-  // Describes an animation of frames using the specified surface.
-  class CAnimation
-  {
-  public:
-    // The named identifier of the animation.
-    const XCHAR* pName;
+	// Type shortcut for a frame list.
+	typedef XLIST<CFrame*> t_FrameList;
 
-    // The surface image to render the animation with.
-    CSurfaceTemplate* pSurfaceTemplate;
+	// Describes an animation of frames using the specified surface.
+	class CAnimation
+	{
+	public:
+		// The named identifier of the animation.
+		const XCHAR* pName;
+
+		// The surface image to render the animation with.
+		CSurfaceTemplate* pSurfaceTemplate;
 
 		// Animation time.
 		XUINT iTime;
 
-    // A list of frames used in the animation.
-    t_FrameList lpFrames;
-  };
+		// A list of frames used in the animation.
+		t_FrameList lpFrames;
+	};
 
-  // Type shortcut for an animation list.
-  typedef XLIST<CAnimation*> t_AnimationList;
+	// Type shortcut for an animation list.
+	typedef XLIST<CAnimation*> t_AnimationList;
 
 	// The default surface image to render with.
 	CSurfaceTemplate* pSurfaceTemplate;
 
-  // The default position to place the sprite at.
-  XPOINT xInitialPosition;
+	// The default position to place the sprite at.
+	XPOINT xInitialPosition;
 
-  // The default animation for the sprite.
-  const XCHAR* pInitialAnimation;
+	// The default animation for the sprite.
+	CAnimation* pInitialAnimation;
 
-  // The animations available in the sprite.
-  t_AnimationList lpAnimations;
+	// The animations available in the sprite.
+	t_AnimationList lpAnimations;
 };
 
 //##############################################################################
 #pragma endregion
 
-#pragma region Declaration
+#pragma region Sprite
 //##############################################################################
 //
-//                                 DECLARATION
+//                                   SPRITE
 //
 //##############################################################################
 class CSprite : public CResource, public CRenderable
 {
 public:
-  /**
-  * Constructor: Create a new sprite from a sprite template.
-  */
-  CSprite(CSpriteTemplate* pTemplate);
+	/**
+	* Constructor: Create a new sprite from a sprite template.
+	*/
+	CSprite(CSpriteTemplate* pTemplate);
 
-  /**
-  * Render the sprite at the current position with the current animation.
-  */
-  virtual void Render();
+	/**
+	* Render the sprite at the current position with the current animation.
+	*/
+	virtual void Render();
 
-  /**
-  * Set the sprite position in screen coordinates.
-  * @param bCentre Use the centre point of the sprite to offset the image.
-  */
-  void SetPosition(XPOINT xPosition, XBOOL bCentre = true)
-  {
+	/**
+	* Find an area by name from a surface template.
+	*/
+	static CSurfaceTemplate::CArea* FindArea(CSurfaceTemplate* pTemplate, const XCHAR* pName);
+
+	/**
+	* Find an area by name from the surface.
+	*/
+	CSurfaceTemplate::CArea* FindArea(const XCHAR* pName)
+	{
+		return FindArea(GetSurfaceTemplate(), pName);
+	}
+
+	/**
+	* Set the current surface area to render.
+	*/
+	void SetArea(CSurfaceTemplate::CArea* pArea)
+	{
+		m_pArea = pArea;
+	}
+
+	/**
+	* Set the current surface area to render by name.
+	*/
+	void SetArea(const XCHAR* pName)
+	{
+		SetArea(FindArea(pName));
+	}
+
+	/**
+	* Get the current area set for the sprite.
+	*/
+	CSurfaceTemplate::CArea* GetArea()
+	{
+		return m_pArea;
+	}
+
+	/**
+	* Set the sprite position in screen coordinates.
+	* @param bCentre Use the centre point of the sprite to offset the image.
+	*/
+	void SetPosition(XPOINT xPosition, XBOOL bCentre = true)
+	{
 		m_xPosition = bCentre ? xPosition : xPosition + (XPOINT(GetWidth(), GetHeight()) / 2);
-  }
+	}
 
-  /**
-  * Get the current sprite position in screen coordinates.
-  */
-  XPOINT GetPosition(XBOOL bCentre = true)
-  {
-    return bCentre ? m_xPosition : m_xPosition - (XPOINT(GetWidth(), GetHeight()) / 2);
-  }
+	/**
+	* Get the current sprite position in screen coordinates.
+	*/
+	XPOINT GetPosition(XBOOL bCentre = true)
+	{
+		return bCentre ? m_xPosition : m_xPosition - (XPOINT(GetWidth(), GetHeight()) / 2);
+	}
 
 	/**
 	* Set the alpha level of the sprite.
@@ -185,96 +238,140 @@ public:
 	{
 		return m_fAlpha;
 	}
-	
-	/**
-	* Find an area by name from a surface template.
-	*/
-	static CSurfaceTemplate::CArea* FindArea(CSurfaceTemplate* pTemplate, const XCHAR* pName);
 
 	/**
-	* Find an area by name from the surface.
+	* Set the rotation angle of the sprite.
+	* @param bDegrees Specify true if the angle is in degrees, otherwise the system assumes radians.
 	*/
-	CSurfaceTemplate::CArea* FindArea(const XCHAR* pName)
+	void SetRotation(XFLOAT fAngle, XBOOL bDegrees = false)
 	{
-		return FindArea(GetSurfaceTemplate(), pName);
+		m_fRotation = !bDegrees ? fAngle : (fAngle / 180.0f) * M_PI;
 	}
 
 	/**
-	* Set the current surface area to render.
-	* @note This will stop and reset any current animation.
+	* Get the rotation angle of the sprite.
+	* @param bDegrees Specify true to get the angle in degrees, otherwise returns the angle in radians.
 	*/
-	void SetArea(CSurfaceTemplate::CArea* pArea)
+	XFLOAT GetRotation(XBOOL bDegrees = false)
 	{
-		Stop();
-		m_pArea = pArea;
+		return !bDegrees ? m_fRotation : m_fRotation * (180.0f / M_PI);
 	}
 
 	/**
-	* Set the current surface area to render by name.
-	* @note This will stop and reset any current animation.
+	* Get the width of the current frame.
 	*/
-	void SetArea(const XCHAR* pName)
+	XUINT GetWidth()
 	{
-		SetArea(FindArea(pName));
+		return m_pArea ? m_pArea->xRect.GetWidth() : GetSurfaceWidth();
 	}
 
 	/**
-	* Get the current area set for the sprite.
+	* Get the height of the current frame.
 	*/
-	CSurfaceTemplate::CArea* GetArea()
+	XUINT GetHeight()
 	{
-		return m_pArea;
+		return m_pArea ? m_pArea->xRect.GetHeight() : GetSurfaceHeight();
 	}
 
 	/**
-	* Set the current animation frame within the sprite.
+	* Get the width of the entire surface.
 	*/
-	void SetFrame(CSpriteTemplate::CFrame* pFrame)
+	XUINT GetSurfaceWidth()
 	{
-		m_pFrame = pFrame;
+		return (XUINT)GetSurfaceTemplate()->pSurface->GetWidth();
 	}
 
 	/**
-	* Set the current animation frame by name.
+	* Get the height of the entire surface.
 	*/
-	void SetFrame(const XCHAR* pName)
+	XUINT GetSurfaceHeight()
 	{
-		SetFrame(FindFrame(m_pAnimation, pName));
+		return (XUINT)GetSurfaceTemplate()->pSurface->GetHeight();
 	}
 
-  /**
-  * Find a frame by name from the specified animation.
-  */
-  static CSpriteTemplate::CFrame* FindFrame(CSpriteTemplate::CAnimation* pAnimation, const XCHAR* pName);
+	/**
+	* Get a screen area rect for the current frame.
+	*/
+	XRECT GetScreenRect(XPOINT xPosition)
+	{
+		return XRECT(m_xPosition.iX, m_xPosition.iY, m_xPosition.iX + GetWidth(), m_xPosition.iY + GetHeight());
+	}
 
-  /**
-  * Find a frame by name from an animation specified by name also.
-  */
-  CSpriteTemplate::CFrame* FindFrame(const XCHAR* pAnimName, const XCHAR* pFrameName)
-  {
-    return FindFrame(FindAnimation(pAnimName), pFrameName);
-  }
+	/**
+	* Return the current sprite template. This is for advanced use only.
+	*/
+	CSpriteTemplate* GetSpriteTemplate()
+	{
+		return m_pSpriteTemplate;
+	}
 
-  /**
-  * Get the current animation frame set within the sprite.
-  */
-  CSpriteTemplate::CFrame* GetFrame()
-  {
-    return m_pFrame;
-  }
+	/**
+	* Return the current surface template. This is for advanced use only.
+	*/
+	virtual CSurfaceTemplate* GetSurfaceTemplate()
+	{
+		return m_pSpriteTemplate->pSurfaceTemplate;
+	}
 
-  /**
-  * Check if the current animation frame name matches the name specified.
-  */
-  XBOOL IsCurrentFrame(const XCHAR* pName)
-  {
-    return m_pFrame->pName && strcmp(m_pFrame->pName, pName) == 0;
-  }
+protected:
+	// The sprite template containing rendering information.
+	CSpriteTemplate* m_pSpriteTemplate;
+
+	// The visibility status of the sprite.
+	//XBOOL m_bVisible;
+
+	// The current position of the sprite.
+	XPOINT m_xPosition;
+
+	// The current alpha level of the sprite.
+	XFLOAT m_fAlpha;
+
+	// The current rotation angle in radians.
+	XFLOAT m_fRotation;
+
+	// The current area for the surface.
+	CSurfaceTemplate::CArea* m_pArea;
+};
+
+//##############################################################################
+#pragma endregion
+
+#pragma region Animated Sprite
+//##############################################################################
+//
+//                               ANIMATED SPRITE
+//
+//##############################################################################
+class CAnimatedSprite : public CSprite
+{
+public:
+	/**
+	* Constructor: Create a new animated sprite from a sprite template.
+	*/
+	CAnimatedSprite(CSpriteTemplate* pTemplate);
+
+	/**
+	* Render the sprite at the current position with the current animation.
+	*/
+	virtual void Render();
+
+	/**
+	* Find an animation by name from the specified sprite template.
+	*/
+	static CSpriteTemplate::CAnimation* FindAnimation(CSpriteTemplate* pTemplate, const XCHAR* pName);
 
 	/**
 	* Find an animation by name.
 	*/
-	CSpriteTemplate::CAnimation* FindAnimation(const XCHAR* pName);
+	CSpriteTemplate::CAnimation* FindAnimation(const XCHAR* pName)
+	{
+		return FindAnimation(m_pSpriteTemplate, pName);
+	}
+
+	/**
+	* Set the current animation playing. This will not change the play state.
+	*/
+	void SetAnimation(CSpriteTemplate::CAnimation* pAnimation);
 
 	/**
 	* Get the current animation set within the sprite.
@@ -300,151 +397,131 @@ public:
 		return m_pAnimation != NULL;
 	}
 
-  /**
-  * Play an animation using an animation descriptor.
-	* @note This will invalidate any area that has been set.
-  */
-  void Play(CSpriteTemplate::CAnimation* pAnimation);
-
-  /**
-  * Play an animation by name.
-	* @note This will invalidate any area that has been set.
-  */
-  void Play(const XCHAR* pName)
-  {
-    Play(FindAnimation(pName));
-  }
-
-  /**
-  * Stop the animation from playing but keep the current frame and timer.
-  */
-  void Pause()
-  {
-    m_bPlaying = false;
-  }
-
-  /**
-  * Resume the animation playback from a previously paused state.
-  */
-  void Resume()
-  {
-    m_bPlaying = true;
-  }
-
-  /**
-  * Stop the animation from playing and reset the animation frame back to the first.
-  */
-  void Stop();
-
-  /**
-  * Check if any animation is currently playing.
-  */
-  XBOOL IsPlaying()
-  {
-    return m_bPlaying;
-  }
-
-  /**
-  * Get the width of the current frame.
-  */
-  XUINT GetWidth()
-  {
-		return IsAnimated() ? m_pFrame->pArea->xRect.GetWidth() : (m_pArea ? m_pArea->xRect.GetWidth() : GetSurfaceWidth());
-  }
-
-  /**
-  * Get the height of the current frame.
-  */
-  XUINT GetHeight()
-  {
-		return IsAnimated() ? m_pFrame->pArea->xRect.GetHeight() : (m_pArea ? m_pArea->xRect.GetHeight() : GetSurfaceHeight());
-  }
+	/**
+	* Reset all frames and timings and play the specified animation.
+	*/
+	void Play(CSpriteTemplate::CAnimation* pAnimation);
 
 	/**
-	* Get the width of the entire surface.
+	* Reset all frames and timings and play the specified animation.
 	*/
-	XUINT GetSurfaceWidth()
+	void Play(const XCHAR* pName)
 	{
-		return (XUINT)GetSurfaceTemplate()->pSurface->GetWidth();
+		Play(FindAnimation(pName));
 	}
 
 	/**
-	* Get the height of the entire surface.
+	* Reset all frames and timings and play the existing animation.
 	*/
-	XUINT GetSurfaceHeight()
-	{
-		return (XUINT)GetSurfaceTemplate()->pSurface->GetHeight();
-	}
-
-  /**
-  * Get a screen area rect for the current frame.
-  */
-  XRECT GetScreenRect(XPOINT xPosition)
-  {
-    return XRECT(m_xPosition.iX, m_xPosition.iY, m_xPosition.iX + GetWidth(), m_xPosition.iY + GetHeight());
-  }
+	void Play();
 
 	/**
-	* Set the rotation angle of the sprite.
-	* @param bDegrees Specify true if the angle is in degrees, otherwise the system assumes radians.
+	* Stop the animation from playing but keep the current frame and timer.
 	*/
-	void SetRotation(XFLOAT fAngle, XBOOL bDegrees = false)
+	void Pause()
 	{
-		m_fRotation = !bDegrees ? fAngle : (fAngle / 180.0f) * M_PI;
+		m_bPlaying = false;
 	}
 
 	/**
-	* Get the rotation andle of the sprite.
-	* @param bDegrees Specify true to get the angle in degrees, otherwise returns the angle in radians.
+	* Resume the animation playback from a previously paused state.
 	*/
-	XFLOAT GetRotation(XBOOL bDegrees = false)
+	void Resume()
 	{
-		return !bDegrees ? m_fRotation : m_fRotation * (180.0f / M_PI);
+		m_bPlaying = true;
 	}
 
 	/**
-	* Return the current sprite template. This is for advanced use only.
+	* Stop the animation from playing and reset the animation frame back to the first.
 	*/
-	CSpriteTemplate* GetSpriteTemplate()
+	void Stop();
+
+	/**
+	* Check if any animation is currently playing.
+	*/
+	XBOOL IsPlaying()
 	{
-		return m_pSpriteTemplate;
+		return m_bPlaying;
+	}
+
+	/**
+	* Find a frame by name from the specified animation.
+	*/
+	static CSpriteTemplate::CFrame* FindFrame(CSpriteTemplate::CAnimation* pAnimation, const XCHAR* pName);
+
+	/**
+	* Find a frame by name from an animation specified by name also.
+	*/
+	CSpriteTemplate::CFrame* FindFrame(const XCHAR* pAnimName, const XCHAR* pFrameName)
+	{
+		return FindFrame(FindAnimation(pAnimName), pFrameName);
+	}
+
+	/**
+	* Set the current animation frame within the sprite.
+	*/
+	void SetFrame(CSpriteTemplate::CFrame* pFrame);
+
+	/**
+	* Set the current animation frame by name.
+	*/
+	void SetFrame(const XCHAR* pName)
+	{
+		SetFrame(FindFrame(m_pAnimation, pName));
+	}
+
+	/**
+	* Get the current animation frame set within the sprite.
+	*/
+	CSpriteTemplate::CFrame* GetFrame()
+	{
+		return m_pFrame;
+	}
+
+	/**
+	* Check if the current animation frame name matches the name specified.
+	*/
+	XBOOL IsCurrentFrame(const XCHAR* pName)
+	{
+		return m_pFrame->pName && strcmp(m_pFrame->pName, pName) == 0;
+	}
+
+	/**
+	* Set the callback for all the sprite's animation events.
+	* @param fpCallback Specify NULL to disable this callback.
+	*/
+	void SetEventCallback(t_AnimationEventCallback fpCallback, void* pObject = NULL)
+	{
+		m_fpEvent = fpCallback;
+		m_pEventObject = pObject;
 	}
 
 	/**
 	* Return the current surface template. This is for advanced use only.
 	*/
-	CSurfaceTemplate* GetSurfaceTemplate()
+	virtual CSurfaceTemplate* GetSurfaceTemplate()
 	{
-		return IsAnimated() ? m_pAnimation->pSurfaceTemplate : m_pSpriteTemplate->pSurfaceTemplate;
+		return m_pAnimation->pSurfaceTemplate;
 	}
 
 protected:
-  // The sprite template containing rendering information.
-  CSpriteTemplate* m_pSpriteTemplate;
+	// The delay timer used for frame timings.
+	XUINT m_iTimer;
 
-  // The current position of the sprite.
-  XPOINT m_xPosition;
+	// The playback control flag.
+	XBOOL m_bPlaying;
 
-	// The current alpha level of the sprite.
-	XFLOAT m_fAlpha;
+	// The animation event callback.
+	t_AnimationEventCallback m_fpEvent;
 
-	// The current rotation angle in radians.
-	XFLOAT m_fRotation;
-
-  // The delay timer used for frame timings.
-  XUINT m_iTimer;
-
-  // The playback control flag.
-  XBOOL m_bPlaying;
-
-	// The current area for the surface.
-	CSurfaceTemplate::CArea* m_pArea;
+	// The animation event custom object pointer.
+	void* m_pEventObject;
 
 	// The current frame of the animation we are playing.
 	CSpriteTemplate::CFrame* m_pFrame;
 
-  // The current animation we are playing.
-  CSpriteTemplate::CAnimation* m_pAnimation;
+	// The current animation we are playing.
+	CSpriteTemplate::CAnimation* m_pAnimation;
 };
 
 //##############################################################################
