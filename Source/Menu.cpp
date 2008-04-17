@@ -157,9 +157,10 @@ void CMenuScreen::Load()
 	{
 		// Main.
 		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Play,		0, "Play Online",	&Callback_StartGame),
-		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Options, 1, "Options",			NULL),
-		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Credits, 2, "Credits",			NULL),
-		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Exit,		3, "Exit",				&Callback_QuitGame),
+		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Credits, 1, "Tutorial",		NULL),
+		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Options, 2, "Options",			NULL),
+		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Credits, 3, "Credits",			NULL),
+		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Exit,		4, "Exit",				&Callback_QuitGame),
 
 		// Play.
 		new CMenuLink(MenuGroupIndex_Play, MenuElementIndex_Link_Find,		0, "Find",				NULL),

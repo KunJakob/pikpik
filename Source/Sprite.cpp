@@ -37,9 +37,9 @@ CSprite::CSprite(CSpriteTemplate* pTemplate) : CRenderable(RenderableType_Sprite
 // =============================================================================
 void CSprite::Render()
 {
-	hgeSprite* pSurface = GetSurfaceTemplate()->pSurface;
-
 	XRECT xRect = m_pArea ? m_pArea->xRect : XRECT(0, 0, GetWidth(), GetHeight());
+
+	hgeSprite* pSurface = GetSurfaceTemplate()->pSurface;
 
 	pSurface->SetHotSpot((float)xRect.GetWidth() / 2.f, (float)xRect.GetHeight() / 2.f);
 	pSurface->SetColor(SETA(pSurface->GetColor(), (XCHAR)(m_fAlpha * 255.f)));

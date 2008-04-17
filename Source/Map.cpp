@@ -77,13 +77,6 @@ static const XFLOAT s_fRotationAngleLookup[] =
 	0.0f,
 };
 
-// The current and next maps.
-static CMap* s_pCurrentMap = NULL;
-static CMap* s_pNextMap = NULL;
-
-// The player to track on the map.
-static CPlayer* s_pPlayer = NULL;
-
 //##############################################################################
 #pragma endregion
 
@@ -111,6 +104,7 @@ public:
 		s_pTileAreas[TileType_Blank]				= s_pTiles->FindArea("Blank");
 		s_pTileAreas[TileType_Pellet]				= s_pTiles->FindArea("Pellet");
 		s_pTileAreas[TileType_Power]				= s_pTiles->FindArea("Power");
+		s_pTileAreas[TileType_Eaten]				= s_pTiles->FindArea("Eaten");
 		s_pTileAreas[TileType_Solo]					= s_pTiles->FindArea("Solo");
 		s_pTileAreas[TileType_Tunnel]				= s_pTiles->FindArea("Tunnel");
 		s_pTileAreas[TileType_Cap]					= s_pTiles->FindArea("Cap");
@@ -139,6 +133,39 @@ public:
 	}
 } 
 s_Module;
+
+//##############################################################################
+#pragma endregion
+
+#pragma region Block
+//##############################################################################
+//
+//                                   BLOCK
+//
+//##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                         17-Apr-2008
+// =============================================================================
+XBOOL CMapBlock::IsVisible(CPlayer* pPlayer)
+{
+	/*switch (pPlayer->GetType())
+	{
+	case PlayerType_PacMan:
+		{
+			return true;
+		}
+		break;
+
+	case PlayerType_Ghost:
+		{
+			return true;
+		}
+		break;
+	}*/
+
+	return true;
+}
 
 //##############################################################################
 #pragma endregion
@@ -181,6 +208,7 @@ CMap::CMap(const XCHAR* pID) : CRenderable(RenderableType_Map)
 			pBlock->iType = TileType_Blank;
 			pBlock->fRotation = 0.f;
 			pBlock->xPosition = XPOINT(iX, iY);
+			pBlock->bEaten = false;
 			pBlock->fVisibility = 0.f;
 
 			pBlock->pAdjacents[AdjacentDir_Left]		= (iIndex % m_iWidth > 0) ? &m_xBlocks[iIndex - 1] : NULL;
@@ -196,11 +224,13 @@ CMap::CMap(const XCHAR* pID) : CRenderable(RenderableType_Map)
 		
 		switch (pBlock->cChar)
 		{
+		// Debug.
+		case '^': pBlock->iType = TileType_Pellet; pBlock->bEaten = true;		break;	
+
 		// Special.
 		case '*': pBlock->iType = TileType_Pellet;		break;
 		case '@': pBlock->iType = TileType_Power;			break;
 		case '=': pBlock->iType = TileType_Entrance;	break;
-		case '%': pBlock->iType = TileType_Base;			break;
 
 		// Wall.
 		case '#':
@@ -220,7 +250,13 @@ CMap::CMap(const XCHAR* pID) : CRenderable(RenderableType_Map)
 
 		// Spawn.
 		case '$': 
-			m_lpSpawnBlocks.push_back(pBlock); 
+			pBlock->iType = TileType_Pellet;
+			m_lpSpawnPoints[PlayerType_PacMan].push_back(pBlock); 
+			break;
+
+		case '%': 
+			pBlock->iType = TileType_Base;
+			m_lpSpawnPoints[PlayerType_Ghost].push_back(pBlock);
 			break;
 		}
 	}
@@ -239,13 +275,18 @@ CMap::~CMap()
 // =============================================================================
 void CMap::Update()
 {
-	if (s_pPlayer->m_iType == PlayerType_Ghost)
+	if (_GLOBAL.pActivePlayer->m_iType == PlayerType_Ghost)
 	{
 		for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
-			m_xBlocks[iA].fVisibility = m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsBase() ? 1.f : .0f;
-		
-		AddVisibility(s_pPlayer->m_pCurrentBlock, 1.0f - s_pPlayer->m_fTransition);
-		AddVisibility(s_pPlayer->m_pTargetBlock, s_pPlayer->m_fTransition);
+			m_xBlocks[iA].fVisibility = m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsBase();
+
+		AddVisibility(_GLOBAL.pActivePlayer->m_pCurrentBlock, 1.0f - _GLOBAL.pActivePlayer->m_fTransition);
+		AddVisibility(_GLOBAL.pActivePlayer->m_pTargetBlock, _GLOBAL.pActivePlayer->m_fTransition);
+	}
+	else
+	{
+		for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
+			m_xBlocks[iA].fVisibility = 1.f;
 	}
 }
 
@@ -256,26 +297,14 @@ void CMap::AddVisibility(CMapBlock* pBase, XFLOAT fVisibility)
 {
 	pBase->fVisibility += fVisibility;
 
-	/*for (XUINT iA = 0; iA < AdjacentDir_Max; ++iA)
-	{
-		if (pBase->pAdjacents[iA] && pBase->pAdjacents[iA]->IsWall())
-			pBase->pAdjacents[iA]->fVisibility += fVisibility;
-	}*/
-
 	for (XUINT iA = 0; iA < AdjacentDir_Max; ++iA)
 	{
 		CMapBlock* pBlock = pBase;
 
-		while (pBlock->pAdjacents[iA] && !pBlock->pAdjacents[iA]->IsBase() && !pBlock->pAdjacents[iA]->IsWall())
+		while (pBlock->pAdjacents[iA] && !pBlock->pAdjacents[iA]->IsWall())
 		{
 			pBlock = pBlock->pAdjacents[iA];
 			pBlock->fVisibility += fVisibility;
-
-			/*for (XUINT iB = 0; iB < AdjacentDir_Max; ++iB)
-			{
-				if (pBlock->pAdjacents[iB] && pBlock->pAdjacents[iB]->IsWall())
-					pBlock->pAdjacents[iB]->fVisibility += fVisibility;
-			}*/
 		}
 	}
 }
@@ -288,48 +317,12 @@ void CMap::Render()
 	for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
 	{
 		s_pTiles->SetAlpha(m_xBlocks[iA].fVisibility);
-
 		s_pTiles->SetRotation(m_xBlocks[iA].fRotation, true);
 		s_pTiles->SetArea(s_pTileAreas[m_xBlocks[iA].iType]);
 		s_pTiles->SetPosition(m_xBlocks[iA].GetScreenPosition() - m_xOffset);
 		s_pTiles->Render();
 	}
 }
-
-//##############################################################################
-#pragma endregion
-
-#pragma region Manager
-//##############################################################################
-//
-//                                   MANAGER
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         13-Apr-2008
-// =============================================================================
-void MapManager::SetMap(CMap* pMap)
-{
-	s_pCurrentMap = pMap;
-}
-
-// =============================================================================
-// Nat Ryall                                                         13-Apr-2008
-// =============================================================================
-CMap* MapManager::GetMap()
-{
-	return s_pCurrentMap;
-}
-
-// =============================================================================
-// Nat Ryall                                                         16-Apr-2008
-// =============================================================================
-void MapManager::SetPlayer(CPlayer* pPlayer)
-{
-	s_pPlayer = pPlayer;
-}
-
 
 //##############################################################################
 #pragma endregion

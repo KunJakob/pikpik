@@ -46,7 +46,7 @@ static XPOINT s_xOffset;
 // =============================================================================
 // Nat Ryall                                                         14-Apr-2008
 // =============================================================================
-/*void WorldTransform(CRenderable* pRenderable)
+void WorldTransform(CRenderable* pRenderable)
 {
 	switch (pRenderable->GetRenderableType())
 	{
@@ -54,12 +54,26 @@ static XPOINT s_xOffset;
 		{
 			CMap* pMap = (CMap*)pRenderable;
 			pMap->SetOffset(s_xOffset);
+			pMap->Render();
 		}
 		break;
-	}
 
-	pRenderable->Render();
-}*/
+	case RenderableType_Player:
+		{
+			CPlayer* pPlayer = (CPlayer*)pRenderable;
+
+			XPOINT xPosition = pPlayer->GetSprite()->GetPosition();
+
+			pPlayer->GetSprite()->SetPosition(xPosition - s_xOffset);
+			pPlayer->Render();
+			pPlayer->GetSprite()->SetPosition(xPosition);
+		}
+		break;
+
+	default:
+		pRenderable->Render();
+	}
+}
 
 //##############################################################################
 #pragma endregion
@@ -76,21 +90,22 @@ static XPOINT s_xOffset;
 // =============================================================================
 void CGameScreen::Load()
 {
-	m_pMap = new CMap(XFORMAT("M%03d", 3));
-	MapManager::SetMap(m_pMap);
+	_GLOBAL.pActiveMap = new CMap(XFORMAT("M%03d", 3));
 
-	m_pPacMan = new CPacMan;
-	m_pGhost = new CGhost;
-
-	MapManager::SetPlayer(m_pGhost);
+	_GLOBAL.lpPlayers.push_back(new CPacMan);
+	_GLOBAL.lpPlayers.push_back(new CGhost);
+	_GLOBAL.lpPlayers.push_back(new CGhost);
+	_GLOBAL.lpPlayers.push_back(new CGhost);
+	_GLOBAL.pActivePlayer = _GLOBAL.lpPlayers.front();
 
 	RenderManager::Add(LayerIndex_Background, &m_Background);
-	RenderManager::Add(LayerIndex_Map, m_pMap);
-	RenderManager::Add(LayerIndex_Player, m_pGhost);
-	RenderManager::Add(LayerIndex_Player, m_pPacMan);
+	RenderManager::Add(LayerIndex_Map, _GLOBAL.pActiveMap);
 
-	//RenderManager::SetRenderCallback(LayerIndex_Map, &WorldTransform);
-	//RenderManager::SetRenderCallback(LayerIndex_Player, &WorldTransform);
+	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, _GLOBAL.lpPlayers)
+		RenderManager::Add(LayerIndex_Player, *ppPlayer);
+
+	RenderManager::SetRenderCallback(LayerIndex_Map, &WorldTransform);
+	RenderManager::SetRenderCallback(LayerIndex_Player, &WorldTransform);
 }
 
 // =============================================================================
@@ -100,9 +115,8 @@ void CGameScreen::Unload()
 {
 	RenderManager::Reset();
 
-	delete m_pGhost;
-	delete m_pPacMan;
-	delete m_pMap;
+	XEN_LIST_ERASEMEM(_GLOBAL.lpPlayers);
+	delete _GLOBAL.pActiveMap;
 }
 
 // =============================================================================
@@ -116,7 +130,24 @@ void CGameScreen::Update()
 		return;
 	}
 
-	//s_xOffset = (m_pPacMan->m_pCurrentBlock->xPosition * 48) - XPOINT(_HSWIDTH, _HSHEIGHT);
+	if (_HGE->Input_KeyDown(HGEK_SPACE))
+	{
+		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, _GLOBAL.lpPlayers)
+		{
+			if (_GLOBAL.pActivePlayer == *ppPlayer)
+			{
+				if (*ppPlayer == _GLOBAL.lpPlayers.back())
+					_GLOBAL.pActivePlayer = _GLOBAL.lpPlayers.front();
+				else
+				{
+					ppPlayer++;
+					_GLOBAL.pActivePlayer = *ppPlayer;
+				}
+			}
+		}
+	}
+
+	s_xOffset = _GLOBAL.pActivePlayer->GetSprite()->GetPosition() - XPOINT(_HSWIDTH, _HSHEIGHT);
 }
 
 // =============================================================================

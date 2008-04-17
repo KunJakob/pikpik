@@ -52,13 +52,6 @@ public:
 protected:
 	// The map background.
 	CBackground m_Background;
-
-	// The current map being played.
-	CMap* m_pMap;
-
-	// The player characters.
-	CPacMan* m_pPacMan;
-	CGhost* m_pGhost;
 };
 
 //##############################################################################

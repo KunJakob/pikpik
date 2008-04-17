@@ -71,16 +71,19 @@ void CPlayer::Update()
 	{
 	case PlayerState_Idle:
 		{
-			for (XUINT iA = 0; iA < AdjacentDir_Max; ++iA)
+			if (this == _GLOBAL.pActivePlayer)
 			{
-				if (_HGE->Input_GetKeyState(HGEK_LEFT + iA) && m_pCurrentBlock->pAdjacents[iA] && IsPassable(m_pCurrentBlock->pAdjacents[iA]))
+				for (XUINT iA = 0; iA < AdjacentDir_Max; ++iA)
 				{
-					m_pTargetBlock = m_pCurrentBlock->pAdjacents[iA];
-					m_iTransitionDir = (t_AdjacentDir)iA;
-					m_iTime = 0;
-					m_fTransition = 0.f;
+					if (_HGE->Input_GetKeyState(HGEK_LEFT + iA) && m_pCurrentBlock->pAdjacents[iA] && IsPassable(m_pCurrentBlock->pAdjacents[iA]))
+					{
+						m_pTargetBlock = m_pCurrentBlock->pAdjacents[iA];
+						m_iTransitionDir = (t_AdjacentDir)iA;
+						m_iTime = 0;
+						m_fTransition = 0.f;
 
-					SetState(PlayerState_Move);
+						SetState(PlayerState_Move);
+					}
 				}
 			}
 		}
@@ -112,6 +115,10 @@ void CPlayer::Update()
 		break;
 	}
 
+	if (this != _GLOBAL.pActivePlayer)
+		m_pSprite->SetAlpha(m_pCurrentBlock->fVisibility);
+	else
+		m_pSprite->SetAlpha(1.f);
 }
 
 // =============================================================================
@@ -148,8 +155,8 @@ void CPlayer::OnAnimationEvent(const XCHAR* pEvent, void* pObject)
 
 	if (strcmp(pEvent, "Eat") == 0)
 	{
-		if (pPlayer->m_pTargetBlock->iType == TileType_Pellet)
-			pPlayer->m_pTargetBlock->iType = TileType_Blank;
+		if (pPlayer->m_pTargetBlock->iType == TileType_Pellet || pPlayer->m_pTargetBlock->iType == TileType_Power)
+			pPlayer->m_pTargetBlock->iType = TileType_Eaten;
 	}
 }
 
@@ -168,10 +175,18 @@ void CPlayer::OnAnimationEvent(const XCHAR* pEvent, void* pObject)
 // =============================================================================
 CPacMan::CPacMan() : CPlayer(PlayerType_PacMan, "Player-PacMan")
 {
-	m_pCurrentBlock = _MAP->GetSpawnBlock(/*PlayerType_PacMan*/);
+	m_pCurrentBlock = _GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_PacMan);
 	m_pSprite->SetPosition(m_pCurrentBlock->GetScreenPosition());
 
 	SetState(PlayerState_Idle);
+}
+
+// =============================================================================
+// Nat Ryall                                                         17-Apr-2008
+// =============================================================================
+void CPacMan::Update()
+{
+	CPlayer::Update();
 }
 
 // =============================================================================
@@ -183,8 +198,8 @@ void CPacMan::SetState(t_PlayerState iState)
 	{
 	case PlayerState_Idle:
 		{
-			if (!m_pSprite->IsCurrentAnimation("Move"))
-				m_pSprite->Play("Move");
+			if (!m_pSprite->IsCurrentAnimation("Idle"))
+				m_pSprite->Play("Idle");
 		}
 		break;
 
@@ -217,7 +232,7 @@ void CPacMan::SetState(t_PlayerState iState)
 CGhost::CGhost() : CPlayer(PlayerType_Ghost, "Player-Ghost"),
 	m_pEyes(NULL)
 {
-	m_pCurrentBlock = _MAP->GetSpawnBlock(/*PlayerType_Ghost*/);
+	m_pCurrentBlock = _GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_Ghost);
 	m_pSprite->SetPosition(m_pCurrentBlock->GetScreenPosition());
 
 	m_pEyes = ResourceManager::CreateSprite("Player-Ghost-Eyes");
@@ -240,7 +255,6 @@ CGhost::~CGhost()
 void CGhost::Update()
 {
 	CPlayer::Update();
-	m_pEyes->SetPosition(m_pSprite->GetPosition());
 }
 
 // =============================================================================
@@ -249,6 +263,9 @@ void CGhost::Update()
 void CGhost::Render()
 {
 	CPlayer::Render();
+
+	//m_pEyes->SetAlpha((m_pSprite->GetAlpha());
+	m_pEyes->SetPosition(m_pSprite->GetPosition());
 	m_pEyes->Render();
 }
 

@@ -35,6 +35,7 @@ enum t_TileType
 	TileType_Blank,
 	TileType_Pellet,
 	TileType_Power,
+	TileType_Eaten,
 	TileType_Solo,
 	TileType_Tunnel,
 	TileType_Cap,
@@ -49,6 +50,7 @@ enum t_TileType
 // Adjacent direction.
 enum t_AdjacentDir
 {
+	AdjacentDir_None = -1,
 	AdjacentDir_Left,
 	AdjacentDir_Up,
 	AdjacentDir_Right,
@@ -91,6 +93,11 @@ public:
 	}
 
 	/**
+	* Check if the specified player can see this block.
+	*/
+	XBOOL IsVisible(CPlayer* pPlayer);
+
+	/**
 	* Get the screen position of a block.
 	*/
 	XPOINT GetScreenPosition()
@@ -109,6 +116,9 @@ public:
 
 	// The map block position.
 	XPOINT xPosition;
+
+	// The block "eaten" status.
+	XBOOL bEaten;
 
 	// The block visibility.
 	XFLOAT fVisibility;
@@ -220,9 +230,9 @@ public:
 	/**
 	* Get a random player spawn block.
 	*/
-	CMapBlock* GetSpawnBlock()
+	CMapBlock* GetSpawnBlock(t_PlayerType iPlayerType)
 	{
-		return m_lpSpawnBlocks[rand() % m_lpSpawnBlocks.size()];
+		return m_lpSpawnPoints[iPlayerType][rand() % m_lpSpawnPoints[iPlayerType].size()];
 	}
 
 protected:
@@ -245,38 +255,11 @@ protected:
 	CMapBlock* m_xBlocks;
 
 	// The list of player spawn positions.
-	t_MapBlockList m_lpSpawnBlocks;	
+	t_MapBlockList m_lpSpawnPoints[PlayerType_Max];	
 
 	// The current map offset in pixels.
 	XPOINT m_xOffset;
 };
-
-//##############################################################################
-#pragma endregion
-
-#pragma region Declaration
-//##############################################################################
-//
-//                                 DECLARATION
-//
-//##############################################################################
-namespace MapManager
-{
-	/**
-	* Set the currently active map.
-	*/
-	void SetMap(CMap* pMap);
-
-	/**
-	* Get the currently active map.
-	*/
-	CMap* GetMap();
-
-	/**
-	* Set the currently active player.
-	*/
-	void SetPlayer(CPlayer* pPlayer);
-}
 
 //##############################################################################
 #pragma endregion

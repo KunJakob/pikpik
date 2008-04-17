@@ -7,17 +7,18 @@
 {
 	.File "Surfaces\Map-Blocks.png"
 	
-	.Area "Blank"			{ .Rect 0   0 48  48 }
+	.Area "Blank"			{ .Rect 144 0 192 48 }
 	.Area "Pellet"			{ .Rect 48  0 96  48 }
 	.Area "Power"			{ .Rect 96  0 144 48 }
-	.Area "Solo"			{ .Rect 144 0 192 48 }
-	.Area "Tunnel"			{ .Rect 192 0 240 48 }
-	.Area "Cap"				{ .Rect 240 0 288 48 }
-	.Area "Corner"			{ .Rect 288 0 336 48 }
-	.Area "Junction"		{ .Rect 336 0 384 48 }
-	.Area "Intersection"	{ .Rect 384 0 432 48 }
-	.Area "Entrance"		{ .Rect 432 0 480 48 }
-	.Area "Base"			{ .Rect 480 0 528 48 }
+	.Area "Eaten"			{ .Rect 144 0 192 48 }
+	.Area "Solo"			{ .Rect 192 0 240 48 }
+	.Area "Tunnel"			{ .Rect 240 0 288 48 }
+	.Area "Cap"				{ .Rect 288 0 336 48 }
+	.Area "Corner"			{ .Rect 336 0 384 48 }
+	.Area "Junction"		{ .Rect 384 0 432 48 }
+	.Area "Intersection"	{ .Rect 432 0 480 48 }
+	.Area "Entrance"		{ .Rect 480 0 528 48 }
+	.Area "Base"			{ .Rect 528 0 576 48 }
 }
 
 .Surface "Menu-Background"

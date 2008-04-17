@@ -59,11 +59,11 @@
 #define _SRECT          XRECT(0, 0, _SWIDTH, _SHEIGHT)
 
 // Shortcuts.
+#define _GLOBAL					CGlobal::Get()
 #define _HGE						Application::GetInterface()
 #define _TERMINATE			Application::Terminate()
 #define _TIMEDELTA			Application::GetTimeDelta()
 #define _TIMEDELTAF			_HGE->Timer_GetDelta()
-#define _MAP						MapManager::GetMap()
 
 // Colour manipulations.
 #define COLOURF(COLF) \
@@ -81,6 +81,20 @@
 //                                   TYPES
 //
 //##############################################################################
+
+// Predeclare.
+class CMap;
+class CSurface;
+class CSprite;
+class CPlayer;
+
+// The player identifier type.
+enum t_PlayerType
+{
+	PlayerType_Ghost,
+	PlayerType_PacMan,
+	/*MAX*/PlayerType_Max,
+};
 
 // Screen index.
 enum t_ScreenIndex
@@ -116,11 +130,9 @@ enum t_RenderableType
 };
 
 // Common list types.
-class CSurface;
-class CSprite;
-
 typedef XLIST<CSurface*> t_SurfaceList;
 typedef XLIST<CSprite*> t_SpriteList;
+typedef XLIST<CPlayer*> t_PlayerList;
 
 //##############################################################################
 #pragma endregion
@@ -132,6 +144,28 @@ typedef XLIST<CSprite*> t_SpriteList;
 //
 //##############################################################################
 using namespace Xen;
+
+//##############################################################################
+#pragma endregion
+
+#pragma region Global
+//##############################################################################
+//
+//                                   GLOBAL
+//
+//##############################################################################
+class CGlobal : public Templates::CSingletonT<CGlobal>
+{
+public:
+	// The currently active map.
+	CMap* pActiveMap;
+
+	// The player list.
+	t_PlayerList lpPlayers;
+
+	// The currently active player on the local machine.
+	CPlayer* pActivePlayer;
+};
 
 //##############################################################################
 #pragma endregion

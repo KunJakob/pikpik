@@ -24,13 +24,6 @@
 //
 //##############################################################################
 
-// The player identifier type.
-enum t_PlayerType
-{
-	PlayerType_Ghost,
-	PlayerType_PacMan,
-};
-
 // The possible player states.
 enum t_PlayerState
 {
@@ -84,6 +77,14 @@ public:
 	t_PlayerState GetState()
 	{
 		return m_iState;
+	}
+
+	/**
+	* Get the internal sprite.
+	*/
+	CAnimatedSprite* GetSprite()
+	{
+		return m_pSprite;
 	}
 
 protected:
@@ -171,12 +172,7 @@ public:
 	/**
 	* Update the object ready for rendering.
 	*/
-	virtual void Update() { m_pSprite->SetAlpha(m_pCurrentBlock->fVisibility); }
-
-	/**
-	* Render the object.
-	*/
-	//virtual void Render();
+	virtual void Update();
 
 protected:
 	/**
