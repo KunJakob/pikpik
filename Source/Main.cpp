@@ -15,6 +15,7 @@
 #include <Splash.h>
 #include <Menu.h>
 #include <Game.h>
+#include <Selection.h>
 
 // Other.
 #include <Windows.h>
@@ -80,6 +81,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
   s_pInterface->System_SetState(HGE_SCREENWIDTH, _SWIDTH);
   s_pInterface->System_SetState(HGE_SCREENHEIGHT, _SHEIGHT);
   s_pInterface->System_SetState(HGE_SCREENBPP, 32);
+	//s_pInterface->System_SetState(HGE_FPS, HGEFPS_VSYNC);
 	s_pInterface->System_SetState(HGE_SHOWSPLASH, false);
 
   if(s_pInterface->System_Initiate())
@@ -132,6 +134,7 @@ void Application::Initialise()
 	s_lpScreens.push_back(new CSplashScreen);
 	s_lpScreens.push_back(new CMenuScreen);
 	s_lpScreens.push_back(new CGameScreen);
+	s_lpScreens.push_back(new CSelectionScreen);
 
 	ScreenManager::Set(ScreenIndex_SplashScreen);
 }
@@ -153,10 +156,7 @@ void Application::Deinitialise()
 // =============================================================================
 XBOOL Application::Update()
 {
-	static XUINT s_iTimerMs = GetTickCount();
-
-	s_iTimeDelta = GetTickCount() - s_iTimerMs;
-	s_iTimerMs += s_iTimeDelta;
+	s_iTimeDelta = (XUINT)(_TIMEDELTAF * 1000.f);
 
   Xen::ModuleManager::Update();
 

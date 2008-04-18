@@ -56,7 +56,8 @@
 #define _HSWIDTH        400
 #define _HSHEIGHT       300
 
-#define _SRECT          XRECT(0, 0, _SWIDTH, _SHEIGHT)
+// Game options.
+#define _MAXNAMELEN			15
 
 // Shortcuts.
 #define _GLOBAL					CGlobal::Get()
@@ -103,6 +104,8 @@ enum t_ScreenIndex
   ScreenIndex_SplashScreen,
 	ScreenIndex_MenuScreen,
 	ScreenIndex_GameScreen,
+	ScreenIndex_SelectionScreen,
+	ScreenIndex_LobbyScreen,
 };
 
 // Layer index.

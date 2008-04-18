@@ -239,7 +239,7 @@ protected:
 	/**
 	* Add the specified visibility to all valid paths from the specified block.
 	*/
-	void AddVisibility(CMapBlock* pStartingBlock, XFLOAT fVisibility);
+	void AddVisiblePaths(CMapBlock* pStartingBlock, XFLOAT fVisibility);
 
 	// The map name.
 	const XCHAR* m_pName;

@@ -110,7 +110,6 @@ void CPlayer::Update()
 
 	case PlayerState_Die:
 		{
-
 		}
 		break;
 	}
@@ -264,7 +263,6 @@ void CGhost::Render()
 {
 	CPlayer::Render();
 
-	//m_pEyes->SetAlpha((m_pSprite->GetAlpha());
 	m_pEyes->SetPosition(m_pSprite->GetPosition());
 	m_pEyes->Render();
 }

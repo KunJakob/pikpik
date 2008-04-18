@@ -32,9 +32,14 @@
 //
 //##############################################################################
 
+// Predeclare.
+class CMenuScreen;
+class CMenuLink;
+
 // The different group types.
 enum t_MenuGroupIndex
 {
+	MenuGroupIndex_None = -1,
 	MenuGroupIndex_Main,
 	MenuGroupIndex_Play,
 	/*MAX*/MenuGroupIndex_Max,
@@ -43,6 +48,8 @@ enum t_MenuGroupIndex
 // The different element types.
 enum t_MenuElementIndex
 {
+	MenuElementIndex_Link_Debug,
+
 	// Main Menu.
 	MenuElementIndex_Link_Play,
 	MenuElementIndex_Link_Options,
@@ -58,14 +65,13 @@ enum t_MenuElementIndex
 // The different transition states.
 enum t_MenuElementState
 {
-	MenuElementState_None,
+	MenuElementState_None = -1,
 	MenuElementState_In,
 	MenuElementState_Normal,
 	MenuElementState_Out,
 };
 
 // Lists.
-class CMenuLink;
 typedef XLIST<CMenuLink*> t_MenuLinkList;
 
 //##############################################################################
@@ -82,13 +88,16 @@ typedef XLIST<CMenuLink*> t_MenuLinkList;
 class CMenuLink : public hgeGUIObject
 {
 public:
+	// Friends.
+	friend CMenuScreen;
+
 	// Callbacks.
 	typedef void (*t_fpLinkSelectedCallback)();
 
 	/**
 	* Constructor.
 	*/
-	CMenuLink(XUINT iGroupIndex, XUINT iElementIndex, XUINT iOrderIndex, const XCHAR* pText, t_fpLinkSelectedCallback fpCallback = NULL);
+	CMenuLink(XUINT iGroupIndex, XUINT iElementIndex, const XCHAR* pText, t_fpLinkSelectedCallback fpCallback = NULL);
 
 	/**
 	* Destructor.
@@ -110,10 +119,12 @@ public:
 	*/
 	virtual bool MouseLButton(bool bDown);
 
-	// The group index of the element. This us used to enable/disable elements in groups.
-	XUINT m_iGroupIndex;
-
 protected:
+	/**
+	* Re-position the menu link in relation to other links.
+	*/
+	void RePosition(XUINT iElementIndex, XUINT iNumElements);
+
 	/**
 	* Execute the internal callback.
 	*/
@@ -123,8 +134,8 @@ protected:
 			m_fpLinkSelectedCallback();
 	}
 
-	// The screen index specifying the screen order of the element.
-	XUINT m_iOrderIndex;
+	// The group index of the element. This us used to enable/disable elements in groups.
+	XUINT m_iGroupIndex;
 
 	// The text to render for the link.
 	const XCHAR* m_pText;
@@ -192,13 +203,22 @@ protected:
 	hgeGUI* m_pGUI;
 
 	// A list of all the menu elements.
-	t_MenuLinkList m_lpMenuLinks;
+	t_MenuLinkList m_lpMenuLinks[MenuGroupIndex_Max];
 
 	// The background image to scroll.
 	CSprite* m_pBackground;
 
 	// The cursor image to use.
 	CSprite* m_pCursor;
+
+	// The internal timer used to scroll the background.
+	XUINT m_iTimer;
+
+	// The menu scrolling offset.
+	XPOINT m_xOffset;
+
+	// The currently active menu group.
+	t_MenuGroupIndex m_iMenuGroup;
 };
 
 //##############################################################################

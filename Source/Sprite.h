@@ -205,8 +205,8 @@ public:
 	}
 
 	/**
-	* Set the sprite position in screen coordinates.
-	* @param bCentre Use the centre point of the sprite to offset the image.
+	* Set the sprite position.
+	* @param bCentre Use the centre point of the sprite to position the image.
 	*/
 	void SetPosition(XPOINT xPosition, XBOOL bCentre = true)
 	{
@@ -214,7 +214,17 @@ public:
 	}
 
 	/**
+	* Add an offset to the current position.
+	* @param bCentre Use the centre point of the sprite to offset the image.
+	*/
+	void ChangePosition(XPOINT xOffset, XBOOL bCentre = true)
+	{
+		SetPosition(GetPosition(bCentre) + xOffset, bCentre);
+	}
+
+	/**
 	* Get the current sprite position in screen coordinates.
+	* @param bCentre Use the centre point of the sprite when returning the position.
 	*/
 	XPOINT GetPosition(XBOOL bCentre = true)
 	{

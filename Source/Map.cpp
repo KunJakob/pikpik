@@ -224,9 +224,6 @@ CMap::CMap(const XCHAR* pID) : CRenderable(RenderableType_Map)
 		
 		switch (pBlock->cChar)
 		{
-		// Debug.
-		case '^': pBlock->iType = TileType_Pellet; pBlock->bEaten = true;		break;	
-
 		// Special.
 		case '*': pBlock->iType = TileType_Pellet;		break;
 		case '@': pBlock->iType = TileType_Power;			break;
@@ -278,10 +275,10 @@ void CMap::Update()
 	if (_GLOBAL.pActivePlayer->m_iType == PlayerType_Ghost)
 	{
 		for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
-			m_xBlocks[iA].fVisibility = m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsBase();
+			m_xBlocks[iA].fVisibility = m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsBase() ? 1.f : 0.f;
 
-		AddVisibility(_GLOBAL.pActivePlayer->m_pCurrentBlock, 1.0f - _GLOBAL.pActivePlayer->m_fTransition);
-		AddVisibility(_GLOBAL.pActivePlayer->m_pTargetBlock, _GLOBAL.pActivePlayer->m_fTransition);
+		AddVisiblePaths(_GLOBAL.pActivePlayer->m_pCurrentBlock, 1.0f - _GLOBAL.pActivePlayer->m_fTransition);
+		AddVisiblePaths(_GLOBAL.pActivePlayer->m_pTargetBlock, _GLOBAL.pActivePlayer->m_fTransition);
 	}
 	else
 	{
@@ -293,7 +290,7 @@ void CMap::Update()
 // =============================================================================
 // Nat Ryall                                                         16-Apr-2008
 // =============================================================================
-void CMap::AddVisibility(CMapBlock* pBase, XFLOAT fVisibility)
+void CMap::AddVisiblePaths(CMapBlock* pBase, XFLOAT fVisibility)
 {
 	pBase->fVisibility += fVisibility;
 

@@ -106,6 +106,12 @@ void CGameScreen::Load()
 
 	RenderManager::SetRenderCallback(LayerIndex_Map, &WorldTransform);
 	RenderManager::SetRenderCallback(LayerIndex_Player, &WorldTransform);
+
+	//CSelectionScreen* pSelection = new CSelectionScreen;
+	//pSelection->AddPlayer(pPlayer1);
+	//pSelection->AddPlayer(pPlayer2);
+	//pSelection->AddPlayer(pPlayer3);
+	//pSelection->AddPlayer(pPlayer4);
 }
 
 // =============================================================================

@@ -25,7 +25,7 @@
 {
 	.File "Surfaces\Menu-Background.png"
 	
-	.Area "Screen"			{ .Rect 0 0 800 600 }
+	.Area "Screen"			{ .Rect 0 0 864 664 }
 }
 
 .Surface "Cursor"
