@@ -57,6 +57,7 @@
 #define _HSHEIGHT       300
 
 // Game options.
+#define _MAXPLAYERS			5
 #define _MAXNAMELEN			15
 
 // Shortcuts.
@@ -84,10 +85,10 @@
 //##############################################################################
 
 // Predeclare.
-class CMap;
-class CSurface;
+class CMetadata;
 class CSprite;
 class CPlayer;
+class CMap;
 
 // The player identifier type.
 enum t_PlayerType
@@ -130,10 +131,11 @@ enum t_RenderableType
 	RenderableType_Sprite,
 	RenderableType_Map,
 	RenderableType_Player,
+	RenderableType_Text,
 };
 
 // Common list types.
-typedef XLIST<CSurface*> t_SurfaceList;
+typedef XLIST<CMetadata*> t_MetadataList;
 typedef XLIST<CSprite*> t_SpriteList;
 typedef XLIST<CPlayer*> t_PlayerList;
 

@@ -13,6 +13,7 @@
 // Other.
 #include <Metadata.h>
 #include <Sprite.h>
+#include <Renderer.h>
 
 //##############################################################################
 #pragma endregion
@@ -112,7 +113,7 @@ public:
 	t_TileType iType;
 
 	// The map rotation angle.
-	XFLOAT fRotation;
+	XFLOAT fAngle;
 
 	// The map block position.
 	XPOINT xPosition;

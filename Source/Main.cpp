@@ -14,8 +14,6 @@
 // Screens.
 #include <Splash.h>
 #include <Menu.h>
-#include <Game.h>
-#include <Selection.h>
 
 // Other.
 #include <Windows.h>
@@ -81,7 +79,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
   s_pInterface->System_SetState(HGE_SCREENWIDTH, _SWIDTH);
   s_pInterface->System_SetState(HGE_SCREENHEIGHT, _SHEIGHT);
   s_pInterface->System_SetState(HGE_SCREENBPP, 32);
-	//s_pInterface->System_SetState(HGE_FPS, HGEFPS_VSYNC);
 	s_pInterface->System_SetState(HGE_SHOWSPLASH, false);
 
   if(s_pInterface->System_Initiate())
@@ -124,8 +121,8 @@ void Application::Initialise()
 	srand(GetTickCount());
 
 	// Load all relevant metadata.
-	ResourceManager::LoadMetadata(new CMetadata(".\\Metadata\\Surfaces.mta", true));
-	ResourceManager::LoadMetadata(new CMetadata(".\\Metadata\\Sprites.mta", true));
+	ResourceManager::RegisterMetadata(new CMetadata(".\\Metadata\\Sprites.mta"));
+	ResourceManager::RegisterMetadata(new CMetadata(".\\Metadata\\Font.mta"));
 
 	// Initialise all modules.
 	Xen::ModuleManager::Initialise();
@@ -133,8 +130,6 @@ void Application::Initialise()
 	// Create all the screen instances.
 	s_lpScreens.push_back(new CSplashScreen);
 	s_lpScreens.push_back(new CMenuScreen);
-	s_lpScreens.push_back(new CGameScreen);
-	s_lpScreens.push_back(new CSelectionScreen);
 
 	ScreenManager::Set(ScreenIndex_SplashScreen);
 }

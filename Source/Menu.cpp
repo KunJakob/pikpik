@@ -23,6 +23,7 @@
 // Other.
 #include <Resource.h>
 #include <Font.h>
+#include <Selection.h>
 
 //##############################################################################
 #pragma endregion
@@ -33,9 +34,6 @@
 //                                   STATIC
 //
 //##############################################################################
-
-// The font to render the links.
-static CShadowFont* s_pFont;
 
 // The next screen to process.
 static t_ScreenIndex s_iNextScreen = ScreenIndex_Invalid;
@@ -53,10 +51,9 @@ static t_ScreenIndex s_iNextScreen = ScreenIndex_Invalid;
 // =============================================================================
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
-CMenuLink::CMenuLink(XUINT iGroupIndex, XUINT iElementIndex, const XCHAR* pText, t_fpLinkSelectedCallback fpCallback) 
-:
+CMenuLink::CMenuLink(XUINT iGroupIndex, XUINT iElementIndex, CFontMetadata* pFont, const XCHAR* pText, t_fpLinkSelectedCallback fpCallback) :
 	m_iGroupIndex(iGroupIndex),
-	m_pText(pText),
+	m_pText(NULL),
 	m_fpLinkSelectedCallback(fpCallback)
 {
 	id = iElementIndex;
@@ -66,6 +63,10 @@ CMenuLink::CMenuLink(XUINT iGroupIndex, XUINT iElementIndex, const XCHAR* pText,
 	bEnabled = false;
 
 	rect = hgeRect(0, 0, 0, 0);
+
+	m_pText = new CText(pFont);
+	m_pText->SetString(pText);
+	m_pText->SetAlignment(HGETEXT_CENTER);
 }
 
 // =============================================================================
@@ -73,6 +74,7 @@ CMenuLink::CMenuLink(XUINT iGroupIndex, XUINT iElementIndex, const XCHAR* pText,
 // =============================================================================
 CMenuLink::~CMenuLink()
 {
+	delete m_pText;
 }
 
 // =============================================================================
@@ -87,15 +89,7 @@ void CMenuLink::Update(float fDeltaTime)
 // =============================================================================
 void CMenuLink::Render()
 {
-	s_pFont->SetShadowColor(0xFF000000);
-	s_pFont->SetShadowOffset(XPOINT(3, 3));
-
-	if (m_fpLinkSelectedCallback)
-		s_pFont->SetColor(0xFFFFFFFF);
-	else
-		s_pFont->SetColor(0xFF808080);
-
-	s_pFont->RenderShadowed(rect.x1, rect.y1, HGETEXT_LEFT, m_pText);
+	m_pText->Render();
 }
 
 // =============================================================================
@@ -114,8 +108,8 @@ bool CMenuLink::MouseLButton(bool bDown)
 // =============================================================================
 void CMenuLink::RePosition(XUINT iElementIndex, XUINT iNumElements)
 {
-	XFLOAT fHalfWidth = s_pFont->GetStringWidth(m_pText, false) / 2.f;
-	XFLOAT fHeight = s_pFont->GetHeight();
+	XFLOAT fHalfWidth = (XFLOAT)m_pText->GetStringWidth() / 2.f;
+	XFLOAT fHeight = (XFLOAT)m_pText->GetFontHeight();
 	XFLOAT fLineHeight = (XFLOAT)(XUINT)(fHeight * 1.25f);
 	XFLOAT fHalfLineHeight = fLineHeight / 2.f;
 
@@ -123,6 +117,8 @@ void CMenuLink::RePosition(XUINT iElementIndex, XUINT iNumElements)
 	XFLOAT fY = (XFLOAT)_HSHEIGHT - (iNumElements * fHalfLineHeight) + ((XFLOAT)iElementIndex * fLineHeight);
 
 	rect = hgeRect(fX - fHalfWidth, fY, fX + fHalfWidth, fY + fHeight);
+	
+	m_pText->SetPosition(XPOINT((XUINT)fX, (XUINT)fY));
 }
 
 //##############################################################################
@@ -156,7 +152,25 @@ void Callback_QuitGame()
 // =============================================================================
 void Callback_ShowCharacterSelect()
 {
-	s_iNextScreen = ScreenIndex_SelectionScreen;
+	/*CSelectionScreen* pSelection = (CSelectionScreen*)ScreenManager::FindScreen(ScreenIndex_SelectionScreen);
+
+	CPacMan* pPacMan = new CPacMan(NULL);
+	pPacMan->SetName("Krakken");
+	pSelection->PushPlayer(pPacMan);
+
+	CGhost* pGhost1 = new CGhost(NULL);
+	pGhost1->SetName("Yossarian");
+	pSelection->PushPlayer(pGhost1);
+
+	CGhost* pGhost2 = new CGhost(NULL);
+	pGhost2->SetName("Schmee43");
+	pSelection->PushPlayer(pGhost2);
+
+	CGhost* pGhost3 = new CGhost(NULL);
+	pGhost3->SetName("SlyGamer123");
+	pSelection->PushPlayer(pGhost3);
+
+	s_iNextScreen = ScreenIndex_SelectionScreen;*/
 }
 
 //##############################################################################
@@ -176,7 +190,7 @@ void CMenuScreen::Load()
 {
 	// Initialise prerequisites.
 	m_pGUI = new hgeGUI;
-	s_pFont = new CShadowFont(".\\Font\\ShowcardGothic_36.fnt");
+	m_pFont = _FONT("Menu-Item");
 
 	// Initialise the menu links.
 	m_iMenuGroup = MenuGroupIndex_None;
@@ -184,17 +198,17 @@ void CMenuScreen::Load()
 	CMenuLink* pLinkList[] = 
 	{
 		// Main.
-		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Play,		"Play Online",	&Callback_StartGame),
-		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Credits, "Tutorial",			NULL),
-		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Options, "Options",			NULL),
-		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Credits, "Credits",			NULL),
-		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Exit,		"Exit",					&Callback_QuitGame),
-		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Debug,		"Debug",				&Callback_ShowCharacterSelect),
+		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Play,		m_pFont, "Play Online",	&Callback_StartGame),
+		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Credits, m_pFont, "Tutorial",		NULL),
+		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Options, m_pFont, "Options",			NULL),
+		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Credits, m_pFont, "Credits",			NULL),
+		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Exit,		m_pFont, "Exit",				&Callback_QuitGame),
+		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Debug,		m_pFont, "Debug",				&Callback_ShowCharacterSelect),
 
 		// Play.
-		new CMenuLink(MenuGroupIndex_Play, MenuElementIndex_Link_Find,		"Find",					NULL),
-		new CMenuLink(MenuGroupIndex_Play, MenuElementIndex_Link_Direct,	"Join",					NULL),
-		new CMenuLink(MenuGroupIndex_Play, MenuElementIndex_Link_Create,	"Create",				NULL),
+		new CMenuLink(MenuGroupIndex_Play, MenuElementIndex_Link_Find,		m_pFont, "Find",				NULL),
+		new CMenuLink(MenuGroupIndex_Play, MenuElementIndex_Link_Direct,	m_pFont, "Join",				NULL),
+		new CMenuLink(MenuGroupIndex_Play, MenuElementIndex_Link_Create,	m_pFont, "Create",			NULL),
 	};
 
 	for (XUINT iA = 0; iA < (sizeof(pLinkList) / sizeof(CMenuLink*)); ++iA)
@@ -215,16 +229,10 @@ void CMenuScreen::Load()
 	SetMenuGroup(MenuGroupIndex_Main);
 
 	// Initialise the render resources.
-	m_pBackground = ResourceManager::CreateSprite("Menu-Background");
-	m_pBackground->SetArea("Screen");
-	m_pBackground->SetPosition(XPOINT(0, 0), false);
+	m_pBackground = new CBackgroundImage("Menu-Background");
 
-	m_pCursor = ResourceManager::CreateSprite("Cursor");
-	m_pGUI->SetCursor(m_pCursor->GetSurfaceTemplate()->pSurface);
-
-	// Initialise the background scroll.
-	m_iTimer = 0;
-	m_xOffset.Reset();
+	m_pCursor = new CBasicSprite(_SPRITE("Cursor"));
+	m_pGUI->SetCursor(m_pCursor->GetMetadata()->GetSprite());
 
 	// Initialise statics.
 	s_iNextScreen = ScreenIndex_Invalid;
@@ -235,11 +243,10 @@ void CMenuScreen::Load()
 // =============================================================================
 void CMenuScreen::Unload()
 {
-	delete s_pFont;
 	delete m_pGUI; // Also erases the GUI elements.
+	delete m_pBackground;
 
-	ResourceManager::FreeResource(m_pCursor);
-	ResourceManager::FreeResource(m_pBackground);
+	delete m_pCursor;
 }
 
 // =============================================================================
@@ -263,18 +270,8 @@ void CMenuScreen::Update()
 		s_iNextScreen = ScreenIndex_Invalid;
 	}
 
-	// Scroll the background.
-	m_iTimer += _TIMEDELTA;
-
-	if (m_iTimer > 25)
-	{
-		m_iTimer %= 25;
-
-		m_xOffset += XPOINT(1, 1);
-		m_xOffset %= 64;
-		
-		m_pBackground->SetPosition(m_xOffset * -1, false);
-	}
+	// Update the background.
+	m_pBackground->Update();
 }
 
 // =============================================================================

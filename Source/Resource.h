@@ -3,13 +3,16 @@
 /**
 * @file Resource.h
 * @author Nat Ryall
-* @date 18/02/2008
-* @brief Manages all game resources.
+* @date 22/04/2008 (Original: 18/02/2008)
+* 
+* The resource manager is designed to simplify the import of constant object 
+* values through the use of metadata. Resources will internally share the same
+* file data if more than one request is made on a specific file meaning data is 
+* never duplicated.
 *
-* Copyright © Creative Disorder
+* Copyright © SAPIAN
 */
 
-#pragma region Include
 //##############################################################################
 //
 //                                   INCLUDE
@@ -23,125 +26,130 @@
 #include <Metadata.h>
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Types
 //##############################################################################
 //
 //                                   TYPES
 //
 //##############################################################################
 
-/**
-* Pre-declarations.
-*/
-class CSprite;
-class CAnimatedSprite;
+// Pre-declare.
+class CResourceFile;
+class CResourceMetadata;
 
-/**
-* List of supported resource types.
-*/
+// List of supported resource types.
 enum t_ResourceType
 {
-	ResourceType_Unknown,       // The resource type is unknown.
-	ResourceType_Surface,       // The resource is a surface.
-	ResourceType_Sprite,        // The resource is a sprite.
+	ResourceType_Sprite,
+	ResourceType_Font,
+	/*MAX*/ResourceType_Max,
 };
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Base
 //##############################################################################
 //
-//                                    BASE
+//                               RESOURCE FILE
 //
 //##############################################################################
 
 /**
-* Base class for resource templates.
+* Management class for sharing internal resource types.
 */
-class CResourceTemplate
+class CResourceFile
 {
 public:
-	// The type of the resource template.
-	t_ResourceType iResourceType;
-
-	// The name of the resource template.
-	const XCHAR* pResourceName;
-};
-
-/**
-* Base class for resource objects.
-*/
-class CResource
-{
-public:
-	/**
-	* Get the resource type specified within the resource class constructor.
-	*/
-	t_ResourceType GetResourceType()
-	{
-		return m_iResourceType;
-	}
-
 	/**
 	* Destructor: Ensure any derived object is properly destroyed.
 	*/
-	virtual ~CResource() {}
+	virtual ~CResourceFile() {}
+
+	// The resource type.
+	t_ResourceType iType;
+
+	// The resource object.
+	void* pResource;
+
+	// The resource file name.
+	const XCHAR* pFile;
+
+	// The resource reference count.
+	XUINT iReferenceCount;
 
 protected:
 	/**
-	* Constructor: Initialise the resource type.
+	* Constructor: Initialise the file.
 	*/
-	CResource(t_ResourceType iType) : m_iResourceType(iType) {}
-
-private:
-	// The resource type.
-	t_ResourceType m_iResourceType;
+	CResourceFile(t_ResourceType iResourceType, const XCHAR* pResourceFile);
 };
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Declaration
 //##############################################################################
 //
-//                                 DECLARATION
+//                             RESOURCE METADATA
+//
+//##############################################################################
+
+/**
+* Base class for meta-based resources (object templates).
+*/
+class CResourceMetadata
+{
+public:
+	/**
+	* Destructor: Ensure any derived object is properly destroyed.
+	*/
+	virtual ~CResourceMetadata() {}
+
+	// The resource type.
+	t_ResourceType iType;
+
+	// The resource name.
+	const XCHAR* pName;
+
+protected:
+	/**
+	* Constructor: Initialise the metadata.
+	*/
+	CResourceMetadata(t_ResourceType iResourceType, CDataset* pDataset);
+};
+
+//##############################################################################
+
+//##############################################################################
+//
+//                              RESOURCE MANAGER
 //
 //##############################################################################
 namespace ResourceManager
 {
 	/**
-	* Unload all metadata and free all associated resources.
+	* Deregister all metadata and in doing so, remove all existing resources.
 	*/
 	void Reset();
 
 	/**
-	* Load a metadata file and any resources associated with it. 
+	* Register a metadata file with the system and parse all valid, managed 
+	* resources described within the data.
 	*/
-	void LoadMetadata(CMetadata* pMetadata);
+	void RegisterMetadata(CMetadata* pMetadata);
 
 	/**
-	* Unload a loaded metadata file and any resources associated with it.
+	* Allocate a new or existing resource file with the specified type and file.
 	*/
-	void UnloadMetadata(CMetadata* pMetadata);
+	CResourceFile* AllocResourceFile(t_ResourceType iType, const XCHAR* pFile);
 
 	/**
-	* Create a new sprite by name as it appears in the metadata.
+	* Release a resource file and destroy it if there are no remaining references.
 	*/
-	CSprite* CreateSprite(const XCHAR* pName);
+	void ReleaseResourceFile(CResourceFile* pFile);
 
 	/**
-	* Create an animated sprite by name as it appears in the metadata.
+	* Find the metadata for a managed resource with the specified type and name.
+	* @return The resource metadata or NULL if not found.
 	*/
-	CAnimatedSprite* CreateAnimatedSprite(const XCHAR* pName);
-
-	/**
-	* Free a resource of any type.
-	*/
-	void FreeResource(CResource* pResource);
+	CResourceMetadata* FindResource(t_ResourceType iType, const XCHAR* pName);
 }
 
 //##############################################################################
-#pragma endregion

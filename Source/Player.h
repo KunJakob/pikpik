@@ -87,6 +87,22 @@ public:
 		return m_pSprite;
 	}
 
+	/**
+	* Set the player's name.
+	*/
+	void SetName(const XCHAR* pName)
+	{
+		strcpy_s(m_cName, _MAXNAMELEN + 1, pName);
+	}
+
+	/**
+	* Get the player's name.
+	*/
+	const XCHAR* GetName()
+	{
+		return m_cName;
+	}
+
 protected:
 	/**
 	* Constructor.
@@ -109,7 +125,7 @@ protected:
 	/**
 	* Called when an animation event occurs.
 	*/
-	static void OnAnimationEvent(const XCHAR* pEvent, void* pObject);
+	static void OnAnimationEvent(CAnimatedSprite* pSprite, const XCHAR* pEvent, void* pObject);
 
 	// The type of the derived class.
 	t_PlayerType m_iType;
@@ -139,7 +155,7 @@ protected:
 	t_AdjacentDir m_iTransitionDir;
 
 	// The player name.
-	XCHAR cName[_MAXNAMELEN + 1];
+	XCHAR m_cName[_MAXNAMELEN + 1];
 };
 
 //##############################################################################
@@ -157,7 +173,7 @@ public:
 	/**
 	* Constructor.
 	*/
-	CPacMan();
+	CPacMan(CMapBlock* pSpawnBlock);
 
 	/**
 	* Update the object ready for rendering.
@@ -194,7 +210,7 @@ public:
 	/**
 	* Constructor.
 	*/
-	CGhost();
+	CGhost(CMapBlock* pSpawnBlock);
 
 	/**
 	* Destructor.

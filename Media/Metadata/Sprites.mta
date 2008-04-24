@@ -1,26 +1,48 @@
 .Sprite "Logo-SAPIAN"
 {
-	.Surface "Logo-SAPIAN"
+	.File "Surfaces\Logo-SAPIAN.png"
 }
 
 .Sprite "Map-Tiles"
 {
-	.Surface "Map-Tiles"
+	.File "Surfaces\Map-Blocks.png"
+	
+	.Area "Blank"			{ .Rect 144 0 192 48 }
+	.Area "Pellet"			{ .Rect 48  0 96  48 }
+	.Area "Power"			{ .Rect 96  0 144 48 }
+	.Area "Eaten"			{ .Rect 144 0 192 48 }
+	.Area "Solo"			{ .Rect 192 0 240 48 }
+	.Area "Tunnel"			{ .Rect 240 0 288 48 }
+	.Area "Cap"				{ .Rect 288 0 336 48 }
+	.Area "Corner"			{ .Rect 336 0 384 48 }
+	.Area "Junction"		{ .Rect 384 0 432 48 }
+	.Area "Intersection"	{ .Rect 432 0 480 48 }
+	.Area "Entrance"		{ .Rect 480 0 528 48 }
+	.Area "Base"			{ .Rect 528 0 576 48 }
 }
 
 .Sprite "Menu-Background"
 {
-	.Surface "Menu-Background"
+	.File "Surfaces\Menu-Background.png"
+}
+
+.Sprite "Lobby-Background"
+{
+	.File "Surfaces\Lobby-Background.png"
 }
 
 .Sprite "Cursor"
 {
-	.Surface "Cursor"
+	.File "Surfaces\Cursor.png"
 }
 
 .Sprite "Player-PacMan"
 {
-	.Surface "Player-PacMan"
+	.File "Surfaces\Player-PacMan.png"
+	
+	.Area "F1"				{ .Rect 0  0 46  46 }
+	.Area "F2"				{ .Rect 46 0 92  46 }
+	.Area "F3"				{ .Rect 92 0 138 46 }
 	
 	.Animation "Idle"
 	{
@@ -40,7 +62,10 @@
 
 .Sprite "Player-Ghost"
 {
-	.Surface "Player-Ghost"
+	.File "Surfaces\Player-Ghost.png"
+	
+	.Area "F1"				{ .Rect 0  0 46 46 }
+	.Area "F2"				{ .Rect 46 0 92 46 }
 	
 	.Animation "Idle"
 	{
@@ -53,5 +78,29 @@
 
 .Sprite "Player-Ghost-Eyes"
 {
-	.Surface "Player-Ghost-Eyes"
+	.File "Surfaces\Player-Ghost-Eyes.png"
+	
+	.Area "F1"				{ .Rect 0   0 46  46 }
+	.Area "F3"				{ .Rect 46  0 92  46 }
+	.Area "F2"				{ .Rect 92  0 138 46 }
+	.Area "F4"				{ .Rect 138 0 184 46 }
+}
+
+
+.Sprite "Power-Icons"
+{
+	.File "Surfaces\Power-Icons.png"
+	
+	.Area "Beacon"			{ .Rect 0  0 32  32 }
+	.Area "Hacker"			{ .Rect 32 0 64  32 }
+	.Area "Blind"			{ .Rect 64 0 92  32 }
+	.Area "Dizzy"			{ .Rect 92 0 128 32 }
+}
+
+.Sprite "Trap-Icons"
+{
+	.File "Surfaces\Trap-Tiles.png"
+	
+	.Area "Blind"			{ .Rect 0  0 46 46 }
+	.Area "Dizzy"			{ .Rect 46 0 92 46 }
 }

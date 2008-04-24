@@ -183,6 +183,10 @@
 			Name="Source"
 			>
 			<File
+				RelativePath="..\Source\Background.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\Background.h"
 				>
 			</File>
@@ -1215,15 +1219,19 @@
 			Name="Metadata"
 			>
 			<File
+				RelativePath="..\Media\Metadata\Font.mta"
+				>
+			</File>
+			<File
 				RelativePath="..\Media\Metadata\Maps.mta"
 				>
 			</File>
 			<File
-				RelativePath="..\Media\Metadata\Sprites.mta"
+				RelativePath="..\Media\Metadata\Menus.mta"
 				>
 			</File>
 			<File
-				RelativePath="..\Media\Metadata\Surfaces.mta"
+				RelativePath="..\Media\Metadata\Sprites.mta"
 				>
 			</File>
 		</Filter>

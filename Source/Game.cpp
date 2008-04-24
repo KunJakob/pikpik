@@ -90,12 +90,17 @@ void WorldTransform(CRenderable* pRenderable)
 // =============================================================================
 void CGameScreen::Load()
 {
-	_GLOBAL.pActiveMap = new CMap(XFORMAT("M%03d", 3));
+	/*_GLOBAL.pActiveMap = new CMap(XFORMAT("M%03d", 4));
 
-	_GLOBAL.lpPlayers.push_back(new CPacMan);
-	_GLOBAL.lpPlayers.push_back(new CGhost);
-	_GLOBAL.lpPlayers.push_back(new CGhost);
-	_GLOBAL.lpPlayers.push_back(new CGhost);
+	_GLOBAL.lpPlayers.push_back(new CPacMan(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_PacMan)));
+	_GLOBAL.lpPlayers.back()->SetName("Krakken");
+	_GLOBAL.lpPlayers.push_back(new CGhost(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_Ghost)));
+	_GLOBAL.lpPlayers.back()->SetName("Yossarian");
+	_GLOBAL.lpPlayers.push_back(new CGhost(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_Ghost)));
+	_GLOBAL.lpPlayers.back()->SetName("Schmee43");
+	_GLOBAL.lpPlayers.push_back(new CGhost(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_Ghost)));
+	_GLOBAL.lpPlayers.back()->SetName("SlyGamer123");
+
 	_GLOBAL.pActivePlayer = _GLOBAL.lpPlayers.front();
 
 	RenderManager::Add(LayerIndex_Background, &m_Background);
@@ -105,13 +110,7 @@ void CGameScreen::Load()
 		RenderManager::Add(LayerIndex_Player, *ppPlayer);
 
 	RenderManager::SetRenderCallback(LayerIndex_Map, &WorldTransform);
-	RenderManager::SetRenderCallback(LayerIndex_Player, &WorldTransform);
-
-	//CSelectionScreen* pSelection = new CSelectionScreen;
-	//pSelection->AddPlayer(pPlayer1);
-	//pSelection->AddPlayer(pPlayer2);
-	//pSelection->AddPlayer(pPlayer3);
-	//pSelection->AddPlayer(pPlayer4);
+	RenderManager::SetRenderCallback(LayerIndex_Player, &WorldTransform);*/
 }
 
 // =============================================================================
@@ -119,10 +118,10 @@ void CGameScreen::Load()
 // =============================================================================
 void CGameScreen::Unload()
 {
-	RenderManager::Reset();
+	/*RenderManager::Reset();
 
 	XEN_LIST_ERASEMEM(_GLOBAL.lpPlayers);
-	delete _GLOBAL.pActiveMap;
+	delete _GLOBAL.pActiveMap;*/
 }
 
 // =============================================================================
@@ -130,7 +129,7 @@ void CGameScreen::Unload()
 // =============================================================================
 void CGameScreen::Update()
 {
-	if (_HGE->Input_KeyDown(HGEK_ESCAPE))
+	/*if (_HGE->Input_KeyDown(HGEK_ESCAPE))
 	{
 		ScreenManager::Pop();
 		return;
@@ -153,7 +152,7 @@ void CGameScreen::Update()
 		}
 	}
 
-	s_xOffset = _GLOBAL.pActivePlayer->GetSprite()->GetPosition() - XPOINT(_HSWIDTH, _HSHEIGHT);
+	s_xOffset = _GLOBAL.pActivePlayer->GetSprite()->GetPosition() - XPOINT(_HSWIDTH, _HSHEIGHT);*/
 }
 
 // =============================================================================

@@ -50,8 +50,10 @@ CPlayer::CPlayer(t_PlayerType iType, const XCHAR* pSpriteName) : CRenderable(Ren
 	m_fTransition(0.f),
 	m_iTransitionDir(AdjacentDir_Left)
 {
-	m_pSprite = ResourceManager::CreateAnimatedSprite(pSpriteName);
+	m_pSprite = new CAnimatedSprite(_SPRITE(pSpriteName));
 	m_pSprite->SetEventCallback(&OnAnimationEvent, this);
+
+	SetName("Unknown");
 }
 
 // =============================================================================
@@ -59,7 +61,7 @@ CPlayer::CPlayer(t_PlayerType iType, const XCHAR* pSpriteName) : CRenderable(Ren
 // =============================================================================
 CPlayer::~CPlayer()
 {
-	ResourceManager::FreeResource(m_pSprite);
+	delete m_pSprite;
 }
 
 // =============================================================================
@@ -148,14 +150,17 @@ void CPlayer::SetState(t_PlayerState iState)
 // =============================================================================
 // Nat Ryall                                                         16-Apr-2008
 // =============================================================================
-void CPlayer::OnAnimationEvent(const XCHAR* pEvent, void* pObject)
+void CPlayer::OnAnimationEvent(CAnimatedSprite* pSprite, const XCHAR* pEvent, void* pObject)
 {
 	CPlayer* pPlayer = (CPlayer*)pObject;
 
 	if (strcmp(pEvent, "Eat") == 0)
 	{
-		if (pPlayer->m_pTargetBlock->iType == TileType_Pellet || pPlayer->m_pTargetBlock->iType == TileType_Power)
-			pPlayer->m_pTargetBlock->iType = TileType_Eaten;
+		if (pPlayer->m_pTargetBlock)
+		{
+			if (pPlayer->m_pTargetBlock->iType == TileType_Pellet || pPlayer->m_pTargetBlock->iType == TileType_Power)
+				pPlayer->m_pTargetBlock->iType = TileType_Eaten;
+		}
 	}
 }
 
@@ -172,10 +177,12 @@ void CPlayer::OnAnimationEvent(const XCHAR* pEvent, void* pObject)
 // =============================================================================
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
-CPacMan::CPacMan() : CPlayer(PlayerType_PacMan, "Player-PacMan")
+CPacMan::CPacMan(CMapBlock* pSpawnBlock) : CPlayer(PlayerType_PacMan, "Player-PacMan")
 {
-	m_pCurrentBlock = _GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_PacMan);
-	m_pSprite->SetPosition(m_pCurrentBlock->GetScreenPosition());
+	m_pCurrentBlock = pSpawnBlock;
+
+	if (m_pCurrentBlock)
+		m_pSprite->SetPosition(m_pCurrentBlock->GetScreenPosition());
 
 	SetState(PlayerState_Idle);
 }
@@ -197,7 +204,7 @@ void CPacMan::SetState(t_PlayerState iState)
 	{
 	case PlayerState_Idle:
 		{
-			if (!m_pSprite->IsCurrentAnimation("Idle"))
+			if (!m_pSprite->IsActiveAnimation("Idle"))
 				m_pSprite->Play("Idle");
 		}
 		break;
@@ -205,9 +212,9 @@ void CPacMan::SetState(t_PlayerState iState)
 	case PlayerState_Move:
 		{
 			m_pSprite->Play("Move");
-			m_pSprite->SetRotation((XFLOAT)m_iTransitionDir * 90.f, true);
+			m_pSprite->SetAngle((XFLOAT)m_iTransitionDir * 90.f, true);
 
-			m_iMoveTime = m_pSprite->GetAnimation()->iTime;
+			m_iMoveTime = m_pSprite->GetAnimation()->iAnimationTime;
 		}
 		break;
 	}
@@ -228,13 +235,15 @@ void CPacMan::SetState(t_PlayerState iState)
 // =============================================================================
 // Nat Ryall                                                         16-Apr-2008
 // =============================================================================
-CGhost::CGhost() : CPlayer(PlayerType_Ghost, "Player-Ghost"),
+CGhost::CGhost(CMapBlock* pSpawnBlock) : CPlayer(PlayerType_Ghost, "Player-Ghost"),
 	m_pEyes(NULL)
 {
-	m_pCurrentBlock = _GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_Ghost);
-	m_pSprite->SetPosition(m_pCurrentBlock->GetScreenPosition());
+	m_pCurrentBlock = pSpawnBlock;
 
-	m_pEyes = ResourceManager::CreateSprite("Player-Ghost-Eyes");
+	if (m_pCurrentBlock)
+		m_pSprite->SetPosition(m_pCurrentBlock->GetScreenPosition());
+
+	m_pEyes = new CSprite(_SPRITE("Player-Ghost-Eyes"));
 	m_pEyes->SetArea("F1");
 
 	SetState(PlayerState_Idle);
@@ -245,7 +254,7 @@ CGhost::CGhost() : CPlayer(PlayerType_Ghost, "Player-Ghost"),
 // =============================================================================
 CGhost::~CGhost()
 {
-	ResourceManager::FreeResource(m_pEyes);
+	delete m_pEyes;
 }
 
 // =============================================================================
@@ -264,6 +273,7 @@ void CGhost::Render()
 	CPlayer::Render();
 
 	m_pEyes->SetPosition(m_pSprite->GetPosition());
+	m_pEyes->SetAlpha(m_pSprite->GetAlpha());
 	m_pEyes->Render();
 }
 
@@ -276,7 +286,7 @@ void CGhost::SetState(t_PlayerState iState)
 	{
 	case PlayerState_Idle:
 		{
-			if (!m_pSprite->IsCurrentAnimation("Idle"))
+			if (!m_pSprite->IsActiveAnimation("Idle"))
 				m_pSprite->Play("Idle");
 		}
 		break;
@@ -284,7 +294,7 @@ void CGhost::SetState(t_PlayerState iState)
 	case PlayerState_Move:
 		{
 			m_pEyes->SetArea(XFORMAT("F%d", m_iTransitionDir + 1));
-			m_iMoveTime = m_pSprite->GetAnimation()->iTime;
+			m_iMoveTime = m_pSprite->GetAnimation()->iAnimationTime;
 
 			if (m_pCurrentBlock->iType == TileType_Entrance || m_pTargetBlock->iType == TileType_Entrance)
 				m_iMoveTime *= 4;

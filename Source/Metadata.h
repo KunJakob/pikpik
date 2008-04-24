@@ -42,11 +42,11 @@ class CMetadata;
 //                                   MACROS
 //
 //##############################################################################
-#define _SUBSET_FOREACH(ITER, SUBSET, TYPE, NAME) \
-        for (CDataset* ITER = NULL; ITER = SUBSET->GetDataset(ITER, TYPE, NAME);)
+#define _DATASET_FOREACH(ITER, DATASET, TYPE, NAME) \
+        for (CDataset* ITER = NULL; ITER = DATASET->GetDataset(ITER, TYPE, NAME);)
 
-#define _PROPERTY_FOREACH(ITER, SUBSET, NAME) \
-        for (CProperty* ITER = NULL; ITER = SUBSET->GetProperty(ITER, NAME);)
+#define _PROPERTY_FOREACH(ITER, DATASET, NAME) \
+        for (CProperty* ITER = NULL; ITER = DATASET->GetProperty(ITER, NAME);)
 
 //##############################################################################
 #pragma endregion

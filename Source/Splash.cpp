@@ -41,8 +41,10 @@
 // =============================================================================
 void CSplashScreen::Load()
 {
-	m_pImage = ResourceManager::CreateSprite("Logo-SAPIAN");
-	m_pImage->SetPosition(XPOINT(_HSWIDTH, _HSHEIGHT), true);
+	m_pImage = new CSprite(_SPRITE("Logo-SAPIAN"));
+
+	m_pImage->SetAnchor(m_pImage->GetAreaCentre());
+  m_pImage->SetPosition(XPOINT(_HSWIDTH, _HSHEIGHT));
 }
 
 // =============================================================================
@@ -50,7 +52,7 @@ void CSplashScreen::Load()
 // =============================================================================
 void CSplashScreen::Unload()
 {
-	ResourceManager::FreeResource(m_pImage);
+	delete m_pImage;
 }
 
 // =============================================================================
@@ -126,6 +128,8 @@ void CSplashScreen::Update()
 			m_fAlpha = 1.0f - ((float)m_iElapsedTime / (float)SPLASH_FADETIME);
 		break;
 	}
+
+	m_pImage->SetAlpha(m_fAlpha);
 }
 
 // =============================================================================
@@ -136,7 +140,6 @@ void CSplashScreen::Render()
 	XUCHAR cBackgroundColour = (XUCHAR)(m_fAlpha * 20.0f);
 	_HGE->Gfx_Clear(ARGB(0, cBackgroundColour, cBackgroundColour, cBackgroundColour));
 
-	m_pImage->SetAlpha(m_fAlpha);
 	m_pImage->Render();
 }
 

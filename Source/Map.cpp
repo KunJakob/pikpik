@@ -33,7 +33,7 @@ static CMetadata* s_pMetadata = NULL;
 static CSprite* s_pTiles = NULL;
 
 // The areas of each map tile.
-static CSurfaceTemplate::CArea* s_pTileAreas[TileType_Max];
+static CSpriteMetadata::CArea* s_pTileAreas[TileType_Max];
 
 // The tile index lookup table.
 static const t_TileType s_iTileIndexLookup[] = 
@@ -99,20 +99,20 @@ public:
 	virtual void Initialise()
 	{
 		s_pMetadata = new CMetadata(".\\Metadata\\Maps.mta");
-		s_pTiles = ResourceManager::CreateSprite("Map-Tiles");
+		s_pTiles = new CSprite(_SPRITE("Map-Tiles"));
 
-		s_pTileAreas[TileType_Blank]				= s_pTiles->FindArea("Blank");
-		s_pTileAreas[TileType_Pellet]				= s_pTiles->FindArea("Pellet");
-		s_pTileAreas[TileType_Power]				= s_pTiles->FindArea("Power");
-		s_pTileAreas[TileType_Eaten]				= s_pTiles->FindArea("Eaten");
-		s_pTileAreas[TileType_Solo]					= s_pTiles->FindArea("Solo");
-		s_pTileAreas[TileType_Tunnel]				= s_pTiles->FindArea("Tunnel");
-		s_pTileAreas[TileType_Cap]					= s_pTiles->FindArea("Cap");
-		s_pTileAreas[TileType_Corner]				= s_pTiles->FindArea("Corner");
-		s_pTileAreas[TileType_Junction]			= s_pTiles->FindArea("Junction");
-		s_pTileAreas[TileType_Intersection] = s_pTiles->FindArea("Intersection");
-		s_pTileAreas[TileType_Entrance]			= s_pTiles->FindArea("Entrance");
-		s_pTileAreas[TileType_Base]					= s_pTiles->FindArea("Base");
+		s_pTileAreas[TileType_Blank]				= s_pTiles->GetMetadata()->FindArea("Blank");
+		s_pTileAreas[TileType_Pellet]				= s_pTiles->GetMetadata()->FindArea("Pellet");
+		s_pTileAreas[TileType_Power]				= s_pTiles->GetMetadata()->FindArea("Power");
+		s_pTileAreas[TileType_Eaten]				= s_pTiles->GetMetadata()->FindArea("Eaten");
+		s_pTileAreas[TileType_Solo]					= s_pTiles->GetMetadata()->FindArea("Solo");
+		s_pTileAreas[TileType_Tunnel]				= s_pTiles->GetMetadata()->FindArea("Tunnel");
+		s_pTileAreas[TileType_Cap]					= s_pTiles->GetMetadata()->FindArea("Cap");
+		s_pTileAreas[TileType_Corner]				= s_pTiles->GetMetadata()->FindArea("Corner");
+		s_pTileAreas[TileType_Junction]			= s_pTiles->GetMetadata()->FindArea("Junction");
+		s_pTileAreas[TileType_Intersection] = s_pTiles->GetMetadata()->FindArea("Intersection");
+		s_pTileAreas[TileType_Entrance]			= s_pTiles->GetMetadata()->FindArea("Entrance");
+		s_pTileAreas[TileType_Base]					= s_pTiles->GetMetadata()->FindArea("Base");
 	}
 
 	// Update.
@@ -128,7 +128,7 @@ public:
 	// Deinitialise.
 	virtual void Deinitialise()
 	{
-		ResourceManager::FreeResource(s_pTiles);
+		delete s_pTiles;
 		delete s_pMetadata;
 	}
 } 
@@ -206,7 +206,7 @@ CMap::CMap(const XCHAR* pID) : CRenderable(RenderableType_Map)
 
 			pBlock->cChar = pProperty->GetChar(iIndex);
 			pBlock->iType = TileType_Blank;
-			pBlock->fRotation = 0.f;
+			pBlock->fAngle = 0.f;
 			pBlock->xPosition = XPOINT(iX, iY);
 			pBlock->bEaten = false;
 			pBlock->fVisibility = 0.f;
@@ -241,13 +241,13 @@ CMap::CMap(const XCHAR* pID) : CRenderable(RenderableType_Map)
 				}
 
 				pBlock->iType = s_iTileIndexLookup[iMask];
-				pBlock->fRotation = s_fRotationAngleLookup[iMask];
+				pBlock->fAngle = s_fRotationAngleLookup[iMask];
 			}
 			break;
 
 		// Spawn.
 		case '$': 
-			pBlock->iType = TileType_Pellet;
+			pBlock->iType = TileType_Blank;
 			m_lpSpawnPoints[PlayerType_PacMan].push_back(pBlock); 
 			break;
 
@@ -314,7 +314,7 @@ void CMap::Render()
 	for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
 	{
 		s_pTiles->SetAlpha(m_xBlocks[iA].fVisibility);
-		s_pTiles->SetRotation(m_xBlocks[iA].fRotation, true);
+		s_pTiles->SetAngle(m_xBlocks[iA].fAngle, true);
 		s_pTiles->SetArea(s_pTileAreas[m_xBlocks[iA].iType]);
 		s_pTiles->SetPosition(m_xBlocks[iA].GetScreenPosition() - m_xOffset);
 		s_pTiles->Render();

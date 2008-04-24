@@ -21,6 +21,8 @@
 
 // Other.
 #include <Sprite.h>
+#include <Background.h>
+#include <Font.h>
 
 //##############################################################################
 #pragma endregion
@@ -97,7 +99,7 @@ public:
 	/**
 	* Constructor.
 	*/
-	CMenuLink(XUINT iGroupIndex, XUINT iElementIndex, const XCHAR* pText, t_fpLinkSelectedCallback fpCallback = NULL);
+	CMenuLink(XUINT iGroupIndex, XUINT iElementIndex, CFontMetadata* pFont, const XCHAR* pText, t_fpLinkSelectedCallback fpCallback = NULL);
 
 	/**
 	* Destructor.
@@ -138,7 +140,7 @@ protected:
 	XUINT m_iGroupIndex;
 
 	// The text to render for the link.
-	const XCHAR* m_pText;
+	CText* m_pText;
 
 	// The link callback.
 	t_fpLinkSelectedCallback m_fpLinkSelectedCallback;
@@ -202,20 +204,17 @@ protected:
 	// The GUI control object.
 	hgeGUI* m_pGUI;
 
+	// The font metadata to render the links with.
+	CFontMetadata* m_pFont;
+
 	// A list of all the menu elements.
 	t_MenuLinkList m_lpMenuLinks[MenuGroupIndex_Max];
 
 	// The background image to scroll.
-	CSprite* m_pBackground;
+	CBackgroundImage* m_pBackground;
 
 	// The cursor image to use.
-	CSprite* m_pCursor;
-
-	// The internal timer used to scroll the background.
-	XUINT m_iTimer;
-
-	// The menu scrolling offset.
-	XPOINT m_xOffset;
+	CBasicSprite* m_pCursor;
 
 	// The currently active menu group.
 	t_MenuGroupIndex m_iMenuGroup;
