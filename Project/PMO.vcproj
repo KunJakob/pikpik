@@ -231,6 +231,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Source\Interface.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Interface.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\Main.cpp"
 				>
 			</File>

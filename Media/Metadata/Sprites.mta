@@ -104,3 +104,18 @@
 	.Area "Blind"			{ .Rect 0  0 46 46 }
 	.Area "Dizzy"			{ .Rect 46 0 92 46 }
 }
+
+.Sprite "Dialog-Tiles"
+{
+	.File "Surfaces\Dialog-Tiles.png"
+	
+	.Area "TL"				{ .Rect 0  0  8  8  }
+	.Area "TM"				{ .Rect 8  0  16 8  }
+	.Area "TR"				{ .Rect 16 0  24 8  }
+	.Area "ML"				{ .Rect 0  8  8  16 }
+	.Area "MM"				{ .Rect 8  8  16 16 }
+	.Area "MR"				{ .Rect 16 8  24 16 }
+	.Area "BL"				{ .Rect 0  16 8  24 }
+	.Area "BM"				{ .Rect 8  16 16 24 }
+	.Area "BR"				{ .Rect 16 16 24 24 }
+}

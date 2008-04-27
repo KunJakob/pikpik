@@ -23,6 +23,7 @@
 #include <Sprite.h>
 #include <Background.h>
 #include <Font.h>
+#include <Interface.h>
 
 //##############################################################################
 #pragma endregion
@@ -202,6 +203,9 @@ protected:
 
 	// The currently active menu group.
 	t_MenuGroupIndex m_iMenuGroup;
+
+  //
+  CDialog* m_pDialog;
 };
 
 //##############################################################################

@@ -133,6 +133,7 @@ enum t_RenderableType
 	RenderableType_Map,
 	RenderableType_Player,
 	RenderableType_Text,
+  RenderableType_Dialog,
 };
 
 // Common list types.

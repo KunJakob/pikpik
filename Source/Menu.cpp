@@ -246,6 +246,11 @@ void CMenuScreen::Load()
 
   // Initialise statics.
   s_iNextScreen = ScreenIndex_Invalid;
+
+  //
+  m_pDialog = new CDialog;
+  m_pDialog->SetSize(24, 2);
+  m_pDialog->SetPosition(XPOINT(10, 10));
 }
 
 // =============================================================================
@@ -291,6 +296,8 @@ void CMenuScreen::Render()
 {
 	m_pBackground->Render();
 	m_pGUI->Render();
+
+  m_pDialog->Render();
 }
 
 // =============================================================================
