@@ -210,7 +210,7 @@ void CBasicSprite::Render(XRECT xArea, XPOINT xAnchor, XPOINT xPosition, XFLOAT 
 // =============================================================================
 // Author: Nat Ryall                                           Date: 19-Feb-2008
 // =============================================================================
-CSprite::CSprite(CSpriteMetadata* pMetadata) : CBasicSprite(pMetadata),
+CSprite::CSprite(CSpriteMetadata* pMetadata) : CBasicSprite(pMetadata), CRenderable(RenderableType_Sprite),
 	m_pArea(NULL),
 	m_fAlpha(1.f),
 	m_fAngle(0.f)

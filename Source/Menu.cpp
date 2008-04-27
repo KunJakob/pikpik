@@ -51,12 +51,12 @@ static t_ScreenIndex s_iNextScreen = ScreenIndex_Invalid;
 // =============================================================================
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
-CMenuLink::CMenuLink(XUINT iGroupIndex, XUINT iElementIndex, CFontMetadata* pFont, const XCHAR* pText, t_fpLinkSelectedCallback fpCallback) :
+CMenuLink::CMenuLink(XUINT iGroupIndex, CFontMetadata* pFont, const XCHAR* pText, t_fpLinkSelectedCallback fpCallback) :
 	m_iGroupIndex(iGroupIndex),
 	m_pText(NULL),
 	m_fpLinkSelectedCallback(fpCallback)
 {
-	id = iElementIndex;
+  id = 0;
 	
 	bStatic = false;
 	bVisible = false;
@@ -89,7 +89,7 @@ void CMenuLink::Update(float fDeltaTime)
 // =============================================================================
 void CMenuLink::Render()
 {
-	m_pText->Render();
+  m_pText->Render();
 }
 
 // =============================================================================
@@ -132,6 +132,38 @@ void CMenuLink::RePosition(XUINT iElementIndex, XUINT iNumElements)
 //##############################################################################
 
 // =============================================================================
+// Nat Ryall                                                         27-Apr-2008
+// =============================================================================
+void Callback_ShowMainMenu()
+{
+  _GLOBAL.pMenu->SetMenuGroup(MenuGroupIndex_Main);
+}
+
+// =============================================================================
+// Nat Ryall                                                         27-Apr-2008
+// =============================================================================
+void Callback_ShowPlayMenu()
+{
+	_GLOBAL.pMenu->SetMenuGroup(MenuGroupIndex_Play);
+}
+
+// =============================================================================
+// Nat Ryall                                                         27-Apr-2008
+// =============================================================================
+void Callback_ShowOnlineMenu()
+{
+	_GLOBAL.pMenu->SetMenuGroup(MenuGroupIndex_Online);
+}
+
+// =============================================================================
+// Nat Ryall                                                         27-Apr-2008
+// =============================================================================
+void Callback_StartLobby()
+{
+	s_iNextScreen = ScreenIndex_SplashScreen;
+}
+
+// =============================================================================
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
 void Callback_StartGame()
@@ -145,32 +177,6 @@ void Callback_StartGame()
 void Callback_QuitGame()
 {
 	_TERMINATE;
-}
-
-// =============================================================================
-// Nat Ryall                                                         18-Apr-2008
-// =============================================================================
-void Callback_ShowCharacterSelect()
-{
-	/*CSelectionScreen* pSelection = (CSelectionScreen*)ScreenManager::FindScreen(ScreenIndex_SelectionScreen);
-
-	CPacMan* pPacMan = new CPacMan(NULL);
-	pPacMan->SetName("Krakken");
-	pSelection->PushPlayer(pPacMan);
-
-	CGhost* pGhost1 = new CGhost(NULL);
-	pGhost1->SetName("Yossarian");
-	pSelection->PushPlayer(pGhost1);
-
-	CGhost* pGhost2 = new CGhost(NULL);
-	pGhost2->SetName("Schmee43");
-	pSelection->PushPlayer(pGhost2);
-
-	CGhost* pGhost3 = new CGhost(NULL);
-	pGhost3->SetName("SlyGamer123");
-	pSelection->PushPlayer(pGhost3);
-
-	s_iNextScreen = ScreenIndex_SelectionScreen;*/
 }
 
 //##############################################################################
@@ -188,54 +194,58 @@ void Callback_ShowCharacterSelect()
 // =============================================================================
 void CMenuScreen::Load()
 {
-	// Initialise prerequisites.
-	m_pGUI = new hgeGUI;
-	m_pFont = _FONT("Menu-Item");
+  _GLOBAL.pMenu = this;
 
-	// Initialise the menu links.
-	m_iMenuGroup = MenuGroupIndex_None;
+  // Initialise prerequisites.
+  m_pGUI = new hgeGUI;
+  m_pFont = _FONT("Menu-Item");
 
-	CMenuLink* pLinkList[] = 
-	{
-		// Main.
-		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Play,		m_pFont, "Play Online",	&Callback_StartGame),
-		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Credits, m_pFont, "Tutorial",		NULL),
-		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Options, m_pFont, "Options",			NULL),
-		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Credits, m_pFont, "Credits",			NULL),
-		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Exit,		m_pFont, "Exit",				&Callback_QuitGame),
-		//new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Debug,		m_pFont, "Debug",				&Callback_ShowCharacterSelect),
+  // Initialise the menu links.
+  m_iMenuGroup = MenuGroupIndex_None;
 
-		// Play.
-		new CMenuLink(MenuGroupIndex_Play, MenuElementIndex_Link_Find,		m_pFont, "Find",				NULL),
-		new CMenuLink(MenuGroupIndex_Play, MenuElementIndex_Link_Direct,	m_pFont, "Join",				NULL),
-		new CMenuLink(MenuGroupIndex_Play, MenuElementIndex_Link_Create,	m_pFont, "Create",			NULL),
-	};
+  CMenuLink* pLinkList[] = 
+  {
+    // Main.
+    new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Play Online",		&Callback_ShowOnlineMenu),
+    new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Tutorial",	NULL),
+    new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Options",		NULL),
+    new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Credits",		NULL),
+    new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Exit",			&Callback_QuitGame),
 
-	for (XUINT iA = 0; iA < (sizeof(pLinkList) / sizeof(CMenuLink*)); ++iA)
-	{
-		m_lpMenuLinks[pLinkList[iA]->m_iGroupIndex].push_back(pLinkList[iA]);
-		m_pGUI->AddCtrl(pLinkList[iA]);
-	}
+    // Play.
+    new CMenuLink(MenuGroupIndex_Play,		m_pFont, "Back",			&Callback_ShowMainMenu),
 
-	for (XUINT iGroup = 0; iGroup < MenuGroupIndex_Max; ++iGroup)
-	{
-		XUINT iElementCount = m_lpMenuLinks[iGroup].size();
-		XUINT iElement = 0;
+    // Online.
+    new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Join",			NULL),
+    new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Create",		Callback_StartGame),
+    new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Back",			&Callback_ShowMainMenu),
+  };
 
-		XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[iGroup])
-			(*ppMenuLink)->RePosition(iElement++, iElementCount);
-	}
+  for (XUINT iA = 0; iA < (sizeof(pLinkList) / sizeof(CMenuLink*)); ++iA)
+  {
+    m_lpMenuLinks[pLinkList[iA]->m_iGroupIndex].push_back(pLinkList[iA]);
+    m_pGUI->AddCtrl(pLinkList[iA]);
+  }
 
-	SetMenuGroup(MenuGroupIndex_Main);
+  for (XUINT iGroup = 0; iGroup < MenuGroupIndex_Max; ++iGroup)
+  {
+    XUINT iElementCount = m_lpMenuLinks[iGroup].size();
+    XUINT iElement = 0;
 
-	// Initialise the render resources.
-	m_pBackground = new CBackgroundImage("Lobby-Background");
+    XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[iGroup])
+      (*ppMenuLink)->RePosition(iElement++, iElementCount);
+  }
 
-	m_pCursor = new CBasicSprite(_SPRITE("Cursor"));
-	m_pGUI->SetCursor(m_pCursor->GetMetadata()->GetSprite());
+  SetMenuGroup(MenuGroupIndex_Main);
 
-	// Initialise statics.
-	s_iNextScreen = ScreenIndex_Invalid;
+  // Initialise the render resources.
+  m_pBackground = new CBackgroundImage("Lobby-Background");
+
+  m_pCursor = new CBasicSprite(_SPRITE("Cursor"));
+  m_pGUI->SetCursor(m_pCursor->GetMetadata()->GetSprite());
+
+  // Initialise statics.
+  s_iNextScreen = ScreenIndex_Invalid;
 }
 
 // =============================================================================

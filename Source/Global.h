@@ -88,6 +88,7 @@
 class CMetadata;
 class CSprite;
 class CPlayer;
+class CMenuScreen;
 class CMap;
 
 // The player identifier type.
@@ -162,6 +163,9 @@ using namespace Xen;
 class CGlobal : public Templates::CSingletonT<CGlobal>
 {
 public:
+  // The menu class.
+  CMenuScreen* pMenu;
+    
 	// The currently active map.
 	CMap* pActiveMap;
 

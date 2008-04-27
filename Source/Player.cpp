@@ -51,7 +51,7 @@ CPlayer::CPlayer(t_PlayerType iType, const XCHAR* pSpriteName) : CRenderable(Ren
 	m_iTransitionDir(AdjacentDir_Left)
 {
 	m_pSprite = new CAnimatedSprite(_SPRITE(pSpriteName));
-	m_pSprite->SetAnimation("Idle");
+	m_pSprite->SetAnimation("Idle", true);
 	m_pSprite->SetAnchor(m_pSprite->GetAreaCentre());
 	m_pSprite->SetEventCallback(&OnAnimationEvent, this);
 

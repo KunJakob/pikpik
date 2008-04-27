@@ -24,6 +24,7 @@
 // Other.
 #include <Metadata.h>
 #include <Resource.h>
+#include <Renderer.h>
 
 //##############################################################################
 
@@ -234,7 +235,7 @@ protected:
 //                                   SPRITE
 //
 //##############################################################################
-class CSprite : public CBasicSprite
+class CSprite : public CBasicSprite, public CRenderable
 {
 public:
 	/**

@@ -44,24 +44,8 @@ enum t_MenuGroupIndex
 	MenuGroupIndex_None = -1,
 	MenuGroupIndex_Main,
 	MenuGroupIndex_Play,
+	MenuGroupIndex_Online,
 	/*MAX*/MenuGroupIndex_Max,
-};
-
-// The different element types.
-enum t_MenuElementIndex
-{
-	MenuElementIndex_Link_Debug,
-
-	// Main Menu.
-	MenuElementIndex_Link_Play,
-	MenuElementIndex_Link_Options,
-	MenuElementIndex_Link_Credits,
-	MenuElementIndex_Link_Exit,
-
-	// Play Menu.
-	MenuElementIndex_Link_Find,
-	MenuElementIndex_Link_Direct,
-	MenuElementIndex_Link_Create,
 };
 
 // The different transition states.
@@ -99,7 +83,7 @@ public:
 	/**
 	* Constructor.
 	*/
-	CMenuLink(XUINT iGroupIndex, XUINT iElementIndex, CFontMetadata* pFont, const XCHAR* pText, t_fpLinkSelectedCallback fpCallback = NULL);
+	CMenuLink(XUINT iGroupIndex, CFontMetadata* pFont, const XCHAR* pText, t_fpLinkSelectedCallback fpCallback = NULL);
 
 	/**
 	* Destructor.
@@ -195,12 +179,12 @@ public:
 	*/
 	virtual void Event(XIN xuint iEventType, XIN void* pEventInfo) {}
 
-protected:
-	/**
-	* Set the menu group to render.
-	*/
-	void SetMenuGroup(t_MenuGroupIndex iMenuGroup);
+  /**
+  * Set the menu group to render.
+  */
+  void SetMenuGroup(t_MenuGroupIndex iMenuGroup);
 
+protected:
 	// The GUI control object.
 	hgeGUI* m_pGUI;
 
