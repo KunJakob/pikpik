@@ -84,7 +84,7 @@ public:
 	XUINT iScrollInterval;
 
 	// The background scrolling speed.
-	XPOINT xScrollSpeed;
+	XPOINT xScrollVector;
 
 protected:
 	// The background sprite.

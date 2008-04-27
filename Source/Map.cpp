@@ -30,7 +30,7 @@
 static CMetadata* s_pMetadata = NULL;
 
 // The tiles used for rendering the map.
-static CSprite* s_pTiles = NULL;
+static CBasicSprite* s_pTiles = NULL;
 
 // The areas of each map tile.
 static CSpriteMetadata::CArea* s_pTileAreas[TileType_Max];
@@ -99,7 +99,7 @@ public:
 	virtual void Initialise()
 	{
 		s_pMetadata = new CMetadata(".\\Metadata\\Maps.mta");
-		s_pTiles = new CSprite(_SPRITE("Map-Tiles"));
+		s_pTiles = new CBasicSprite(_SPRITE("Map-Tiles"));
 
 		s_pTileAreas[TileType_Blank]				= s_pTiles->GetMetadata()->FindArea("Blank");
 		s_pTileAreas[TileType_Pellet]				= s_pTiles->GetMetadata()->FindArea("Pellet");
@@ -149,21 +149,6 @@ s_Module;
 // =============================================================================
 XBOOL CMapBlock::IsVisible(CPlayer* pPlayer)
 {
-	/*switch (pPlayer->GetType())
-	{
-	case PlayerType_PacMan:
-		{
-			return true;
-		}
-		break;
-
-	case PlayerType_Ghost:
-		{
-			return true;
-		}
-		break;
-	}*/
-
 	return true;
 }
 
@@ -313,11 +298,16 @@ void CMap::Render()
 {
 	for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
 	{
-		s_pTiles->SetAlpha(m_xBlocks[iA].fVisibility);
-		s_pTiles->SetAngle(m_xBlocks[iA].fAngle, true);
-		s_pTiles->SetArea(s_pTileAreas[m_xBlocks[iA].iType]);
-		s_pTiles->SetPosition(m_xBlocks[iA].GetScreenPosition() - m_xOffset);
-		s_pTiles->Render();
+		static XPOINT s_xCentrePoint = XPOINT(24, 24);
+
+		s_pTiles->Render
+		(
+			s_pTileAreas[m_xBlocks[iA].iType]->xRect, 
+			s_xCentrePoint, 
+			m_xBlocks[iA].GetScreenPosition() - m_xOffset,
+			m_xBlocks[iA].fVisibility, 
+			(m_xBlocks[iA].fAngle / 180.0f) * M_PI
+		);
 	}
 }
 

@@ -203,7 +203,7 @@ void CMenuScreen::Load()
 		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Options, m_pFont, "Options",			NULL),
 		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Credits, m_pFont, "Credits",			NULL),
 		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Exit,		m_pFont, "Exit",				&Callback_QuitGame),
-		new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Debug,		m_pFont, "Debug",				&Callback_ShowCharacterSelect),
+		//new CMenuLink(MenuGroupIndex_Main, MenuElementIndex_Link_Debug,		m_pFont, "Debug",				&Callback_ShowCharacterSelect),
 
 		// Play.
 		new CMenuLink(MenuGroupIndex_Play, MenuElementIndex_Link_Find,		m_pFont, "Find",				NULL),
@@ -229,7 +229,7 @@ void CMenuScreen::Load()
 	SetMenuGroup(MenuGroupIndex_Main);
 
 	// Initialise the render resources.
-	m_pBackground = new CBackgroundImage("Menu-Background");
+	m_pBackground = new CBackgroundImage("Lobby-Background");
 
 	m_pCursor = new CBasicSprite(_SPRITE("Cursor"));
 	m_pGUI->SetCursor(m_pCursor->GetMetadata()->GetSprite());

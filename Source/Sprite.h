@@ -454,7 +454,7 @@ public:
 	*/
 	XBOOL IsActiveFrame(const XCHAR* pName)
 	{
-		return strcmp(m_pFrame->pName, pName) == 0;
+		return m_pFrame && strcmp(m_pFrame->pName, pName) == 0;
 	}
 
 	/**
@@ -485,7 +485,7 @@ public:
 	*/
 	XBOOL IsActiveAnimation(const XCHAR* pName)
 	{
-		return strcmp(m_pAnimation->pName, pName) == 0;
+		return m_pAnimation && strcmp(m_pAnimation->pName, pName) == 0;
 	}
 
 	/**

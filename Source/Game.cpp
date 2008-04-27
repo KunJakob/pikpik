@@ -90,7 +90,7 @@ void WorldTransform(CRenderable* pRenderable)
 // =============================================================================
 void CGameScreen::Load()
 {
-	/*_GLOBAL.pActiveMap = new CMap(XFORMAT("M%03d", 4));
+	_GLOBAL.pActiveMap = new CMap(XFORMAT("M%03d", 4));
 
 	_GLOBAL.lpPlayers.push_back(new CPacMan(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_PacMan)));
 	_GLOBAL.lpPlayers.back()->SetName("Krakken");
@@ -110,7 +110,7 @@ void CGameScreen::Load()
 		RenderManager::Add(LayerIndex_Player, *ppPlayer);
 
 	RenderManager::SetRenderCallback(LayerIndex_Map, &WorldTransform);
-	RenderManager::SetRenderCallback(LayerIndex_Player, &WorldTransform);*/
+	RenderManager::SetRenderCallback(LayerIndex_Player, &WorldTransform);
 }
 
 // =============================================================================
@@ -118,10 +118,10 @@ void CGameScreen::Load()
 // =============================================================================
 void CGameScreen::Unload()
 {
-	/*RenderManager::Reset();
+	RenderManager::Reset();
 
 	XEN_LIST_ERASEMEM(_GLOBAL.lpPlayers);
-	delete _GLOBAL.pActiveMap;*/
+	delete _GLOBAL.pActiveMap;
 }
 
 // =============================================================================
@@ -129,7 +129,7 @@ void CGameScreen::Unload()
 // =============================================================================
 void CGameScreen::Update()
 {
-	/*if (_HGE->Input_KeyDown(HGEK_ESCAPE))
+	if (_HGE->Input_KeyDown(HGEK_ESCAPE))
 	{
 		ScreenManager::Pop();
 		return;
@@ -152,7 +152,7 @@ void CGameScreen::Update()
 		}
 	}
 
-	s_xOffset = _GLOBAL.pActivePlayer->GetSprite()->GetPosition() - XPOINT(_HSWIDTH, _HSHEIGHT);*/
+	s_xOffset = _GLOBAL.pActivePlayer->GetSprite()->GetPosition() - XPOINT(_HSWIDTH, _HSHEIGHT);
 }
 
 // =============================================================================

@@ -14,6 +14,7 @@
 // Screens.
 #include <Splash.h>
 #include <Menu.h>
+#include <Game.h>
 
 // Other.
 #include <Windows.h>
@@ -130,6 +131,7 @@ void Application::Initialise()
 	// Create all the screen instances.
 	s_lpScreens.push_back(new CSplashScreen);
 	s_lpScreens.push_back(new CMenuScreen);
+	s_lpScreens.push_back(new CGameScreen);
 
 	ScreenManager::Set(ScreenIndex_SplashScreen);
 }

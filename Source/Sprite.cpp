@@ -84,12 +84,13 @@ CSpriteMetadata::CSpriteMetadata(CDataset* pDataset) : CResourceMetadata(Resourc
 			CFrame* pFrame = new CFrame;
 			pAnimation->lpFrames.push_back(pFrame);
 
-			if (pFrameDataset->GetName())
-				pFrame->pName = pFrameDataset->GetName();
-
+			pFrame->pName = NULL;
 			pFrame->iDelay = iAnimationDelay;
 			pFrame->pEvent = NULL;
 			pFrame->pNextFrame = NULL;
+
+			if (pFrameDataset->GetName())
+				pFrame->pName = pFrameDataset->GetName();
 
 			pFrame->pArea = FindArea(pFrameDataset->GetProperty("Area")->GetString());
 

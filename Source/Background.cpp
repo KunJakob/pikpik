@@ -29,7 +29,7 @@
 // =============================================================================
 CBackgroundImage::CBackgroundImage(const XCHAR* pSpriteName) :
 	iScrollInterval(25),
-	xScrollSpeed(XPOINT(1, 1)),
+	xScrollVector(XPOINT(1, 1)),
 	m_pSprite(NULL),
 	m_iTimer(0)
 {
@@ -56,8 +56,18 @@ void CBackgroundImage::Update()
 	{
 		m_iTimer %= iScrollInterval;
 
-		m_xOffset += xScrollSpeed;
-		m_xOffset %= XPOINT(m_pSprite->GetImageWidth(), m_pSprite->GetImageHeight());
+		m_xOffset += xScrollVector;
+		//m_xOffset %= XPOINT(m_pSprite->GetImageWidth(), m_pSprite->GetImageHeight());
+
+		if (m_xOffset.iX < 0)
+			m_xOffset.iX += m_pSprite->GetImageWidth();
+		else if (m_xOffset.iX > (XINT)m_pSprite->GetImageWidth())
+			m_xOffset.iX -= m_pSprite->GetImageWidth();
+
+		if (m_xOffset.iY < 0)
+			m_xOffset.iY += m_pSprite->GetImageHeight();
+		else if (m_xOffset.iY > (XINT)m_pSprite->GetImageHeight())
+			m_xOffset.iY -= m_pSprite->GetImageHeight();
 	}
 }
 

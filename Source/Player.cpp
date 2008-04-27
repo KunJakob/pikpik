@@ -51,6 +51,8 @@ CPlayer::CPlayer(t_PlayerType iType, const XCHAR* pSpriteName) : CRenderable(Ren
 	m_iTransitionDir(AdjacentDir_Left)
 {
 	m_pSprite = new CAnimatedSprite(_SPRITE(pSpriteName));
+	m_pSprite->SetAnimation("Idle");
+	m_pSprite->SetAnchor(m_pSprite->GetAreaCentre());
 	m_pSprite->SetEventCallback(&OnAnimationEvent, this);
 
 	SetName("Unknown");
@@ -120,6 +122,8 @@ void CPlayer::Update()
 		m_pSprite->SetAlpha(m_pCurrentBlock->fVisibility);
 	else
 		m_pSprite->SetAlpha(1.f);
+
+	m_pSprite->Update();
 }
 
 // =============================================================================
@@ -245,6 +249,7 @@ CGhost::CGhost(CMapBlock* pSpawnBlock) : CPlayer(PlayerType_Ghost, "Player-Ghost
 
 	m_pEyes = new CSprite(_SPRITE("Player-Ghost-Eyes"));
 	m_pEyes->SetArea("F1");
+	m_pEyes->SetAnchor(m_pEyes->GetAreaCentre());
 
 	SetState(PlayerState_Idle);
 }
