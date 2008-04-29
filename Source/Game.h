@@ -52,6 +52,9 @@ public:
 protected:
 	// The map background.
 	CBackground m_Background;
+
+  // The field mask.
+  hgeSprite* m_pFieldMask;
 };
 
 //##############################################################################

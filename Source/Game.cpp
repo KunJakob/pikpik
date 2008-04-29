@@ -75,6 +75,48 @@ void WorldTransform(CRenderable* pRenderable)
 	}
 }
 
+// =============================================================================
+// Nat Ryall                                                         29-Apr-2008
+// =============================================================================
+HTEXTURE GenerateFieldMask(XUINT iInnerRadius, XUINT iOuterRadius)
+{
+  XUINT iRadiusDifference = iOuterRadius - iInnerRadius;
+  
+  static XUINT s_iWidth = _SWIDTH;
+  static XUINT s_iHeight = _SHEIGHT;
+
+  static XPOINT s_xCentre = XPOINT(_HSWIDTH, _HSHEIGHT);
+
+  HTEXTURE hFieldMask = _HGE->Texture_Create(s_iWidth, s_iHeight);
+
+  DWORD* pTexMem = _HGE->Texture_Lock(hFieldMask, false);
+  {
+    for (XUINT iY = 0; iY < s_iHeight; ++iY)
+    {
+      for (XUINT iX = 0; iX < s_iWidth; ++iX)
+      {
+        DWORD* pPixel = &pTexMem[iX + (iY * s_iWidth)];
+        XUINT iAlpha = 255;
+
+        XPOINT xDistance = XPOINT(abs((int)iX - (int)s_xCentre.iX), abs((int)iY - (int)s_xCentre.iY));
+        xDistance *= xDistance;
+
+        XUINT iDistance = (XUINT)sqrt((XFLOAT)xDistance.iX + (XFLOAT)xDistance.iY);
+
+        if (iDistance < iInnerRadius)
+          iAlpha = 0;
+        else if (iDistance < iOuterRadius)
+          iAlpha = ((iDistance - iInnerRadius) * 255) / iRadiusDifference;
+
+        *pPixel = ARGB(Math::Clamp<XUINT>(iAlpha, 0, 255), 0, 0, 0);
+      }
+    }
+  }
+  _HGE->Texture_Unlock(hFieldMask);
+
+  return hFieldMask;
+}
+
 //##############################################################################
 #pragma endregion
 
@@ -111,6 +153,8 @@ void CGameScreen::Load()
 
 	RenderManager::SetRenderCallback(LayerIndex_Map, &WorldTransform);
 	RenderManager::SetRenderCallback(LayerIndex_Player, &WorldTransform);
+
+  m_pFieldMask = new hgeSprite(GenerateFieldMask(48 * 1, 48 * 5), 0, 0, _SWIDTH, _SHEIGHT);
 }
 
 // =============================================================================
@@ -118,6 +162,9 @@ void CGameScreen::Load()
 // =============================================================================
 void CGameScreen::Unload()
 {
+  _HGE->Texture_Free(m_pFieldMask->GetTexture());
+  delete m_pFieldMask;
+
 	RenderManager::Reset();
 
 	XEN_LIST_ERASEMEM(_GLOBAL.lpPlayers);
@@ -160,6 +207,8 @@ void CGameScreen::Update()
 // =============================================================================
 void CGameScreen::Render()
 {
+  if (_GLOBAL.pActivePlayer->GetType() == PlayerType_Ghost)
+    m_pFieldMask->Render(0, 0);
 }
 
 //##############################################################################
