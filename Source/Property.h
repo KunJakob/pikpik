@@ -109,17 +109,19 @@ public:
   /**
   * Get the property value as a point.
   */
-  XPOINT GetPoint()
+  XPOINT GetPoint(XUINT iIndex = 0)
   {
-    return XPOINT(GetInt(0), GetInt(1));
+		XUINT iOffset = iIndex * 2;
+    return XPOINT(GetInt(iOffset + 0), GetInt(iOffset + 1));
   }
 
   /**
   * Get the property value as a rect.
   */
-  XRECT GetRect()
+  XRECT GetRect(XUINT iIndex = 0)
   {
-    return XRECT(GetInt(0), GetInt(1), GetInt(2), GetInt(3));
+		XUINT iOffset = iIndex * 4;
+    return XRECT(GetInt(iOffset + 0), GetInt(iOffset + 1), GetInt(iOffset + 2), GetInt(iOffset + 3));
   }
 
 protected:

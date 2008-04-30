@@ -247,10 +247,13 @@ void CMenuScreen::Load()
   // Initialise statics.
   s_iNextScreen = ScreenIndex_Invalid;
 
-  //
-  m_pDialog = new CDialog;
-  m_pDialog->SetSize(24, 2);
-  m_pDialog->SetPosition(XPOINT(10, 10));
+  // Debug.
+  m_pWindow = new CWindow(_SPRITE("Test-Window"));
+  m_pWindow->SetPosition(XPOINT(20, 30));
+  m_pWindow->SetSize(192, 92);
+
+  m_pButton = new CButton(_SPRITE("Test-Button"));
+  m_pButton->SetPosition(XPOINT(25, 35));
 }
 
 // =============================================================================
@@ -295,9 +298,9 @@ void CMenuScreen::Update()
 void CMenuScreen::Render()
 {
 	m_pBackground->Render();
+  m_pWindow->Render();
+  m_pButton->Render();
 	m_pGUI->Render();
-
-  m_pDialog->Render();
 }
 
 // =============================================================================

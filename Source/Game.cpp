@@ -135,13 +135,9 @@ void CGameScreen::Load()
 	_GLOBAL.pActiveMap = new CMap(XFORMAT("M%03d", 4));
 
 	_GLOBAL.lpPlayers.push_back(new CPacMan(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_PacMan)));
-	_GLOBAL.lpPlayers.back()->SetName("Krakken");
 	_GLOBAL.lpPlayers.push_back(new CGhost(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_Ghost)));
-	_GLOBAL.lpPlayers.back()->SetName("Yossarian");
 	_GLOBAL.lpPlayers.push_back(new CGhost(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_Ghost)));
-	_GLOBAL.lpPlayers.back()->SetName("Schmee43");
 	_GLOBAL.lpPlayers.push_back(new CGhost(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_Ghost)));
-	_GLOBAL.lpPlayers.back()->SetName("SlyGamer123");
 
 	_GLOBAL.pActivePlayer = _GLOBAL.lpPlayers.front();
 
@@ -154,7 +150,7 @@ void CGameScreen::Load()
 	RenderManager::SetRenderCallback(LayerIndex_Map, &WorldTransform);
 	RenderManager::SetRenderCallback(LayerIndex_Player, &WorldTransform);
 
-  m_pFieldMask = new hgeSprite(GenerateFieldMask(48 * 1, 48 * 5), 0, 0, _SWIDTH, _SHEIGHT);
+  m_pFieldMask = new hgeSprite(GenerateFieldMask(48 * 2, 48 * 5), 0, 0, _SWIDTH, _SHEIGHT);
 }
 
 // =============================================================================

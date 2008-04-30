@@ -23,6 +23,7 @@
 #include <Map.h>
 #include <Player.h>
 #include <Background.h>
+#include <Interface.h>
 
 //##############################################################################
 #pragma endregion

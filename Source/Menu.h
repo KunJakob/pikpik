@@ -204,8 +204,9 @@ protected:
 	// The currently active menu group.
 	t_MenuGroupIndex m_iMenuGroup;
 
-  //
-  CDialog* m_pDialog;
+  // Debug.
+  CWindow* m_pWindow;
+  CButton* m_pButton;
 };
 
 //##############################################################################

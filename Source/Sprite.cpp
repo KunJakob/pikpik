@@ -59,7 +59,13 @@ CSpriteMetadata::CSpriteMetadata(CDataset* pDataset) : CResourceMetadata(Resourc
 		lpAreas.push_back(pArea);
 
 		pArea->pName = pAreaDataset->GetName();
-		pArea->xRect = pAreaDataset->GetProperty("Rect")->GetRect();
+
+		if (_PROPERTY_EXISTS(pAreaDataset, "Rect"))
+			pArea->xRect = _PROPVAR->GetRect();
+		else if (_PROPERTY_EXISTS(pAreaDataset, "Size"))
+			pArea->xRect = XRECT(_PROPVAR->GetPoint(0), _PROPVAR->GetPoint(0) + _PROPVAR->GetPoint(1));
+		else if (_PROPERTY_EXISTS(pAreaDataset, "Tile"))
+			pArea->xRect = XRECT(_PROPVAR->GetInt(0) * _PROPVAR->GetInt(1), 0, (_PROPVAR->GetInt(0) + 1) * _PROPVAR->GetInt(1), _PROPVAR->GetInt(2));
 	}
 
 	// Animations.
@@ -73,8 +79,8 @@ CSpriteMetadata::CSpriteMetadata(CDataset* pDataset) : CResourceMetadata(Resourc
 
 		XUINT iAnimationDelay = 0;
 
-		if (CProperty* pProperty = pAnimationDataset->GetProperty("Delay"))
-			iAnimationDelay = pProperty->GetInt();
+		if (_PROPERTY_EXISTS(pAnimationDataset, "Delay"))
+			iAnimationDelay = _PROPVAR->GetInt();
 
 		CFrame* pPrevFrame = NULL;
 
@@ -94,11 +100,11 @@ CSpriteMetadata::CSpriteMetadata(CDataset* pDataset) : CResourceMetadata(Resourc
 
 			pFrame->pArea = FindArea(pFrameDataset->GetProperty("Area")->GetString());
 
-			if (CProperty* pProperty = pAnimationDataset->GetProperty("Delay"))
-				pFrame->iDelay = (XUINT)pProperty->GetInt();
+			if (_PROPERTY_EXISTS(pAnimationDataset, "Delay"))
+				pFrame->iDelay = (XUINT)_PROPVAR->GetInt();
 
-			if (CProperty* pProperty = pFrameDataset->GetProperty("Event"))
-				pFrame->pEvent = pProperty->GetString();
+			if (_PROPERTY_EXISTS(pFrameDataset, "Event"))
+				pFrame->pEvent = _PROPVAR->GetString();
 				
 			if (pPrevFrame && pPrevFrame->pNextFrame == NULL)
 				pPrevFrame->pNextFrame = pFrame;
@@ -106,10 +112,10 @@ CSpriteMetadata::CSpriteMetadata(CDataset* pDataset) : CResourceMetadata(Resourc
 			pFrame->pNextFrame = NULL;
 			pPrevFrame = pFrame;
 
-			if (CProperty* pProperty = pFrameDataset->GetProperty("Loop"))
+			if (_PROPERTY_EXISTS(pFrameDataset, "Loop"))
 				pFrame->pNextFrame = pAnimation->lpFrames.front();
-			else if (CProperty* pProperty = pFrameDataset->GetProperty("Goto"))
-				pFrame->pNextFrame = FindFrame(pAnimation, pProperty->GetString());
+			else if (_PROPERTY_EXISTS(pFrameDataset, "Goto"))
+				pFrame->pNextFrame = FindFrame(pAnimation, _PROPVAR->GetString());
 
 			pAnimation->iAnimationTime += pFrame->iDelay;
 		}

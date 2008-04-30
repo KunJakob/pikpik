@@ -14,98 +14,252 @@
 
 //##############################################################################
 //
-//                                   MODULE
+//                                   STATIC
 //
 //##############################################################################
-/*static class CInterfaceModule : public Xen::CModule
-{
-public:
-  // Constructor.
-  CInterfaceModule()
-  {
-    XMODULE(this);
-  }
 
-  // Initialise.
-  virtual void Initialise()
-  {
-  }
-
-  // Update.
-  virtual void Update()
-  {
-  }
-
-  // Render.
-  virtual void Render()
-  {
-  }
-
-  // Deinitialise.
-  virtual void Deinitialise()
-  {
-  }
-} 
-s_Module;*/
+// The currently focused element.
+CInterfaceElement* CInterfaceElement::s_pFocusedElement = NULL;
 
 //##############################################################################
 
 //##############################################################################
 //
-//                                   DIALOG
+//                             INTERFACE ELEMENT
 //
 //##############################################################################
 
 // =============================================================================
-// Nat Ryall                                                         27-Apr-2008
+// Nat Ryall                                                         30-Apr-2008
 // =============================================================================
-CDialog::CDialog() : CRenderable(RenderableType_Dialog),
-  m_iWidth(1),
-  m_iHeight(1)
+CInterfaceElement::CInterfaceElement(t_ElementType iType) :
+  m_pParent(NULL),
+  m_iType(iType),
+  m_bVisible(true),
+  m_bEnabled(true)
 {
-  m_pSprite = new CBasicSprite(_SPRITE("Dialog-Tiles"));
 }
 
 // =============================================================================
-// Nat Ryall                                                         27-Apr-2008
+// Nat Ryall                                                         30-Apr-2008
 // =============================================================================
-CDialog::~CDialog()
+void CInterfaceElement::Attach(CInterfaceElement* pElement)
+{
+  pElement->m_pParent = this;
+  m_lpChildElements.push_back(pElement);
+}
+
+// =============================================================================
+// Nat Ryall                                                         30-Apr-2008
+// =============================================================================
+void CInterfaceElement::Detach(CInterfaceElement* pElement)
+{
+  XEN_LIST_ERASE(t_ElementList, m_lpChildElements, pElement);
+}
+
+// =============================================================================
+// Nat Ryall                                                         30-Apr-2008
+// =============================================================================
+void CInterfaceElement::SetFocus(CInterfaceElement* pElement)
+{
+  if (s_pFocusedElement != pElement)
+  {
+    if (s_pFocusedElement)
+      s_pFocusedElement->OnBlur();
+
+    s_pFocusedElement = pElement;
+    s_pFocusedElement->OnFocus();
+  }
+}
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                 CONTAINER
+//
+//##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                         30-Apr-2008
+// =============================================================================
+CContainer::CContainer() : CInterfaceElement(ElementType_Container),
+  m_iWidth(0),
+  m_iHeight(0)
+{
+}
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                   WINDOW
+//
+//##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                         30-Apr-2008
+// =============================================================================
+CWindow::CWindow(CSpriteMetadata* pMetadata) :
+  m_pSprite(NULL),
+  m_bMoveable(false)
+{
+  m_iType = ElementType_Dialog;
+  m_pSprite = new CBasicSprite(pMetadata);
+
+  m_pAreas[AreaIndex_TopLeft]       = pMetadata->FindArea("TopLeft"); 
+  m_pAreas[AreaIndex_TopMiddle]     = pMetadata->FindArea("TopMiddle"); 
+  m_pAreas[AreaIndex_TopRight]      = pMetadata->FindArea("TopRight"); 
+  m_pAreas[AreaIndex_MiddleLeft]    = pMetadata->FindArea("MiddleLeft"); 
+  m_pAreas[AreaIndex_Middle]        = pMetadata->FindArea("Middle"); 
+  m_pAreas[AreaIndex_MiddleRight]   = pMetadata->FindArea("MiddleRight"); 
+  m_pAreas[AreaIndex_BottomLeft]    = pMetadata->FindArea("BottomLeft"); 
+  m_pAreas[AreaIndex_BottomMiddle]  = pMetadata->FindArea("BottomMiddle"); 
+  m_pAreas[AreaIndex_BottomRight]   = pMetadata->FindArea("BottomRight"); 
+}
+
+// =============================================================================
+// Nat Ryall                                                         30-Apr-2008
+// =============================================================================
+CWindow::~CWindow()
 {
   delete m_pSprite;
 }
 
 // =============================================================================
-// Nat Ryall                                                         27-Apr-2008
+// Nat Ryall                                                         30-Apr-2008
 // =============================================================================
-void CDialog::Render()
+void CWindow::Render()
 {
-  CSpriteMetadata* pMetadata = m_pSprite->GetMetadata();
+  XRECT xOffset
+  (
+    m_pAreas[AreaIndex_MiddleLeft]->xRect.GetWidth() * -1,
+    m_pAreas[AreaIndex_TopMiddle]->xRect.GetHeight() * -1,
+    m_pAreas[AreaIndex_MiddleRight]->xRect.GetWidth(),
+    m_pAreas[AreaIndex_BottomMiddle]->xRect.GetHeight()
+  );
 
-  XUINT iRealWidth = 8 + (m_iWidth * 8);
-  XUINT iRealHeight = 8 + (m_iHeight * 8);
+  // Draw corners.
+  InternalRender(m_pAreas[AreaIndex_TopLeft]->xRect, XPOINT(xOffset.iLeft, xOffset.iTop));
+  InternalRender(m_pAreas[AreaIndex_TopRight]->xRect, XPOINT(m_iWidth, xOffset.iTop));
+  InternalRender(m_pAreas[AreaIndex_BottomLeft]->xRect, XPOINT(xOffset.iLeft, m_iHeight));
+  InternalRender(m_pAreas[AreaIndex_BottomRight]->xRect, XPOINT(m_iWidth, m_iHeight));
 
-  m_pSprite->Render(pMetadata->FindArea("TL")->xRect, XPOINT(), m_xPosition, 1.f, 0.f);
-  m_pSprite->Render(pMetadata->FindArea("TR")->xRect, XPOINT(), m_xPosition + XPOINT(iRealWidth, 0), 1.f, 0.f);
-  m_pSprite->Render(pMetadata->FindArea("BL")->xRect, XPOINT(), m_xPosition + XPOINT(0, iRealHeight), 1.f, 0.f);
-  m_pSprite->Render(pMetadata->FindArea("BR")->xRect, XPOINT(), m_xPosition + XPOINT(iRealWidth, iRealHeight), 1.f, 0.f);
+  XUINT iCentreWidth = m_pAreas[AreaIndex_Middle]->xRect.GetWidth();
+  XUINT iCentreHeight = m_pAreas[AreaIndex_Middle]->xRect.GetHeight();
 
-  for (XUINT iA = 0; iA < m_iWidth; ++iA)
+  // Draw horizontal.
+  for (XUINT iX = 0; iX < m_iWidth;)
   {
-    m_pSprite->Render(pMetadata->FindArea("TM")->xRect, XPOINT(), m_xPosition + XPOINT(8 + (iA * 8), 0), 1.f, 0.f);
-    m_pSprite->Render(pMetadata->FindArea("BM")->xRect, XPOINT(), m_xPosition + XPOINT(8 + (iA * 8), iRealHeight), 1.f, 0.f);
+    XUINT iDrawWidth = Math::Clamp<XUINT>(m_iWidth - iX, 0, iCentreWidth);
+
+    XRECT xTopRect = m_pAreas[AreaIndex_TopMiddle]->xRect;
+    xTopRect.iRight = xTopRect.iLeft + iDrawWidth;
+
+    InternalRender(xTopRect, XPOINT(iX, xOffset.iTop));
+
+    XRECT xBottomRect = m_pAreas[AreaIndex_BottomMiddle]->xRect;
+    xBottomRect.iRight = xBottomRect.iLeft + iDrawWidth;
+
+    InternalRender(xBottomRect, XPOINT(iX, m_iHeight));
+
+    iX += iDrawWidth;
   }
 
-  for (XUINT iA = 0; iA < m_iHeight; ++iA)
+  // Draw vertical.
+  for (XUINT iY = 0; iY < m_iHeight;)
   {
-    m_pSprite->Render(pMetadata->FindArea("ML")->xRect, XPOINT(), m_xPosition + XPOINT(0, 8 + (iA * 8)), 1.f, 0.f);
-    m_pSprite->Render(pMetadata->FindArea("MR")->xRect, XPOINT(), m_xPosition + XPOINT(iRealWidth, 8 + (iA * 8)), 1.f, 0.f);
+    XUINT iDrawHeight = Math::Clamp<XUINT>(m_iHeight - iY, 0, iCentreHeight);
+
+    XRECT xLeftRect = m_pAreas[AreaIndex_MiddleLeft]->xRect;
+    xLeftRect.iBottom = xLeftRect.iTop + iDrawHeight;
+
+    InternalRender(xLeftRect, XPOINT(xOffset.iLeft, iY));
+
+    XRECT xRightRect = m_pAreas[AreaIndex_MiddleLeft]->xRect;
+    xRightRect.iBottom = xRightRect.iTop + iDrawHeight;
+
+    InternalRender(xRightRect, XPOINT(m_iWidth, iY));
+
+    iY += iDrawHeight;
   }
 
-  for (XUINT iY = 0; iY < m_iHeight; ++iY)
+  // Draw fill.
+  for (XUINT iY = 0; iY < m_iHeight;)
   {
-    for (XUINT iX = 0; iX < m_iWidth; ++iX)
-      m_pSprite->Render(pMetadata->FindArea("MM")->xRect, XPOINT(), m_xPosition + XPOINT(8 + (iX * 8), 8 + (iY * 8)), 1.f, 0.f);
+    XUINT iDrawHeight = Math::Clamp<XUINT>(m_iHeight - iY, 0, iCentreHeight);
+
+    for (XUINT iX = 0; iX < m_iWidth;)
+    {
+      XUINT iDrawWidth = Math::Clamp<XUINT>(m_iWidth - iX, 0, iCentreWidth);
+      XRECT xRect = m_pAreas[AreaIndex_Middle]->xRect;
+
+      xRect.iRight = xRect.iLeft + iDrawWidth;
+      xRect.iBottom = xRect.iTop + iDrawHeight;
+
+      InternalRender(xRect, XPOINT(iX, iY));
+
+      iX += iDrawWidth;
+    }
+
+    iY += iDrawHeight;
   }
+}
+
+// =============================================================================
+// Nat Ryall                                                         30-Apr-2008
+// =============================================================================
+void CWindow::InternalRender(XRECT& xRect, XPOINT xOffset)
+{
+  m_pSprite->Render(xRect, XPOINT(), m_xPosition + xOffset, 1.f, 0.f);
+}
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                   LABEL
+//
+//##############################################################################
+
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                   BUTTON
+//
+//##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                         30-Apr-2008
+// =============================================================================
+CButton::CButton(CSpriteMetadata* pMetadata) : CInterfaceElement(ElementType_Button),
+  m_pSprite(NULL),
+  iButtonState(AreaIndex_Normal),
+  m_pLabel(NULL)
+{
+  m_pSprite = new CBasicSprite(pMetadata);
+
+  m_pAreas[AreaIndex_Normal]  = pMetadata->FindArea("Normal"); 
+  m_pAreas[AreaIndex_Over]    = pMetadata->FindArea("Over"); 
+  m_pAreas[AreaIndex_Down]    = pMetadata->FindArea("Down"); 
+}
+
+// =============================================================================
+// Nat Ryall                                                         30-Apr-2008
+// =============================================================================
+CButton::~CButton()
+{
+  delete m_pSprite;
+}
+
+// =============================================================================
+// Nat Ryall                                                         30-Apr-2008
+// =============================================================================
+void CButton::Render()
+{
+  m_pSprite->Render(m_pAreas[iButtonState]->xRect, XPOINT(), m_xPosition, 1.f, 0.f);
 }
 
 //##############################################################################

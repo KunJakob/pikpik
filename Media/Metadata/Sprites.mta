@@ -119,3 +119,32 @@
 	.Area "BM"				{ .Rect 8  16 16 24 }
 	.Area "BR"				{ .Rect 16 16 24 24 }
 }
+
+.Sprite "Test-Cursor"
+{
+	.File "Surfaces\Test-Cursor.png"
+}
+
+.Sprite "Test-Window"
+{
+	.File "Surfaces\Test-Dialog.png"
+	
+	.Area "TopLeft"			{ .Size 0  0  3  17 }
+	.Area "TopMiddle"		{ .Size 3  0  58 17 }
+	.Area "TopRight"		{ .Size 61 0  3  17 }
+	.Area "MiddleLeft"		{ .Size 0  17 3  58 }
+	.Area "Middle"			{ .Size 3  17 58 58 }
+	.Area "MiddleRight"		{ .Size 61 17 3  58 }
+	.Area "BottomLeft"		{ .Size 0  75 3  3  }
+	.Area "BottomMiddle"	{ .Size 3  75 58 3  }
+	.Area "BottomRight"		{ .Size 61 75 3  3  }
+}
+
+.Sprite "Test-Button"
+{
+	.File "Surfaces\Test-Button.png"
+	
+	.Area "Normal"			{ .Tile 0 108 20 }
+	.Area "Over"			{ .Tile 1 108 20 }
+	.Area "Down"			{ .Tile 2 108 20 }
+}
