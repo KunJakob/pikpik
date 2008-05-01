@@ -25,6 +25,117 @@ CInterfaceElement* CInterfaceElement::s_pFocusedElement = NULL;
 
 //##############################################################################
 //
+//                             INTERFACE MANAGER
+//
+//##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                          1-May-2008
+// =============================================================================
+CInterfaceManager::CInterfaceManager() :
+  m_pContainer(NULL),
+  m_pCurrentElement(NULL)
+{
+  m_pContainer = new CContainer();
+}
+
+// =============================================================================
+// Nat Ryall                                                          1-May-2008
+// =============================================================================
+CInterfaceManager::~CInterfaceManager()
+{
+  delete m_pContainer;
+}
+
+// =============================================================================
+// Nat Ryall                                                          1-May-2008
+// =============================================================================
+void CInterfaceManager::Update()
+{
+  m_xLastMousePos = m_xMousePos;
+
+  XFLOAT fX;
+  XFLOAT fY;
+
+  _HGE->Input_GetMousePos(&fX, &fY);
+  m_xMousePos = XPOINT((XINT)fX, (XINT)fY);
+
+  UpdateElement(m_pContainer);
+}
+
+// =============================================================================
+// Nat Ryall                                                          1-May-2008
+// =============================================================================
+void CInterfaceManager::Render()
+{
+  RenderElement(m_pContainer);
+}
+
+// =============================================================================
+// Nat Ryall                                                          1-May-2008
+// =============================================================================
+void CInterfaceManager::UpdateElement(CInterfaceElement* pElement)
+{
+  CheckIntersection(pElement);
+
+  pElement->Update();
+
+  for (XUINT iA = 0; iA < pElement->GetAttachedCount(); ++iA)
+    UpdateElement(pElement->GetAttached(iA));
+}
+
+// =============================================================================
+// Nat Ryall                                                          1-May-2008
+// =============================================================================
+void CInterfaceManager::RenderElement(CInterfaceElement* pElement)
+{
+  pElement->Render();
+
+  XEN_LIST_FOREACH(t_ElementList, ppElement, pElement->m_lpChildElements)
+  {
+    RenderElement(*ppElement);
+  }
+}
+
+// =============================================================================
+// Nat Ryall                                                          1-May-2008
+// =============================================================================
+bool CInterfaceManager::CheckIntersection(CInterfaceElement* pElement)
+{
+  XEN_LIST_FOREACH_R(t_ElementList, ppElement, pElement->m_lpChildElements)
+  {
+    if (CheckIntersection(*ppElement))
+      return true;
+  }
+
+  if (pElement->IsVisible())
+  {
+    if (Math::Intersect(m_xMousePos, pElement->m_xArea))
+    {
+      if (!Math::Intersect(m_xLastMousePos, pElement->m_xArea))
+        pElement->OnMouseEnter();
+
+      if (_HGE->Input_KeyDown(HGEK_LBUTTON))
+        pElement->OnMouseDown();
+      else if (_HGE->Input_KeyUp(HGEK_LBUTTON))
+        pElement->OnMouseUp();
+    }
+    else
+    {
+      if (Math::Intersect(m_xLastMousePos, pElement->m_xArea))
+      {
+        pElement->OnMouseLeave();
+      }
+    }
+  }
+
+  return false;
+}
+
+//##############################################################################
+
+//##############################################################################
+//
 //                             INTERFACE ELEMENT
 //
 //##############################################################################
@@ -236,7 +347,7 @@ void CWindow::InternalRender(XRECT& xRect, XPOINT xOffset)
 // =============================================================================
 CButton::CButton(CSpriteMetadata* pMetadata) : CInterfaceElement(ElementType_Button),
   m_pSprite(NULL),
-  iButtonState(AreaIndex_Normal),
+  m_iButtonState(AreaIndex_Normal),
   m_pLabel(NULL)
 {
   m_pSprite = new CBasicSprite(pMetadata);
@@ -259,7 +370,7 @@ CButton::~CButton()
 // =============================================================================
 void CButton::Render()
 {
-  m_pSprite->Render(m_pAreas[iButtonState]->xRect, XPOINT(), m_xPosition, 1.f, 0.f);
+  m_pSprite->Render(m_pAreas[m_iButtonState]->xRect, XPOINT(), m_xPosition, 1.f, 0.f);
 }
 
 //##############################################################################

@@ -27,12 +27,24 @@
 
 //##############################################################################
 //
+//                                   MACROS
+//
+//##############################################################################
+
+// Shortcuts.
+#define InterfaceManager CInterfaceManager::Get()
+
+//##############################################################################
+
+//##############################################################################
+//
 //                                   TYPES
 //
 //##############################################################################
 
 // Predeclare.
 class CInterfaceElement;
+class CContainer;
 
 // The types of interface elements.
 enum t_ElementType
@@ -54,6 +66,65 @@ typedef XVLIST<CInterfaceElement*> t_ElementList;
 //                             INTERFACE MANAGER
 //
 //##############################################################################
+class CInterfaceManager : public Templates::CSingletonT<CInterfaceManager>
+{
+public:
+  /**
+  * 
+  */
+  CInterfaceManager();
+
+  /**
+  * 
+  */
+  ~CInterfaceManager();
+
+  /**
+  * 
+  */
+  virtual void Update();
+
+  /**
+  * 
+  */
+  virtual void Render();
+
+  /**
+  * 
+  */
+  CContainer* GetContainer()
+  {
+    return m_pContainer;
+  }
+
+protected:
+  /**
+  * 
+  */
+  void UpdateElement(CInterfaceElement* pElement);
+
+  /**
+  * 
+  */
+  void RenderElement(CInterfaceElement* pElement);
+
+  /**
+  * 
+  */
+  bool CheckIntersection(CInterfaceElement* pElement);
+
+  // The base container object.
+  CContainer* m_pContainer;
+
+  // The current mouse position.
+  XPOINT m_xMousePos;
+
+  // The last mouse position.
+  XPOINT m_xLastMousePos;
+
+  // The current element the mouse is over.
+  CInterfaceElement* m_pCurrentElement;
+};
 
 //##############################################################################
 
@@ -65,6 +136,9 @@ typedef XVLIST<CInterfaceElement*> t_ElementList;
 class CInterfaceElement
 {
 public:
+  // Friend.
+  friend CInterfaceManager;
+
   /**
   * 
   */
@@ -133,7 +207,7 @@ public:
   */
   XRECT GetArea()
   {
-    return m_xArea;
+    return m_xArea; // + XRECT(m_xPosition, m_xPosition)
   }
 
   /**
@@ -189,9 +263,8 @@ public:
   */
   virtual void OnMouseEnter() {}
   virtual void OnMouseLeave() {}
-  virtual void OnMouseOver(XPOINT xLocalPos) {}
-  virtual void OnMouseDown(XPOINT xLocalPos) {}
-  virtual void OnMouseUp(XPOINT xLocalPos) {}
+  virtual void OnMouseDown() {}
+  virtual void OnMouseUp() {}
 
   /**
   * 
@@ -413,6 +486,15 @@ public:
   /**
   * 
   */
+  virtual void Update() 
+  { 
+    XPOINT xSize(m_pAreas[m_iButtonState]->xRect.GetWidth(), m_pAreas[m_iButtonState]->xRect.GetHeight());
+    m_xArea = XRECT(m_xPosition, m_xPosition + xSize); 
+  }
+
+  /**
+  * 
+  */
   virtual void Render();
 
   /**
@@ -437,6 +519,38 @@ public:
     return NULL;
   }
 
+  /**
+  * 
+  */
+  virtual void OnMouseEnter() 
+  {
+    m_iButtonState = AreaIndex_Over;
+  }
+
+  /**
+  * 
+  */
+  virtual void OnMouseLeave()
+  {
+    m_iButtonState = AreaIndex_Normal;
+  }
+
+  /**
+  * 
+  */
+  virtual void OnMouseDown()
+  {
+    m_iButtonState = AreaIndex_Down;
+  }
+
+  /**
+  * 
+  */
+  virtual void OnMouseUp() 
+  {
+    m_iButtonState = AreaIndex_Over;
+  }
+
 protected:
   // Internal types.
   enum t_AreaIndex
@@ -454,7 +568,7 @@ protected:
   CSpriteMetadata::CArea* m_pAreas[AreaIndex_Max];
 
   // The button state.
-  t_AreaIndex iButtonState;
+  t_AreaIndex m_iButtonState;
 
   // The button label.
   CLabel* m_pLabel;

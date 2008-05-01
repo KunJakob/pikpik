@@ -254,6 +254,9 @@ void CMenuScreen::Load()
 
   m_pButton = new CButton(_SPRITE("Test-Button"));
   m_pButton->SetPosition(XPOINT(25, 35));
+
+  InterfaceManager.GetContainer()->Attach(m_pWindow);
+  InterfaceManager.GetContainer()->Attach(m_pButton);
 }
 
 // =============================================================================
@@ -290,6 +293,9 @@ void CMenuScreen::Update()
 
 	// Update the background.
 	m_pBackground->Update();
+
+  //
+  InterfaceManager.Update();
 }
 
 // =============================================================================
@@ -298,8 +304,9 @@ void CMenuScreen::Update()
 void CMenuScreen::Render()
 {
 	m_pBackground->Render();
-  m_pWindow->Render();
-  m_pButton->Render();
+  //m_pWindow->Render();
+  //m_pButton->Render();
+  InterfaceManager.Render();
 	m_pGUI->Render();
 }
 
