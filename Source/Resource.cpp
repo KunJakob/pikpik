@@ -91,7 +91,7 @@ void ResourceManager::Reset()
 {
 	for (XUINT iA = 0; iA < ResourceType_Max; ++iA)
 	{
-		XEN_LIST_ERASEMEM(s_lpResourceMetadata[iA]);
+		XEN_LIST_ERASE_ALL(s_lpResourceMetadata[iA]);
 	}
 }
 

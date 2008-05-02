@@ -163,7 +163,7 @@ void CGameScreen::Unload()
 
 	RenderManager::Reset();
 
-	XEN_LIST_ERASEMEM(_GLOBAL.lpPlayers);
+	XEN_LIST_ERASE_ALL(_GLOBAL.lpPlayers);
 	delete _GLOBAL.pActiveMap;
 }
 

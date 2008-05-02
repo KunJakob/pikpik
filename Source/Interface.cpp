@@ -14,17 +14,6 @@
 
 //##############################################################################
 //
-//                                   STATIC
-//
-//##############################################################################
-
-// The currently focused element.
-CInterfaceElement* CInterfaceElement::s_pFocusedElement = NULL;
-
-//##############################################################################
-
-//##############################################################################
-//
 //                             INTERFACE MANAGER
 //
 //##############################################################################
@@ -33,10 +22,12 @@ CInterfaceElement* CInterfaceElement::s_pFocusedElement = NULL;
 // Nat Ryall                                                          1-May-2008
 // =============================================================================
 CInterfaceManager::CInterfaceManager() :
-  m_pContainer(NULL),
-  m_pCurrentElement(NULL)
+  m_pContainer(NULL)
 {
   m_pContainer = new CContainer();
+	m_pContainer->SetSize(_SWIDTH, _SHEIGHT);
+
+	Reset();
 }
 
 // =============================================================================
@@ -45,6 +36,17 @@ CInterfaceManager::CInterfaceManager() :
 CInterfaceManager::~CInterfaceManager()
 {
   delete m_pContainer;
+}
+
+// =============================================================================
+// Nat Ryall                                                          2-May-2008
+// =============================================================================
+void CInterfaceManager::Reset()
+{
+	m_pActiveElement = NULL;
+	m_pFocusedElement = NULL;
+
+	m_pContainer->DetachAll();
 }
 
 // =============================================================================
@@ -60,7 +62,22 @@ void CInterfaceManager::Update()
   _HGE->Input_GetMousePos(&fX, &fY);
   m_xMousePos = XPOINT((XINT)fX, (XINT)fY);
 
+	if (m_pActiveElement)
+	{
+		m_pActiveElement->OnMouseMove(m_xMousePos - m_xLastMousePos);
+		m_pActiveElement = NULL;
+	}
+
   UpdateElement(m_pContainer);
+
+	if (m_pFocusedElement)
+	{
+		CInterfaceElement* pElement = m_pFocusedElement;
+
+		do 
+			pElement->ToFront();
+		while (pElement = pElement->m_pParent);
+	}
 }
 
 // =============================================================================
@@ -69,6 +86,62 @@ void CInterfaceManager::Update()
 void CInterfaceManager::Render()
 {
   RenderElement(m_pContainer);
+
+	if (m_pActiveElement)
+	{
+		XRECT xRect = m_pActiveElement->GetArea();
+		XUINT iColour = ARGB(255, 32, 32, 32);
+		
+		hgeQuad xQuad;
+		memset(&xQuad, 0, sizeof(hgeQuad));
+
+		xQuad.v[0].x = (float)xRect.iLeft;
+		xQuad.v[0].y = (float)xRect.iTop;
+		xQuad.v[1].x = (float)xRect.iRight;
+		xQuad.v[1].y = (float)xRect.iTop;
+		xQuad.v[3].x = (float)xRect.iLeft;
+		xQuad.v[3].y = (float)xRect.iBottom;
+		xQuad.v[2].x = (float)xRect.iRight;
+		xQuad.v[2].y = (float)xRect.iBottom;
+
+		xQuad.v[0].col = xQuad.v[1].col = xQuad.v[2].col = xQuad.v[3].col = iColour;
+
+		_HGE->Gfx_RenderQuad(&xQuad);
+	}
+
+	if (m_pFocusedElement)
+	{
+		XRECT xRect = m_pFocusedElement->GetFocusArea() + XRECT(2, 2, -1, -1);
+		XUINT iColour = ARGB(255, 255, 0, 0);
+
+		_HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iTop, iColour);
+		_HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iBottom, iColour);
+		_HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iBottom, iColour);
+		_HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iTop, iColour);
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                          2-May-2008
+// =============================================================================
+void CInterfaceManager::SetFocus(CInterfaceElement* pElement)
+{
+	if (m_pFocusedElement != pElement)
+	{
+		if (m_pFocusedElement)
+			m_pFocusedElement->OnBlur();
+
+		m_pFocusedElement = pElement;
+		m_pFocusedElement->OnFocus();
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                          2-May-2008
+// =============================================================================
+XBOOL CInterfaceManager::IsMouseOver(CInterfaceElement* pElement)
+{
+	return Math::Intersect(m_xMousePos, pElement->GetArea());
 }
 
 // =============================================================================
@@ -80,8 +153,8 @@ void CInterfaceManager::UpdateElement(CInterfaceElement* pElement)
 
   pElement->Update();
 
-  for (XUINT iA = 0; iA < pElement->GetAttachedCount(); ++iA)
-    UpdateElement(pElement->GetAttached(iA));
+	XEN_LIST_FOREACH(t_ElementList, ppElement, pElement->m_lpChildElements)
+		UpdateElement(*ppElement);
 }
 
 // =============================================================================
@@ -92,44 +165,49 @@ void CInterfaceManager::RenderElement(CInterfaceElement* pElement)
   pElement->Render();
 
   XEN_LIST_FOREACH(t_ElementList, ppElement, pElement->m_lpChildElements)
-  {
     RenderElement(*ppElement);
-  }
 }
 
 // =============================================================================
 // Nat Ryall                                                          1-May-2008
 // =============================================================================
-bool CInterfaceManager::CheckIntersection(CInterfaceElement* pElement)
+void CInterfaceManager::CheckIntersection(CInterfaceElement* pElement)
 {
+	// Iterate through all children in reverse-render order.
   XEN_LIST_FOREACH_R(t_ElementList, ppElement, pElement->m_lpChildElements)
-  {
-    if (CheckIntersection(*ppElement))
-      return true;
-  }
+		CheckIntersection(*ppElement);
 
   if (pElement->IsVisible())
   {
-    if (Math::Intersect(m_xMousePos, pElement->m_xArea))
+    if (Math::Intersect(m_xMousePos, pElement->GetArea()))
     {
-      if (!Math::Intersect(m_xLastMousePos, pElement->m_xArea))
-        pElement->OnMouseEnter();
+			// If we are the first element intersecting, we become the active element.
+			if (!m_pActiveElement)
+				m_pActiveElement = pElement;
 
-      if (_HGE->Input_KeyDown(HGEK_LBUTTON))
-        pElement->OnMouseDown();
-      else if (_HGE->Input_KeyUp(HGEK_LBUTTON))
-        pElement->OnMouseUp();
+			// If we didn't intersect last frame but do this frame.
+      if (!Math::Intersect(m_xLastMousePos, pElement->GetArea()))
+        pElement->OnMouseEnter(m_pActiveElement == pElement);
+
+			// If we're the active element, check for mouse clicks.
+			if (m_pActiveElement == pElement)
+			{
+				if (_HGE->Input_KeyDown(HGEK_LBUTTON))
+				{
+					SetFocus(pElement);
+					pElement->OnMouseDown(m_xMousePos);
+				}
+				else if (_HGE->Input_KeyUp(HGEK_LBUTTON))
+					pElement->OnMouseUp(m_xMousePos);
+			}
     }
     else
     {
-      if (Math::Intersect(m_xLastMousePos, pElement->m_xArea))
-      {
+			// If we intersected last frame but not this frame.
+      if (Math::Intersect(m_xLastMousePos, pElement->GetArea()))
         pElement->OnMouseLeave();
-      }
     }
   }
-
-  return false;
 }
 
 //##############################################################################
@@ -152,6 +230,17 @@ CInterfaceElement::CInterfaceElement(t_ElementType iType) :
 }
 
 // =============================================================================
+// Nat Ryall                                                          2-May-2008
+// =============================================================================
+void CInterfaceElement::Move(XPOINT xOffset)
+{
+	m_xPosition += xOffset;
+
+	XEN_LIST_FOREACH(t_ElementList, ppElement, m_lpChildElements)
+		(*ppElement)->Move(xOffset);
+}
+
+// =============================================================================
 // Nat Ryall                                                         30-Apr-2008
 // =============================================================================
 void CInterfaceElement::Attach(CInterfaceElement* pElement)
@@ -165,22 +254,19 @@ void CInterfaceElement::Attach(CInterfaceElement* pElement)
 // =============================================================================
 void CInterfaceElement::Detach(CInterfaceElement* pElement)
 {
-  XEN_LIST_ERASE(t_ElementList, m_lpChildElements, pElement);
+  XEN_LIST_REMOVE(t_ElementList, m_lpChildElements, pElement);
 }
 
 // =============================================================================
-// Nat Ryall                                                         30-Apr-2008
+// Nat Ryall                                                          2-May-2008
 // =============================================================================
-void CInterfaceElement::SetFocus(CInterfaceElement* pElement)
+void CInterfaceElement::ToFront()
 {
-  if (s_pFocusedElement != pElement)
-  {
-    if (s_pFocusedElement)
-      s_pFocusedElement->OnBlur();
-
-    s_pFocusedElement = pElement;
-    s_pFocusedElement->OnFocus();
-  }
+	if (m_pParent)
+	{
+		m_pParent->Detach(this);
+		m_pParent->Attach(this);
+	}
 }
 
 //##############################################################################
@@ -213,7 +299,8 @@ CContainer::CContainer() : CInterfaceElement(ElementType_Container),
 // =============================================================================
 CWindow::CWindow(CSpriteMetadata* pMetadata) :
   m_pSprite(NULL),
-  m_bMoveable(false)
+	m_bDragging(false),
+  m_bMoveable(true)
 {
   m_iType = ElementType_Dialog;
   m_pSprite = new CBasicSprite(pMetadata);
@@ -226,7 +313,15 @@ CWindow::CWindow(CSpriteMetadata* pMetadata) :
   m_pAreas[AreaIndex_MiddleRight]   = pMetadata->FindArea("MiddleRight"); 
   m_pAreas[AreaIndex_BottomLeft]    = pMetadata->FindArea("BottomLeft"); 
   m_pAreas[AreaIndex_BottomMiddle]  = pMetadata->FindArea("BottomMiddle"); 
-  m_pAreas[AreaIndex_BottomRight]   = pMetadata->FindArea("BottomRight"); 
+  m_pAreas[AreaIndex_BottomRight]   = pMetadata->FindArea("BottomRight");
+
+	m_xFrameSize = XRECT
+	(
+		m_pAreas[AreaIndex_MiddleLeft]->xRect.GetWidth(),
+		m_pAreas[AreaIndex_TopMiddle]->xRect.GetHeight(),
+		m_pAreas[AreaIndex_MiddleRight]->xRect.GetWidth(),
+		m_pAreas[AreaIndex_BottomMiddle]->xRect.GetHeight()
+	);
 }
 
 // =============================================================================
@@ -242,76 +337,66 @@ CWindow::~CWindow()
 // =============================================================================
 void CWindow::Render()
 {
-  XRECT xOffset
-  (
-    m_pAreas[AreaIndex_MiddleLeft]->xRect.GetWidth() * -1,
-    m_pAreas[AreaIndex_TopMiddle]->xRect.GetHeight() * -1,
-    m_pAreas[AreaIndex_MiddleRight]->xRect.GetWidth(),
-    m_pAreas[AreaIndex_BottomMiddle]->xRect.GetHeight()
-  );
+	XUINT iWindowWidth = GetWidth();
+	XUINT iWindowHeight = GetHeight();
+
+	XRECT xOffset
+	(
+		0, 0, iWindowWidth - m_xFrameSize.iRight, iWindowHeight - m_xFrameSize.iBottom
+	);
 
   // Draw corners.
   InternalRender(m_pAreas[AreaIndex_TopLeft]->xRect, XPOINT(xOffset.iLeft, xOffset.iTop));
-  InternalRender(m_pAreas[AreaIndex_TopRight]->xRect, XPOINT(m_iWidth, xOffset.iTop));
-  InternalRender(m_pAreas[AreaIndex_BottomLeft]->xRect, XPOINT(xOffset.iLeft, m_iHeight));
-  InternalRender(m_pAreas[AreaIndex_BottomRight]->xRect, XPOINT(m_iWidth, m_iHeight));
+  InternalRender(m_pAreas[AreaIndex_TopRight]->xRect, XPOINT(xOffset.iRight, xOffset.iTop));
+  InternalRender(m_pAreas[AreaIndex_BottomLeft]->xRect, XPOINT(xOffset.iLeft, xOffset.iBottom));
+  InternalRender(m_pAreas[AreaIndex_BottomRight]->xRect, XPOINT(xOffset.iRight, xOffset.iBottom));
 
   XUINT iCentreWidth = m_pAreas[AreaIndex_Middle]->xRect.GetWidth();
   XUINT iCentreHeight = m_pAreas[AreaIndex_Middle]->xRect.GetHeight();
-
-  // Draw horizontal.
-  for (XUINT iX = 0; iX < m_iWidth;)
-  {
-    XUINT iDrawWidth = Math::Clamp<XUINT>(m_iWidth - iX, 0, iCentreWidth);
-
-    XRECT xTopRect = m_pAreas[AreaIndex_TopMiddle]->xRect;
-    xTopRect.iRight = xTopRect.iLeft + iDrawWidth;
-
-    InternalRender(xTopRect, XPOINT(iX, xOffset.iTop));
-
-    XRECT xBottomRect = m_pAreas[AreaIndex_BottomMiddle]->xRect;
-    xBottomRect.iRight = xBottomRect.iLeft + iDrawWidth;
-
-    InternalRender(xBottomRect, XPOINT(iX, m_iHeight));
-
-    iX += iDrawWidth;
-  }
 
   // Draw vertical.
   for (XUINT iY = 0; iY < m_iHeight;)
   {
     XUINT iDrawHeight = Math::Clamp<XUINT>(m_iHeight - iY, 0, iCentreHeight);
 
+		// Left.
     XRECT xLeftRect = m_pAreas[AreaIndex_MiddleLeft]->xRect;
     xLeftRect.iBottom = xLeftRect.iTop + iDrawHeight;
 
-    InternalRender(xLeftRect, XPOINT(xOffset.iLeft, iY));
+    InternalRender(xLeftRect, XPOINT(xOffset.iLeft, iY + xOffset.iTop + m_xFrameSize.iTop));
 
+		// Right.
     XRECT xRightRect = m_pAreas[AreaIndex_MiddleLeft]->xRect;
     xRightRect.iBottom = xRightRect.iTop + iDrawHeight;
 
-    InternalRender(xRightRect, XPOINT(m_iWidth, iY));
+    InternalRender(xRightRect, XPOINT(xOffset.iRight, iY + xOffset.iTop + m_xFrameSize.iTop));
 
-    iY += iDrawHeight;
-  }
+		// Draw horizontal.
+		for (XUINT iX = 0; iX < m_iWidth;)
+		{
+			XUINT iDrawWidth = Math::Clamp<XUINT>(m_iWidth - iX, 0, iCentreWidth);
 
-  // Draw fill.
-  for (XUINT iY = 0; iY < m_iHeight;)
-  {
-    XUINT iDrawHeight = Math::Clamp<XUINT>(m_iHeight - iY, 0, iCentreHeight);
+			// Top.
+			XRECT xTopRect = m_pAreas[AreaIndex_TopMiddle]->xRect;
+			xTopRect.iRight = xTopRect.iLeft + iDrawWidth;
 
-    for (XUINT iX = 0; iX < m_iWidth;)
-    {
-      XUINT iDrawWidth = Math::Clamp<XUINT>(m_iWidth - iX, 0, iCentreWidth);
-      XRECT xRect = m_pAreas[AreaIndex_Middle]->xRect;
+			InternalRender(xTopRect, XPOINT(iX + xOffset.iLeft + m_xFrameSize.iLeft, xOffset.iTop));
 
-      xRect.iRight = xRect.iLeft + iDrawWidth;
-      xRect.iBottom = xRect.iTop + iDrawHeight;
+			// Bottom.
+			XRECT xBottomRect = m_pAreas[AreaIndex_BottomMiddle]->xRect;
+			xBottomRect.iRight = xBottomRect.iLeft + iDrawWidth;
 
-      InternalRender(xRect, XPOINT(iX, iY));
+			InternalRender(xBottomRect, XPOINT(iX + xOffset.iLeft + m_xFrameSize.iLeft, xOffset.iBottom));
 
-      iX += iDrawWidth;
-    }
+			// Fill.
+			XRECT xRect = m_pAreas[AreaIndex_Middle]->xRect;
+			xRect.iRight = xRect.iLeft + iDrawWidth;
+			xRect.iBottom = xRect.iTop + iDrawHeight;
+
+			InternalRender(xRect, XPOINT(iX + xOffset.iLeft + m_xFrameSize.iLeft, iY + xOffset.iTop + m_xFrameSize.iTop));
+
+			iX += iDrawWidth;
+		}
 
     iY += iDrawHeight;
   }
@@ -322,7 +407,7 @@ void CWindow::Render()
 // =============================================================================
 void CWindow::InternalRender(XRECT& xRect, XPOINT xOffset)
 {
-  m_pSprite->Render(xRect, XPOINT(), m_xPosition + xOffset, 1.f, 0.f);
+  m_pSprite->Render(xRect, XPOINT(), GetPosition() + xOffset, 1.f, 0.f);
 }
 
 //##############################################################################
@@ -348,7 +433,8 @@ void CWindow::InternalRender(XRECT& xRect, XPOINT xOffset)
 CButton::CButton(CSpriteMetadata* pMetadata) : CInterfaceElement(ElementType_Button),
   m_pSprite(NULL),
   m_iButtonState(AreaIndex_Normal),
-  m_pLabel(NULL)
+  m_pLabel(NULL),
+	m_fpOnClickCallback(NULL)
 {
   m_pSprite = new CBasicSprite(pMetadata);
 
@@ -370,7 +456,40 @@ CButton::~CButton()
 // =============================================================================
 void CButton::Render()
 {
-  m_pSprite->Render(m_pAreas[m_iButtonState]->xRect, XPOINT(), m_xPosition, 1.f, 0.f);
+  m_pSprite->Render(m_pAreas[m_iButtonState]->xRect, XPOINT(), GetPosition(), 1.f, 0.f);
+}
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                 INPUT BOX
+//
+//##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                          2-May-2008
+// =============================================================================
+CInputBox::CInputBox(CSpriteMetadata* pMetadata) : CInterfaceElement(ElementType_InputBox),
+	m_pSprite(NULL)
+{
+
+}
+
+// =============================================================================
+// Nat Ryall                                                          2-May-2008
+// =============================================================================
+CInputBox::~CInputBox()
+{
+
+}
+
+// =============================================================================
+// Nat Ryall                                                          2-May-2008
+// =============================================================================
+void CInputBox::Render()
+{
+
 }
 
 //##############################################################################

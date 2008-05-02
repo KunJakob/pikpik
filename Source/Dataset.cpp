@@ -26,8 +26,8 @@
 // =============================================================================
 CDataset::~CDataset()
 {
-	XEN_LIST_ERASEMEM(m_lpDatasets);
-	XEN_LIST_ERASEMEM(m_lpProperties);
+	XEN_LIST_ERASE_ALL(m_lpDatasets);
+	XEN_LIST_ERASE_ALL(m_lpProperties);
 }
 
 // =============================================================================

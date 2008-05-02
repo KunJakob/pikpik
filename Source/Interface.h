@@ -57,7 +57,7 @@ enum t_ElementType
 };
 
 // Lists.
-typedef XVLIST<CInterfaceElement*> t_ElementList;
+typedef XLIST<CInterfaceElement*> t_ElementList;
 
 //##############################################################################
 
@@ -79,6 +79,11 @@ public:
   */
   ~CInterfaceManager();
 
+	/**
+	* 
+	*/
+	void Reset();
+
   /**
   * 
   */
@@ -97,6 +102,56 @@ public:
     return m_pContainer;
   }
 
+	/**
+	* 
+	*/
+	CInterfaceElement* GetActiveElement()
+	{
+		return m_pActiveElement;
+	}
+
+	/**
+	* 
+	*/
+	XBOOL IsActiveElement(CInterfaceElement* pElement)
+	{
+		return m_pActiveElement == pElement;
+	}
+
+	/**
+	* 
+	*/
+	void SetFocus(CInterfaceElement* pElement);
+
+	/**
+	* 
+	*/
+	CInterfaceElement* GetFocusedElement()
+	{
+		return m_pFocusedElement;
+	}
+
+	/**
+	* 
+	*/
+	XPOINT GetMousePosition()
+	{
+		return m_xMousePos;
+	}
+
+	/**
+	* 
+	*/
+	XBOOL IsMouseOver(CInterfaceElement* pElement);
+
+	/**
+	* 
+	*/
+	XBOOL IsMouseDown()
+	{
+		return _HGE->Input_GetKeyState(HGEK_LBUTTON);
+	}
+
 protected:
   /**
   * 
@@ -111,7 +166,7 @@ protected:
   /**
   * 
   */
-  bool CheckIntersection(CInterfaceElement* pElement);
+  void CheckIntersection(CInterfaceElement* pElement);
 
   // The base container object.
   CContainer* m_pContainer;
@@ -122,8 +177,11 @@ protected:
   // The last mouse position.
   XPOINT m_xLastMousePos;
 
-  // The current element the mouse is over.
-  CInterfaceElement* m_pCurrentElement;
+  // The active element the mouse is over.
+  CInterfaceElement* m_pActiveElement;
+
+	// The last focused element.
+	CInterfaceElement* m_pFocusedElement;
 };
 
 //##############################################################################
@@ -205,18 +263,49 @@ public:
   /**
   * 
   */
-  XRECT GetArea()
-  {
-    return m_xArea; // + XRECT(m_xPosition, m_xPosition)
-  }
+  virtual XUINT GetWidth() = 0;
+
+	/**
+	* 
+	*/
+	virtual XUINT GetHeight() = 0;
+
+	/**
+	* 
+	*/
+	XPOINT GetSize()
+	{
+		return XPOINT(GetWidth(), GetHeight());
+	}
+
+	/**
+	* Get the element area for collision and event purposes.
+	*/
+	XRECT GetArea()
+	{
+		return XRECT(m_xPosition, m_xPosition + GetSize());
+	}
+
+	/**
+	* 
+	*/
+	virtual XRECT GetFocusArea()
+	{
+		return GetArea();
+	}
 
   /**
   * 
   */
   void SetPosition(XPOINT xPosition)
-  {
-    m_xPosition = xPosition;
-  }
+	{
+		Move(xPosition - m_xPosition);
+	}
+
+	/**
+	* 
+	*/
+	void Move(XPOINT xOffset);
 
   /**
   * 
@@ -225,6 +314,17 @@ public:
   {
     return m_xPosition;
   }
+
+	/**
+	* 
+	*/
+	XPOINT GetLocalPosition()
+	{
+		if (m_pParent)
+			return GetPosition() - m_pParent->GetPosition();
+		else
+			return GetPosition();
+	}
 
   /**
   * 
@@ -236,38 +336,56 @@ public:
   */
   void Detach(CInterfaceElement* pElement);
 
+	/**
+	* 
+	*/
+	void DetachAll()
+	{
+		m_lpChildElements.clear();
+	}
+
   /**
   * 
   */
-  XUINT GetAttachedCount()
+  /*XUINT GetAttachedCount()
   {
     return (XUINT)m_lpChildElements.size();
-  }
+  }*/
 
   /**
   * 
   */
-  CInterfaceElement* GetAttached(XUINT iIndex)
+  /*CInterfaceElement* GetAttached(XUINT iIndex)
   {
     return m_lpChildElements[iIndex];
-  }
+  }*/
+
+	/**
+	* 
+	*/
+	void ToFront();
 
   /**
-  * 
+  * Fired on click/tab or manually with SetFocus().
   */
   virtual void OnFocus() {}
   virtual void OnBlur() {}
 
   /**
-  * 
+  * Fired always.
   */
-  virtual void OnMouseEnter() {}
+  virtual void OnMouseEnter(XBOOL bActive) {}
   virtual void OnMouseLeave() {}
-  virtual void OnMouseDown() {}
-  virtual void OnMouseUp() {}
+
+	/**
+	* Fired when active.
+	*/
+	virtual void OnMouseMove(XPOINT xDifference) {}
+  virtual void OnMouseDown(XPOINT xPosition) {}
+  virtual void OnMouseUp(XPOINT xPosition) {}
 
   /**
-  * 
+  * Fired when in focus.
   */
   virtual void OnKeyDown(XUINT iVirtualKey, XBOOL bShift) {}
   virtual void OnKeyUp(XUINT iVirtualKey, XBOOL bShift) {}
@@ -278,14 +396,6 @@ protected:
   * 
   */
   CInterfaceElement(t_ElementType iType);
-
-  /**
-  * 
-  */
-  static void SetFocus(CInterfaceElement* pElement);
-  
-  // The currently focused element.
-  static CInterfaceElement* s_pFocusedElement;
 
   // The parent element or NULL if top level.
   CInterfaceElement* m_pParent;
@@ -299,14 +409,12 @@ protected:
   // Specifies if the element is enabled and will accept events.
   XBOOL m_bEnabled;
 
-  // The relative position of the element to the parent.
-  XPOINT m_xPosition;
-
-  // The element area for collision and event purposes.
-  XRECT m_xArea;
-
   // A list of child elements.
   t_ElementList m_lpChildElements;
+
+private:
+	// The screen position of the element.
+	XPOINT m_xPosition;
 };
 
 //##############################################################################
@@ -341,7 +449,7 @@ public:
   /**
   * 
   */
-  XUINT GetWidth()
+  virtual XUINT GetWidth()
   {
     return m_iWidth;
   }
@@ -349,7 +457,7 @@ public:
   /**
   * 
   */
-  XUINT GetHeight()
+  virtual XUINT GetHeight()
   {
     return m_iHeight;
   }
@@ -387,6 +495,62 @@ public:
   */
   virtual void Render();
 
+	/**
+	* 
+	*/
+	virtual XUINT GetWidth()
+	{
+		return GetInnerWidth() + m_xFrameSize.iLeft + m_xFrameSize.iRight;
+	}
+
+	/**
+	* 
+	*/
+	virtual XUINT GetHeight()
+	{
+		return GetInnerHeight() + m_xFrameSize.iTop + m_xFrameSize.iBottom;
+	}
+
+	/**
+	* 
+	*/
+	XUINT GetInnerWidth()
+	{
+		return CContainer::GetWidth();
+	}
+
+	/**
+	* 
+	*/
+	XUINT GetInnerHeight()
+	{
+		return CContainer::GetHeight();
+	}
+
+	/**
+	* 
+	*/
+	XPOINT GetInnerPosition()
+	{
+		return GetPosition() + XPOINT(m_xFrameSize.iLeft, m_xFrameSize.iTop);
+	}
+
+	/**
+	* 
+	*/
+	XRECT GetFrameSize()
+	{
+		return m_xFrameSize;
+	}
+
+	/**
+	* 
+	*/
+	virtual XRECT GetFocusArea()
+	{
+		return XRECT(0, 0, GetInnerWidth(), GetInnerHeight()) + GetInnerPosition();
+	}
+
   /**
   * 
   */
@@ -403,21 +567,31 @@ public:
     return m_bMoveable;
   }
 
-  /**
-  * 
-  */
-  XUINT GetWindowWidth()
-  {
-    return GetWidth() + m_pAreas[AreaIndex_MiddleLeft]->xRect.GetWidth() + m_pAreas[AreaIndex_MiddleRight]->xRect.GetWidth();
-  }
+	/**
+	* 
+	*/
+	virtual void OnMouseMove(XPOINT xDifference) 
+	{
+		if (m_bDragging)
+			Move(xDifference);
+	}
 
-  /**
-  * 
-  */
-  XUINT GetWindowHeight()
-  {
-    return GetHeight()  + m_pAreas[AreaIndex_TopMiddle]->xRect.GetHeight() + m_pAreas[AreaIndex_BottomMiddle]->xRect.GetHeight();
-  }
+	/**
+	* 
+	*/
+	virtual void OnMouseDown(XPOINT xPosition) 
+	{
+		if (m_bMoveable && Math::Intersect(xPosition, XRECT(m_xFrameSize.iLeft, 0, GetInnerWidth(), m_xFrameSize.iTop) + GetPosition()))
+			m_bDragging = true;
+	}
+
+	/**
+	* 
+	*/
+	virtual void OnMouseUp(XPOINT xPosition) 
+	{
+		m_bDragging = false;
+	}
 
 protected:
   // Internal types.
@@ -446,6 +620,12 @@ protected:
   // The element area list.
   CSpriteMetadata::CArea* m_pAreas[AreaIndex_Max];
 
+	// The frame size from all directions.
+	XRECT m_xFrameSize;
+
+	// Specifies if the window is being dragged.
+	XBOOL m_bDragging;
+
   // Specifies if the window can be dragged around the screen or if it is static.
   XBOOL m_bMoveable;
 };
@@ -473,6 +653,9 @@ protected:
 class CButton : public CInterfaceElement
 {
 public:
+	// Callbacks.
+	typedef void (*t_OnClickCallback)(XPOINT /*Offset*/);
+
   /**
   * 
   */
@@ -486,16 +669,23 @@ public:
   /**
   * 
   */
-  virtual void Update() 
-  { 
-    XPOINT xSize(m_pAreas[m_iButtonState]->xRect.GetWidth(), m_pAreas[m_iButtonState]->xRect.GetHeight());
-    m_xArea = XRECT(m_xPosition, m_xPosition + xSize); 
-  }
-
-  /**
-  * 
-  */
   virtual void Render();
+
+	/**
+	* 
+	*/
+	virtual XUINT GetWidth()
+	{
+		return m_pAreas[m_iButtonState]->xRect.GetWidth();
+	}
+
+	/**
+	* 
+	*/
+	virtual XUINT GetHeight()
+	{
+		return m_pAreas[m_iButtonState]->xRect.GetHeight();
+	}
 
   /**
   * 
@@ -522,9 +712,10 @@ public:
   /**
   * 
   */
-  virtual void OnMouseEnter() 
+  virtual void OnMouseEnter(XBOOL bActive) 
   {
-    m_iButtonState = AreaIndex_Over;
+		if (bActive)
+			m_iButtonState = InterfaceManager.IsMouseDown() ? AreaIndex_Down : AreaIndex_Over;
   }
 
   /**
@@ -538,7 +729,7 @@ public:
   /**
   * 
   */
-  virtual void OnMouseDown()
+  virtual void OnMouseDown(XPOINT xPosition)
   {
     m_iButtonState = AreaIndex_Down;
   }
@@ -546,9 +737,12 @@ public:
   /**
   * 
   */
-  virtual void OnMouseUp() 
+  virtual void OnMouseUp(XPOINT xPosition) 
   {
     m_iButtonState = AreaIndex_Over;
+
+		if (m_fpOnClickCallback)
+			m_fpOnClickCallback(InterfaceManager.GetMousePosition() - GetPosition());
   }
 
 protected:
@@ -574,7 +768,49 @@ protected:
   CLabel* m_pLabel;
 
   // The callback to execute if the button is clicked.
-  //m_fpClickCallback
+  t_OnClickCallback m_fpOnClickCallback;
+};
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                 INPUT BOX
+//
+//##############################################################################
+class CInputBox : public CInterfaceElement
+{
+public:
+	/**
+	* 
+	*/
+	CInputBox(CSpriteMetadata* pMetadata);
+
+	/**
+	* 
+	*/
+	virtual ~CInputBox();
+
+	/**
+	* 
+	*/
+	virtual void Render();
+
+protected:
+	// Internal types.
+	enum t_AreaIndex
+	{
+		AreaIndex_Left,
+		AreaIndex_Middle,
+		AreaIndex_Right,
+		/*MAX*/AreaIndex_Max,
+	};
+
+	// The element sprite.
+	CBasicSprite* m_pSprite;
+
+	// The element area list.
+	CSpriteMetadata::CArea* m_pAreas[AreaIndex_Max];
 };
 
 //##############################################################################

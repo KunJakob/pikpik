@@ -145,7 +145,7 @@ void Application::Deinitialise()
 	Xen::ModuleManager::Deinitialise();
 
 	// Free all screen instances.
-	XEN_LIST_ERASEMEM(s_lpScreens);
+	XEN_LIST_ERASE_ALL(s_lpScreens);
 }
 
 // =============================================================================

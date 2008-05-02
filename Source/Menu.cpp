@@ -249,14 +249,28 @@ void CMenuScreen::Load()
 
   // Debug.
   m_pWindow = new CWindow(_SPRITE("Test-Window"));
-  m_pWindow->SetPosition(XPOINT(20, 30));
+  m_pWindow->SetPosition(XPOINT(20, 20));
   m_pWindow->SetSize(192, 92);
 
   m_pButton = new CButton(_SPRITE("Test-Button"));
-  m_pButton->SetPosition(XPOINT(25, 35));
+  m_pButton->SetPosition(m_pWindow->GetInnerPosition() + XPOINT(5, 5));
+		m_pWindow->Attach(m_pButton);
 
   InterfaceManager.GetContainer()->Attach(m_pWindow);
-  InterfaceManager.GetContainer()->Attach(m_pButton);
+
+	m_pWindow = new CWindow(_SPRITE("Test-Window"));
+	m_pWindow->SetPosition(XPOINT(_HSWIDTH, _HSHEIGHT));
+	m_pWindow->SetSize(200, 200);
+
+	m_pButton = new CButton(_SPRITE("Test-Button"));
+	m_pButton->SetPosition(m_pWindow->GetInnerPosition() + XPOINT(5, 5));
+	m_pWindow->Attach(m_pButton);
+
+	m_pButton = new CButton(_SPRITE("Test-Button"));
+	m_pButton->SetPosition(m_pWindow->GetInnerPosition() + XPOINT(5, 5 + m_pButton->GetHeight()));
+	m_pWindow->Attach(m_pButton);
+
+	InterfaceManager.GetContainer()->Attach(m_pWindow);
 }
 
 // =============================================================================

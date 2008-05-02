@@ -129,11 +129,11 @@ CSpriteMetadata::~CSpriteMetadata()
 {
 	ResourceManager::ReleaseResourceFile(pFile);
 
-	XEN_LIST_ERASEMEM(lpAreas);
+	XEN_LIST_ERASE_ALL(lpAreas);
 
 	while (lpAnimations.size())
 	{
-		XEN_LIST_ERASEMEM(lpAnimations.front()->lpFrames);
+		XEN_LIST_ERASE_ALL(lpAnimations.front()->lpFrames);
 		lpAnimations.pop_front();
 	}
 }
