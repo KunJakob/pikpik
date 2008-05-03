@@ -22,7 +22,8 @@
 // Nat Ryall                                                          1-May-2008
 // =============================================================================
 CInterfaceManager::CInterfaceManager() :
-  m_pContainer(NULL)
+  m_pContainer(NULL),
+  m_pCursor(NULL)
 {
   m_pContainer = new CContainer();
 	m_pContainer->SetSize(_SWIDTH, _SHEIGHT);
@@ -36,6 +37,9 @@ CInterfaceManager::CInterfaceManager() :
 CInterfaceManager::~CInterfaceManager()
 {
   delete m_pContainer;
+
+  if (m_pCursor)
+    delete m_pCursor;
 }
 
 // =============================================================================
@@ -63,10 +67,7 @@ void CInterfaceManager::Update()
   m_xMousePos = XPOINT((XINT)fX, (XINT)fY);
 
 	if (m_pActiveElement)
-	{
 		m_pActiveElement->OnMouseMove(m_xMousePos - m_xLastMousePos);
-		//m_pActiveElement = NULL;
-	}
 
   m_bFoundActive = false;
 
@@ -121,6 +122,20 @@ void CInterfaceManager::Render()
 		_HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iBottom, iColour);
 		_HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iTop, iColour);
 	}
+
+  if (_HGE->Input_IsMouseOver() && m_pCursor)
+    m_pCursor->Render(m_pCursor->GetImageRect(), XPOINT(), m_xMousePos, 1.f, 0.f);
+}
+
+// =============================================================================
+// Nat Ryall                                                          3-May-2008
+// =============================================================================
+void CInterfaceManager::SetCursor(CSpriteMetadata* pMetadata)
+{
+  if (m_pCursor)
+    delete m_pCursor;
+
+  m_pCursor = new CBasicSprite(pMetadata);
 }
 
 // =============================================================================

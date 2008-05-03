@@ -102,6 +102,11 @@ public:
     return m_pContainer;
   }
 
+  /**
+  * 
+  */
+  void SetCursor(CSpriteMetadata* pMetadata);
+
 	/**
 	* 
 	*/
@@ -170,6 +175,9 @@ protected:
 
   // The base container object.
   CContainer* m_pContainer;
+
+  // The cursor sprite.
+  CBasicSprite* m_pCursor;
 
   // The current mouse position.
   XPOINT m_xMousePos;
@@ -779,6 +787,38 @@ public:
 	*/
 	virtual void Render();
 
+  /**
+  * 
+  */
+  virtual XUINT GetWidth()
+  {
+    return GetInnerWidth() + m_pAreas[AreaIndex_Left]->xRect.GetWidth() + m_pAreas[AreaIndex_Right]->xRect.GetWidth();
+  }
+
+  /**
+  * 
+  */
+  virtual XUINT GetHeight()
+  {
+    return m_pAreas[AreaIndex_Middle]->xRect.GetHeight();
+  }
+
+  /**
+  * 
+  */
+  void SetInnerWidth(XUINT iWidth)
+  {
+    m_iWidth = iWidth;
+  }
+
+  /**
+  * 
+  */
+  XUINT GetInnerWidth()
+  {
+    return m_iWidth;
+  }
+
 protected:
 	// Internal types.
 	enum t_AreaIndex
@@ -794,6 +834,9 @@ protected:
 
 	// The element area list.
 	CSpriteMetadata::CArea* m_pAreas[AreaIndex_Max];
+
+  // The width, in pixels, of the input area.
+  XUINT m_iWidth;
 };
 
 //##############################################################################

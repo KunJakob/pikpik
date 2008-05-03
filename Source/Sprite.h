@@ -215,6 +215,14 @@ public:
 		return (XUINT)_HGE->Texture_GetHeight(m_pMetadata->GetSprite()->GetTexture(), true);
 	}
 
+  /**
+  * Get the rect of the entire sprite image.
+  */
+  XRECT GetImageRect()
+  {
+    return XRECT(0, 0, (XUINT)GetImageWidth(), (XUINT)GetImageHeight());
+  }
+
 	/**
 	* Get the sprite metadata structure. This is for advanced use only.
 	*/

@@ -228,7 +228,7 @@ CSprite::CSprite(CSpriteMetadata* pMetadata) : CBasicSprite(pMetadata), CRendera
 // =============================================================================
 void CSprite::Render()
 {
-	XRECT xArea = m_pArea ? m_pArea->xRect : XRECT(0, 0, (XUINT)GetImageWidth(), (XUINT)GetImageHeight());
+	XRECT xArea = m_pArea ? m_pArea->xRect : GetImageRect();
 	CBasicSprite::Render(xArea, m_xAnchor, m_xPosition, m_fAlpha, m_fAngle);
 }
 

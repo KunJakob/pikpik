@@ -221,11 +221,11 @@ void CMenuScreen::Load()
     new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Back",			&Callback_ShowMainMenu),
   };
 
-  for (XUINT iA = 0; iA < (sizeof(pLinkList) / sizeof(CMenuLink*)); ++iA)
+  /*for (XUINT iA = 0; iA < (sizeof(pLinkList) / sizeof(CMenuLink*)); ++iA)
   {
     m_lpMenuLinks[pLinkList[iA]->m_iGroupIndex].push_back(pLinkList[iA]);
     m_pGUI->AddCtrl(pLinkList[iA]);
-  }
+  }*/
 
   for (XUINT iGroup = 0; iGroup < MenuGroupIndex_Max; ++iGroup)
   {
@@ -241,8 +241,8 @@ void CMenuScreen::Load()
   // Initialise the render resources.
   m_pBackground = new CBackgroundImage("Lobby-Background");
 
-  m_pCursor = new CBasicSprite(_SPRITE("Cursor"));
-  m_pGUI->SetCursor(m_pCursor->GetMetadata()->GetSprite());
+  //m_pCursor = new CBasicSprite(_SPRITE("Cursor"));
+  //m_pGUI->SetCursor(m_pCursor->GetMetadata()->GetSprite());
 
   // Initialise statics.
   s_iNextScreen = ScreenIndex_Invalid;
@@ -252,9 +252,12 @@ void CMenuScreen::Load()
   m_pWindow->SetPosition(XPOINT(20, 20));
   m_pWindow->SetSize(192, 92);
 
-  m_pButton = new CButton(_SPRITE("Test-Button"));
-  m_pButton->SetPosition(m_pWindow->GetInnerPosition() + XPOINT(5, 5));
-		m_pWindow->Attach(m_pButton);
+  //m_pButton = new CButton(_SPRITE("Test-Button"));
+  //m_pButton->SetPosition(m_pWindow->GetInnerPosition() + XPOINT(5, 5));
+	//m_pWindow->Attach(m_pButton);
+
+  //CInputBox* pInputBox = new CInputBox(_SPRITE("Test-InputBox"));
+  //pInputBox->SetWidth()
 
   InterfaceManager.GetContainer()->Attach(m_pWindow);
 
@@ -271,6 +274,8 @@ void CMenuScreen::Load()
 	m_pWindow->Attach(m_pButton);
 
 	InterfaceManager.GetContainer()->Attach(m_pWindow);
+
+  InterfaceManager.SetCursor(_SPRITE("Test-Cursor"));
 }
 
 // =============================================================================
@@ -278,10 +283,10 @@ void CMenuScreen::Load()
 // =============================================================================
 void CMenuScreen::Unload()
 {
-	delete m_pGUI; // Also erases the GUI elements.
+	//delete m_pGUI; // Also erases the GUI elements.
 	delete m_pBackground;
 
-	delete m_pCursor;
+	//delete m_pCursor;
 }
 
 // =============================================================================
@@ -297,7 +302,7 @@ void CMenuScreen::Update()
 	}
 
 	// Update the GUI.
-	m_pGUI->Update(_TIMEDELTAF);
+	//m_pGUI->Update(_TIMEDELTAF);
 
 	if (s_iNextScreen != ScreenIndex_Invalid)
 	{
@@ -318,10 +323,9 @@ void CMenuScreen::Update()
 void CMenuScreen::Render()
 {
 	m_pBackground->Render();
-  //m_pWindow->Render();
-  //m_pButton->Render();
   InterfaceManager.Render();
-	m_pGUI->Render();
+
+	//m_pGUI->Render();
 }
 
 // =============================================================================
