@@ -182,6 +182,10 @@ protected:
 
 	// The last focused element.
 	CInterfaceElement* m_pFocusedElement;
+
+private:
+  // Tracking variable for finding the current active element.
+  XBOOL m_bFoundActive;
 };
 
 //##############################################################################
@@ -344,26 +348,16 @@ public:
 		m_lpChildElements.clear();
 	}
 
-  /**
-  * 
-  */
-  /*XUINT GetAttachedCount()
-  {
-    return (XUINT)m_lpChildElements.size();
-  }*/
-
-  /**
-  * 
-  */
-  /*CInterfaceElement* GetAttached(XUINT iIndex)
-  {
-    return m_lpChildElements[iIndex];
-  }*/
-
 	/**
 	* 
 	*/
 	void ToFront();
+
+protected:
+  /**
+  * 
+  */
+  CInterfaceElement(t_ElementType iType);
 
   /**
   * Fired on click/tab or manually with SetFocus().
@@ -372,15 +366,11 @@ public:
   virtual void OnBlur() {}
 
   /**
-  * Fired always.
+  * Fired when active.
   */
-  virtual void OnMouseEnter(XBOOL bActive) {}
+  virtual void OnMouseEnter() {}
   virtual void OnMouseLeave() {}
-
-	/**
-	* Fired when active.
-	*/
-	virtual void OnMouseMove(XPOINT xDifference) {}
+  virtual void OnMouseMove(XPOINT xDifference) {}
   virtual void OnMouseDown(XPOINT xPosition) {}
   virtual void OnMouseUp(XPOINT xPosition) {}
 
@@ -390,12 +380,6 @@ public:
   virtual void OnKeyDown(XUINT iVirtualKey, XBOOL bShift) {}
   virtual void OnKeyUp(XUINT iVirtualKey, XBOOL bShift) {}
   virtual void OnKeyHold(XUINT iVirtualKey, XBOOL bShift) {}
-
-protected:
-  /**
-  * 
-  */
-  CInterfaceElement(t_ElementType iType);
 
   // The parent element or NULL if top level.
   CInterfaceElement* m_pParent;
@@ -712,10 +696,9 @@ public:
   /**
   * 
   */
-  virtual void OnMouseEnter(XBOOL bActive) 
+  virtual void OnMouseEnter() 
   {
-		if (bActive)
-			m_iButtonState = InterfaceManager.IsMouseDown() ? AreaIndex_Down : AreaIndex_Over;
+		m_iButtonState = InterfaceManager.IsMouseDown() ? AreaIndex_Down : AreaIndex_Over;
   }
 
   /**

@@ -65,8 +65,10 @@ void CInterfaceManager::Update()
 	if (m_pActiveElement)
 	{
 		m_pActiveElement->OnMouseMove(m_xMousePos - m_xLastMousePos);
-		m_pActiveElement = NULL;
+		//m_pActiveElement = NULL;
 	}
+
+  m_bFoundActive = false;
 
   UpdateElement(m_pContainer);
 
@@ -182,12 +184,16 @@ void CInterfaceManager::CheckIntersection(CInterfaceElement* pElement)
     if (Math::Intersect(m_xMousePos, pElement->GetArea()))
     {
 			// If we are the first element intersecting, we become the active element.
-			if (!m_pActiveElement)
-				m_pActiveElement = pElement;
+			if (!m_bFoundActive)
+      {
+        m_bFoundActive = true;
 
-			// If we didn't intersect last frame but do this frame.
-      if (!Math::Intersect(m_xLastMousePos, pElement->GetArea()))
-        pElement->OnMouseEnter(m_pActiveElement == pElement);
+        if (m_pActiveElement && m_pActiveElement != pElement)
+          m_pActiveElement->OnMouseLeave();
+
+        m_pActiveElement = pElement;
+        m_pActiveElement->OnMouseEnter();
+      }
 
 			// If we're the active element, check for mouse clicks.
 			if (m_pActiveElement == pElement)
@@ -200,12 +206,6 @@ void CInterfaceManager::CheckIntersection(CInterfaceElement* pElement)
 				else if (_HGE->Input_KeyUp(HGEK_LBUTTON))
 					pElement->OnMouseUp(m_xMousePos);
 			}
-    }
-    else
-    {
-			// If we intersected last frame but not this frame.
-      if (Math::Intersect(m_xLastMousePos, pElement->GetArea()))
-        pElement->OnMouseLeave();
     }
   }
 }

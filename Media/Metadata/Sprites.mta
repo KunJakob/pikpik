@@ -148,3 +148,12 @@
 	.Area "Over"			{ .Tile 1 108 20 }
 	.Area "Down"			{ .Tile 2 108 20 }
 }
+
+.Sprite "Test-InputBox"
+{
+	.File "Surfaces\Test-InputBox.png"
+	
+	.Area "Left"			{ .Size 0  0 1  22 }
+	.Area "Middle"			{ .Size 1  0 64 22 }
+	.Area "Right"			{ .Size 65 0 1  22 }
+}
