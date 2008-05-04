@@ -80,6 +80,10 @@ void CInterfaceManager::Update()
 		do 
 			pElement->ToFront();
 		while (pElement = pElement->m_pParent);
+
+    // Check key presses.
+    if (XINT iChar = _HGE->Input_GetChar())
+      m_pFocusedElement->OnKeyChar(iChar);
 	}
 }
 
@@ -90,7 +94,7 @@ void CInterfaceManager::Render()
 {
   RenderElement(m_pContainer);
 
-	if (m_pActiveElement)
+	/*if (m_pActiveElement)
 	{
 		XRECT xRect = m_pActiveElement->GetArea();
 		XUINT iColour = ARGB(255, 32, 32, 32);
@@ -121,7 +125,7 @@ void CInterfaceManager::Render()
 		_HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iBottom, iColour);
 		_HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iBottom, iColour);
 		_HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iTop, iColour);
-	}
+	}*/
 
   if (_HGE->Input_IsMouseOver() && m_pCursor)
     m_pCursor->Render(m_pCursor->GetImageRect(), XPOINT(), m_xMousePos, 1.f, 0.f);
@@ -312,12 +316,11 @@ CContainer::CContainer() : CInterfaceElement(ElementType_Container),
 // =============================================================================
 // Nat Ryall                                                         30-Apr-2008
 // =============================================================================
-CWindow::CWindow(CSpriteMetadata* pMetadata) :
+CWindow::CWindow(CSpriteMetadata* pMetadata) : CInterfaceElement(ElementType_Window),
   m_pSprite(NULL),
 	m_bDragging(false),
   m_bMoveable(true)
 {
-  m_iType = ElementType_Dialog;
   m_pSprite = new CBasicSprite(pMetadata);
 
   m_pAreas[AreaIndex_TopLeft]       = pMetadata->FindArea("TopLeft"); 
@@ -352,12 +355,9 @@ CWindow::~CWindow()
 // =============================================================================
 void CWindow::Render()
 {
-	XUINT iWindowWidth = GetWidth();
-	XUINT iWindowHeight = GetHeight();
-
 	XRECT xOffset
 	(
-		0, 0, iWindowWidth - m_xFrameSize.iRight, iWindowHeight - m_xFrameSize.iBottom
+		0, 0, GetWidth() - m_xFrameSize.iRight, GetHeight() - m_xFrameSize.iBottom
 	);
 
   // Draw corners.
@@ -415,6 +415,18 @@ void CWindow::Render()
 
     iY += iDrawHeight;
   }
+}
+
+// =============================================================================
+// Nat Ryall                                                          3-May-2008
+// =============================================================================
+void CWindow::SetSize(XUINT iWidth, XUINT iHeight)
+{
+  XUINT iFrameWidth = m_xFrameSize.iLeft + m_xFrameSize.iRight;
+  XUINT iFrameHeight = m_xFrameSize.iTop + m_xFrameSize.iBottom;
+
+  m_iWidth = (iWidth < iFrameWidth) ? 0 : iWidth - iFrameWidth;
+  m_iHeight = (iHeight < iFrameHeight) ? 0 : iHeight - iFrameHeight;
 }
 
 // =============================================================================
@@ -485,10 +497,20 @@ void CButton::Render()
 // =============================================================================
 // Nat Ryall                                                          2-May-2008
 // =============================================================================
-CInputBox::CInputBox(CSpriteMetadata* pMetadata) : CInterfaceElement(ElementType_InputBox),
-	m_pSprite(NULL)
+CInputBox::CInputBox(CSpriteMetadata* pSprite, CFontMetadata* pFont) : CInterfaceElement(ElementType_InputBox),
+	m_pSprite(NULL),
+  m_pFont(NULL),
+  m_iWidth(0),
+  m_iCharLimit(0),
+  m_iCharOffset(0),
+  m_iFlashTimer(0)
 {
+  m_pSprite = new CBasicSprite(pSprite);
+  m_pFont = new CFont(pFont);
 
+  m_pAreas[AreaIndex_Left]    = pSprite->FindArea("Left"); 
+  m_pAreas[AreaIndex_Middle]  = pSprite->FindArea("Middle"); 
+  m_pAreas[AreaIndex_Right]   = pSprite->FindArea("Right"); 
 }
 
 // =============================================================================
@@ -496,7 +518,16 @@ CInputBox::CInputBox(CSpriteMetadata* pMetadata) : CInterfaceElement(ElementType
 // =============================================================================
 CInputBox::~CInputBox()
 {
+  delete m_pFont;
+  delete m_pSprite;
+}
 
+// =============================================================================
+// Nat Ryall                                                          3-May-2008
+// =============================================================================
+void CInputBox::Update()
+{
+  m_iFlashTimer = (m_iFlashTimer + _TIMEDELTA) % 1000;
 }
 
 // =============================================================================
@@ -504,7 +535,54 @@ CInputBox::~CInputBox()
 // =============================================================================
 void CInputBox::Render()
 {
+  XUINT iLeftWidth = m_pAreas[AreaIndex_Left]->xRect.GetWidth();
+  XUINT iMiddleWidth = m_pAreas[AreaIndex_Middle]->xRect.GetWidth();
 
+  InternalRender(m_pAreas[AreaIndex_Left]->xRect, XPOINT(0, 0));
+  InternalRender(m_pAreas[AreaIndex_Right]->xRect, XPOINT(iLeftWidth + m_iWidth, 0));
+
+  for (XUINT iX = 0; iX < m_iWidth;)
+  {
+    XUINT iDrawWidth = Math::Clamp<XUINT>(m_iWidth - iX, 0, iMiddleWidth);
+
+    XRECT xRect = m_pAreas[AreaIndex_Middle]->xRect;
+    xRect.iRight = xRect.iLeft + iDrawWidth;
+
+    InternalRender(xRect, XPOINT(iX + iLeftWidth, 0));
+
+    iX += iDrawWidth;
+  }
+
+  XUINT iFontHeight = m_pFont->GetFontHeight();
+  XUINT iOffsetY = (GetHeight() - iFontHeight) / 2;
+
+  if (InterfaceManager.IsFocusedElement(this) && m_iFlashTimer < 500)
+  {
+    XRECT iLinePoints(iLeftWidth + 1, iOffsetY, iLeftWidth + 1, GetHeight() - iOffsetY);
+    iLinePoints += GetPosition();
+
+    _HGE->Gfx_RenderLine((float)iLinePoints.iLeft, (float)iLinePoints.iTop, (float)iLinePoints.iRight, (float)iLinePoints.iBottom, 0xFF000000); 
+  }
+
+  m_pFont->Render(GetInputString(), GetPosition() + XPOINT(iLeftWidth + 1, iOffsetY), HGETEXT_LEFT);
+}
+
+// =============================================================================
+// Nat Ryall                                                          3-May-2008
+// =============================================================================
+void CInputBox::SetWidth(XUINT iWidth)
+{
+  XUINT iFrameWidth = m_pAreas[AreaIndex_Left]->xRect.GetWidth() + m_pAreas[AreaIndex_Right]->xRect.GetWidth();
+
+  m_iWidth = (iWidth < iFrameWidth) ? 0 : iWidth - iFrameWidth;
+}
+
+// =============================================================================
+// Nat Ryall                                                          3-May-2008
+// =============================================================================
+void CInputBox::InternalRender(XRECT& xRect, XPOINT xOffset)
+{
+  m_pSprite->Render(xRect, XPOINT(), GetPosition() + xOffset, 1.f, 0.f);
 }
 
 //##############################################################################

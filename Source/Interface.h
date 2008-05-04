@@ -22,6 +22,7 @@
 #include <Renderer.h>
 #include <Resource.h>
 #include <Sprite.h>
+#include <Font.h>
 
 //##############################################################################
 
@@ -51,7 +52,7 @@ enum t_ElementType
 {
   ElementType_Abstract,
   ElementType_Container,
-  ElementType_Dialog,
+  ElementType_Window,
   ElementType_Button,
   ElementType_InputBox,
 };
@@ -135,6 +136,14 @@ public:
 	{
 		return m_pFocusedElement;
 	}
+
+  /**
+  * 
+  */
+  XBOOL IsFocusedElement(CInterfaceElement* pElement)
+  {
+    return m_pFocusedElement == pElement;
+  }
 
 	/**
 	* 
@@ -385,6 +394,7 @@ protected:
   /**
   * Fired when in focus.
   */
+  virtual void OnKeyChar(XINT iChar) {}
   virtual void OnKeyDown(XUINT iVirtualKey, XBOOL bShift) {}
   virtual void OnKeyUp(XUINT iVirtualKey, XBOOL bShift) {}
   virtual void OnKeyHold(XUINT iVirtualKey, XBOOL bShift) {}
@@ -469,7 +479,7 @@ protected:
 //                                   WINDOW
 //
 //##############################################################################
-class CWindow : public CContainer
+class CWindow : public CInterfaceElement
 {
 public:
   /**
@@ -503,12 +513,26 @@ public:
 		return GetInnerHeight() + m_xFrameSize.iTop + m_xFrameSize.iBottom;
 	}
 
+  /**
+  * Set the size of the window including the border.
+  */
+  void SetSize(XUINT iWidth, XUINT iHeight);
+
+  /**
+  * Set the size of the inner-area of the window excluding the border.
+  */
+  void SetInnerSize(XUINT iWidth, XUINT iHeight)
+  {
+    m_iWidth = iWidth; 
+    m_iHeight = iHeight;
+  }
+
 	/**
 	* 
 	*/
 	XUINT GetInnerWidth()
 	{
-		return CContainer::GetWidth();
+		return m_iWidth;
 	}
 
 	/**
@@ -516,7 +540,7 @@ public:
 	*/
 	XUINT GetInnerHeight()
 	{
-		return CContainer::GetHeight();
+		return m_iHeight;
 	}
 
 	/**
@@ -559,32 +583,6 @@ public:
     return m_bMoveable;
   }
 
-	/**
-	* 
-	*/
-	virtual void OnMouseMove(XPOINT xDifference) 
-	{
-		if (m_bDragging)
-			Move(xDifference);
-	}
-
-	/**
-	* 
-	*/
-	virtual void OnMouseDown(XPOINT xPosition) 
-	{
-		if (m_bMoveable && Math::Intersect(xPosition, XRECT(m_xFrameSize.iLeft, 0, GetInnerWidth(), m_xFrameSize.iTop) + GetPosition()))
-			m_bDragging = true;
-	}
-
-	/**
-	* 
-	*/
-	virtual void OnMouseUp(XPOINT xPosition) 
-	{
-		m_bDragging = false;
-	}
-
 protected:
   // Internal types.
   enum t_AreaIndex
@@ -606,11 +604,43 @@ protected:
   */
   void InternalRender(XRECT& xRect, XPOINT xOffset);
 
+  /**
+  * 
+  */
+  virtual void OnMouseMove(XPOINT xDifference) 
+  {
+    if (m_bDragging)
+      Move(xDifference);
+  }
+
+  /**
+  * 
+  */
+  virtual void OnMouseDown(XPOINT xPosition) 
+  {
+    if (m_bMoveable && Math::Intersect(xPosition, XRECT(m_xFrameSize.iLeft, 0, GetInnerWidth(), m_xFrameSize.iTop) + GetPosition()))
+      m_bDragging = true;
+  }
+
+  /**
+  * 
+  */
+  virtual void OnMouseUp(XPOINT xPosition) 
+  {
+    m_bDragging = false;
+  }
+
   // The element sprite.
   CBasicSprite* m_pSprite;
 
   // The element area list.
   CSpriteMetadata::CArea* m_pAreas[AreaIndex_Max];
+
+  // The width, in pixels, of the inner container.
+  XUINT m_iWidth;
+
+  // The height, in pixels, of the inner container.
+  XUINT m_iHeight;
 
 	// The frame size from all directions.
 	XRECT m_xFrameSize;
@@ -701,12 +731,22 @@ public:
     return NULL;
   }
 
+protected:
+  // Internal types.
+  enum t_AreaIndex
+  {
+    AreaIndex_Normal,
+    AreaIndex_Over,
+    AreaIndex_Down,
+    /*MAX*/AreaIndex_Max,
+  };
+
   /**
   * 
   */
   virtual void OnMouseEnter() 
   {
-		m_iButtonState = InterfaceManager.IsMouseDown() ? AreaIndex_Down : AreaIndex_Over;
+    m_iButtonState = InterfaceManager.IsMouseDown() ? AreaIndex_Down : AreaIndex_Over;
   }
 
   /**
@@ -732,19 +772,9 @@ public:
   {
     m_iButtonState = AreaIndex_Over;
 
-		if (m_fpOnClickCallback)
-			m_fpOnClickCallback(InterfaceManager.GetMousePosition() - GetPosition());
+    if (m_fpOnClickCallback)
+      m_fpOnClickCallback(InterfaceManager.GetMousePosition() - GetPosition());
   }
-
-protected:
-  // Internal types.
-  enum t_AreaIndex
-  {
-    AreaIndex_Normal,
-    AreaIndex_Over,
-    AreaIndex_Down,
-    /*MAX*/AreaIndex_Max,
-  };
 
   // The element sprite.
   CBasicSprite* m_pSprite;
@@ -775,12 +805,17 @@ public:
 	/**
 	* 
 	*/
-	CInputBox(CSpriteMetadata* pMetadata);
+	CInputBox(CSpriteMetadata* pMetadata, CFontMetadata* pFont);
 
 	/**
 	* 
 	*/
 	virtual ~CInputBox();
+
+  /**
+  * 
+  */
+  virtual void Update();
 
 	/**
 	* 
@@ -806,6 +841,11 @@ public:
   /**
   * 
   */
+  void SetWidth(XUINT iWidth);
+
+  /**
+  * 
+  */
   void SetInnerWidth(XUINT iWidth)
   {
     m_iWidth = iWidth;
@@ -819,7 +859,53 @@ public:
     return m_iWidth;
   }
 
+  /**
+  * The total number of characters allowed in the input box.
+  * Set this to 0 for unlimited length.
+  */
+  void SetCharLimit(XUINT iLimit)
+  {
+    m_iCharLimit = iLimit;
+  }
+
+  /**
+  * 
+  */
+  XUINT GetCharLimit()
+  {
+    return m_iCharLimit;
+  }
+
+  /**
+  * 
+  */
+  void SetInputString(const XCHAR* pString)
+  {
+    m_xInputString = pString;
+  }
+
+  /**
+  * 
+  */
+  const XCHAR* GetInputString()
+  {
+    return m_xInputString.c_str();
+  }
+
 protected:
+  /**
+  * 
+  */
+  void InternalRender(XRECT& xRect, XPOINT xOffset);
+
+  /**
+  * 
+  */
+  virtual void OnKeyChar(XINT iChar) 
+  {
+    m_xInputString += iChar;
+  }
+
 	// Internal types.
 	enum t_AreaIndex
 	{
@@ -832,11 +918,26 @@ protected:
 	// The element sprite.
 	CBasicSprite* m_pSprite;
 
+  // The element font.
+  CFont* m_pFont;
+
 	// The element area list.
 	CSpriteMetadata::CArea* m_pAreas[AreaIndex_Max];
 
   // The width, in pixels, of the input area.
   XUINT m_iWidth;
+
+  // The total number of input characters allowed with zero being unlimited.
+  XUINT m_iCharLimit;
+
+  // The current input-box text.
+  XSTRING m_xInputString;
+
+  // The input cursor text character offset.
+  XUINT m_iCharOffset;
+
+  // The cursor flash timer.
+  XUINT m_iFlashTimer;
 };
 
 //##############################################################################

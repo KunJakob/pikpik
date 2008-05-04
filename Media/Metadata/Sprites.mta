@@ -153,7 +153,7 @@
 {
 	.File "Surfaces\Test-InputBox.png"
 	
-	.Area "Left"			{ .Size 0  0 1  22 }
-	.Area "Middle"			{ .Size 1  0 64 22 }
-	.Area "Right"			{ .Size 65 0 1  22 }
+	.Area "Left"			{ .Size 0  0 2  22 }
+	.Area "Middle"			{ .Size 2  0 60 22 }
+	.Area "Right"			{ .Size 62 0 2  22 }
 }

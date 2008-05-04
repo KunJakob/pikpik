@@ -199,6 +199,36 @@ public:
 	*/
 	void Render(XRECT xArea, XPOINT xAnchor, XPOINT xPosition, XFLOAT fAlpha, XFLOAT fAngle);
 
+  /**
+  * Render the sprite with the specified attributes.
+  * @param xArea The coordinates within the image to render.
+  * @param xAnchor The area relative anchor point to use when positioning and rotating the sprite.
+  * @param xPosition The screen position to render at using the centre of the image as an anchor.
+  */
+  void Render(XRECT xArea, XPOINT xAnchor, XPOINT xPosition)
+  {
+    Render(xArea, xAnchor, xPosition, 1.f, 0.f);
+  }
+
+  /**
+  * Render the sprite with the specified attributes.
+  * @param xArea The coordinates within the image to render.
+  * @param xPosition The screen position to render at using the centre of the image as an anchor.
+  */
+  void Render(XRECT xArea, XPOINT xPosition)
+  {
+    Render(xArea, XPOINT(), xPosition, 1.f, 0.f);
+  }
+
+  /**
+  * Render the sprite with the specified attributes.
+  * @param xPosition The screen position to render at using the centre of the image as an anchor.
+  */
+  void Render(XPOINT xPosition)
+  {
+    Render(GetImageRect(), XPOINT(), xPosition, 1.f, 0.f);
+  }
+
 	/**
 	* Get the width of the entire sprite image.
 	*/

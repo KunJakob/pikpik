@@ -250,20 +250,22 @@ void CMenuScreen::Load()
   // Debug.
   m_pWindow = new CWindow(_SPRITE("Test-Window"));
   m_pWindow->SetPosition(XPOINT(20, 20));
-  m_pWindow->SetSize(192, 92);
+  m_pWindow->SetInnerSize(200, 200);
 
   //m_pButton = new CButton(_SPRITE("Test-Button"));
   //m_pButton->SetPosition(m_pWindow->GetInnerPosition() + XPOINT(5, 5));
 	//m_pWindow->Attach(m_pButton);
 
-  //CInputBox* pInputBox = new CInputBox(_SPRITE("Test-InputBox"));
-  //pInputBox->SetWidth()
+  CInputBox* pInputBox = new CInputBox(_SPRITE("Test-InputBox"), _FONT("Test-Input"));
+  pInputBox->SetPosition(m_pWindow->GetInnerPosition() + XPOINT(5, 5));
+  pInputBox->SetWidth(190);
+  m_pWindow->Attach(pInputBox);
 
   InterfaceManager.GetContainer()->Attach(m_pWindow);
 
 	m_pWindow = new CWindow(_SPRITE("Test-Window"));
 	m_pWindow->SetPosition(XPOINT(_HSWIDTH, _HSHEIGHT));
-	m_pWindow->SetSize(200, 200);
+	m_pWindow->SetInnerSize(200, 200);
 
 	m_pButton = new CButton(_SPRITE("Test-Button"));
 	m_pButton->SetPosition(m_pWindow->GetInnerPosition() + XPOINT(5, 5));
