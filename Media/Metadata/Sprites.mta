@@ -144,16 +144,22 @@
 {
 	.File "Surfaces\Test-Button.png"
 	
-	.Area "Normal"			{ .Tile 0 108 20 }
-	.Area "Over"			{ .Tile 1 108 20 }
-	.Area "Down"			{ .Tile 2 108 20 }
+	.Area "NormalLeft"		{ .Size 0   0 4   20 }
+	.Area "NormalMiddle"	{ .Size 4   0 100 20 }
+	.Area "NormalRight"		{ .Size 104 0 4   20 }
+	.Area "OverLeft"		{ .Size 108 0 4   20 }
+	.Area "OverMiddle"		{ .Size 112 0 100 20 }
+	.Area "OverRight"		{ .Size 212 0 4   20 }
+	.Area "DownLeft"		{ .Size 216 0 4   20 }
+	.Area "DownMiddle"		{ .Size 220 0 100 20 }
+	.Area "DownRight"		{ .Size 320 0 4   20 }
 }
 
 .Sprite "Test-InputBox"
 {
 	.File "Surfaces\Test-InputBox.png"
 	
-	.Area "Left"			{ .Size 0  0 2  22 }
-	.Area "Middle"			{ .Size 2  0 60 22 }
-	.Area "Right"			{ .Size 62 0 2  22 }
+	.Area "Left"			{ .Size 0  0 3  20 }
+	.Area "Middle"			{ .Size 1  0 62 20 }
+	.Area "Right"			{ .Size 61 0 3  20 }
 }

@@ -241,9 +241,6 @@ void CMenuScreen::Load()
   // Initialise the render resources.
   m_pBackground = new CBackgroundImage("Lobby-Background");
 
-  //m_pCursor = new CBasicSprite(_SPRITE("Cursor"));
-  //m_pGUI->SetCursor(m_pCursor->GetMetadata()->GetSprite());
-
   // Initialise statics.
   s_iNextScreen = ScreenIndex_Invalid;
 
@@ -252,12 +249,14 @@ void CMenuScreen::Load()
   m_pWindow->SetPosition(XPOINT(20, 20));
   m_pWindow->SetInnerSize(200, 200);
 
-  //m_pButton = new CButton(_SPRITE("Test-Button"));
-  //m_pButton->SetPosition(m_pWindow->GetInnerPosition() + XPOINT(5, 5));
-	//m_pWindow->Attach(m_pButton);
-
   CInputBox* pInputBox = new CInputBox(_SPRITE("Test-InputBox"), _FONT("Test-Input"));
   pInputBox->SetPosition(m_pWindow->GetInnerPosition() + XPOINT(5, 5));
+  pInputBox->SetWidth(190);
+  pInputBox->SetCharLimit(16);
+  m_pWindow->Attach(pInputBox);
+
+  pInputBox = new CInputBox(_SPRITE("Test-InputBox"), _FONT("Test-Input"));
+  pInputBox->SetPosition(m_pWindow->GetInnerPosition() + XPOINT(5, 28));
   pInputBox->SetWidth(190);
   m_pWindow->Attach(pInputBox);
 
@@ -269,6 +268,7 @@ void CMenuScreen::Load()
 
 	m_pButton = new CButton(_SPRITE("Test-Button"));
 	m_pButton->SetPosition(m_pWindow->GetInnerPosition() + XPOINT(5, 5));
+  m_pButton->SetWidth(190);
 	m_pWindow->Attach(m_pButton);
 
 	m_pButton = new CButton(_SPRITE("Test-Button"));

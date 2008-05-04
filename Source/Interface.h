@@ -395,9 +395,8 @@ protected:
   * Fired when in focus.
   */
   virtual void OnKeyChar(XINT iChar) {}
-  virtual void OnKeyDown(XUINT iVirtualKey, XBOOL bShift) {}
-  virtual void OnKeyUp(XUINT iVirtualKey, XBOOL bShift) {}
-  virtual void OnKeyHold(XUINT iVirtualKey, XBOOL bShift) {}
+  virtual void OnKeyDown(XUINT iVirtualKey) {}
+  virtual void OnKeyUp(XUINT iVirtualKey) {}
 
   // The parent element or NULL if top level.
   CInterfaceElement* m_pParent;
@@ -698,7 +697,7 @@ public:
 	*/
 	virtual XUINT GetWidth()
 	{
-		return m_pAreas[m_iButtonState]->xRect.GetWidth();
+		return m_iWidth + m_pAreas[m_iButtonState - 1]->xRect.GetWidth() + m_pAreas[m_iButtonState + 1]->xRect.GetWidth();
 	}
 
 	/**
@@ -708,6 +707,27 @@ public:
 	{
 		return m_pAreas[m_iButtonState]->xRect.GetHeight();
 	}
+
+  /**
+  * 
+  */
+  void SetWidth(XUINT iWidth);
+
+  /**
+  * 
+  */
+  void SetInnerWidth(XUINT iWidth)
+  {
+    m_iWidth = iWidth;
+  }
+
+  /**
+  * 
+  */
+  XUINT GetInnerWidth()
+  {
+    return m_iWidth;
+  }
 
   /**
   * 
@@ -735,18 +755,29 @@ protected:
   // Internal types.
   enum t_AreaIndex
   {
-    AreaIndex_Normal,
-    AreaIndex_Over,
-    AreaIndex_Down,
+    AreaIndex_NormalLeft,
+    AreaIndex_NormalMiddle,
+    AreaIndex_NormalRight,
+    AreaIndex_OverLeft,
+    AreaIndex_OverMiddle,
+    AreaIndex_OverRight,
+    AreaIndex_DownLeft,
+    AreaIndex_DownMiddle,
+    AreaIndex_DownRight,
     /*MAX*/AreaIndex_Max,
   };
 
   /**
   * 
   */
+  void InternalRender(XRECT& xRect, XPOINT xOffset);
+
+  /**
+  * 
+  */
   virtual void OnMouseEnter() 
   {
-    m_iButtonState = InterfaceManager.IsMouseDown() ? AreaIndex_Down : AreaIndex_Over;
+    m_iButtonState = InterfaceManager.IsMouseDown() ? AreaIndex_DownMiddle : AreaIndex_OverMiddle;
   }
 
   /**
@@ -754,7 +785,7 @@ protected:
   */
   virtual void OnMouseLeave()
   {
-    m_iButtonState = AreaIndex_Normal;
+    m_iButtonState = AreaIndex_NormalMiddle;
   }
 
   /**
@@ -762,7 +793,7 @@ protected:
   */
   virtual void OnMouseDown(XPOINT xPosition)
   {
-    m_iButtonState = AreaIndex_Down;
+    m_iButtonState = AreaIndex_DownMiddle;
   }
 
   /**
@@ -770,7 +801,7 @@ protected:
   */
   virtual void OnMouseUp(XPOINT xPosition) 
   {
-    m_iButtonState = AreaIndex_Over;
+    m_iButtonState = AreaIndex_OverMiddle;
 
     if (m_fpOnClickCallback)
       m_fpOnClickCallback(InterfaceManager.GetMousePosition() - GetPosition());
@@ -781,6 +812,9 @@ protected:
 
   // The element area list.
   CSpriteMetadata::CArea* m_pAreas[AreaIndex_Max];
+
+  // The width, in pixels, of the button area.
+  XUINT m_iWidth;
 
   // The button state.
   t_AreaIndex m_iButtonState;
@@ -901,10 +935,25 @@ protected:
   /**
   * 
   */
-  virtual void OnKeyChar(XINT iChar) 
+  virtual void OnFocus()
   {
-    m_xInputString += iChar;
+    m_iFlashTimer = 0;
   }
+
+  /**
+  * 
+  */
+  virtual void OnMouseDown(XPOINT xPosition);
+
+  /**
+  * 
+  */
+  virtual void OnKeyChar(XINT iChar);
+
+  /**
+  * 
+  */
+  virtual void OnKeyDown(XUINT iVirtualKey);
 
 	// Internal types.
 	enum t_AreaIndex
