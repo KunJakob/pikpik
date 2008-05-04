@@ -186,9 +186,6 @@ public:
   void SetMenuGroup(t_MenuGroupIndex iMenuGroup);
 
 protected:
-	// The GUI control object.
-	hgeGUI* m_pGUI;
-
 	// The font metadata to render the links with.
 	CFontMetadata* m_pFont;
 
@@ -203,10 +200,6 @@ protected:
 
 	// The currently active menu group.
 	t_MenuGroupIndex m_iMenuGroup;
-
-  // Debug.
-  CWindow* m_pWindow;
-  CButton* m_pButton;
 };
 
 //##############################################################################

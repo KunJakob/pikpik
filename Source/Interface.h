@@ -53,6 +53,7 @@ enum t_ElementType
   ElementType_Abstract,
   ElementType_Container,
   ElementType_Window,
+  ElementType_Label,
   ElementType_Button,
   ElementType_InputBox,
 };
@@ -661,7 +662,59 @@ protected:
 class CLabel : public CInterfaceElement
 {
 public:
+  /**
+  * 
+  */
+  CLabel(CFontMetadata* pFont);
+
+  /**
+  * 
+  */
+  virtual ~CLabel();
+
+  /**
+  * 
+  */
+  virtual void Render();
+
+  /**
+  * 
+  */
+  virtual XUINT GetWidth()
+  {
+    return m_pFont->GetStringWidth(m_xText.c_str());
+  }
+
+  /**
+  * 
+  */
+  virtual XUINT GetHeight()
+  {
+    return m_pFont->GetFontHeight();
+  }
+
+  /**
+  * 
+  */
+  void SetText(const XCHAR* pText) 
+  {
+    m_xText = pText;
+  }
+
+  /**
+  * 
+  */
+  const XCHAR* GetText() 
+  {
+    return m_xText.c_str();
+  }
+
 protected:
+  // The element font.
+  CFont* m_pFont;
+
+  // The text string.
+  XSTRING m_xText;
 };
 
 //##############################################################################
@@ -680,7 +733,7 @@ public:
   /**
   * 
   */
-  CButton(CSpriteMetadata* pMetadata);
+  CButton(CSpriteMetadata* pSprite, CFontMetadata* pFont = NULL);
 
   /**
   * 
@@ -732,23 +785,25 @@ public:
   /**
   * 
   */
-  void SetClickCallback(void* pCallback)
+  void SetClickCallback(t_OnClickCallback fpCallback)
   {
+    m_fpOnClickCallback = fpCallback;
   }
 
   /**
   * 
   */
-  void SetText(const XCHAR* pButtonText) 
+  void SetText(const XCHAR* pLabel) 
   {
+    m_xLabel = pLabel;
   }
 
   /**
   * 
   */
-  const XCHAR* GetText() 
+  const XCHAR* GetLabel() 
   {
-    return NULL;
+    return m_xLabel.c_str();
   }
 
 protected:
@@ -810,6 +865,9 @@ protected:
   // The element sprite.
   CBasicSprite* m_pSprite;
 
+  // The element font.
+  CFont* m_pFont;
+
   // The element area list.
   CSpriteMetadata::CArea* m_pAreas[AreaIndex_Max];
 
@@ -819,8 +877,8 @@ protected:
   // The button state.
   t_AreaIndex m_iButtonState;
 
-  // The button label.
-  CLabel* m_pLabel;
+  // The button label string.
+  XSTRING m_xLabel;
 
   // The callback to execute if the button is clicked.
   t_OnClickCallback m_fpOnClickCallback;
@@ -913,17 +971,17 @@ public:
   /**
   * 
   */
-  void SetInputString(const XCHAR* pString)
+  void SetText(const XCHAR* pText)
   {
-    m_xInputString = pString;
+    m_xText = pText;
   }
 
   /**
   * 
   */
-  const XCHAR* GetInputString()
+  const XCHAR* GetText()
   {
-    return m_xInputString.c_str();
+    return m_xText.c_str();
   }
 
 protected:
@@ -980,7 +1038,7 @@ protected:
   XUINT m_iCharLimit;
 
   // The current input-box text.
-  XSTRING m_xInputString;
+  XSTRING m_xText;
 
   // The input cursor text character offset.
   XUINT m_iCharOffset;

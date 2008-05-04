@@ -197,7 +197,6 @@ void CMenuScreen::Load()
   _GLOBAL.pMenu = this;
 
   // Initialise prerequisites.
-  m_pGUI = new hgeGUI;
   m_pFont = _FONT("Menu-Item");
 
   // Initialise the menu links.
@@ -245,7 +244,7 @@ void CMenuScreen::Load()
   s_iNextScreen = ScreenIndex_Invalid;
 
   // Debug.
-  m_pWindow = new CWindow(_SPRITE("Test-Window"));
+  /*CWindow* m_pWindow = new CWindow(_SPRITE("Test-Window"));
   m_pWindow->SetPosition(XPOINT(20, 20));
   m_pWindow->SetInnerSize(200, 200);
 
@@ -258,6 +257,7 @@ void CMenuScreen::Load()
   pInputBox = new CInputBox(_SPRITE("Test-InputBox"), _FONT("Test-Input"));
   pInputBox->SetPosition(m_pWindow->GetInnerPosition() + XPOINT(5, 28));
   pInputBox->SetWidth(190);
+  pInputBox->SetText("Welcome to PMO.");
   m_pWindow->Attach(pInputBox);
 
   InterfaceManager.GetContainer()->Attach(m_pWindow);
@@ -266,9 +266,10 @@ void CMenuScreen::Load()
 	m_pWindow->SetPosition(XPOINT(_HSWIDTH, _HSHEIGHT));
 	m_pWindow->SetInnerSize(200, 200);
 
-	m_pButton = new CButton(_SPRITE("Test-Button"));
+	CButton* m_pButton = new CButton(_SPRITE("Test-Button"), _FONT("Test-Input"));
 	m_pButton->SetPosition(m_pWindow->GetInnerPosition() + XPOINT(5, 5));
-  m_pButton->SetWidth(190);
+  m_pButton->SetWidth(100);
+  m_pButton->SetText("Continue");
 	m_pWindow->Attach(m_pButton);
 
 	m_pButton = new CButton(_SPRITE("Test-Button"));
@@ -277,7 +278,7 @@ void CMenuScreen::Load()
 
 	InterfaceManager.GetContainer()->Attach(m_pWindow);
 
-  InterfaceManager.SetCursor(_SPRITE("Test-Cursor"));
+  InterfaceManager.SetCursor(_SPRITE("Test-Cursor"));*/
 }
 
 // =============================================================================
@@ -285,10 +286,7 @@ void CMenuScreen::Load()
 // =============================================================================
 void CMenuScreen::Unload()
 {
-	//delete m_pGUI; // Also erases the GUI elements.
 	delete m_pBackground;
-
-	//delete m_pCursor;
 }
 
 // =============================================================================
@@ -303,9 +301,6 @@ void CMenuScreen::Update()
 		return;
 	}
 
-	// Update the GUI.
-	//m_pGUI->Update(_TIMEDELTAF);
-
 	if (s_iNextScreen != ScreenIndex_Invalid)
 	{
 		ScreenManager::Push(s_iNextScreen);
@@ -315,7 +310,7 @@ void CMenuScreen::Update()
 	// Update the background.
 	m_pBackground->Update();
 
-  //
+  // Update the interface.
   InterfaceManager.Update();
 }
 
@@ -325,9 +320,9 @@ void CMenuScreen::Update()
 void CMenuScreen::Render()
 {
 	m_pBackground->Render();
-  InterfaceManager.Render();
 
-	//m_pGUI->Render();
+  // Render the interface.
+  InterfaceManager.Render();
 }
 
 // =============================================================================

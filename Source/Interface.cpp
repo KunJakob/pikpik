@@ -453,6 +453,29 @@ void CWindow::InternalRender(XRECT& xRect, XPOINT xOffset)
 //
 //##############################################################################
 
+// =============================================================================
+// Nat Ryall                                                          5-May-2008
+// =============================================================================
+CLabel::CLabel(CFontMetadata* pFont) : CInterfaceElement(ElementType_Label)
+{
+  m_pFont = new CFont(pFont);
+}
+
+// =============================================================================
+// Nat Ryall                                                          5-May-2008
+// =============================================================================
+CLabel::~CLabel()
+{
+  delete m_pFont;
+}
+
+// =============================================================================
+// Nat Ryall                                                          5-May-2008
+// =============================================================================
+void CLabel::Render()
+{
+  m_pFont->Render(m_xText.c_str(), GetPosition(), HGETEXT_LEFT);
+}
 
 //##############################################################################
 
@@ -465,24 +488,27 @@ void CWindow::InternalRender(XRECT& xRect, XPOINT xOffset)
 // =============================================================================
 // Nat Ryall                                                         30-Apr-2008
 // =============================================================================
-CButton::CButton(CSpriteMetadata* pMetadata) : CInterfaceElement(ElementType_Button),
+CButton::CButton(CSpriteMetadata* pSprite, CFontMetadata* pFont) : CInterfaceElement(ElementType_Button),
   m_pSprite(NULL),
+  m_pFont(NULL),
   m_iWidth(0),
   m_iButtonState(AreaIndex_NormalMiddle),
-  m_pLabel(NULL),
 	m_fpOnClickCallback(NULL)
 {
-  m_pSprite = new CBasicSprite(pMetadata);
+  m_pSprite = new CBasicSprite(pSprite);
 
-  m_pAreas[AreaIndex_NormalLeft]    = pMetadata->FindArea("NormalLeft"); 
-  m_pAreas[AreaIndex_NormalMiddle]  = pMetadata->FindArea("NormalMiddle"); 
-  m_pAreas[AreaIndex_NormalRight]   = pMetadata->FindArea("NormalRight"); 
-  m_pAreas[AreaIndex_OverLeft]      = pMetadata->FindArea("OverLeft"); 
-  m_pAreas[AreaIndex_OverMiddle]    = pMetadata->FindArea("OverMiddle"); 
-  m_pAreas[AreaIndex_OverRight]     = pMetadata->FindArea("OverRight"); 
-  m_pAreas[AreaIndex_DownLeft]      = pMetadata->FindArea("DownLeft"); 
-  m_pAreas[AreaIndex_DownMiddle]    = pMetadata->FindArea("DownMiddle"); 
-  m_pAreas[AreaIndex_DownRight]     = pMetadata->FindArea("DownRight"); 
+  if (pFont)
+    m_pFont = new CFont(pFont);
+
+  m_pAreas[AreaIndex_NormalLeft]    = pSprite->FindArea("NormalLeft"); 
+  m_pAreas[AreaIndex_NormalMiddle]  = pSprite->FindArea("NormalMiddle"); 
+  m_pAreas[AreaIndex_NormalRight]   = pSprite->FindArea("NormalRight"); 
+  m_pAreas[AreaIndex_OverLeft]      = pSprite->FindArea("OverLeft"); 
+  m_pAreas[AreaIndex_OverMiddle]    = pSprite->FindArea("OverMiddle"); 
+  m_pAreas[AreaIndex_OverRight]     = pSprite->FindArea("OverRight"); 
+  m_pAreas[AreaIndex_DownLeft]      = pSprite->FindArea("DownLeft"); 
+  m_pAreas[AreaIndex_DownMiddle]    = pSprite->FindArea("DownMiddle"); 
+  m_pAreas[AreaIndex_DownRight]     = pSprite->FindArea("DownRight"); 
 }
 
 // =============================================================================
@@ -490,6 +516,9 @@ CButton::CButton(CSpriteMetadata* pMetadata) : CInterfaceElement(ElementType_But
 // =============================================================================
 CButton::~CButton()
 {
+  if (m_pFont)
+    delete m_pFont;
+
   delete m_pSprite;
 }
 
@@ -517,6 +546,10 @@ void CButton::Render()
 
     iX += iDrawWidth;
   }
+
+  // Label.
+  if (m_pFont)
+    m_pFont->Render(m_xLabel.c_str(), GetPosition() + XPOINT(GetWidth() / 2, (GetHeight() - m_pFont->GetFontHeight()) / 2), HGETEXT_CENTER);
 }
 
 // =============================================================================
@@ -612,7 +645,7 @@ void CInputBox::Render()
   // Input cursor.
   if (InterfaceManager.IsFocusedElement(this) && m_iFlashTimer < 500)
   {
-    XSTRING xString = m_xInputString.substr(0, m_iCharOffset);
+    XSTRING xString = m_xText.substr(0, m_iCharOffset);
     XUINT iOffsetX = iLeftWidth + 1 + m_pFont->GetStringWidth(xString.c_str());
 
     XRECT iLinePoints(iOffsetX, iOffsetY, iOffsetX, GetHeight() - iOffsetY);
@@ -621,7 +654,7 @@ void CInputBox::Render()
     _HGE->Gfx_RenderLine((float)iLinePoints.iLeft, (float)iLinePoints.iTop, (float)iLinePoints.iRight, (float)iLinePoints.iBottom, 0xFF000000); 
   }
 
-  m_pFont->Render(GetInputString(), GetPosition() + XPOINT(iLeftWidth + 1, iOffsetY), HGETEXT_LEFT);
+  m_pFont->Render(GetText(), GetPosition() + XPOINT(iLeftWidth + 1, iOffsetY), HGETEXT_LEFT);
 }
 
 // =============================================================================
@@ -647,7 +680,7 @@ void CInputBox::InternalRender(XRECT& xRect, XPOINT xOffset)
 // =============================================================================
 void CInputBox::OnMouseDown(XPOINT xPosition)
 {
-  if (m_xInputString.length())
+  if (m_xText.length())
   {
     XSTRING xCheckString;
 
@@ -655,9 +688,9 @@ void CInputBox::OnMouseDown(XPOINT xPosition)
     XUINT iWidth = 0;
     XUINT iLastWidth = 0;
 
-    for (XUINT iA = 0; iA < m_xInputString.length(); ++iA)
+    for (XUINT iA = 0; iA < m_xText.length(); ++iA)
     {
-      xCheckString += m_xInputString[iA];
+      xCheckString += m_xText[iA];
       iWidth = m_pFont->GetStringWidth(xCheckString.c_str()) + m_pAreas[AreaIndex_Left]->xRect.GetWidth();
 
       if (iWidth > iTarget)
@@ -678,8 +711,8 @@ void CInputBox::OnMouseDown(XPOINT xPosition)
 // =============================================================================
 void CInputBox::OnKeyChar(XINT iChar)
 {
-  if (iChar >= ' ' && iChar <= '~' && (m_iCharLimit == 0 || m_xInputString.length() < m_iCharLimit))
-    m_xInputString.insert(m_iCharOffset++, 1, iChar);
+  if (iChar >= ' ' && iChar <= '~' && (m_iCharLimit == 0 || m_xText.length() < m_iCharLimit))
+    m_xText.insert(m_iCharOffset++, 1, iChar);
 }
 
 // =============================================================================
@@ -692,7 +725,7 @@ void CInputBox::OnKeyDown(XUINT iVirtualKey)
   case HGEK_BACKSPACE:
     {
       if (m_iCharOffset)
-        m_xInputString.erase(--m_iCharOffset, 1);
+        m_xText.erase(--m_iCharOffset, 1);
     }
     break;
 
@@ -705,7 +738,7 @@ void CInputBox::OnKeyDown(XUINT iVirtualKey)
 
   case HGEK_RIGHT:
     {
-      if (m_iCharOffset < m_xInputString.length())
+      if (m_iCharOffset < m_xText.length())
         m_iCharOffset++;
     }
     break;
