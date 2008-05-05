@@ -31,11 +31,6 @@
 	.File "Surfaces\Lobby-Background.png"
 }
 
-.Sprite "Cursor"
-{
-	.File "Surfaces\Cursor.png"
-}
-
 .Sprite "Player-PacMan"
 {
 	.File "Surfaces\Player-PacMan.png"
@@ -120,9 +115,19 @@
 	.Area "BR"				{ .Rect 16 16 24 24 }
 }
 
-.Sprite "Test-Cursor"
+.Sprite "Cursor-Main"
 {
 	.File "Surfaces\Test-Cursor.png"
+}
+
+.Sprite "Cursor-Write"
+{
+	.File "Surfaces\Test-WriteCursor.png"
+}
+
+.Sprite "Cursor-Click"
+{
+	.File "Surfaces\Cursor-Click.png"
 }
 
 .Sprite "Test-Window"

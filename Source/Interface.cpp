@@ -23,7 +23,10 @@
 // =============================================================================
 CInterfaceManager::CInterfaceManager() :
   m_pContainer(NULL),
-  m_pCursor(NULL)
+  m_pActiveElement(NULL),
+  m_pFocusedElement(NULL),
+  m_bFoundActive(false),
+  m_bDebugRender(false)
 {
   m_pContainer = new CContainer();
 	m_pContainer->SetSize(_SWIDTH, _SHEIGHT);
@@ -38,8 +41,11 @@ CInterfaceManager::~CInterfaceManager()
 {
   delete m_pContainer;
 
-  if (m_pCursor)
-    delete m_pCursor;
+  for (XUINT iA = 0; iA < ElementType_Max; ++iA)
+  {
+    if (m_pCursor[iA])
+      delete m_pCursor[iA];
+  }
 }
 
 // =============================================================================
@@ -51,6 +57,9 @@ void CInterfaceManager::Reset()
 	m_pFocusedElement = NULL;
 
 	m_pContainer->DetachAll();
+
+  for (XUINT iA = 0; iA < ElementType_Max; ++iA)
+    m_pCursor[iA] = NULL;
 }
 
 // =============================================================================
@@ -102,52 +111,62 @@ void CInterfaceManager::Render()
 {
   RenderElement(m_pContainer);
 
-	/*if (m_pActiveElement)
-	{
-		XRECT xRect = m_pActiveElement->GetArea();
-		XUINT iColour = ARGB(255, 32, 32, 32);
-		
-		hgeQuad xQuad;
-		memset(&xQuad, 0, sizeof(hgeQuad));
+	if (m_bDebugRender)
+  {
+    if (m_pActiveElement)
+    {
+      XRECT xRect = m_pActiveElement->GetArea();
+      XUINT iColour = ARGB(255, 32, 32, 32);
 
-		xQuad.v[0].x = (float)xRect.iLeft;
-		xQuad.v[0].y = (float)xRect.iTop;
-		xQuad.v[1].x = (float)xRect.iRight;
-		xQuad.v[1].y = (float)xRect.iTop;
-		xQuad.v[3].x = (float)xRect.iLeft;
-		xQuad.v[3].y = (float)xRect.iBottom;
-		xQuad.v[2].x = (float)xRect.iRight;
-		xQuad.v[2].y = (float)xRect.iBottom;
+      hgeQuad xQuad;
+      memset(&xQuad, 0, sizeof(hgeQuad));
 
-		xQuad.v[0].col = xQuad.v[1].col = xQuad.v[2].col = xQuad.v[3].col = iColour;
+      xQuad.v[0].x = (float)xRect.iLeft;
+      xQuad.v[0].y = (float)xRect.iTop;
+      xQuad.v[1].x = (float)xRect.iRight;
+      xQuad.v[1].y = (float)xRect.iTop;
+      xQuad.v[3].x = (float)xRect.iLeft;
+      xQuad.v[3].y = (float)xRect.iBottom;
+      xQuad.v[2].x = (float)xRect.iRight;
+      xQuad.v[2].y = (float)xRect.iBottom;
 
-		_HGE->Gfx_RenderQuad(&xQuad);
-	}
+      xQuad.v[0].col = xQuad.v[1].col = xQuad.v[2].col = xQuad.v[3].col = iColour;
 
-	if (m_pFocusedElement)
-	{
-		XRECT xRect = m_pFocusedElement->GetFocusArea() + XRECT(2, 2, -1, -1);
-		XUINT iColour = ARGB(255, 255, 0, 0);
+      _HGE->Gfx_RenderQuad(&xQuad);
+    }
 
-		_HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iTop, iColour);
-		_HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iBottom, iColour);
-		_HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iBottom, iColour);
-		_HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iTop, iColour);
-	}*/
+    if (m_pFocusedElement)
+    {
+      XRECT xRect = m_pFocusedElement->GetFocusArea() + XRECT(2, 2, -1, -1);
+      XUINT iColour = ARGB(255, 255, 0, 0);
 
-  if (_HGE->Input_IsMouseOver() && m_pCursor)
-    m_pCursor->Render(m_pCursor->GetImageRect(), XPOINT(), m_xMousePos, 1.f, 0.f);
+      _HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iTop, iColour);
+      _HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iBottom, iColour);
+      _HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iBottom, iColour);
+      _HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iTop, iColour);
+    }
+  }
+
+  if (_HGE->Input_IsMouseOver() && m_pCursor[ElementType_Unknown])
+  {
+    CBasicSprite* pCursor = m_pCursor[ElementType_Unknown];
+
+    if (m_pActiveElement && m_pCursor[m_pActiveElement->GetType()])
+      pCursor = m_pCursor[m_pActiveElement->GetType()];
+
+    pCursor->Render(pCursor->GetImageRect(), XPOINT(), m_xMousePos, 1.f, 0.f);
+  }
 }
 
 // =============================================================================
 // Nat Ryall                                                          3-May-2008
 // =============================================================================
-void CInterfaceManager::SetCursor(CSpriteMetadata* pMetadata)
+void CInterfaceManager::SetCursor(t_ElementType iType, CSpriteMetadata* pMetadata)
 {
-  if (m_pCursor)
-    delete m_pCursor;
+  if (m_pCursor[iType])
+    delete m_pCursor[iType];
 
-  m_pCursor = new CBasicSprite(pMetadata);
+  m_pCursor[iType] = new CBasicSprite(pMetadata);
 }
 
 // =============================================================================
@@ -191,10 +210,13 @@ void CInterfaceManager::UpdateElement(CInterfaceElement* pElement)
 // =============================================================================
 void CInterfaceManager::RenderElement(CInterfaceElement* pElement)
 {
-  pElement->Render();
+  if (pElement->IsVisible())
+  {
+    pElement->Render();
 
-  XEN_LIST_FOREACH(t_ElementList, ppElement, pElement->m_lpChildElements)
-    RenderElement(*ppElement);
+    XEN_LIST_FOREACH(t_ElementList, ppElement, pElement->m_lpChildElements)
+      RenderElement(*ppElement);
+  }
 }
 
 // =============================================================================
@@ -206,7 +228,7 @@ void CInterfaceManager::CheckIntersection(CInterfaceElement* pElement)
   XEN_LIST_FOREACH_R(t_ElementList, ppElement, pElement->m_lpChildElements)
 		CheckIntersection(*ppElement);
 
-  if (pElement->IsVisible())
+  if (pElement->IsVisible() && pElement->IsEnabled())
   {
     if (Math::Intersect(m_xMousePos, pElement->GetArea()))
     {

@@ -51,22 +51,14 @@ static t_ScreenIndex s_iNextScreen = ScreenIndex_Invalid;
 // =============================================================================
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
-CMenuLink::CMenuLink(XUINT iGroupIndex, CFontMetadata* pFont, const XCHAR* pText, t_fpLinkSelectedCallback fpCallback) :
+CMenuLink::CMenuLink(XUINT iGroupIndex, CFontMetadata* pFont, const XCHAR* pText, t_fpLinkSelectedCallback fpCallback) : CInterfaceElement(ElementType_MenuLink),
 	m_iGroupIndex(iGroupIndex),
 	m_pText(NULL),
 	m_fpLinkSelectedCallback(fpCallback)
 {
-  id = 0;
-	
-	bStatic = false;
-	bVisible = false;
-	bEnabled = false;
-
-	rect = hgeRect(0, 0, 0, 0);
-
 	m_pText = new CText(pFont);
 	m_pText->SetString(pText);
-	m_pText->SetAlignment(HGETEXT_CENTER);
+	m_pText->SetAlignment(HGETEXT_LEFT);
 }
 
 // =============================================================================
@@ -80,7 +72,7 @@ CMenuLink::~CMenuLink()
 // =============================================================================
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
-void CMenuLink::Update(float fDeltaTime)
+void CMenuLink::Update()
 {
 }
 
@@ -93,32 +85,14 @@ void CMenuLink::Render()
 }
 
 // =============================================================================
-// Nat Ryall                                                         13-Apr-2008
-// =============================================================================
-bool CMenuLink::MouseLButton(bool bDown)
-{
-	if (bDown)
-		ExecuteCallback();
-
-	return false;
-}
-
-// =============================================================================
 // Nat Ryall                                                         18-Apr-2008
 // =============================================================================
 void CMenuLink::RePosition(XUINT iElementIndex, XUINT iNumElements)
 {
-	XFLOAT fHalfWidth = (XFLOAT)m_pText->GetStringWidth() / 2.f;
-	XFLOAT fHeight = (XFLOAT)m_pText->GetFontHeight();
-	XFLOAT fLineHeight = (XFLOAT)(XUINT)(fHeight * 1.25f);
-	XFLOAT fHalfLineHeight = fLineHeight / 2.f;
+  XPOINT xPosition = XPOINT(_HSWIDTH - (GetWidth() / 2), _HSHEIGHT - (iNumElements * (GetHeight() / 2)) + iElementIndex * (GetHeight() + 5));
 
-	XFLOAT fX = (XFLOAT)_HSWIDTH;
-	XFLOAT fY = (XFLOAT)_HSHEIGHT - (iNumElements * fHalfLineHeight) + ((XFLOAT)iElementIndex * fLineHeight);
-
-	rect = hgeRect(fX - fHalfWidth, fY, fX + fHalfWidth, fY + fHeight);
-	
-	m_pText->SetPosition(XPOINT((XUINT)fX, (XUINT)fY));
+	SetPosition(xPosition);
+	m_pText->SetPosition(xPosition);
 }
 
 //##############################################################################
@@ -153,6 +127,15 @@ void Callback_ShowPlayMenu()
 void Callback_ShowOnlineMenu()
 {
 	_GLOBAL.pMenu->SetMenuGroup(MenuGroupIndex_Online);
+}
+
+// =============================================================================
+// Nat Ryall                                                          5-May-2008
+// =============================================================================
+void Callback_ShowJoinInterface()
+{
+  _GLOBAL.pMenu->SetMenuGroup(MenuGroupIndex_None);
+  _GLOBAL.pMenu->m_pJoinWindow->SetVisible(true);
 }
 
 // =============================================================================
@@ -199,6 +182,10 @@ void CMenuScreen::Load()
   // Initialise prerequisites.
   m_pFont = _FONT("Menu-Item");
 
+  // Initialise interface.
+  InterfaceManager.SetCursor(_SPRITE("Cursor-Main"));
+  InterfaceManager.SetCursor(ElementType_MenuLink, _SPRITE("Cursor-Click"));
+
   // Initialise the menu links.
   m_iMenuGroup = MenuGroupIndex_None;
 
@@ -206,25 +193,25 @@ void CMenuScreen::Load()
   {
     // Main.
     new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Play Online",		&Callback_ShowOnlineMenu),
-    new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Tutorial",	NULL),
-    new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Options",		NULL),
-    new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Credits",		NULL),
-    new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Exit",			&Callback_QuitGame),
+    new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Tutorial",	    NULL),
+    new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Options",		    NULL),
+    new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Credits",		    NULL),
+    new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Exit",			    &Callback_QuitGame),
 
     // Play.
-    new CMenuLink(MenuGroupIndex_Play,		m_pFont, "Back",			&Callback_ShowMainMenu),
+    new CMenuLink(MenuGroupIndex_Play,		m_pFont, "Back",			    &Callback_ShowMainMenu),
 
     // Online.
-    new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Join",			NULL),
-    new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Create",		Callback_StartGame),
-    new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Back",			&Callback_ShowMainMenu),
+    new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Join",			    &Callback_ShowJoinInterface),
+    new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Create",		    &Callback_StartGame),
+    new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Back",			    &Callback_ShowMainMenu),
   };
 
-  /*for (XUINT iA = 0; iA < (sizeof(pLinkList) / sizeof(CMenuLink*)); ++iA)
+  for (XUINT iA = 0; iA < (sizeof(pLinkList) / sizeof(CMenuLink*)); ++iA)
   {
     m_lpMenuLinks[pLinkList[iA]->m_iGroupIndex].push_back(pLinkList[iA]);
-    m_pGUI->AddCtrl(pLinkList[iA]);
-  }*/
+    InterfaceManager.GetContainer()->Attach(pLinkList[iA]);
+  }
 
   for (XUINT iGroup = 0; iGroup < MenuGroupIndex_Max; ++iGroup)
   {
@@ -232,7 +219,10 @@ void CMenuScreen::Load()
     XUINT iElement = 0;
 
     XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[iGroup])
+    {
+      (*ppMenuLink)->SetVisible(false);
       (*ppMenuLink)->RePosition(iElement++, iElementCount);
+    }
   }
 
   SetMenuGroup(MenuGroupIndex_Main);
@@ -243,42 +233,91 @@ void CMenuScreen::Load()
   // Initialise statics.
   s_iNextScreen = ScreenIndex_Invalid;
 
-  // Debug.
-  /*CWindow* m_pWindow = new CWindow(_SPRITE("Test-Window"));
-  m_pWindow->SetPosition(XPOINT(20, 20));
-  m_pWindow->SetInnerSize(200, 200);
+  // Create windows.
+  CFontMetadata* pFont = _FONT("Test-Input");
 
-  CInputBox* pInputBox = new CInputBox(_SPRITE("Test-InputBox"), _FONT("Test-Input"));
-  pInputBox->SetPosition(m_pWindow->GetInnerPosition() + XPOINT(5, 5));
-  pInputBox->SetWidth(190);
-  pInputBox->SetCharLimit(16);
-  m_pWindow->Attach(pInputBox);
+  m_pJoinWindow = new CWindow(_SPRITE("Test-Window"));
+  m_pJoinWindow->SetInnerSize(280, 90);
+  m_pJoinWindow->SetPosition(XPOINT(_HSWIDTH - (m_pJoinWindow->GetWidth() / 2), _HSHEIGHT - (m_pJoinWindow->GetHeight() / 2)));
 
-  pInputBox = new CInputBox(_SPRITE("Test-InputBox"), _FONT("Test-Input"));
-  pInputBox->SetPosition(m_pWindow->GetInnerPosition() + XPOINT(5, 28));
-  pInputBox->SetWidth(190);
-  pInputBox->SetText("Welcome to PMO.");
-  m_pWindow->Attach(pInputBox);
+  XPOINT xWinPos = m_pJoinWindow->GetInnerPosition();
 
-  InterfaceManager.GetContainer()->Attach(m_pWindow);
+  CLabel* pLabel = NULL;
+  CButton* pButton = NULL;
+  CInputBox* pInputBox = NULL;
 
-	m_pWindow = new CWindow(_SPRITE("Test-Window"));
-	m_pWindow->SetPosition(XPOINT(_HSWIDTH, _HSHEIGHT));
-	m_pWindow->SetInnerSize(200, 200);
+  // Address Line
+  pLabel = new CLabel(pFont);
+  pLabel->SetPosition(xWinPos + XPOINT(13, 13));
+  pLabel->SetText("Address:");
+  m_pJoinWindow->Attach(pLabel);
 
-	CButton* m_pButton = new CButton(_SPRITE("Test-Button"), _FONT("Test-Input"));
-	m_pButton->SetPosition(m_pWindow->GetInnerPosition() + XPOINT(5, 5));
-  m_pButton->SetWidth(100);
-  m_pButton->SetText("Continue");
-	m_pWindow->Attach(m_pButton);
+  pInputBox = new CInputBox(_SPRITE("Test-InputBox"), pFont);
+  pInputBox->SetPosition(xWinPos + XPOINT(83, 10));
+  pInputBox->SetWidth(30);
+  pInputBox->SetCharLimit(3);
+  m_pJoinWindow->Attach(pInputBox);
 
-	m_pButton = new CButton(_SPRITE("Test-Button"));
-	m_pButton->SetPosition(m_pWindow->GetInnerPosition() + XPOINT(5, 5 + m_pButton->GetHeight()));
-	m_pWindow->Attach(m_pButton);
+  pInputBox = new CInputBox(_SPRITE("Test-InputBox"), pFont);
+  pInputBox->SetPosition(xWinPos + XPOINT(133, 10));
+  pInputBox->SetWidth(30);
+  pInputBox->SetCharLimit(3);
+  m_pJoinWindow->Attach(pInputBox);
 
-	InterfaceManager.GetContainer()->Attach(m_pWindow);
+  pInputBox = new CInputBox(_SPRITE("Test-InputBox"), pFont);
+  pInputBox->SetPosition(xWinPos + XPOINT(183, 10));
+  pInputBox->SetWidth(30);
+  pInputBox->SetCharLimit(3);
+  m_pJoinWindow->Attach(pInputBox);
 
-  InterfaceManager.SetCursor(_SPRITE("Test-Cursor"));*/
+  pInputBox = new CInputBox(_SPRITE("Test-InputBox"), pFont);
+  pInputBox->SetPosition(xWinPos + XPOINT(233, 10));
+  pInputBox->SetWidth(30);
+  pInputBox->SetCharLimit(3);
+  m_pJoinWindow->Attach(pInputBox);
+
+  pLabel = new CLabel(pFont);
+  pLabel->SetPosition(xWinPos + XPOINT(121, 13));
+  pLabel->SetText(".");
+  m_pJoinWindow->Attach(pLabel);
+
+  pLabel = new CLabel(pFont);
+  pLabel->SetPosition(xWinPos + XPOINT(171, 13));
+  pLabel->SetText(".");
+  m_pJoinWindow->Attach(pLabel);
+
+  pLabel = new CLabel(pFont);
+  pLabel->SetPosition(xWinPos + XPOINT(221, 13));
+  pLabel->SetText(".");
+  m_pJoinWindow->Attach(pLabel);
+
+  // Port Line.
+  pLabel = new CLabel(pFont);
+  pLabel->SetPosition(xWinPos + XPOINT(13, 39));
+  pLabel->SetText("Port:");
+  m_pJoinWindow->Attach(pLabel);
+
+  pInputBox = new CInputBox(_SPRITE("Test-InputBox"), pFont);
+  pInputBox->SetPosition(xWinPos + XPOINT(83, 36));
+  pInputBox->SetWidth(48);
+  pInputBox->SetCharLimit(5);
+  m_pJoinWindow->Attach(pInputBox);
+
+  // Button Line.
+  pButton = new CButton(_SPRITE("Test-Button"), pFont);
+  pButton->SetPosition(xWinPos + XPOINT(82, 62));
+  pButton->SetWidth(105);
+  pButton->SetText("Join");
+  m_pJoinWindow->Attach(pButton);
+
+  pButton = new CButton(_SPRITE("Test-Button"), pFont);
+  pButton->SetPosition(xWinPos + XPOINT(194, 62));
+  pButton->SetWidth(75);
+  pButton->SetText("Quit");
+  m_pJoinWindow->Attach(pButton);
+
+  InterfaceManager.GetContainer()->Attach(m_pJoinWindow);
+  m_pJoinWindow->SetVisible(false);
 }
 
 // =============================================================================
@@ -330,20 +369,17 @@ void CMenuScreen::Render()
 // =============================================================================
 void CMenuScreen::SetMenuGroup(t_MenuGroupIndex iMenuGroup)
 {
-	if (m_iMenuGroup != MenuGroupIndex_None)
-	{
-		XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[m_iMenuGroup])
-		{
-			(*ppMenuLink)->bVisible = false;
-			(*ppMenuLink)->bEnabled = false;
-		}
-	}
+  if (m_iMenuGroup != MenuGroupIndex_None)
+  {
+    XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[m_iMenuGroup])
+      (*ppMenuLink)->SetVisible(false);
+  }
 
-	XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[iMenuGroup])
-	{
-		(*ppMenuLink)->bVisible = true;
-		(*ppMenuLink)->bEnabled = true;
-	}
+  if (iMenuGroup != MenuGroupIndex_None)
+  {
+    XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[iMenuGroup])
+      (*ppMenuLink)->SetVisible(true);
+  }
 
 	m_iMenuGroup = iMenuGroup;
 }

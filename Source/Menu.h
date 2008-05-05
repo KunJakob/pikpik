@@ -72,7 +72,7 @@ typedef XLIST<CMenuLink*> t_MenuLinkList;
 //##############################################################################
 
 // Text link element.
-class CMenuLink : public hgeGUIObject
+class CMenuLink : public CInterfaceElement
 {
 public:
 	// Friends.
@@ -94,17 +94,28 @@ public:
 	/**
 	* Update the element.
 	*/
-	virtual void Update(float fDeltaTime);
+	virtual void Update();
 
 	/**
 	* Render the element.
 	*/
 	virtual void Render();
 
-	/**
-	* Called when the element is clicked or released.
-	*/
-	virtual bool MouseLButton(bool bDown);
+  /**
+  * Get the element width in pixels.
+  */
+  virtual XUINT GetWidth()
+  {
+    return m_pText->GetStringWidth();
+  }
+
+  /**
+  * Get the element height in pixels.
+  */
+  virtual XUINT GetHeight()
+  {
+    return m_pText->GetFontHeight();
+  }
 
 protected:
 	/**
@@ -112,14 +123,14 @@ protected:
 	*/
 	void RePosition(XUINT iElementIndex, XUINT iNumElements);
 
-	/**
-	* Execute the internal callback.
-	*/
-	void ExecuteCallback()
-	{
-		if (m_fpLinkSelectedCallback)
-			m_fpLinkSelectedCallback();
-	}
+  /**
+  * Called when the mouse is released when the element is active.
+  */
+  virtual void OnMouseUp(XPOINT xPosition)
+  {
+    if (m_fpLinkSelectedCallback)
+      m_fpLinkSelectedCallback();
+  }
 
 	// The group index of the element. This us used to enable/disable elements in groups.
 	XUINT m_iGroupIndex;
@@ -184,6 +195,9 @@ public:
   * Set the menu group to render.
   */
   void SetMenuGroup(t_MenuGroupIndex iMenuGroup);
+
+  // The join window.
+  CWindow* m_pJoinWindow;
 
 protected:
 	// The font metadata to render the links with.

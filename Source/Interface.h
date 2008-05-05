@@ -50,12 +50,16 @@ class CContainer;
 // The types of interface elements.
 enum t_ElementType
 {
-  ElementType_Abstract,
+  ElementType_Unknown,
   ElementType_Container,
   ElementType_Window,
   ElementType_Label,
   ElementType_Button,
   ElementType_InputBox,
+
+  ElementType_MenuLink,
+  
+  ElementType_Max,
 };
 
 // Lists.
@@ -107,7 +111,15 @@ public:
   /**
   * 
   */
-  void SetCursor(CSpriteMetadata* pMetadata);
+  void SetCursor(t_ElementType iType, CSpriteMetadata* pMetadata);
+
+  /**
+  * 
+  */
+  void SetCursor(CSpriteMetadata* pMetadata)
+  {
+    SetCursor(ElementType_Unknown, pMetadata);
+  }
 
 	/**
 	* 
@@ -167,6 +179,14 @@ public:
 		return _HGE->Input_GetKeyState(HGEK_LBUTTON);
 	}
 
+  /**
+  * 
+  */
+  void SetDebugRender(XBOOL bDebug)
+  {
+    m_bDebugRender = bDebug;
+  }
+
 protected:
   /**
   * 
@@ -187,7 +207,7 @@ protected:
   CContainer* m_pContainer;
 
   // The cursor sprite.
-  CBasicSprite* m_pCursor;
+  CBasicSprite* m_pCursor[ElementType_Max];
 
   // The current mouse position.
   XPOINT m_xMousePos;
@@ -204,6 +224,9 @@ protected:
 private:
   // Tracking variable for finding the current active element.
   XBOOL m_bFoundActive;
+
+  // Specifies if debug rendering is used.
+  XBOOL m_bDebugRender;
 };
 
 //##############################################################################
