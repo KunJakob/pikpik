@@ -328,7 +328,7 @@ public:
 	*/
 	XRECT GetArea()
 	{
-		return XRECT(m_xPosition, m_xPosition + GetSize());
+		return XRECT(GetPosition(), GetPosition() + GetSize());
 	}
 
 	/**

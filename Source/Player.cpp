@@ -105,7 +105,7 @@ void CPlayer::Update()
 			else
 			{
 				m_iTime = Math::Clamp<XUINT>(m_iTime + _TIMEDELTA, 0, m_iMoveTime);
-				m_fTransition = Math::Clamp<XFLOAT>((XFLOAT)m_iTime / (XFLOAT)m_iMoveTime, 0.f, 1.f);
+				m_fTransition = Math::Clamp((XFLOAT)m_iTime / (XFLOAT)m_iMoveTime, 0.f, 1.f);
 
 				m_pSprite->SetPosition(m_pCurrentBlock->GetScreenPosition() + (((m_pTargetBlock->GetScreenPosition() - m_pCurrentBlock->GetScreenPosition()) * m_iTime) / m_iMoveTime));
 			}

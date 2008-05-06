@@ -3,11 +3,11 @@
 //                               CONTROL ELEMENT
 //
 //##############################################################################
-class CControlElement : public CInterfaceElement
+class CStripElement : public CInterfaceElement
 {
 public:
 	// Virtual destructor to ensure proper cleanup of all child classes.
-	virtual ~CWindowElement();
+	virtual ~CStripElement();
 
 	// Get the width including all borders.
 	inline virtual xint GetWidth()
@@ -50,7 +50,7 @@ public:
 
 protected:
 	// Internal constructor to prevent instantiation of this class.
-	CControlElement(t_ElementType iElementType) : CInterfaceElement(iElementType) {}
+	CStripElement(t_ElementType iElementType) : CInterfaceElement(iElementType) {}
 
 	// Render a control at the current position and current size using the specified rects for each tile.
 	void Render(xrect& xL, xrect& xC, xrect& xR, xint iVertOffset = 0);
@@ -72,9 +72,12 @@ protected:
 //                               WINDOW ELEMENT
 //
 //##############################################################################
-class CWindowElement : public CControlElement
+class CContainerElement : public CStripElement
 {
 public:
+	// Virtual destructor to ensure proper cleanup of all child classes.
+	virtual ~CContainerElement();
+
 	// Get the width including all borders.
 	inline virtual xint GetWidth()
 	{
@@ -155,13 +158,13 @@ public:
 		return m_xFrameSize;
 	}
 
-	// Allow or prevent the window from being draggable.
+	// Allow or prevent the container from being draggable.
 	void SetMoveable(xbool bMoveable)
 	{
 		m_bMoveable = bMoveable;
 	}
 
-	// Determine if the window is draggable.
+	// Determine if the container is draggable.
 	xbool IsMoveable()
 	{
 		return m_bMoveable;
@@ -169,7 +172,7 @@ public:
 
 protected:
 	// Internal constructor to prevent instantiation of this class.
-	CWindowElement(t_ElementType iElementType) : CControlElement(iElementType) {}
+	CContainerElement(t_ElementType iElementType) : CStripElement(iElementType) {}
 
 	// Render a window at the current position and current size using the specified rects for each tile.
 	inline void Render(xrect& xTL, xrect& xTC, xrect& xTR, xrect& xML, xrect& xMC, xrect& xMR, xrect& xBL, xrect& xBC, xrect& xBR)
@@ -182,11 +185,37 @@ protected:
 	// The height, in pixels, of the inner container.
 	xint m_iHeight;
 
-	// Specifies if the window can be dragged around the screen.
+	// Specifies if the container can be dragged around the screen.
 	xbool m_bMoveable;
 
-	// Specifies if the window is being dragged.
+	// Specifies if the container is being dragged.
 	xbool m_bDragging;
 };
 
 //##############################################################################
+
+class CInterfaceManager
+{
+public:
+	void RegisterElement(CInterfaceElement* pElement);
+	CInterfaceElement* FindElement(const xchar* pName);
+};
+
+class CCheckElement : CInterfaceElement
+{
+public:
+	virtual xuint GetWidth();
+	virtual xuint GetHeight();
+
+	void SetLabel(const xchar* pLabel);
+	const xchar* GetLabel();
+
+protected:
+	CCheckElement(t_ElementType iElementType) : CInterfaceElement(iElementType) {}
+
+	OnMouseEnter();
+	OnMouseLeave();
+	OnMouseUp();
+
+	xbool m_bChecked;
+};
