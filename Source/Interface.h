@@ -45,18 +45,18 @@
 
 // Predeclare.
 class CInterfaceElement;
-class CContainer;
+class CScreenElement;
 
 // The types of interface elements.
 enum t_ElementType
 {
   ElementType_Unknown,
+	ElementType_Screen,
   ElementType_Container,
   ElementType_Window,
   ElementType_Label,
   ElementType_Button,
   ElementType_InputBox,
-
   ElementType_MenuLink,
   
   ElementType_Max,
@@ -100,12 +100,10 @@ public:
   */
   virtual void Render();
 
-  /**
-  * 
-  */
-  CContainer* GetContainer()
+  // Get the base screen element that all other elements should attach to.
+  CScreenElement* GetScreenElement()
   {
-    return m_pContainer;
+    return m_pScreen;
   }
 
   /**
@@ -204,7 +202,7 @@ protected:
   void CheckIntersection(CInterfaceElement* pElement);
 
   // The base container object.
-  CContainer* m_pContainer;
+  CScreenElement* m_pScreen;
 
   // The cursor sprite.
   CBasicSprite* m_pCursor[ElementType_Max];
@@ -242,128 +240,92 @@ public:
   // Friend.
   friend CInterfaceManager;
 
-  /**
-  * 
-  */
+  // Virtual destructor to ensure proper cleanup of all child classes.
   virtual ~CInterfaceElement() {}
 
-  /**
-  * 
-  */
+  // Optional update virtual function for this element. Called each frame when visible.
   virtual void Update() {}
   
-  /**
-  * 
-  */
+  // Required render virtual function for this element. Called each frame when visible.
   virtual void Render() = 0;
 
-  /**
-  * 
-  */
+  // Get the parent element that this element belongs to. Returns NULL if top-level.
   CInterfaceElement* GetParent() 
   { 
     return m_pParent; 
   }
 
-  /**
-  * 
-  */
-  XUINT GetType()
+  // Get the type of the element assigned at construction time.
+  inline xuint GetType()
   {
     return m_iType;
   }
 
-  /**
-  * 
-  */
-  void SetVisible(XBOOL bVisible)
+  // Set the visibility of the element. This will also disable the element when invisible.
+  inline void SetVisible(xbool bVisible)
   {
     m_bVisible = bVisible;
   }
 
-  /**
-  * 
-  */
-  XBOOL IsVisible()
+  // Check if the element is visible.
+  inline xbool IsVisible()
   {
     return m_bVisible;
   }
 
-  /**
-  * 
-  */
-  void SetEnabled(XBOOL bEnabled)
+  // Set the enabled status of the element. This will prevent input notifications for this element.
+  inline void SetEnabled(xbool bEnabled)
   {
     m_bEnabled = bEnabled;
   }
 
-  /**
-  * 
-  */
-  XBOOL IsEnabled()
+  // Check if the element is enabled.
+  inline xbool IsEnabled()
   {
     return m_bEnabled;
   }
 
-  /**
-  * 
-  */
-  virtual XUINT GetWidth() = 0;
+  // Get the width of the element. This must be overloaded.
+  virtual xint GetWidth() = 0;
 
-	/**
-	* 
-	*/
-	virtual XUINT GetHeight() = 0;
+	// Get the height of the element. This must be overloaded.
+	virtual xint GetHeight() = 0;
 
-	/**
-	* 
-	*/
-	XPOINT GetSize()
+	// Get the size of the element.
+	inline xpoint GetSize()
 	{
-		return XPOINT(GetWidth(), GetHeight());
+		return xpoint(GetWidth(), GetHeight());
 	}
 
-	/**
-	* Get the element area for collision and event purposes.
-	*/
-	XRECT GetArea()
+	// Get the element area for collision and event purposes.
+	inline xrect GetArea()
 	{
-		return XRECT(GetPosition(), GetPosition() + GetSize());
+		return xrect(GetPosition(), GetPosition() + GetSize());
 	}
 
-	/**
-	* 
-	*/
-	virtual XRECT GetFocusArea()
+	// Get the focus area of the element. By default, this is the element area.
+	virtual xrect GetFocusArea()
 	{
 		return GetArea();
 	}
 
-  /**
-  * 
-  */
-  void SetPosition(XPOINT xPosition)
+  // Set the screen position of the element.
+  inline void SetPosition(xpoint xPosition)
 	{
 		Move(xPosition - m_xPosition);
 	}
 
-	/**
-	* 
-	*/
-	void Move(XPOINT xOffset);
+	// CHange the position of the element by specifying an offset.
+	void Move(xpoint xOffset);
 
-  /**
-  * 
-  */
-  XPOINT GetPosition()
+	// Get the screen position of the element.
+  inline xpoint GetPosition()
   {
     return m_xPosition;
   }
 
-	/**
-	* 
-	*/
-	XPOINT GetLocalPosition()
+	// Get the position of the element relative to it's parent element.
+	inline xpoint GetLocalPosition()
 	{
 		if (m_pParent)
 			return GetPosition() - m_pParent->GetPosition();
@@ -371,56 +333,40 @@ public:
 			return GetPosition();
 	}
 
-  /**
-  * 
-  */
+  // Attach a child element to this element.
   void Attach(CInterfaceElement* pElement);
   
-  /**
-  * 
-  */
+  // Detach a specific child element from this element.
   void Detach(CInterfaceElement* pElement);
 
-	/**
-	* 
-	*/
-	void DetachAll()
+	// Detach all child elements from this element.
+	inline void DetachAll()
 	{
 		m_lpChildElements.clear();
 	}
 
-	/**
-	* 
-	*/
+	// Bring the element to the front on the parent element.
 	void ToFront();
 
 protected:
-  /**
-  * 
-  */
+  // Set the element type and initialise the element.
   CInterfaceElement(t_ElementType iType);
 
-  /**
-  * Fired on click/tab or manually with SetFocus().
-  */
+  // Fired when entering and leaving focus.
   virtual void OnFocus() {}
   virtual void OnBlur() {}
 
-  /**
-  * Fired when active.
-  */
+  // Fired when active.
   virtual void OnMouseEnter() {}
   virtual void OnMouseLeave() {}
-  virtual void OnMouseMove(XPOINT xDifference) {}
-  virtual void OnMouseDown(XPOINT xPosition) {}
-  virtual void OnMouseUp(XPOINT xPosition) {}
+  virtual void OnMouseMove(xpoint xDifference) {}
+  virtual void OnMouseDown(xpoint xPosition) {}
+  virtual void OnMouseUp(xpoint xPosition) {}
 
-  /**
-  * Fired when in focus.
-  */
-  virtual void OnKeyChar(XINT iChar) {}
-  virtual void OnKeyDown(XUINT iVirtualKey) {}
-  virtual void OnKeyUp(XUINT iVirtualKey) {}
+  // Fired when in focus.
+  virtual void OnKeyChar(xint iChar) {}
+  virtual void OnKeyDown(xint iVirtualKey) {}
+  virtual void OnKeyUp(xint iVirtualKey) {}
 
   // The parent element or NULL if top level.
   CInterfaceElement* m_pParent;
@@ -429,645 +375,49 @@ protected:
   t_ElementType m_iType;
 
   // Specifies if the element is visible.
-  XBOOL m_bVisible;
+  xbool m_bVisible;
 
   // Specifies if the element is enabled and will accept events.
-  XBOOL m_bEnabled;
+  xbool m_bEnabled;
 
   // A list of child elements.
   t_ElementList m_lpChildElements;
 
 private:
 	// The screen position of the element.
-	XPOINT m_xPosition;
+	xpoint m_xPosition;
 };
 
 //##############################################################################
 
 //##############################################################################
 //
-//                                 CONTAINER
+//                               SCREEN ELEMENT
 //
 //##############################################################################
-class CContainer : public CInterfaceElement
+class CScreenElement : public CInterfaceElement
 {
 public:
-  /**
-  * 
-  */
-  CContainer();
+	// Constructor to initialise the element.
+	CScreenElement() : CInterfaceElement(ElementType_Screen) {}
 
-  /**
-  * 
-  */
-  virtual void Render() {}
+	// Virtual destructor to ensure proper cleanup of all child classes.
+	virtual ~CScreenElement() {}
 
-  /**
-  * 
-  */
-  void SetSize(XUINT iWidth, XUINT iHeight)
-  {
-    m_iWidth = iWidth;
-    m_iHeight = iHeight;
-  }
+	// Render the screen element (does nothing).
+	virtual void Render() {}
 
-  /**
-  * 
-  */
-  virtual XUINT GetWidth()
-  {
-    return m_iWidth;
-  }
-
-  /**
-  * 
-  */
-  virtual XUINT GetHeight()
-  {
-    return m_iHeight;
-  }
-
-protected:
-  // The width, in pixels, of the container.
-  XUINT m_iWidth;
-
-  // The height, in pixels, of the container.
-  XUINT m_iHeight;
-};
-
-//##############################################################################
-
-//##############################################################################
-//
-//                                   WINDOW
-//
-//##############################################################################
-class CWindow : public CInterfaceElement
-{
-public:
-  /**
-  * 
-  */
-  CWindow(CSpriteMetadata* pMetadata);
-
-  /**
-  * 
-  */
-  virtual ~CWindow();
-
-  /**
-  * 
-  */
-  virtual void Render();
-
-	/**
-	* 
-	*/
-	virtual XUINT GetWidth()
+	// Get the width of the element. This must be overloaded.
+	virtual xint GetWidth() 
 	{
-		return GetInnerWidth() + m_xFrameSize.iLeft + m_xFrameSize.iRight;
-	}
-
-	/**
-	* 
-	*/
-	virtual XUINT GetHeight()
-	{
-		return GetInnerHeight() + m_xFrameSize.iTop + m_xFrameSize.iBottom;
-	}
-
-  /**
-  * Set the size of the window including the border.
-  */
-  void SetSize(XUINT iWidth, XUINT iHeight);
-
-  /**
-  * Set the size of the inner-area of the window excluding the border.
-  */
-  void SetInnerSize(XUINT iWidth, XUINT iHeight)
-  {
-    m_iWidth = iWidth; 
-    m_iHeight = iHeight;
-  }
-
-	/**
-	* 
-	*/
-	XUINT GetInnerWidth()
-	{
-		return m_iWidth;
-	}
-
-	/**
-	* 
-	*/
-	XUINT GetInnerHeight()
-	{
-		return m_iHeight;
-	}
-
-	/**
-	* 
-	*/
-	XPOINT GetInnerPosition()
-	{
-		return GetPosition() + XPOINT(m_xFrameSize.iLeft, m_xFrameSize.iTop);
-	}
-
-	/**
-	* 
-	*/
-	XRECT GetFrameSize()
-	{
-		return m_xFrameSize;
-	}
-
-	/**
-	* 
-	*/
-	virtual XRECT GetFocusArea()
-	{
-		return XRECT(0, 0, GetInnerWidth(), GetInnerHeight()) + GetInnerPosition();
-	}
-
-  /**
-  * 
-  */
-  void SetMoveable(XBOOL bMoveable)
-  {
-    m_bMoveable = bMoveable;
-  }
-
-  /**
-  * 
-  */
-  XBOOL IsMoveable()
-  {
-    return m_bMoveable;
-  }
-
-protected:
-  // Internal types.
-  enum t_AreaIndex
-  {
-    AreaIndex_TopLeft,
-    AreaIndex_TopMiddle,
-    AreaIndex_TopRight,
-    AreaIndex_MiddleLeft,
-    AreaIndex_Middle,
-    AreaIndex_MiddleRight,
-    AreaIndex_BottomLeft,
-    AreaIndex_BottomMiddle,
-    AreaIndex_BottomRight,
-    /*MAX*/AreaIndex_Max,
-  };
-
-  /**
-  * 
-  */
-  void InternalRender(XRECT& xRect, XPOINT xOffset);
-
-  /**
-  * 
-  */
-  virtual void OnMouseMove(XPOINT xDifference) 
-  {
-    if (m_bDragging)
-      Move(xDifference);
-  }
-
-  /**
-  * 
-  */
-  virtual void OnMouseDown(XPOINT xPosition) 
-  {
-    if (m_bMoveable && Math::Intersect(xPosition, XRECT(m_xFrameSize.iLeft, 0, GetInnerWidth(), m_xFrameSize.iTop) + GetPosition()))
-      m_bDragging = true;
-  }
-
-  /**
-  * 
-  */
-  virtual void OnMouseUp(XPOINT xPosition) 
-  {
-    m_bDragging = false;
-  }
-
-  // The element sprite.
-  CBasicSprite* m_pSprite;
-
-  // The element area list.
-  CSpriteMetadata::CArea* m_pAreas[AreaIndex_Max];
-
-  // The width, in pixels, of the inner container.
-  XUINT m_iWidth;
-
-  // The height, in pixels, of the inner container.
-  XUINT m_iHeight;
-
-	// The frame size from all directions.
-	XRECT m_xFrameSize;
-
-	// Specifies if the window is being dragged.
-	XBOOL m_bDragging;
-
-  // Specifies if the window can be dragged around the screen or if it is static.
-  XBOOL m_bMoveable;
-};
-
-//##############################################################################
-
-//##############################################################################
-//
-//                                   LABEL
-//
-//##############################################################################
-class CLabel : public CInterfaceElement
-{
-public:
-  /**
-  * 
-  */
-  CLabel(CFontMetadata* pFont);
-
-  /**
-  * 
-  */
-  virtual ~CLabel();
-
-  /**
-  * 
-  */
-  virtual void Render();
-
-  /**
-  * 
-  */
-  virtual XUINT GetWidth()
-  {
-    return m_pFont->GetStringWidth(m_xText.c_str());
-  }
-
-  /**
-  * 
-  */
-  virtual XUINT GetHeight()
-  {
-    return m_pFont->GetFontHeight();
-  }
-
-  /**
-  * 
-  */
-  void SetText(const XCHAR* pText) 
-  {
-    m_xText = pText;
-  }
-
-  /**
-  * 
-  */
-  const XCHAR* GetText() 
-  {
-    return m_xText.c_str();
-  }
-
-protected:
-  // The element font.
-  CFont* m_pFont;
-
-  // The text string.
-  XSTRING m_xText;
-};
-
-//##############################################################################
-
-//##############################################################################
-//
-//                                   BUTTON
-//
-//##############################################################################
-class CButton : public CInterfaceElement
-{
-public:
-	// Callbacks.
-	typedef void (*t_OnClickCallback)(XPOINT /*Offset*/);
-
-  /**
-  * 
-  */
-  CButton(CSpriteMetadata* pSprite, CFontMetadata* pFont = NULL);
-
-  /**
-  * 
-  */
-  virtual ~CButton();
-
-  /**
-  * 
-  */
-  virtual void Render();
-
-	/**
-	* 
-	*/
-	virtual XUINT GetWidth()
-	{
-		return m_iWidth + m_pAreas[m_iButtonState - 1]->xRect.GetWidth() + m_pAreas[m_iButtonState + 1]->xRect.GetWidth();
-	}
-
-	/**
-	* 
-	*/
-	virtual XUINT GetHeight()
-	{
-		return m_pAreas[m_iButtonState]->xRect.GetHeight();
-	}
-
-  /**
-  * 
-  */
-  void SetWidth(XUINT iWidth);
-
-  /**
-  * 
-  */
-  void SetInnerWidth(XUINT iWidth)
-  {
-    m_iWidth = iWidth;
-  }
-
-  /**
-  * 
-  */
-  XUINT GetInnerWidth()
-  {
-    return m_iWidth;
-  }
-
-  /**
-  * 
-  */
-  void SetClickCallback(t_OnClickCallback fpCallback)
-  {
-    m_fpOnClickCallback = fpCallback;
-  }
-
-  /**
-  * 
-  */
-  void SetText(const XCHAR* pLabel) 
-  {
-    m_xLabel = pLabel;
-  }
-
-  /**
-  * 
-  */
-  const XCHAR* GetLabel() 
-  {
-    return m_xLabel.c_str();
-  }
-
-protected:
-  // Internal types.
-  enum t_AreaIndex
-  {
-    AreaIndex_NormalLeft,
-    AreaIndex_NormalMiddle,
-    AreaIndex_NormalRight,
-    AreaIndex_OverLeft,
-    AreaIndex_OverMiddle,
-    AreaIndex_OverRight,
-    AreaIndex_DownLeft,
-    AreaIndex_DownMiddle,
-    AreaIndex_DownRight,
-    /*MAX*/AreaIndex_Max,
-  };
-
-  /**
-  * 
-  */
-  void InternalRender(XRECT& xRect, XPOINT xOffset);
-
-  /**
-  * 
-  */
-  virtual void OnMouseEnter() 
-  {
-    m_iButtonState = InterfaceManager.IsMouseDown() ? AreaIndex_DownMiddle : AreaIndex_OverMiddle;
-  }
-
-  /**
-  * 
-  */
-  virtual void OnMouseLeave()
-  {
-    m_iButtonState = AreaIndex_NormalMiddle;
-  }
-
-  /**
-  * 
-  */
-  virtual void OnMouseDown(XPOINT xPosition)
-  {
-    m_iButtonState = AreaIndex_DownMiddle;
-  }
-
-  /**
-  * 
-  */
-  virtual void OnMouseUp(XPOINT xPosition) 
-  {
-    m_iButtonState = AreaIndex_OverMiddle;
-
-    if (m_fpOnClickCallback)
-      m_fpOnClickCallback(InterfaceManager.GetMousePosition() - GetPosition());
-  }
-
-  // The element sprite.
-  CBasicSprite* m_pSprite;
-
-  // The element font.
-  CFont* m_pFont;
-
-  // The element area list.
-  CSpriteMetadata::CArea* m_pAreas[AreaIndex_Max];
-
-  // The width, in pixels, of the button area.
-  XUINT m_iWidth;
-
-  // The button state.
-  t_AreaIndex m_iButtonState;
-
-  // The button label string.
-  XSTRING m_xLabel;
-
-  // The callback to execute if the button is clicked.
-  t_OnClickCallback m_fpOnClickCallback;
-};
-
-//##############################################################################
-
-//##############################################################################
-//
-//                                 INPUT BOX
-//
-//##############################################################################
-class CInputBox : public CInterfaceElement
-{
-public:
-	/**
-	* 
-	*/
-	CInputBox(CSpriteMetadata* pMetadata, CFontMetadata* pFont);
-
-	/**
-	* 
-	*/
-	virtual ~CInputBox();
-
-  /**
-  * 
-  */
-  virtual void Update();
-
-	/**
-	* 
-	*/
-	virtual void Render();
-
-  /**
-  * 
-  */
-  virtual XUINT GetWidth()
-  {
-    return GetInnerWidth() + m_pAreas[AreaIndex_Left]->xRect.GetWidth() + m_pAreas[AreaIndex_Right]->xRect.GetWidth();
-  }
-
-  /**
-  * 
-  */
-  virtual XUINT GetHeight()
-  {
-    return m_pAreas[AreaIndex_Middle]->xRect.GetHeight();
-  }
-
-  /**
-  * 
-  */
-  void SetWidth(XUINT iWidth);
-
-  /**
-  * 
-  */
-  void SetInnerWidth(XUINT iWidth)
-  {
-    m_iWidth = iWidth;
-  }
-
-  /**
-  * 
-  */
-  XUINT GetInnerWidth()
-  {
-    return m_iWidth;
-  }
-
-  /**
-  * The total number of characters allowed in the input box.
-  * Set this to 0 for unlimited length.
-  */
-  void SetCharLimit(XUINT iLimit)
-  {
-    m_iCharLimit = iLimit;
-  }
-
-  /**
-  * 
-  */
-  XUINT GetCharLimit()
-  {
-    return m_iCharLimit;
-  }
-
-  /**
-  * 
-  */
-  void SetText(const XCHAR* pText)
-  {
-    m_xText = pText;
-  }
-
-  /**
-  * 
-  */
-  const XCHAR* GetText()
-  {
-    return m_xText.c_str();
-  }
-
-protected:
-  /**
-  * 
-  */
-  void InternalRender(XRECT& xRect, XPOINT xOffset);
-
-  /**
-  * 
-  */
-  virtual void OnFocus()
-  {
-    m_iFlashTimer = 0;
-  }
-
-  /**
-  * 
-  */
-  virtual void OnMouseDown(XPOINT xPosition);
-
-  /**
-  * 
-  */
-  virtual void OnKeyChar(XINT iChar);
-
-  /**
-  * 
-  */
-  virtual void OnKeyDown(XUINT iVirtualKey);
-
-	// Internal types.
-	enum t_AreaIndex
-	{
-		AreaIndex_Left,
-		AreaIndex_Middle,
-		AreaIndex_Right,
-		/*MAX*/AreaIndex_Max,
+		return _SWIDTH;
 	};
 
-	// The element sprite.
-	CBasicSprite* m_pSprite;
-
-  // The element font.
-  CFont* m_pFont;
-
-	// The element area list.
-	CSpriteMetadata::CArea* m_pAreas[AreaIndex_Max];
-
-  // The width, in pixels, of the input area.
-  XUINT m_iWidth;
-
-  // The total number of input characters allowed with zero being unlimited.
-  XUINT m_iCharLimit;
-
-  // The current input-box text.
-  XSTRING m_xText;
-
-  // The input cursor text character offset.
-  XUINT m_iCharOffset;
-
-  // The cursor flash timer.
-  XUINT m_iFlashTimer;
+	// Get the height of the element. This must be overloaded.
+	virtual xint GetHeight()
+	{
+		return _SHEIGHT;
+	}
 };
 
 //##############################################################################

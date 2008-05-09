@@ -1,3 +1,5 @@
+#pragma once
+
 class CWindow : public CContainerElement
 {
 
@@ -13,12 +15,12 @@ class CCheckBox : public CCheckElement
 
 };
 
-class CProgressBar : public CStripElement
+class CProgressBar : public CRowElement
 {
 
 };
 
-class CTextBox : public CStripElement
+class CTextBox : public CRowElement
 {
 
 };
@@ -33,12 +35,12 @@ class CListBox : public CContainerElement
 
 };
 
-class CButton : public CStripElement
+class CButton : public CRowElement
 {
 
 };
 
-class CLabel : public CInterfaceElement
+class CLabel : public CLabelElement
 {
 
 };

@@ -199,11 +199,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Source\Component.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\Dataset.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\Source\Dataset.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Element.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Element.h"
 				>
 			</File>
 			<File

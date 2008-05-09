@@ -135,7 +135,7 @@ void Callback_ShowOnlineMenu()
 void Callback_ShowJoinInterface()
 {
   _GLOBAL.pMenu->SetMenuGroup(MenuGroupIndex_None);
-  _GLOBAL.pMenu->m_pJoinWindow->SetVisible(true);
+  //_GLOBAL.pMenu->m_pJoinWindow->SetVisible(true);
 }
 
 // =============================================================================
@@ -210,7 +210,7 @@ void CMenuScreen::Load()
   for (XUINT iA = 0; iA < (sizeof(pLinkList) / sizeof(CMenuLink*)); ++iA)
   {
     m_lpMenuLinks[pLinkList[iA]->m_iGroupIndex].push_back(pLinkList[iA]);
-    InterfaceManager.GetContainer()->Attach(pLinkList[iA]);
+    InterfaceManager.GetScreenElement()->Attach(pLinkList[iA]);
   }
 
   for (XUINT iGroup = 0; iGroup < MenuGroupIndex_Max; ++iGroup)
@@ -234,7 +234,7 @@ void CMenuScreen::Load()
   s_iNextScreen = ScreenIndex_Invalid;
 
   // Create windows.
-  CFontMetadata* pFont = _FONT("Test-Input");
+  /*CFontMetadata* pFont = _FONT("Test-Input");
 
   m_pJoinWindow = new CWindow(_SPRITE("Test-Window"));
   m_pJoinWindow->SetInnerSize(280, 90);
@@ -317,7 +317,7 @@ void CMenuScreen::Load()
   m_pJoinWindow->Attach(pButton);
 
   InterfaceManager.GetContainer()->Attach(m_pJoinWindow);
-  m_pJoinWindow->SetVisible(false);
+  m_pJoinWindow->SetVisible(false);*/
 }
 
 // =============================================================================

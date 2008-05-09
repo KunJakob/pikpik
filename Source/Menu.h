@@ -104,7 +104,7 @@ public:
   /**
   * Get the element width in pixels.
   */
-  virtual XUINT GetWidth()
+  virtual xint GetWidth()
   {
     return m_pText->GetStringWidth();
   }
@@ -112,7 +112,7 @@ public:
   /**
   * Get the element height in pixels.
   */
-  virtual XUINT GetHeight()
+  virtual xint GetHeight()
   {
     return m_pText->GetFontHeight();
   }
@@ -197,7 +197,7 @@ public:
   void SetMenuGroup(t_MenuGroupIndex iMenuGroup);
 
   // The join window.
-  CWindow* m_pJoinWindow;
+  //CWindow* m_pJoinWindow;
 
 protected:
 	// The font metadata to render the links with.
