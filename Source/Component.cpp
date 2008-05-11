@@ -67,21 +67,15 @@ void CButton::Render()
   switch (m_iButtonState)
   {
   case ButtonState_Normal:
-    {
-      CRowElement::Render(m_pNL->xRect, m_pNM->xRect, m_pNR->xRect);
-    }
+    CRowElement::Render(m_pNL->xRect, m_pNM->xRect, m_pNR->xRect);
     break;
 
   case ButtonState_Over:
-    {
-      CRowElement::Render(m_pOL->xRect, m_pOM->xRect, m_pOR->xRect);
-    }
+    CRowElement::Render(m_pOL->xRect, m_pOM->xRect, m_pOR->xRect);
     break;
 
   case ButtonState_Down:
-    {
-      CRowElement::Render(m_pDL->xRect, m_pDM->xRect, m_pDR->xRect);
-    }
+    CRowElement::Render(m_pDL->xRect, m_pDM->xRect, m_pDR->xRect);
     break;
   }
 
@@ -106,6 +100,46 @@ void CButton::Render()
 //                                   WINDOW
 //
 //##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                         11-May-2008
+// =============================================================================
+CWindow::CWindow(CSpriteMetadata* pSprite) : CContainerElement(ElementType_Window, pSprite, NULL)
+{
+  m_pTL = pMetadata->FindArea("TopLeft"); 
+  m_pTM = pMetadata->FindArea("TopMiddle"); 
+  m_pAreas[AreaIndex_TopRight]      = pMetadata->FindArea("TopRight"); 
+  m_pAreas[AreaIndex_MiddleLeft]    = pMetadata->FindArea("MiddleLeft"); 
+  m_pAreas[AreaIndex_Middle]        = pMetadata->FindArea("Middle"); 
+  m_pAreas[AreaIndex_MiddleRight]   = pMetadata->FindArea("MiddleRight"); 
+  m_pAreas[AreaIndex_BottomLeft]    = pMetadata->FindArea("BottomLeft"); 
+  m_pAreas[AreaIndex_BottomMiddle]  = pMetadata->FindArea("BottomMiddle"); 
+  m_pAreas[AreaIndex_BottomRight]   = pMetadata->FindArea("BottomRight");
+
+  m_xFrameSize = XRECT
+    (
+    m_pAreas[AreaIndex_MiddleLeft]->xRect.GetWidth(),
+    m_pAreas[AreaIndex_TopMiddle]->xRect.GetHeight(),
+    m_pAreas[AreaIndex_MiddleRight]->xRect.GetWidth(),
+    m_pAreas[AreaIndex_BottomMiddle]->xRect.GetHeight()
+    );
+}
+
+// =============================================================================
+// Nat Ryall                                                         11-May-2008
+// =============================================================================
+CWindow::~CWindow()
+{
+
+}
+
+// =============================================================================
+// Nat Ryall                                                         11-May-2008
+// =============================================================================
+CWindow::Render()
+{
+
+}
 
 //##############################################################################
 //

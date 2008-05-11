@@ -155,6 +155,15 @@ class CProgressBar : public CRowElement
 //##############################################################################
 class CWindow : public CContainerElement
 {
+public:
+  // Initialise the window using a specific graphic.
+  CWindow(CSpriteMetadata* pMetadata);
+
+  // Deinitialise the button and clean up any memory.
+  virtual ~CWindow();
+
+  // Render the button.
+  virtual void Render();
 };
 
 //##############################################################################

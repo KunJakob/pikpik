@@ -186,6 +186,7 @@ void CMenuScreen::Load()
 
   // Initialise interface.
   InterfaceManager.SetCursor(_SPRITE("Cursor-Main"));
+  InterfaceManager.SetCursor(ElementType_Button, _SPRITE("Cursor-Click"));
   InterfaceManager.SetCursor(ElementType_MenuLink, _SPRITE("Cursor-Click"));
 
   // Initialise the menu links.
