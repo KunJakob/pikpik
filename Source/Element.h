@@ -179,7 +179,7 @@ protected:
 	CRowElement(t_ElementType iElementType, CSpriteMetadata* pSprite);
 
 	// Render a control at the current position and current size using the specified rects for each tile.
-	void Render(xrect& xL, xrect& xC, xrect& xR, xint iVertOffset = 0);
+	void Render(xrect& xLeft, xrect& xCentre, xrect& xRight, xint iVertOffset = 0);
 
 	// The element sprite.
 	CBasicSprite* m_pSprite;
@@ -301,12 +301,7 @@ protected:
 	CContainerElement(t_ElementType iElementType, CSpriteMetadata* pSprite, CLabelElement* pLabel);
 
 	// Render a window at the current position and current size using the specified rects for each tile.
-	inline void Render(xrect& xTL, xrect& xTC, xrect& xTR, xrect& xML, xrect& xMC, xrect& xMR, xrect& xBL, xrect& xBC, xrect& xBR)
-	{
-		CRowElement::Render(xTL, xTC, xTR, 0);
-		CRowElement::Render(xML, xMC, xMR, xTC.GetHeight());
-		CRowElement::Render(xBL, xBC, xBR, xTC.GetHeight() + xMC.GetHeight());
-	}
+	void Render(xrect& xTL, xrect& xTC, xrect& xTR, xrect& xML, xrect& xMC, xrect& xMR, xrect& xBL, xrect& xBC, xrect& xBR);
 
 	// The label element for the window title.
 	CLabelElement* m_pLabel;

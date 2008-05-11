@@ -199,6 +199,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Source\Component.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\Component.h"
 				>
 			</File>

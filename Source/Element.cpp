@@ -91,6 +91,27 @@ CRowElement::~CRowElement()
 	delete m_pSprite;
 }
 
+// =============================================================================
+// Nat Ryall                                                         11-May-2008
+// =============================================================================
+void CRowElement::Render(xrect& xLeft, xrect& xCentre, xrect& xRight, xint iVertOffset)
+{
+  // Ends.
+  m_pSprite->Render(xLeft, GetPosition() + xpoint(0, iVertOffset));
+  m_pSprite->Render(xRight, GetPosition() + xpoint(xLeft.GetWidth() + m_iWidth, iVertOffset));
+
+  // Centre.
+  for (xint iX = 0, iDrawWidth = 0; iX < m_iWidth; iX += iDrawWidth)
+  {
+    iDrawWidth = Math::Clamp<xuint>(m_iWidth - iX, 0, xCentre.GetWidth());
+
+    xrect xTileRect = xCentre;
+    xTileRect.iRight = xTileRect.iLeft + iDrawWidth;
+
+    m_pSprite->Render(xTileRect, GetPosition() + xpoint(xLeft.GetWidth() + iX, iVertOffset));
+  }
+}
+
 //##############################################################################
 
 //##############################################################################
@@ -115,6 +136,37 @@ CContainerElement::CContainerElement(t_ElementType iElementType, CSpriteMetadata
 // =============================================================================
 CContainerElement::~CContainerElement()
 {
+}
+
+// =============================================================================
+// Nat Ryall                                                         11-May-2008
+// =============================================================================
+void CContainerElement::Render(xrect& xTL, xrect& xTC, xrect& xTR, xrect& xML, xrect& xMC, xrect& xMR, xrect& xBL, xrect& xBC, xrect& xBR)
+{
+  // Top.
+  CRowElement::Render(xTL, xTC, xTR, 0);
+
+  // Middle
+  for (xint iY = 0, iDrawHeight = 0; iY < m_iHeight; iY += iDrawHeight)
+  {
+    iDrawHeight = Math::Clamp<xuint>(m_iHeight - iY, 0, xMC.GetHeight());
+
+    xint iAreaBottom = xMC.iTop + iDrawHeight;
+
+    xrect xLeft = xML;
+    xLeft.iBottom = iAreaBottom;
+
+    xrect xCentre = xMC;
+    xCentre.iBottom = iAreaBottom;
+
+    xrect xRight = xMR;
+    xRight.iBottom = iAreaBottom;
+
+    CRowElement::Render(xLeft, xCentre, xRight, xTC.GetHeight() + iY);
+  }
+
+  // Bottom.
+  CRowElement::Render(xBL, xBC, xBR, xTC.GetHeight() + m_iHeight);
 }
 
 //##############################################################################

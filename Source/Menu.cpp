@@ -24,6 +24,7 @@
 #include <Resource.h>
 #include <Font.h>
 #include <Selection.h>
+#include <Component.h>
 
 //##############################################################################
 #pragma endregion
@@ -179,7 +180,8 @@ void CMenuScreen::Load()
 {
   _GLOBAL.pMenu = this;
 
-  // Initialise prerequisites.
+  // Initialise the render resources.
+  m_pBackground = new CBackgroundImage("Menu-Background");
   m_pFont = _FONT("Menu-Item");
 
   // Initialise interface.
@@ -210,7 +212,7 @@ void CMenuScreen::Load()
   for (XUINT iA = 0; iA < (sizeof(pLinkList) / sizeof(CMenuLink*)); ++iA)
   {
     m_lpMenuLinks[pLinkList[iA]->m_iGroupIndex].push_back(pLinkList[iA]);
-    InterfaceManager.GetScreenElement()->Attach(pLinkList[iA]);
+    InterfaceManager.GetScreen()->Attach(pLinkList[iA]);
   }
 
   for (XUINT iGroup = 0; iGroup < MenuGroupIndex_Max; ++iGroup)
@@ -227,11 +229,15 @@ void CMenuScreen::Load()
 
   SetMenuGroup(MenuGroupIndex_Main);
 
-  // Initialise the render resources.
-  m_pBackground = new CBackgroundImage("Lobby-Background");
-
   // Initialise statics.
   s_iNextScreen = ScreenIndex_Invalid;
+
+  // Interface.
+  CButton* pButton = new CButton(_SPRITE("Test-Button"));
+  pButton->SetWidth(200);
+  pButton->SetPosition(xpoint(10, 10));
+
+  CInterfaceManager::Get().GetScreen()->Attach(pButton);
 
   // Create windows.
   /*CFontMetadata* pFont = _FONT("Test-Input");

@@ -75,131 +75,90 @@ typedef XLIST<CInterfaceElement*> t_ElementList;
 class CInterfaceManager : public Templates::CSingletonT<CInterfaceManager>
 {
 public:
-  /**
-  * 
-  */
+  // Initialise the interface manager.
   CInterfaceManager();
 
-  /**
-  * 
-  */
+  // Deinitialise the interface manager.
   ~CInterfaceManager();
 
-	/**
-	* 
-	*/
+	// Reset the settings to defaults and clear all elements.
 	void Reset();
 
-  /**
-  * 
-  */
+  // Called to update and fire events for elements.
   virtual void Update();
 
-  /**
-  * 
-  */
+  // Called to render elements.
   virtual void Render();
 
   // Get the base screen element that all other elements should attach to.
-  CScreenElement* GetScreenElement()
+  CScreenElement* GetScreen()
   {
     return m_pScreen;
   }
 
-  /**
-  * 
-  */
+  // Set the cursor image for a specific element type.
   void SetCursor(t_ElementType iType, CSpriteMetadata* pMetadata);
 
-  /**
-  * 
-  */
+  // Set the default cursor image.
   void SetCursor(CSpriteMetadata* pMetadata)
   {
     SetCursor(ElementType_Unknown, pMetadata);
   }
 
-	/**
-	* 
-	*/
+	// Get the first visible or "active" element that is currently under the mouse.
 	CInterfaceElement* GetActiveElement()
 	{
 		return m_pActiveElement;
 	}
 
-	/**
-	* 
-	*/
+	// Check if a specific element is the active element.
 	XBOOL IsActiveElement(CInterfaceElement* pElement)
 	{
 		return m_pActiveElement == pElement;
 	}
 
-	/**
-	* 
-	*/
+	// Focus the specified element. This is called automatically when an element is clicked.
 	void SetFocus(CInterfaceElement* pElement);
 
-	/**
-	* 
-	*/
+	// Get the currently focused element or NULL if there is no focus.
 	CInterfaceElement* GetFocusedElement()
 	{
 		return m_pFocusedElement;
 	}
 
-  /**
-  * 
-  */
+  // Check if a specific element is the focused element.
   XBOOL IsFocusedElement(CInterfaceElement* pElement)
   {
     return m_pFocusedElement == pElement;
   }
 
-	/**
-	* 
-	*/
+	// Get the current mouse position.
 	XPOINT GetMousePosition()
 	{
 		return m_xMousePos;
 	}
 
-	/**
-	* 
-	*/
+	// Check if the mouse cursor is over a specific element.
 	XBOOL IsMouseOver(CInterfaceElement* pElement);
 
-	/**
-	* 
-	*/
+	// Check if the left-mouse button is pressed.
 	XBOOL IsMouseDown()
 	{
 		return _HGE->Input_GetKeyState(HGEK_LBUTTON);
 	}
 
-  /**
-  * 
-  */
+  // Switch the debug renderer on or off.
   void SetDebugRender(XBOOL bDebug)
   {
     m_bDebugRender = bDebug;
   }
 
 protected:
-  /**
-  * 
-  */
+  // Recursive function called on each element. Called in reverse render order.
   void UpdateElement(CInterfaceElement* pElement);
 
-  /**
-  * 
-  */
+  // Recursive function called on each element.
   void RenderElement(CInterfaceElement* pElement);
-
-  /**
-  * 
-  */
-  void CheckIntersection(CInterfaceElement* pElement);
 
   // The base container object.
   CScreenElement* m_pScreen;

@@ -150,7 +150,7 @@ void CGameScreen::Load()
 	RenderManager::SetRenderCallback(LayerIndex_Map, &WorldTransform);
 	RenderManager::SetRenderCallback(LayerIndex_Player, &WorldTransform);
 
-  m_pFieldMask = new hgeSprite(GenerateFieldMask(48 * 2, 48 * 5), 0, 0, _SWIDTH, _SHEIGHT);
+  m_pFieldMask = new hgeSprite(GenerateFieldMask(48 * 1, 48 * 5), 0, 0, _SWIDTH, _SHEIGHT);
 }
 
 // =============================================================================
