@@ -52,14 +52,18 @@ enum t_ElementType
 {
   ElementType_Unknown,
 	ElementType_Screen,
-  ElementType_Container,
+	ElementType_Label,
+	ElementType_Image,
+	ElementType_Button,
+	ElementType_Input,
+	ElementType_Progress,
   ElementType_Window,
-  ElementType_Label,
-  ElementType_Button,
-  ElementType_InputBox,
+  ElementType_List,
+  ElementType_Check,
+  ElementType_Radio,
+	ElementType_Scroll,
   ElementType_MenuLink,
-  
-  ElementType_Max,
+  /*MAX*/ElementType_Max,
 };
 
 // Lists.
@@ -311,21 +315,35 @@ protected:
   // Set the element type and initialise the element.
   CInterfaceElement(t_ElementType iType);
 
-  // Fired when entering and leaving focus.
+  // Triggered when focus is applied to the element.
   virtual void OnFocus() {}
+
+	// Triggered when focus is lost from the element.
   virtual void OnBlur() {}
 
-  // Fired when active.
+	// Triggered when the mouse enters this element.
   virtual void OnMouseEnter() {}
+
+	// Triggered when the mouse leaves this element. 
   virtual void OnMouseLeave() {}
-  virtual void OnMouseMove(xpoint xDifference) {}
+
+  // Triggered when the left mouse-button is pressed within the element area.
   virtual void OnMouseDown(xpoint xPosition) {}
+
+	// Triggered when the left mouse-button is released within the element area.
   virtual void OnMouseUp(xpoint xPosition) {}
 
-  // Fired when in focus.
-  virtual void OnKeyChar(xint iChar) {}
+	// Triggered when the mouse is moved within the element area.
+	virtual void OnMouseMove(xpoint xDifference, xbool bMouseDown) {}
+
+	// Triggered when a keyboard key is pressed whilst the element is in focus.
   virtual void OnKeyDown(xint iVirtualKey) {}
+
+	// Triggered when a keyboard key is released whilst the element is in focus.
   virtual void OnKeyUp(xint iVirtualKey) {}
+
+	// Triggered when an ASCII key is input on the keyboard whilst the element is in focus.
+	virtual void OnKeyChar(xchar cChar) {}
 
   // The parent element or NULL if top level.
   CInterfaceElement* m_pParent;

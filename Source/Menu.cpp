@@ -187,6 +187,7 @@ void CMenuScreen::Load()
   // Initialise interface.
   InterfaceManager.SetCursor(_SPRITE("Cursor-Main"));
   InterfaceManager.SetCursor(ElementType_Button, _SPRITE("Cursor-Click"));
+	InterfaceManager.SetCursor(ElementType_Input, _SPRITE("Cursor-Write"));
   InterfaceManager.SetCursor(ElementType_MenuLink, _SPRITE("Cursor-Click"));
 
   // Initialise the menu links.
@@ -234,97 +235,24 @@ void CMenuScreen::Load()
   s_iNextScreen = ScreenIndex_Invalid;
 
   // Interface.
-  CButton* pButton = new CButton(_SPRITE("Test-Button"));
-  pButton->SetWidth(200);
-  pButton->SetPosition(xpoint(10, 10));
+	CWindowComponent* pWindow = new CWindowComponent(_SPRITE("Test-Window"));
+	pWindow->SetInnerSize(200, 300);
+	pWindow->SetPosition(xpoint(10, 10));
+	pWindow->SetMoveable(true);
 
-  CInterfaceManager::Get().GetScreen()->Attach(pButton);
+	CButtonComponent* pButton = new CButtonComponent(_SPRITE("Test-Button"));
+	pButton->SetWidth(190);
+	pButton->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 5));
 
-  // Create windows.
-  /*CFontMetadata* pFont = _FONT("Test-Input");
+	CInputComponent* pInput = new CInputComponent(_SPRITE("Test-Input"), _FONT("Test-Font"));
+	pInput->SetWidth(190);
+	pInput->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 35));
+	pInput->SetMasked(false);
 
-  m_pJoinWindow = new CWindow(_SPRITE("Test-Window"));
-  m_pJoinWindow->SetInnerSize(280, 90);
-  m_pJoinWindow->SetPosition(XPOINT(_HSWIDTH - (m_pJoinWindow->GetWidth() / 2), _HSHEIGHT - (m_pJoinWindow->GetHeight() / 2)));
+	pWindow->Attach(pButton);
+	pWindow->Attach(pInput);
 
-  XPOINT xWinPos = m_pJoinWindow->GetInnerPosition();
-
-  CLabel* pLabel = NULL;
-  CButton* pButton = NULL;
-  CInputBox* pInputBox = NULL;
-
-  // Address Line
-  pLabel = new CLabel(pFont);
-  pLabel->SetPosition(xWinPos + XPOINT(13, 13));
-  pLabel->SetText("Address:");
-  m_pJoinWindow->Attach(pLabel);
-
-  pInputBox = new CInputBox(_SPRITE("Test-InputBox"), pFont);
-  pInputBox->SetPosition(xWinPos + XPOINT(83, 10));
-  pInputBox->SetWidth(30);
-  pInputBox->SetCharLimit(3);
-  m_pJoinWindow->Attach(pInputBox);
-
-  pInputBox = new CInputBox(_SPRITE("Test-InputBox"), pFont);
-  pInputBox->SetPosition(xWinPos + XPOINT(133, 10));
-  pInputBox->SetWidth(30);
-  pInputBox->SetCharLimit(3);
-  m_pJoinWindow->Attach(pInputBox);
-
-  pInputBox = new CInputBox(_SPRITE("Test-InputBox"), pFont);
-  pInputBox->SetPosition(xWinPos + XPOINT(183, 10));
-  pInputBox->SetWidth(30);
-  pInputBox->SetCharLimit(3);
-  m_pJoinWindow->Attach(pInputBox);
-
-  pInputBox = new CInputBox(_SPRITE("Test-InputBox"), pFont);
-  pInputBox->SetPosition(xWinPos + XPOINT(233, 10));
-  pInputBox->SetWidth(30);
-  pInputBox->SetCharLimit(3);
-  m_pJoinWindow->Attach(pInputBox);
-
-  pLabel = new CLabel(pFont);
-  pLabel->SetPosition(xWinPos + XPOINT(121, 13));
-  pLabel->SetText(".");
-  m_pJoinWindow->Attach(pLabel);
-
-  pLabel = new CLabel(pFont);
-  pLabel->SetPosition(xWinPos + XPOINT(171, 13));
-  pLabel->SetText(".");
-  m_pJoinWindow->Attach(pLabel);
-
-  pLabel = new CLabel(pFont);
-  pLabel->SetPosition(xWinPos + XPOINT(221, 13));
-  pLabel->SetText(".");
-  m_pJoinWindow->Attach(pLabel);
-
-  // Port Line.
-  pLabel = new CLabel(pFont);
-  pLabel->SetPosition(xWinPos + XPOINT(13, 39));
-  pLabel->SetText("Port:");
-  m_pJoinWindow->Attach(pLabel);
-
-  pInputBox = new CInputBox(_SPRITE("Test-InputBox"), pFont);
-  pInputBox->SetPosition(xWinPos + XPOINT(83, 36));
-  pInputBox->SetWidth(48);
-  pInputBox->SetCharLimit(5);
-  m_pJoinWindow->Attach(pInputBox);
-
-  // Button Line.
-  pButton = new CButton(_SPRITE("Test-Button"), pFont);
-  pButton->SetPosition(xWinPos + XPOINT(82, 62));
-  pButton->SetWidth(105);
-  pButton->SetText("Join");
-  m_pJoinWindow->Attach(pButton);
-
-  pButton = new CButton(_SPRITE("Test-Button"), pFont);
-  pButton->SetPosition(xWinPos + XPOINT(194, 62));
-  pButton->SetWidth(75);
-  pButton->SetText("Quit");
-  m_pJoinWindow->Attach(pButton);
-
-  InterfaceManager.GetContainer()->Attach(m_pJoinWindow);
-  m_pJoinWindow->SetVisible(false);*/
+	InterfaceManager.GetScreen()->Attach(pWindow);
 }
 
 // =============================================================================

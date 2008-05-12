@@ -28,16 +28,16 @@
 //                                   LABEL
 //
 //##############################################################################
-class CLabel : public CLabelElement
+class CLabelComponent : public CLabelElement
 {
 };
 
 //##############################################################################
 //
-//                                 IMAGE BOX
+//                                   IMAGE
 //
 //##############################################################################
-class CImageBox : public CImageElement
+class CImageComponent : public CImageElement
 {
 };
 
@@ -46,17 +46,17 @@ class CImageBox : public CImageElement
 //                                   BUTTON
 //
 //##############################################################################
-class CButton : public CRowElement
+class CButtonComponent : public CRowElement
 {
 public:
   // Callbacks.
   typedef void (*t_OnClickCallback)(xpoint /*Offset*/);
 
-  // Initialise the button with the button image and font (optional).
-  CButton(CSpriteMetadata* pSprite, CFontMetadata* pFont = NULL);
+  // Initialise the button with the button image and label.
+  CButtonComponent(CSpriteMetadata* pSprite, CLabelElement* pLabel = NULL);
 
   // Deinitialise the button and clean up any memory.
-  virtual ~CButton();
+  virtual ~CButtonComponent();
 
   // Render the button.
   virtual void Render();
@@ -64,7 +64,7 @@ public:
   // Get the height of the button.
   virtual xint GetHeight()
   {
-    return m_pNM->xRect.GetHeight();
+    return m_pCentre[m_iButtonState]->xRect.GetHeight();
   }
 
   // Set the callback to execute if the button is clicked.
@@ -86,13 +86,13 @@ protected:
     m_iButtonState = ButtonState_Normal;
   }
 
-  // Called when the left mouse-button is pressed over the element.
+  // Triggered when the left mouse-button is pressed within the element area when the element is active.
   virtual void OnMouseDown(xpoint xPosition)
   {
     m_iButtonState = ButtonState_Down;
   }
 
-  // Called when the left mouse-button is released over the element.
+  // Triggered when the left mouse-button is released within the element area when the element is active.
   virtual void OnMouseUp(xpoint xPosition) 
   {
     m_iButtonState = ButtonState_Over;
@@ -107,24 +107,19 @@ protected:
     ButtonState_Normal,
     ButtonState_Over,
     ButtonState_Down,
+		/*MAX*/ButtonState_Max,
   };
+
+	// Element areas.
+	CSpriteMetadata::CArea* m_pLeft[ButtonState_Max];
+	CSpriteMetadata::CArea* m_pCentre[ButtonState_Max];
+	CSpriteMetadata::CArea* m_pRight[ButtonState_Max];
 
   // The internal button state.
   t_ButtonState m_iButtonState;
 
   // The button text font.
-  CFont* m_pFont;
-
-  // Element areas.
-  CSpriteMetadata::CArea* m_pNL;
-  CSpriteMetadata::CArea* m_pNM;
-  CSpriteMetadata::CArea* m_pNR;
-  CSpriteMetadata::CArea* m_pOL;
-  CSpriteMetadata::CArea* m_pOM;
-  CSpriteMetadata::CArea* m_pOR;
-  CSpriteMetadata::CArea* m_pDL;
-  CSpriteMetadata::CArea* m_pDM;
-  CSpriteMetadata::CArea* m_pDR;
+  CLabelElement* m_pLabel;
 
   // The callback to execute if the button is clicked.
   t_OnClickCallback m_fpOnClickCallback;
@@ -135,8 +130,101 @@ protected:
 //                                  TEXT BOX
 //
 //##############################################################################
-class CTextBox : public CRowElement
+class CInputComponent : public CRowElement
 {
+public:
+	// Initialise the component.
+	CInputComponent(CSpriteMetadata* pSprite, CFontMetadata* pFont);
+
+	// Deinitialise the component.
+	virtual ~CInputComponent();
+
+	// Update the component.
+	virtual void Update();
+
+	// Render the component.
+	virtual void Render();
+
+	// Get the height of the button.
+	virtual xint GetHeight()
+	{
+		return m_pCentre->xRect.GetHeight();
+	}
+
+	// Specify if the input should be masked.
+	inline void SetMasked(xbool bMasked)
+	{
+		m_bMasked = bMasked;
+	}
+
+	// Determine if the input is masked.
+	inline xbool IsMasked()
+	{
+		return m_bMasked;
+	}
+
+	// Set the maximum number of characters allowed in the input box.
+	void SetCharacterLimit(xint iLimit)
+	{
+		m_iCharLimit = iLimit;
+	}
+
+	// Get the maximum number of characters allowed in the input box.
+	XUINT GetCharacterLimit()
+	{
+		return m_iCharLimit;
+	}
+
+	// Set the text in the input box.
+	void SetText(const xchar* pText)
+	{
+		m_xText = pText;
+	}
+
+	// Get the text in the input box.
+	const xchar* GetText()
+	{
+		return m_xText.c_str();
+	}
+
+protected:
+	// Triggered when focus is applied to the element.
+	virtual void OnFocus()
+	{
+		m_iFlashTimer = 0;
+	}
+	
+	// Triggered when the left mouse-button is pressed within the element area.
+	virtual void OnMouseDown(xpoint xPosition);
+
+	// Triggered when a keyboard key is pressed whilst the element is in focus.
+	virtual void OnKeyDown(xint iVirtualKey);
+
+	// Triggered when an ASCII key is input on the keyboard whilst the element is in focus.
+	virtual void OnKeyChar(xchar cChar);
+
+	// Element areas.
+	CSpriteMetadata::CArea* m_pLeft;
+	CSpriteMetadata::CArea* m_pCentre;
+	CSpriteMetadata::CArea* m_pRight;
+
+	// The text area font.
+	CFont* m_pFont;
+
+	// The input text string.
+	xstring m_xText;
+
+	// Determines if the input field has masked input.
+	xbool m_bMasked;
+
+	// The total number of input characters allowed with zero being unlimited.
+	xint m_iCharLimit;
+
+	// The input cursor text character offset.
+	xint m_iCharOffset;
+
+	// The cursor flash timer.
+	xint m_iFlashTimer;
 };
 
 //##############################################################################
@@ -144,7 +232,7 @@ class CTextBox : public CRowElement
 //                                PROGRESS BAR
 //
 //##############################################################################
-class CProgressBar : public CRowElement
+class CProgressComponent : public CRowElement
 {
 };
 
@@ -153,17 +241,70 @@ class CProgressBar : public CRowElement
 //                                   WINDOW
 //
 //##############################################################################
-class CWindow : public CContainerElement
+class CWindowComponent : public CContainerElement
 {
 public:
   // Initialise the window using a specific graphic.
-  CWindow(CSpriteMetadata* pMetadata);
+	CWindowComponent(CSpriteMetadata* pSprite, CLabelElement* pLabel = NULL);
 
   // Deinitialise the button and clean up any memory.
-  virtual ~CWindow();
+  virtual ~CWindowComponent();
 
   // Render the button.
   virtual void Render();
+
+	// Allow or prevent the window from being draggable.
+	void SetMoveable(xbool bMoveable)
+	{
+		m_bMoveable = bMoveable;
+	}
+
+	// Determine if the window is draggable.
+	xbool IsMoveable()
+	{
+		return m_bMoveable;
+	}
+
+protected:
+	// Triggered when the left mouse-button is pressed within the element area.
+	virtual void OnMouseDown(xpoint xPosition) 
+	{
+		if (m_bMoveable && Math::Intersect(xPosition, xrect(m_xFrameSize.iLeft, 0, GetInnerWidth(), m_xFrameSize.iTop) + GetPosition()))
+			m_bDragging = true;
+	}
+
+	// Triggered when the left mouse-button is released within the element area.
+	virtual void OnMouseUp(xpoint xPosition) 
+	{
+		m_bDragging = false;
+	}
+
+	// Triggered when the mouse is moved within the element area.
+	virtual void OnMouseMove(xpoint xDifference, xbool bMouseDown)
+	{
+		if (m_bDragging)
+			Move(xDifference);
+	}
+
+	// Element areas.
+	CSpriteMetadata::CArea* m_pTL;
+	CSpriteMetadata::CArea* m_pTC;
+	CSpriteMetadata::CArea* m_pTR;
+	CSpriteMetadata::CArea* m_pML;
+	CSpriteMetadata::CArea* m_pMC;
+	CSpriteMetadata::CArea* m_pMR;
+	CSpriteMetadata::CArea* m_pBL;
+	CSpriteMetadata::CArea* m_pBC;
+	CSpriteMetadata::CArea* m_pBR;
+
+	// The label element for the window title.
+	CLabelElement* m_pLabel;
+
+	// Specifies if the container can be dragged around the screen.
+	xbool m_bMoveable;
+
+	// Specifies if the container is being dragged.
+	xbool m_bDragging;
 };
 
 //##############################################################################
@@ -171,7 +312,7 @@ public:
 //                                  LIST BOX
 //
 //##############################################################################
-class CListBox : public CContainerElement
+class CListComponent : public CContainerElement
 {
 };
 
@@ -180,7 +321,7 @@ class CListBox : public CContainerElement
 //                                 CHECK BOX
 //
 //##############################################################################
-class CCheckBox : public CCheckElement
+class CCheckComponent : public CCheckElement
 {
 };
 
@@ -189,7 +330,7 @@ class CCheckBox : public CCheckElement
 //                                RADIO BUTTON
 //
 //##############################################################################
-class CRadioButton : public CCheckElement
+class CRadioComponent : public CCheckElement
 {
 };
 
@@ -198,6 +339,6 @@ class CRadioButton : public CCheckElement
 //                                 SCROLL BAR
 //
 //##############################################################################
-class CScrollBar : public CInterfaceElement
+class CScrollComponent : public CInterfaceElement
 {
 };

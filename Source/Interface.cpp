@@ -74,7 +74,7 @@ void CInterfaceManager::Update()
   m_xMousePos = XPOINT((XINT)fX, (XINT)fY);
 
 	if (m_pActiveElement)
-		m_pActiveElement->OnMouseMove(m_xMousePos - m_xLastMousePos);
+		m_pActiveElement->OnMouseMove(m_xMousePos - m_xLastMousePos, IsMouseDown());
 
   m_bFoundActive = false;
 
@@ -90,7 +90,10 @@ void CInterfaceManager::Update()
 
     // Check key presses.
     if (XINT iChar = _HGE->Input_GetChar())
-      m_pFocusedElement->OnKeyChar(iChar);
+		{
+      if (iChar >= ' ' && iChar <= '~')
+				m_pFocusedElement->OnKeyChar((xchar)iChar);
+		}
 
     if (XINT iKey = _HGE->Input_GetKey())
     {

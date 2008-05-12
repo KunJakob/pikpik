@@ -278,7 +278,12 @@ void CGhost::Render()
 	CPlayer::Render();
 
 	m_pEyes->SetPosition(m_pSprite->GetPosition());
-	m_pEyes->SetAlpha(m_pSprite->GetAlpha());
+	
+	if (_GLOBAL.pActivePlayer->GetType() == PlayerType_Ghost)
+		m_pEyes->SetAlpha(1.f);
+	else
+		m_pEyes->SetAlpha(m_pSprite->GetAlpha());
+
 	m_pEyes->Render();
 }
 

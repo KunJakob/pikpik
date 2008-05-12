@@ -123,11 +123,8 @@ void CRowElement::Render(xrect& xLeft, xrect& xCentre, xrect& xRight, xint iVert
 // =============================================================================
 // Nat Ryall                                                          9-May-2008
 // =============================================================================
-CContainerElement::CContainerElement(t_ElementType iElementType, CSpriteMetadata* pSprite, CLabelElement* pLabel) : CRowElement(iElementType, pSprite),
-	m_pLabel(pLabel),
-	m_iHeight(0),
-	m_bMoveable(false),
-	m_bDragging(false)
+CContainerElement::CContainerElement(t_ElementType iElementType, CSpriteMetadata* pSprite) : CRowElement(iElementType, pSprite),
+	m_iHeight(0)
 {
 }
 

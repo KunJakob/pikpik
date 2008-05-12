@@ -260,10 +260,16 @@ void CMap::Update()
 	if (_GLOBAL.pActivePlayer->m_iType == PlayerType_Ghost)
 	{
 		for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
-			m_xBlocks[iA].fVisibility = m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsBase() ? 1.f : 0.f;
+			m_xBlocks[iA].fVisibility = 0.f;
 
 		AddVisiblePaths(_GLOBAL.pActivePlayer->m_pCurrentBlock, 1.0f - _GLOBAL.pActivePlayer->m_fTransition);
 		AddVisiblePaths(_GLOBAL.pActivePlayer->m_pTargetBlock, _GLOBAL.pActivePlayer->m_fTransition);
+
+		for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
+		{
+			if (m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsBase())
+				m_xBlocks[iA].fVisibility = 1.f;
+		}
 	}
 	else
 	{

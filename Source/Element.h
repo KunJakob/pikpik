@@ -284,36 +284,15 @@ public:
 		return m_xFrameSize;
 	}
 
-	// Allow or prevent the container from being draggable.
-	void SetMoveable(xbool bMoveable)
-	{
-		m_bMoveable = bMoveable;
-	}
-
-	// Determine if the container is draggable.
-	xbool IsMoveable()
-	{
-		return m_bMoveable;
-	}
-
 protected:
 	// Internal constructor to prevent instantiation of this class.
-	CContainerElement(t_ElementType iElementType, CSpriteMetadata* pSprite, CLabelElement* pLabel);
+	CContainerElement(t_ElementType iElementType, CSpriteMetadata* pSprite);
 
 	// Render a window at the current position and current size using the specified rects for each tile.
 	void Render(xrect& xTL, xrect& xTC, xrect& xTR, xrect& xML, xrect& xMC, xrect& xMR, xrect& xBL, xrect& xBC, xrect& xBR);
 
-	// The label element for the window title.
-	CLabelElement* m_pLabel;
-
 	// The height, in pixels, of the inner container.
 	xint m_iHeight;
-
-	// Specifies if the container can be dragged around the screen.
-	xbool m_bMoveable;
-
-	// Specifies if the container is being dragged.
-	xbool m_bDragging;
 };
 
 //##############################################################################
