@@ -98,17 +98,17 @@ void CRowElement::Render(xrect& xLeft, xrect& xCentre, xrect& xRight, xint iVert
 {
   // Ends.
   m_pSprite->Render(xLeft, GetPosition() + xpoint(0, iVertOffset));
-  m_pSprite->Render(xRight, GetPosition() + xpoint(xLeft.GetWidth() + m_iWidth, iVertOffset));
+  m_pSprite->Render(xRight, GetPosition() + xpoint(xLeft.Width() + m_iWidth, iVertOffset));
 
   // Centre.
   for (xint iX = 0, iDrawWidth = 0; iX < m_iWidth; iX += iDrawWidth)
   {
-    iDrawWidth = Math::Clamp<xuint>(m_iWidth - iX, 0, xCentre.GetWidth());
+    iDrawWidth = Math::Clamp<xuint>(m_iWidth - iX, 0, xCentre.Width());
 
     xrect xTileRect = xCentre;
     xTileRect.iRight = xTileRect.iLeft + iDrawWidth;
 
-    m_pSprite->Render(xTileRect, GetPosition() + xpoint(xLeft.GetWidth() + iX, iVertOffset));
+    m_pSprite->Render(xTileRect, GetPosition() + xpoint(xLeft.Width() + iX, iVertOffset));
   }
 }
 
@@ -146,7 +146,7 @@ void CContainerElement::Render(xrect& xTL, xrect& xTC, xrect& xTR, xrect& xML, x
   // Middle
   for (xint iY = 0, iDrawHeight = 0; iY < m_iHeight; iY += iDrawHeight)
   {
-    iDrawHeight = Math::Clamp<xuint>(m_iHeight - iY, 0, xMC.GetHeight());
+    iDrawHeight = Math::Clamp<xuint>(m_iHeight - iY, 0, xMC.Height());
 
     xint iAreaBottom = xMC.iTop + iDrawHeight;
 
@@ -159,11 +159,11 @@ void CContainerElement::Render(xrect& xTL, xrect& xTC, xrect& xTR, xrect& xML, x
     xrect xRight = xMR;
     xRight.iBottom = iAreaBottom;
 
-    CRowElement::Render(xLeft, xCentre, xRight, xTC.GetHeight() + iY);
+    CRowElement::Render(xLeft, xCentre, xRight, xTC.Height() + iY);
   }
 
   // Bottom.
-  CRowElement::Render(xBL, xBC, xBR, xTC.GetHeight() + m_iHeight);
+  CRowElement::Render(xBL, xBC, xBR, xTC.Height() + m_iHeight);
 }
 
 //##############################################################################
@@ -191,6 +191,14 @@ CCheckElement::CCheckElement(t_ElementType iElementType, CSpriteMetadata* pSprit
 CCheckElement::~CCheckElement()
 {
 	delete m_pSprite;
+}
+
+// =============================================================================
+// Nat Ryall                                                         13-May-2008
+// =============================================================================
+void CCheckElement::Render(xrect& xArea)
+{
+	m_pSprite->Render(xArea, GetPosition());
 }
 
 //##############################################################################

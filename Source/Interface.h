@@ -79,6 +79,9 @@ typedef XLIST<CInterfaceElement*> t_ElementList;
 class CInterfaceManager : public Templates::CSingletonT<CInterfaceManager>
 {
 public:
+	// Friend.
+	friend CInterfaceElement;
+
   // Initialise the interface manager.
   CInterfaceManager();
 
@@ -116,7 +119,7 @@ public:
 	}
 
 	// Check if a specific element is the active element.
-	XBOOL IsActiveElement(CInterfaceElement* pElement)
+	xbool IsActiveElement(CInterfaceElement* pElement)
 	{
 		return m_pActiveElement == pElement;
 	}
@@ -131,33 +134,51 @@ public:
 	}
 
   // Check if a specific element is the focused element.
-  XBOOL IsFocusedElement(CInterfaceElement* pElement)
+  xbool IsFocusedElement(CInterfaceElement* pElement)
   {
     return m_pFocusedElement == pElement;
   }
 
+	// Get a list of all existing elements.
+	t_ElementList& GetElementList()
+	{
+		return m_lpElements;
+	}
+
 	// Get the current mouse position.
-	XPOINT GetMousePosition()
+	xpoint GetMousePosition()
 	{
 		return m_xMousePos;
 	}
 
 	// Check if the mouse cursor is over a specific element.
-	XBOOL IsMouseOver(CInterfaceElement* pElement);
+	xbool IsMouseOver(CInterfaceElement* pElement);
 
 	// Check if the left-mouse button is pressed.
-	XBOOL IsMouseDown()
+	xbool IsMouseDown()
 	{
 		return _HGE->Input_GetKeyState(HGEK_LBUTTON);
 	}
 
   // Switch the debug renderer on or off.
-  void SetDebugRender(XBOOL bDebug)
+  void SetDebugRender(xbool bDebug)
   {
     m_bDebugRender = bDebug;
   }
 
 protected:
+	// Register an element with the system. This is done automatically when the element is constructed.
+	inline void RegisterElement(CInterfaceElement* pElement)
+	{
+		m_lpElements.push_back(pElement);
+	}
+
+	// Deregister an element from the system. This is done automatically when the element is destructed.
+	inline void DeregisterElement(CInterfaceElement* pElement)
+	{
+		XEN_LIST_REMOVE(t_ElementList, m_lpElements, pElement);
+	}
+
   // Recursive function called on each element. Called in reverse render order.
   void UpdateElement(CInterfaceElement* pElement);
 
@@ -171,10 +192,10 @@ protected:
   CBasicSprite* m_pCursor[ElementType_Max];
 
   // The current mouse position.
-  XPOINT m_xMousePos;
+  xpoint m_xMousePos;
 
   // The last mouse position.
-  XPOINT m_xLastMousePos;
+  xpoint m_xLastMousePos;
 
   // The active element the mouse is over.
   CInterfaceElement* m_pActiveElement;
@@ -182,12 +203,15 @@ protected:
 	// The last focused element.
 	CInterfaceElement* m_pFocusedElement;
 
+	// A list of pointers to all existing elements.
+	t_ElementList m_lpElements;
+
 private:
   // Tracking variable for finding the current active element.
-  XBOOL m_bFoundActive;
+  xbool m_bFoundActive;
 
   // Specifies if debug rendering is used.
-  XBOOL m_bDebugRender;
+  xbool m_bDebugRender;
 };
 
 //##############################################################################
@@ -204,7 +228,7 @@ public:
   friend CInterfaceManager;
 
   // Virtual destructor to ensure proper cleanup of all child classes.
-  virtual ~CInterfaceElement() {}
+  virtual ~CInterfaceElement();
 
   // Optional update virtual function for this element. Called each frame when visible.
   virtual void Update() {}
@@ -321,10 +345,10 @@ protected:
 	// Triggered when focus is lost from the element.
   virtual void OnBlur() {}
 
-	// Triggered when the mouse enters this element.
+	// Triggered when the mouse enters the element.
   virtual void OnMouseEnter() {}
 
-	// Triggered when the mouse leaves this element. 
+	// Triggered when the mouse leaves the element. 
   virtual void OnMouseLeave() {}
 
   // Triggered when the left mouse-button is pressed within the element area.

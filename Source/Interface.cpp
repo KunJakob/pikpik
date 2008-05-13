@@ -39,7 +39,7 @@ CInterfaceManager::~CInterfaceManager()
 {
   delete m_pScreen;
 
-  for (XUINT iA = 0; iA < ElementType_Max; ++iA)
+  for (xint iA = 0; iA < ElementType_Max; ++iA)
   {
     if (m_pCursor[iA])
       delete m_pCursor[iA];
@@ -56,7 +56,7 @@ void CInterfaceManager::Reset()
 
 	m_pScreen->DetachAll();
 
-  for (XUINT iA = 0; iA < ElementType_Max; ++iA)
+  for (xint iA = 0; iA < ElementType_Max; ++iA)
     m_pCursor[iA] = NULL;
 }
 
@@ -67,11 +67,11 @@ void CInterfaceManager::Update()
 {
   m_xLastMousePos = m_xMousePos;
 
-  XFLOAT fX;
-  XFLOAT fY;
+  xfloat fX;
+  xfloat fY;
 
   _HGE->Input_GetMousePos(&fX, &fY);
-  m_xMousePos = XPOINT((XINT)fX, (XINT)fY);
+  m_xMousePos = xpoint((xint)fX, (xint)fY);
 
 	if (m_pActiveElement)
 		m_pActiveElement->OnMouseMove(m_xMousePos - m_xLastMousePos, IsMouseDown());
@@ -89,13 +89,13 @@ void CInterfaceManager::Update()
 		while (pElement = pElement->m_pParent);
 
     // Check key presses.
-    if (XINT iChar = _HGE->Input_GetChar())
+    if (xint iChar = _HGE->Input_GetChar())
 		{
       if (iChar >= ' ' && iChar <= '~')
 				m_pFocusedElement->OnKeyChar((xchar)iChar);
 		}
 
-    if (XINT iKey = _HGE->Input_GetKey())
+    if (xint iKey = _HGE->Input_GetKey())
     {
       if (_HGE->Input_GetKeyState(iKey))
         m_pFocusedElement->OnKeyDown(iKey);
@@ -116,8 +116,8 @@ void CInterfaceManager::Render()
   {
     if (m_pActiveElement)
     {
-      XRECT xRect = m_pActiveElement->GetArea();
-      XUINT iColour = ARGB(255, 32, 32, 32);
+      xrect xRect = m_pActiveElement->GetArea();
+      xuint iColour = ARGB(255, 32, 32, 32);
 
       hgeQuad xQuad;
       memset(&xQuad, 0, sizeof(hgeQuad));
@@ -138,8 +138,8 @@ void CInterfaceManager::Render()
 
     if (m_pFocusedElement)
     {
-      XRECT xRect = m_pFocusedElement->GetFocusArea() + XRECT(2, 2, -1, -1);
-      XUINT iColour = ARGB(255, 255, 0, 0);
+      xrect xRect = m_pFocusedElement->GetFocusArea() + xrect(2, 2, -1, -1);
+      xuint iColour = ARGB(255, 255, 0, 0);
 
       _HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iTop, iColour);
       _HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iBottom, iColour);
@@ -155,7 +155,7 @@ void CInterfaceManager::Render()
     if (m_pActiveElement && m_pCursor[m_pActiveElement->GetType()])
       pCursor = m_pCursor[m_pActiveElement->GetType()];
 
-    pCursor->Render(pCursor->GetImageRect(), XPOINT(), m_xMousePos, 1.f, 0.f);
+    pCursor->Render(pCursor->GetImageRect(), m_xMousePos);
   }
 }
 
@@ -266,12 +266,21 @@ CInterfaceElement::CInterfaceElement(t_ElementType iType) :
   m_bVisible(true),
   m_bEnabled(true)
 {
+	InterfaceManager.RegisterElement(this);
+}
+
+// =============================================================================
+// Nat Ryall                                                         13-May-2008
+// =============================================================================
+CInterfaceElement::~CInterfaceElement()
+{
+	InterfaceManager.DeregisterElement(this);
 }
 
 // =============================================================================
 // Nat Ryall                                                          2-May-2008
 // =============================================================================
-void CInterfaceElement::Move(XPOINT xOffset)
+void CInterfaceElement::Move(xpoint xOffset)
 {
 	m_xPosition += xOffset;
 

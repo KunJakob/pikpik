@@ -235,10 +235,11 @@ void CMenuScreen::Load()
   s_iNextScreen = ScreenIndex_Invalid;
 
   // Interface.
-	CWindowComponent* pWindow = new CWindowComponent(_SPRITE("Test-Window"));
+	CWindowComponent* pWindow = new CWindowComponent(_SPRITE("Test-Window"), _FONT("Test-WindowFont"));
 	pWindow->SetInnerSize(200, 300);
 	pWindow->SetPosition(xpoint(10, 10));
 	pWindow->SetMoveable(true);
+	pWindow->SetTitle("Window #1");
 
 	CButtonComponent* pButton = new CButtonComponent(_SPRITE("Test-Button"));
 	pButton->SetWidth(190);
@@ -249,8 +250,38 @@ void CMenuScreen::Load()
 	pInput->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 35));
 	pInput->SetMasked(false);
 
+	CCheckComponent* pCheck = new CCheckComponent(_SPRITE("Test-Check"));
+	pCheck->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 65));
+
+	CRadioComponent* pRadio[7] = 
+	{
+		new CRadioComponent(0, _SPRITE("Test-Radio")),
+		new CRadioComponent(0, _SPRITE("Test-Radio")),
+		new CRadioComponent(0, _SPRITE("Test-Radio")),
+		new CRadioComponent(0, _SPRITE("Test-Radio")),
+		new CRadioComponent(1, _SPRITE("Test-Radio")),
+		new CRadioComponent(1, _SPRITE("Test-Radio")),
+		new CRadioComponent(1, _SPRITE("Test-Radio")),
+	};
+
+	pRadio[0]->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 95));
+	pRadio[1]->SetPosition(pWindow->GetInnerPosition() + xpoint(35, 95));
+	pRadio[2]->SetPosition(pWindow->GetInnerPosition() + xpoint(65, 95));
+	pRadio[3]->SetPosition(pWindow->GetInnerPosition() + xpoint(95, 95));
+	pRadio[4]->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 125));
+	pRadio[5]->SetPosition(pWindow->GetInnerPosition() + xpoint(35, 125));
+	pRadio[6]->SetPosition(pWindow->GetInnerPosition() + xpoint(65, 125));
+
 	pWindow->Attach(pButton);
 	pWindow->Attach(pInput);
+	pWindow->Attach(pCheck);
+	pWindow->Attach(pRadio[0]);
+	pWindow->Attach(pRadio[1]);
+	pWindow->Attach(pRadio[2]);
+	pWindow->Attach(pRadio[3]);
+	pWindow->Attach(pRadio[4]);
+	pWindow->Attach(pRadio[5]);
+	pWindow->Attach(pRadio[6]);
 
 	InterfaceManager.GetScreen()->Attach(pWindow);
 }

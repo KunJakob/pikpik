@@ -197,7 +197,7 @@ void CBasicSprite::Render(XRECT xArea, XPOINT xAnchor, XPOINT xPosition, XFLOAT 
 
 	pSprite->SetHotSpot((float)xAnchor.iX, (float)xAnchor.iY);
 	pSprite->SetColor(SETA(pSprite->GetColor(), (XCHAR)(fAlpha * 255.f)));
-	pSprite->SetTextureRect((float)xArea.iLeft, (float)xArea.iTop, (float)xArea.GetWidth(), (float)xArea.GetHeight());
+	pSprite->SetTextureRect((float)xArea.iLeft, (float)xArea.iTop, (float)xArea.Width(), (float)xArea.Height());
 
 	if (fAngle)
 		pSprite->RenderEx((float)xPosition.iX, (float)xPosition.iY, fAngle);

@@ -64,7 +64,7 @@ public:
   // Get the height of the button.
   virtual xint GetHeight()
   {
-    return m_pCentre[m_iButtonState]->xRect.GetHeight();
+    return m_pCentre[m_iButtonState]->xRect.Height();
   }
 
   // Set the callback to execute if the button is clicked.
@@ -148,7 +148,7 @@ public:
 	// Get the height of the button.
 	virtual xint GetHeight()
 	{
-		return m_pCentre->xRect.GetHeight();
+		return m_pCentre->xRect.Height();
 	}
 
 	// Specify if the input should be masked.
@@ -164,25 +164,25 @@ public:
 	}
 
 	// Set the maximum number of characters allowed in the input box.
-	void SetCharacterLimit(xint iLimit)
+	inline void SetCharacterLimit(xint iLimit)
 	{
 		m_iCharLimit = iLimit;
 	}
 
 	// Get the maximum number of characters allowed in the input box.
-	XUINT GetCharacterLimit()
+	inline xint GetCharacterLimit()
 	{
 		return m_iCharLimit;
 	}
 
 	// Set the text in the input box.
-	void SetText(const xchar* pText)
+	inline void SetText(const xchar* pText)
 	{
 		m_xText = pText;
 	}
 
 	// Get the text in the input box.
-	const xchar* GetText()
+	inline const xchar* GetText()
 	{
 		return m_xText.c_str();
 	}
@@ -245,7 +245,7 @@ class CWindowComponent : public CContainerElement
 {
 public:
   // Initialise the window using a specific graphic.
-	CWindowComponent(CSpriteMetadata* pSprite, CLabelElement* pLabel = NULL);
+	CWindowComponent(CSpriteMetadata* pSprite, CFontMetadata* pFont = NULL);
 
   // Deinitialise the button and clean up any memory.
   virtual ~CWindowComponent();
@@ -253,14 +253,26 @@ public:
   // Render the button.
   virtual void Render();
 
+	// Set the window title text.
+	inline void SetTitle(const xchar* pTitle)
+	{
+		m_xTitle = pTitle;
+	}
+
+	// Get the current window title text.
+	inline const xchar* GetTitle()
+	{
+		return m_xTitle.c_str();
+	}
+
 	// Allow or prevent the window from being draggable.
-	void SetMoveable(xbool bMoveable)
+	inline void SetMoveable(xbool bMoveable)
 	{
 		m_bMoveable = bMoveable;
 	}
 
 	// Determine if the window is draggable.
-	xbool IsMoveable()
+	inline xbool IsMoveable()
 	{
 		return m_bMoveable;
 	}
@@ -297,8 +309,11 @@ protected:
 	CSpriteMetadata::CArea* m_pBC;
 	CSpriteMetadata::CArea* m_pBR;
 
-	// The label element for the window title.
-	CLabelElement* m_pLabel;
+	// The font for the window title.
+	CFont* m_pFont;
+
+	// The window title.
+	xstring m_xTitle;
 
 	// Specifies if the container can be dragged around the screen.
 	xbool m_bMoveable;
@@ -323,6 +338,69 @@ class CListComponent : public CContainerElement
 //##############################################################################
 class CCheckComponent : public CCheckElement
 {
+public:
+	// Initialise the element.
+	CCheckComponent(CSpriteMetadata* pSprite, CLabelComponent* pLabel = NULL);
+
+	// Deinitialise the element.
+	virtual ~CCheckComponent();
+
+	// Render the element.
+	virtual void Render();
+
+	// Get the width of the element.
+	virtual xint GetWidth()
+	{
+		return m_pBox[m_iCheckState]->xRect.Width();
+	}
+
+	// Get the height of the element.
+	virtual xint GetHeight()
+	{
+		return m_pBox[m_iCheckState]->xRect.Height();
+	}
+
+protected:
+	// Triggered when the mouse enters the element.
+	virtual void OnMouseEnter() 
+	{
+		m_iCheckState = InterfaceManager.IsMouseDown() ? CheckState_Down : CheckState_Over;
+	}
+
+	// Triggered when the mouse leaves the element.
+	virtual void OnMouseLeave()
+	{
+		m_iCheckState = CheckState_Normal;
+	}
+
+	// Triggered when the left mouse-button is pressed within the element area.
+	virtual void OnMouseDown(xpoint xPosition)
+	{
+		m_iCheckState = CheckState_Down;
+	}
+
+	// Triggered when the left mouse-button is released within the element area.
+	virtual void OnMouseUp(xpoint xPosition) 
+	{
+		m_bChecked = !m_bChecked;
+		m_iCheckState = CheckState_Over;
+	}
+
+	// The check states.
+	enum t_CheckState
+	{
+		CheckState_Normal,
+		CheckState_Over,
+		CheckState_Down,
+		/*MAX*/CheckState_Max,
+	};
+
+	// The element areas.
+	CSpriteMetadata::CArea* m_pBox[CheckState_Max];
+	CSpriteMetadata::CArea* m_pCheck;
+
+	// The internal check state.
+	t_CheckState m_iCheckState;
 };
 
 //##############################################################################
@@ -330,8 +408,27 @@ class CCheckComponent : public CCheckElement
 //                                RADIO BUTTON
 //
 //##############################################################################
-class CRadioComponent : public CCheckElement
+class CRadioComponent : public CCheckComponent
 {
+public:
+	// Initialise the element.
+	CRadioComponent(xint iRadioGroup, CSpriteMetadata* pSprite, CLabelComponent* pLabel = NULL);
+
+	// Deinitialise the element.
+	virtual ~CRadioComponent();
+
+	// Get the radio group this component belongs to.
+	inline xint GetRadioGroup()
+	{
+		return m_iRadioGroup;
+	}
+
+protected:
+	// Triggered when the left mouse-button is released within the element area.
+	virtual void OnMouseUp(xpoint xPosition);
+
+	// The radio component group.
+	xint m_iRadioGroup;
 };
 
 //##############################################################################

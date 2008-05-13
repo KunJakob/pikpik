@@ -48,7 +48,7 @@ CButtonComponent::CButtonComponent(CSpriteMetadata* pSprite, CLabelElement* pLab
 	m_pRight[ButtonState_Over]			= pSprite->FindArea("OverRight"); 
   m_pRight[ButtonState_Down]			= pSprite->FindArea("DownRight");
 
-	m_xFrameSize = xrect(m_pLeft[0]->xRect.GetWidth(), 0, m_pRight[0]->xRect.GetWidth(), 0);
+	m_xFrameSize = xrect(m_pLeft[0]->xRect.Width(), 0, m_pRight[0]->xRect.Width(), 0);
 }
 
 // =============================================================================
@@ -66,7 +66,7 @@ void CButtonComponent::Render()
   CRowElement::Render(m_pLeft[m_iButtonState]->xRect, m_pCentre[m_iButtonState]->xRect, m_pRight[m_iButtonState]->xRect);
 
   //if (m_pLabel)
-  //  m_pFont->Render(m_xLabel.c_str(), GetPosition() + (XPOINT(GetWidth(), GetHeight() - m_pFont->GetFontHeight()) / 2), HGETEXT_CENTER);  }
+  //  m_pFont->Render(m_xLabel.c_str(), GetPosition() + (XPOINT(Width(), GetHeight() - m_pFont->GetFontHeight()) / 2), HGETEXT_CENTER);  }
 }
 
 //##############################################################################
@@ -88,7 +88,7 @@ CInputComponent::CInputComponent(CSpriteMetadata* pSprite, CFontMetadata* pFont)
 	m_pCentre = pSprite->FindArea("Centre"); 
 	m_pRight = pSprite->FindArea("Right");
 
-	m_xFrameSize = xrect(m_pLeft->xRect.GetWidth(), 0, m_pRight->xRect.GetWidth(), 0);
+	m_xFrameSize = xrect(m_pLeft->xRect.Width(), 0, m_pRight->xRect.Width(), 0);
 
 	m_pFont = new CFont(pFont);
 }
@@ -157,7 +157,7 @@ void CInputComponent::OnMouseDown(xpoint xPosition)
 		for (xint iA = 0; iA < (xint)m_xText.length(); ++iA)
 		{
 			xCheckString += m_bMasked ? '*' : m_xText[iA];
-			iWidth = m_pFont->GetStringWidth(xCheckString.c_str()) + m_pLeft->xRect.GetWidth();
+			iWidth = m_pFont->GetStringWidth(xCheckString.c_str()) + m_pLeft->xRect.Width();
 
 			if (iWidth > iTarget)
 				break;
@@ -228,8 +228,8 @@ void CInputComponent::OnKeyChar(xchar cChar)
 // =============================================================================
 // Nat Ryall                                                         11-May-2008
 // =============================================================================
-CWindowComponent::CWindowComponent(CSpriteMetadata* pSprite, CLabelElement* pLabel) : CContainerElement(ElementType_Window, pSprite),
-	m_pLabel(pLabel),
+CWindowComponent::CWindowComponent(CSpriteMetadata* pSprite, CFontMetadata* pFont) : CContainerElement(ElementType_Window, pSprite),
+	m_pFont(NULL),
 	m_bMoveable(false),
 	m_bDragging(false)
 {
@@ -245,11 +245,14 @@ CWindowComponent::CWindowComponent(CSpriteMetadata* pSprite, CLabelElement* pLab
 
   m_xFrameSize = xrect
   (
-    m_pML->xRect.GetWidth(),
-    m_pTC->xRect.GetHeight(),
-    m_pMR->xRect.GetWidth(),
-    m_pBC->xRect.GetHeight()
+    m_pML->xRect.Width(),
+    m_pTC->xRect.Height(),
+    m_pMR->xRect.Width(),
+    m_pBC->xRect.Height()
   );
+
+	if (pFont)
+		m_pFont = new CFont(pFont);
 }
 
 // =============================================================================
@@ -257,6 +260,8 @@ CWindowComponent::CWindowComponent(CSpriteMetadata* pSprite, CLabelElement* pLab
 // =============================================================================
 CWindowComponent::~CWindowComponent()
 {
+	if (m_pFont)
+		delete m_pFont;
 }
 
 // =============================================================================
@@ -264,7 +269,12 @@ CWindowComponent::~CWindowComponent()
 // =============================================================================
 void CWindowComponent::Render()
 {
+	// Render the container.
 	CContainerElement::Render(m_pTL->xRect, m_pTC->xRect, m_pTR->xRect, m_pML->xRect, m_pMC->xRect, m_pMR->xRect, m_pBL->xRect, m_pBC->xRect, m_pBR->xRect);
+
+	// Render the window title.
+	if (m_pFont)
+		m_pFont->Render(m_xTitle.c_str(), GetPosition() + xpoint(m_xFrameSize.iLeft + 1, (m_xFrameSize.iTop - m_pFont->GetFontHeight()) / 2), HGETEXT_LEFT);
 }
 
 //##############################################################################
@@ -279,11 +289,78 @@ void CWindowComponent::Render()
 //
 //##############################################################################
 
+// =============================================================================
+// Nat Ryall                                                         13-May-2008
+// =============================================================================
+CCheckComponent::CCheckComponent(CSpriteMetadata* pSprite, CLabelComponent* pLabel) : CCheckElement(ElementType_Check, pSprite, pLabel),
+	m_iCheckState(CheckState_Normal)
+{
+	m_pBox[CheckState_Normal]		= pSprite->FindArea("Normal"); 
+	m_pBox[CheckState_Over]			= pSprite->FindArea("Over"); 
+	m_pBox[CheckState_Down]			= pSprite->FindArea("Down"); 
+
+	m_pCheck = pSprite->FindArea("Check"); 
+}
+
+// =============================================================================
+// Nat Ryall                                                         13-May-2008
+// =============================================================================
+CCheckComponent::~CCheckComponent()
+{
+}
+
+// =============================================================================
+// Nat Ryall                                                         13-May-2008
+// =============================================================================
+void CCheckComponent::Render()
+{
+	CCheckElement::Render(m_pBox[m_iCheckState]->xRect);
+
+	if (m_bChecked)
+		CCheckElement::Render(m_pCheck->xRect);
+}
+
 //##############################################################################
 //
 //                                RADIO BUTTON
 //
 //##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                         13-May-2008
+// =============================================================================
+CRadioComponent::CRadioComponent(xint iRadioGroup, CSpriteMetadata* pSprite, CLabelComponent* pLabel) : CCheckComponent(pSprite, pLabel),
+	m_iRadioGroup(iRadioGroup)
+{
+	m_iType = ElementType_Radio;
+}
+
+// =============================================================================
+// Nat Ryall                                                         13-May-2008
+// =============================================================================
+CRadioComponent::~CRadioComponent()
+{
+}
+
+// =============================================================================
+// Nat Ryall                                                         13-May-2008
+// =============================================================================
+void CRadioComponent::OnMouseUp(xpoint xPosition)
+{
+	XEN_LIST_FOREACH(t_ElementList, ppElement, InterfaceManager.GetElementList())
+	{
+		if ((*ppElement)->GetType() == ElementType_Radio)
+		{
+			CRadioComponent* pRadio = (CRadioComponent*)*ppElement;
+
+			if (pRadio->GetRadioGroup() == m_iRadioGroup)
+				pRadio->SetChecked(false);
+		}
+	}
+		
+	m_bChecked = true;
+	m_iCheckState = CheckState_Over;
+}
 
 //##############################################################################
 //

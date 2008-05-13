@@ -153,3 +153,23 @@
 	.Area "Centre"			{ .Size 1  0 62 20 }
 	.Area "Right"			{ .Size 61 0 3  20 }
 }
+
+.Sprite "Test-Check"
+{
+	.File "Surfaces\Test-CheckBox.png"
+	
+	.Area "Normal"			{ .Tile 0 13 13 }
+	.Area "Over"			{ .Tile 1 13 13 }
+	.Area "Down"			{ .Tile 2 13 13 }
+	.Area "Check"			{ .Tile 3 13 13 }
+}
+
+.Sprite "Test-Radio"
+{
+	.File "Surfaces\Test-RadioButton.png"
+	
+	.Area "Normal"			{ .Tile 0 13 13 }
+	.Area "Over"			{ .Tile 1 13 13 }
+	.Area "Down"			{ .Tile 2 13 13 }
+	.Area "Check"			{ .Tile 3 13 13 }
+}

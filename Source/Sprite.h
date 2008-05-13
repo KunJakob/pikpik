@@ -394,7 +394,7 @@ public:
 	*/
 	XUINT GetAreaWidth()
 	{
-		return m_pArea ? m_pArea->xRect.GetWidth() : GetImageWidth();
+		return m_pArea ? m_pArea->xRect.Width() : GetImageWidth();
 	}
 
 	/**
@@ -402,7 +402,7 @@ public:
 	*/
 	XUINT GetAreaHeight()
 	{
-		return m_pArea ? m_pArea->xRect.GetHeight() : GetImageHeight();
+		return m_pArea ? m_pArea->xRect.Height() : GetImageHeight();
 	}
 
 	/**
