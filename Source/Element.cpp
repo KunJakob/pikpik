@@ -39,6 +39,14 @@ CLabelElement::~CLabelElement()
 	delete m_pFont;
 }
 
+// =============================================================================
+// Nat Ryall                                                         13-May-2008
+// =============================================================================
+void CLabelElement::Render()
+{
+	m_pFont->Render(m_xText.c_str(), GetPosition(), m_iAlignment);
+}
+
 //##############################################################################
 
 //##############################################################################
@@ -63,6 +71,17 @@ CImageElement::CImageElement(t_ElementType iElementType, CSpriteMetadata* pSprit
 CImageElement::~CImageElement()
 {
 	delete m_pSprite;
+}
+
+// =============================================================================
+// Nat Ryall                                                         13-May-2008
+// =============================================================================
+void CImageElement::Render()
+{
+	if (m_pArea)
+		m_pSprite->Render(m_pArea->xRect, GetPosition());
+	else
+		m_pSprite->Render(GetPosition());
 }
 
 //##############################################################################
@@ -96,20 +115,26 @@ CRowElement::~CRowElement()
 // =============================================================================
 void CRowElement::Render(xrect& xLeft, xrect& xCentre, xrect& xRight, xint iVertOffset)
 {
-  // Ends.
   m_pSprite->Render(xLeft, GetPosition() + xpoint(0, iVertOffset));
-  m_pSprite->Render(xRight, GetPosition() + xpoint(xLeft.Width() + m_iWidth, iVertOffset));
+  m_pSprite->Render(xRight, GetPosition() + xpoint(m_xFrameSize.iLeft + m_iWidth, iVertOffset));
 
-  // Centre.
-  for (xint iX = 0, iDrawWidth = 0; iX < m_iWidth; iX += iDrawWidth)
-  {
-    iDrawWidth = Math::Clamp<xuint>(m_iWidth - iX, 0, xCentre.Width());
+	RenderCentre(xCentre, m_iWidth, iVertOffset);
+}
 
-    xrect xTileRect = xCentre;
-    xTileRect.iRight = xTileRect.iLeft + iDrawWidth;
+// =============================================================================
+// Nat Ryall                                                         13-May-2008
+// =============================================================================
+void CRowElement::RenderCentre(xrect& xCentre, xint iWidth, xint iVertOffset)
+{
+	for (xint iX = 0, iDrawWidth = 0; iX < iWidth; iX += iDrawWidth)
+	{
+		iDrawWidth = Math::Clamp<xuint>(iWidth - iX, 0, xCentre.Width());
 
-    m_pSprite->Render(xTileRect, GetPosition() + xpoint(xLeft.Width() + iX, iVertOffset));
-  }
+		xrect xTileRect = xCentre;
+		xTileRect.iRight = xTileRect.iLeft + iDrawWidth;
+
+		m_pSprite->Render(xTileRect, GetPosition() + xpoint(m_xFrameSize.iLeft + iX, iVertOffset));
+	}
 }
 
 //##############################################################################

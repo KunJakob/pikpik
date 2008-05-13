@@ -173,3 +173,13 @@
 	.Area "Down"			{ .Tile 2 13 13 }
 	.Area "Check"			{ .Tile 3 13 13 }
 }
+
+.Sprite "Test-Progress"
+{
+	.File "Surfaces\Test-Progress.png"
+	
+	.Area "Left"			{ .Size 0  0 4  17 }
+	.Area "Centre"			{ .Size 4  0 44 17 }
+	.Area "Right"			{ .Size 92 0 4  17 }
+	.Area "Progress"		{ .Size 48 0 44 17 }
+}

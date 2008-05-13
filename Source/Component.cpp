@@ -16,11 +16,55 @@
 //
 //##############################################################################
 
+// =============================================================================
+// Nat Ryall                                                         13-May-2008
+// =============================================================================
+CLabelComponent::CLabelComponent(CFontMetadata* pMetaFont) : CLabelElement(ElementType_Label, pMetaFont)
+{
+}
+
+// =============================================================================
+// Nat Ryall                                                         13-May-2008
+// =============================================================================
+CLabelComponent::~CLabelComponent()
+{
+}
+
+// =============================================================================
+// Nat Ryall                                                         13-May-2008
+// =============================================================================
+void CLabelComponent::Render()
+{
+	CLabelElement::Render();
+}
+
 //##############################################################################
 //
 //                                 IMAGE BOX
 //
 //##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                         13-May-2008
+// =============================================================================
+CImageComponent::CImageComponent(CSpriteMetadata* pMetaSprite) : CImageElement(ElementType_Image, pMetaSprite)
+{
+}
+
+// =============================================================================
+// Nat Ryall                                                         13-May-2008
+// =============================================================================
+CImageComponent::~CImageComponent()
+{
+}
+
+// =============================================================================
+// Nat Ryall                                                         13-May-2008
+// =============================================================================
+void CImageComponent::Render()
+{
+	CImageElement::Render();
+}
 
 //##############################################################################
 //
@@ -36,19 +80,17 @@ CButtonComponent::CButtonComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* 
 	m_pFont(NULL),
   m_fpOnClickCallback(NULL)
 {
-  m_pLeft[ButtonState_Normal]			= pMetaSprite->FindArea("NormalLeft");
-	m_pLeft[ButtonState_Over]				= pMetaSprite->FindArea("OverLeft");
-	m_pLeft[ButtonState_Down]				= pMetaSprite->FindArea("DownLeft"); 
+  m_pL[ButtonState_Normal]		= pMetaSprite->FindArea("NormalLeft");
+	m_pC[ButtonState_Normal]		= pMetaSprite->FindArea("NormalCentre"); 
+	m_pR[ButtonState_Normal]		= pMetaSprite->FindArea("NormalRight");
+	m_pL[ButtonState_Over]			= pMetaSprite->FindArea("OverLeft");
+	m_pC[ButtonState_Over]			= pMetaSprite->FindArea("OverCentre");
+	m_pR[ButtonState_Over]			= pMetaSprite->FindArea("OverRight"); 
+	m_pL[ButtonState_Down]			= pMetaSprite->FindArea("DownLeft"); 
+  m_pC[ButtonState_Down]			= pMetaSprite->FindArea("DownCentre"); 
+  m_pR[ButtonState_Down]			= pMetaSprite->FindArea("DownRight");
 
-  m_pCentre[ButtonState_Normal]		= pMetaSprite->FindArea("NormalCentre"); 
-  m_pCentre[ButtonState_Over]			= pMetaSprite->FindArea("OverCentre");
-  m_pCentre[ButtonState_Down]			= pMetaSprite->FindArea("DownCentre"); 
-
-	m_pRight[ButtonState_Normal]		= pMetaSprite->FindArea("NormalRight");
-	m_pRight[ButtonState_Over]			= pMetaSprite->FindArea("OverRight"); 
-  m_pRight[ButtonState_Down]			= pMetaSprite->FindArea("DownRight");
-
-	m_xFrameSize = xrect(m_pLeft[0]->xRect.Width(), 0, m_pRight[0]->xRect.Width(), 0);
+	m_xFrameSize = xrect(m_pL[0]->xRect.Width(), 0, m_pR[0]->xRect.Width(), 0);
 
 	if (pMetaFont)
 		m_pFont = new CFont(pMetaFont);
@@ -68,7 +110,7 @@ CButtonComponent::~CButtonComponent()
 // =============================================================================
 void CButtonComponent::Render()
 {
-  CRowElement::Render(m_pLeft[m_iButtonState]->xRect, m_pCentre[m_iButtonState]->xRect, m_pRight[m_iButtonState]->xRect);
+  CRowElement::Render(m_pL[m_iButtonState]->xRect, m_pC[m_iButtonState]->xRect, m_pR[m_iButtonState]->xRect);
 
   if (m_pFont)
     m_pFont->Render(m_xText.c_str(), xrect(0, 0, GetSize()) + GetPosition(), HGETEXT_CENTER | HGETEXT_MIDDLE);
@@ -89,11 +131,11 @@ CInputComponent::CInputComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pM
 	m_iCharOffset(0),
 	m_iFlashTimer(0)
 {
-	m_pLeft = pMetaSprite->FindArea("Left"); 
-	m_pCentre = pMetaSprite->FindArea("Centre"); 
-	m_pRight = pMetaSprite->FindArea("Right");
+	m_pL = pMetaSprite->FindArea("Left"); 
+	m_pC = pMetaSprite->FindArea("Centre"); 
+	m_pR = pMetaSprite->FindArea("Right");
 
-	m_xFrameSize = xrect(m_pLeft->xRect.Width(), 0, m_pRight->xRect.Width(), 0);
+	m_xFrameSize = xrect(m_pL->xRect.Width(), 0, m_pR->xRect.Width(), 0);
 
 	m_pFont = new CFont(pMetaFont);
 }
@@ -121,7 +163,7 @@ void CInputComponent::Update()
 void CInputComponent::Render()
 {
 	// Render the element area.
-	CRowElement::Render(m_pLeft->xRect, m_pCentre->xRect, m_pRight->xRect);
+	CRowElement::Render(m_pL->xRect, m_pC->xRect, m_pR->xRect);
 
 	// Get the render text and render text offset.
 	xstring xRenderText = m_xText;
@@ -162,7 +204,7 @@ void CInputComponent::OnMouseDown(xpoint xPosition)
 		for (xint iA = 0; iA < (xint)m_xText.length(); ++iA)
 		{
 			xCheckString += m_bMasked ? '*' : m_xText[iA];
-			iWidth = m_pFont->GetStringWidth(xCheckString.c_str()) + m_pLeft->xRect.Width();
+			iWidth = m_pFont->GetStringWidth(xCheckString.c_str()) + m_pL->xRect.Width();
 
 			if (iWidth > iTarget)
 				break;
@@ -223,6 +265,37 @@ void CInputComponent::OnKeyChar(xchar cChar)
 //                                PROGRESS BAR
 //
 //##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                         13-May-2008
+// =============================================================================
+CProgressComponent::CProgressComponent(CSpriteMetadata* pMetaSprite) : CRowElement(ElementType_Progress, pMetaSprite),
+	m_fProgress(0.f)
+{
+	m_pL = pMetaSprite->FindArea("Left");
+	m_pC = pMetaSprite->FindArea("Centre");
+	m_pR = pMetaSprite->FindArea("Right");
+
+	m_pProgress = pMetaSprite->FindArea("Progress");
+
+	m_xFrameSize = xrect(m_pL->xRect.Width(), 0, m_pR->xRect.Width(), 0);
+}
+
+// =============================================================================
+// Nat Ryall                                                         13-May-2008
+// =============================================================================
+CProgressComponent::~CProgressComponent()
+{
+}
+
+// =============================================================================
+// Nat Ryall                                                         13-May-2008
+// =============================================================================
+void CProgressComponent::Render()
+{
+	CRowElement::Render(m_pL->xRect, m_pC->xRect, m_pR->xRect);
+	CRowElement::RenderCentre(m_pProgress->xRect, (xint)((xfloat)m_iWidth * m_fProgress));
+}
 
 //##############################################################################
 //
@@ -366,9 +439,3 @@ void CRadioComponent::OnMouseUp(xpoint xPosition)
 	m_bChecked = true;
 	m_iCheckState = CheckState_Over;
 }
-
-//##############################################################################
-//
-//                                 SCROLL BAR
-//
-//##############################################################################

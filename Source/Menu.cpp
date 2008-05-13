@@ -273,6 +273,11 @@ void CMenuScreen::Load()
 	pRadio[5]->SetPosition(pWindow->GetInnerPosition() + xpoint(35, 125));
 	pRadio[6]->SetPosition(pWindow->GetInnerPosition() + xpoint(65, 125));
 
+	CProgressComponent* pProgress = new CProgressComponent(_SPRITE("Test-Progress"));
+	pProgress->SetWidth(190);
+	pProgress->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 155));
+	pProgress->SetProgress(0.8f);
+	
 	pWindow->Attach(pButton);
 	pWindow->Attach(pInput);
 	pWindow->Attach(pCheck);
@@ -283,6 +288,7 @@ void CMenuScreen::Load()
 	pWindow->Attach(pRadio[4]);
 	pWindow->Attach(pRadio[5]);
 	pWindow->Attach(pRadio[6]);
+	pWindow->Attach(pProgress);
 
 	InterfaceManager.GetScreen()->Attach(pWindow);
 }

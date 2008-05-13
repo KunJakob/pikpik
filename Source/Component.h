@@ -30,6 +30,15 @@
 //##############################################################################
 class CLabelComponent : public CLabelElement
 {
+public:
+	// Initialise the element.
+	CLabelComponent(CFontMetadata* pMetaFont);
+
+	// Deinitialise the element.
+	virtual ~CLabelComponent();
+
+	// Render the element.
+	virtual void Render();
 };
 
 //##############################################################################
@@ -39,6 +48,15 @@ class CLabelComponent : public CLabelElement
 //##############################################################################
 class CImageComponent : public CImageElement
 {
+public:
+	// Initialise the element.
+	CImageComponent(CSpriteMetadata* pMetaSprite);
+
+	// Deinitialise the element.
+	virtual ~CImageComponent();
+
+	// Render the element.
+	virtual void Render();
 };
 
 //##############################################################################
@@ -53,7 +71,7 @@ public:
   typedef void (*t_OnClickCallback)(xpoint /*Offset*/);
 
   // Initialise the button with the button image and label.
-  CButtonComponent(CSpriteMetadata* pSprite, CFontMetadata* pFont = NULL);
+  CButtonComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont = NULL);
 
   // Deinitialise the button and clean up any memory.
   virtual ~CButtonComponent();
@@ -64,7 +82,7 @@ public:
   // Get the height of the button.
   virtual xint GetHeight()
   {
-    return m_pCentre[m_iButtonState]->xRect.Height();
+    return m_pC[m_iButtonState]->xRect.Height();
   }
 
 	// Set the button text label.
@@ -123,9 +141,9 @@ protected:
   };
 
 	// Element areas.
-	CSpriteMetadata::CArea* m_pLeft[ButtonState_Max];
-	CSpriteMetadata::CArea* m_pCentre[ButtonState_Max];
-	CSpriteMetadata::CArea* m_pRight[ButtonState_Max];
+	CSpriteMetadata::CArea* m_pL[ButtonState_Max];
+	CSpriteMetadata::CArea* m_pC[ButtonState_Max];
+	CSpriteMetadata::CArea* m_pR[ButtonState_Max];
 
   // The internal button state.
   t_ButtonState m_iButtonState;
@@ -149,7 +167,7 @@ class CInputComponent : public CRowElement
 {
 public:
 	// Initialise the component.
-	CInputComponent(CSpriteMetadata* pSprite, CFontMetadata* pFont);
+	CInputComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont);
 
 	// Deinitialise the component.
 	virtual ~CInputComponent();
@@ -163,7 +181,7 @@ public:
 	// Get the height of the button.
 	virtual xint GetHeight()
 	{
-		return m_pCentre->xRect.Height();
+		return m_pC->xRect.Height();
 	}
 
 	// Specify if the input should be masked.
@@ -219,9 +237,9 @@ protected:
 	virtual void OnKeyChar(xchar cChar);
 
 	// Element areas.
-	CSpriteMetadata::CArea* m_pLeft;
-	CSpriteMetadata::CArea* m_pCentre;
-	CSpriteMetadata::CArea* m_pRight;
+	CSpriteMetadata::CArea* m_pL;
+	CSpriteMetadata::CArea* m_pC;
+	CSpriteMetadata::CArea* m_pR;
 
 	// The text area font.
 	CFont* m_pFont;
@@ -249,6 +267,43 @@ protected:
 //##############################################################################
 class CProgressComponent : public CRowElement
 {
+public:
+	// Initialise the component.
+	CProgressComponent(CSpriteMetadata* pMetaSprite);
+
+	// Deinitialise the component.
+	virtual ~CProgressComponent();
+
+	// Render the component.
+	virtual void Render();
+
+	// Get the height of the button.
+	virtual xint GetHeight()
+	{
+		return m_pC->xRect.Height();
+	}
+
+	// Set the progress percentage in the range range 0 to 1.
+	inline void SetProgress(xfloat fPercent)
+	{
+		m_fProgress = Math::Clamp(fPercent, 0.f, 1.f);
+	}
+
+	// Get the progress percentage in the range range 0 to 1.
+	inline xfloat GetProgress()
+	{
+		return m_fProgress;
+	}
+
+protected:
+	// Element areas.
+	CSpriteMetadata::CArea* m_pL;
+	CSpriteMetadata::CArea* m_pC;
+	CSpriteMetadata::CArea* m_pR;
+	CSpriteMetadata::CArea* m_pProgress;
+
+	// The progress bar progress in the range 0 to 1.
+	xfloat m_fProgress;
 };
 
 //##############################################################################
@@ -260,7 +315,7 @@ class CWindowComponent : public CContainerElement
 {
 public:
   // Initialise the window using a specific graphic.
-	CWindowComponent(CSpriteMetadata* pSprite, CFontMetadata* pFont = NULL);
+	CWindowComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont = NULL);
 
   // Deinitialise the button and clean up any memory.
   virtual ~CWindowComponent();
@@ -355,7 +410,7 @@ class CCheckComponent : public CCheckElement
 {
 public:
 	// Initialise the element.
-	CCheckComponent(CSpriteMetadata* pSprite, CLabelComponent* pLabel = NULL);
+	CCheckComponent(CSpriteMetadata* pMetaSprite, CLabelComponent* pLabel = NULL);
 
 	// Deinitialise the element.
 	virtual ~CCheckComponent();
@@ -427,7 +482,7 @@ class CRadioComponent : public CCheckComponent
 {
 public:
 	// Initialise the element.
-	CRadioComponent(xint iRadioGroup, CSpriteMetadata* pSprite, CLabelComponent* pLabel = NULL);
+	CRadioComponent(xint iRadioGroup, CSpriteMetadata* pMetaSprite, CLabelComponent* pLabel = NULL);
 
 	// Deinitialise the element.
 	virtual ~CRadioComponent();
@@ -444,13 +499,4 @@ protected:
 
 	// The radio component group.
 	xint m_iRadioGroup;
-};
-
-//##############################################################################
-//
-//                                 SCROLL BAR
-//
-//##############################################################################
-class CScrollComponent : public CInterfaceElement
-{
 };

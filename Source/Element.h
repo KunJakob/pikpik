@@ -39,7 +39,7 @@ public:
 	// Get the width.
 	virtual xint GetWidth()
 	{
-		return m_pFont->GetStringWidth(GetString());
+		return m_pFont->GetStringWidth(GetText());
 	}
 
 	// Get the height.
@@ -49,15 +49,15 @@ public:
 	}
 
 	// Set the text string to render.
-	inline void SetString(const xchar* pString)
+	inline void SetText(const xchar* pString)
 	{
-		m_xString = pString;
+		m_xText = pString;
 	}
 
 	// Get the text string to be rendered.
-	inline const xchar* GetString()
+	inline const xchar* GetText()
 	{
-		return m_xString.c_str();
+		return m_xText.c_str();
 	}
 
 	// Set the text alignment. Use HGETEXT_*.
@@ -76,11 +76,14 @@ protected:
 	// Internal constructor to prevent instantiation of this class.
 	CLabelElement(t_ElementType iElementType, CFontMetadata* pFont);
 
+	// Render the text string using the current font.
+	void Render();
+
 	// The element font.
 	CFont* m_pFont;
 
 	// The element text string.
-	xstring m_xString;
+	xstring m_xText;
 
 	// The text alignment relative to the position.
 	xuint m_iAlignment;
@@ -114,6 +117,9 @@ public:
 protected:
 	// Internal constructor to prevent instantiation of this class.
 	CImageElement(t_ElementType iElementType, CSpriteMetadata* pSprite, CSpriteMetadata::CArea* pArea = NULL);
+
+	// Render the image element using the current area.
+	void Render();
 
 	// The element sprite.
 	CBasicSprite* m_pSprite;
@@ -180,6 +186,9 @@ protected:
 
 	// Render a control at the current position and current size using the specified rects for each tile.
 	void Render(xrect& xLeft, xrect& xCentre, xrect& xRight, xint iVertOffset = 0);
+
+	// Render the centre section of the element by tiling the area repeatedly to fill the space.
+	void RenderCentre(xrect& xCentre, xint iWidth, xint iVertOffset = 0);
 
 	// The element sprite.
 	CBasicSprite* m_pSprite;
