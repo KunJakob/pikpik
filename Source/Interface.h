@@ -103,6 +103,24 @@ public:
     return m_pScreen;
   }
 
+	// Get a list of all existing elements.
+	inline t_ElementList& GetElementList()
+	{
+		return m_lpElements;
+	}
+
+	// Register a metadata object with the system.
+	inline void RegisterMetadata(CMetadata* pMetadata)
+	{
+		m_lpMetadata.push_back(pMetadata);
+	}
+
+	// Remove a metadata object from the system.
+	inline void DeregisterMetadata(CMetadata* pMetadata)
+	{
+		XEN_LIST_REMOVE(t_MetadataList, m_lpMetadata, pMetadata);
+	}
+
   // Set the cursor image for a specific element type.
   void SetCursor(t_ElementType iType, CSpriteMetadata* pMetadata);
 
@@ -138,12 +156,6 @@ public:
   {
     return m_pFocusedElement == pElement;
   }
-
-	// Get a list of all existing elements.
-	t_ElementList& GetElementList()
-	{
-		return m_lpElements;
-	}
 
 	// Get the current mouse position.
 	xpoint GetMousePosition()
@@ -205,6 +217,9 @@ protected:
 
 	// A list of pointers to all existing elements.
 	t_ElementList m_lpElements;
+
+	// A list of metadata objects containing interface information.
+	t_MetadataList m_lpMetadata;
 
 private:
   // Tracking variable for finding the current active element.

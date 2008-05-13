@@ -1,0 +1,13 @@
+.Window "Join"
+{
+	.Position 10 10
+	.InnerSize 200 200
+	
+	.Button
+	{
+		.RelativePosition 10 10
+		.Width 180
+		.Text "Quit"
+		.OnClick "Close-Join"
+	}
+}

@@ -53,7 +53,7 @@ public:
   typedef void (*t_OnClickCallback)(xpoint /*Offset*/);
 
   // Initialise the button with the button image and label.
-  CButtonComponent(CSpriteMetadata* pSprite, CLabelElement* pLabel = NULL);
+  CButtonComponent(CSpriteMetadata* pSprite, CFontMetadata* pFont = NULL);
 
   // Deinitialise the button and clean up any memory.
   virtual ~CButtonComponent();
@@ -66,6 +66,18 @@ public:
   {
     return m_pCentre[m_iButtonState]->xRect.Height();
   }
+
+	// Set the button text label.
+	inline void SetText(const xchar* pText)
+	{
+		m_xText = pText;
+	}
+
+	// Get the button text label.
+	inline const xchar* GetText()
+	{
+		return m_xText.c_str();
+	}
 
   // Set the callback to execute if the button is clicked.
   void SetClickCallback(t_OnClickCallback fpCallback)
@@ -118,8 +130,11 @@ protected:
   // The internal button state.
   t_ButtonState m_iButtonState;
 
-  // The button text font.
-  CLabelElement* m_pLabel;
+	// The button font.
+	CFont* m_pFont;
+
+	// The button string.
+	xstring m_xText;
 
   // The callback to execute if the button is clicked.
   t_OnClickCallback m_fpOnClickCallback;

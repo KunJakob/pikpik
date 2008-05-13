@@ -117,10 +117,18 @@ public:
 	/**
 	* Render the font with the specified attributes.
 	* @param pString The text string to render to the screen using this font.
-	* @param xPosition The position, relative to the supplied alignment, to render the text string at.
+	* @param xRect The aligned screen area to render in.
 	* @param iAlign The font alignment relative to the position. Use HGETEXT_*.
 	*/
-	void CFont::Render(const XCHAR* pString, XPOINT xPosition, XUINT iAlign);
+	void Render(const xchar* pString, xrect xRect, xuint iAlign);
+
+	/**
+	* Render the font with the specified attributes.
+	* @param pString The text string to render to the screen using this font.
+	* @param xPosition The horizontally-aligned screen position to render using.
+	* @param iAlign The font alignment relative to the position. Use HGETEXT_*.
+	*/
+	void Render(const xchar* pString, xpoint xPosition, xuint iAlign);
 
 	/**
 	* Get the font height.

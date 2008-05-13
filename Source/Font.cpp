@@ -91,7 +91,7 @@ CFontMetadata::~CFontMetadata()
 // =============================================================================
 // Nat Ryall                                                         24-Apr-2008
 // =============================================================================
-void CFont::Render(const XCHAR* pString, XPOINT xPosition, XUINT iAlign)
+void CFont::Render(const xchar* pString, xpoint xPosition, xuint iAlign)
 {
 	hgeFont* pFont = m_pMetadata->GetFont();
 
@@ -99,14 +99,35 @@ void CFont::Render(const XCHAR* pString, XPOINT xPosition, XUINT iAlign)
 
 	if (!m_pMetadata->xShadowOffset.IsZero())
 	{
-		XPOINT xShadowPos = xPosition + m_pMetadata->xShadowOffset;
+		xpoint xShadowPosition = xPosition + m_pMetadata->xShadowOffset;
 
 		pFont->SetColor(m_pMetadata->iShadowColour);
-		pFont->Render((XFLOAT)xShadowPos.iX, (XFLOAT)xShadowPos.iY, iAlign, pString);
+		pFont->Render((xfloat)xShadowPosition.iX, (xfloat)xShadowPosition.iY, iAlign, pString);
 	}
 
 	pFont->SetColor(m_pMetadata->iColour);
-	pFont->Render((XFLOAT)xPosition.iX, (XFLOAT)xPosition.iY, iAlign, pString);
+	pFont->Render((xfloat)xPosition.iX, (xfloat)xPosition.iY, iAlign, pString);
+}
+
+// =============================================================================
+// Nat Ryall                                                         13-May-2008
+// =============================================================================
+void CFont::Render(const xchar* pString, xrect xRect, xuint iAlign)
+{
+	hgeFont* pFont = m_pMetadata->GetFont();
+
+	pFont->SetScale(m_pMetadata->fScale);
+	
+	if (!m_pMetadata->xShadowOffset.IsZero())
+	{
+		xrect xShadowRect = xRect + m_pMetadata->xShadowOffset;
+
+		pFont->SetColor(m_pMetadata->iShadowColour);
+		pFont->printfb((xfloat)xShadowRect.iLeft, (xfloat)xShadowRect.iTop, (xfloat)xShadowRect.Width(), (xfloat)xShadowRect.Height(), iAlign, pString);
+	}
+
+	pFont->SetColor(m_pMetadata->iColour);
+	pFont->printfb((xfloat)xRect.iLeft, (xfloat)xRect.iTop, (xfloat)xRect.Width(), (xfloat)xRect.Height(), iAlign, pString);
 }
 
 //##############################################################################

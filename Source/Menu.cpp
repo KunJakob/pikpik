@@ -241,9 +241,10 @@ void CMenuScreen::Load()
 	pWindow->SetMoveable(true);
 	pWindow->SetTitle("Window #1");
 
-	CButtonComponent* pButton = new CButtonComponent(_SPRITE("Test-Button"));
+	CButtonComponent* pButton = new CButtonComponent(_SPRITE("Test-Button"), _FONT("Test-Font"));
 	pButton->SetWidth(190);
 	pButton->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 5));
+	pButton->SetText("Continue");
 
 	CInputComponent* pInput = new CInputComponent(_SPRITE("Test-Input"), _FONT("Test-Font"));
 	pInput->SetWidth(190);

@@ -31,24 +31,27 @@
 // =============================================================================
 // Nat Ryall                                                         11-May-2008
 // =============================================================================
-CButtonComponent::CButtonComponent(CSpriteMetadata* pSprite, CLabelElement* pLabel) : CRowElement(ElementType_Button, pSprite),
+CButtonComponent::CButtonComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont) : CRowElement(ElementType_Button, pMetaSprite),
   m_iButtonState(ButtonState_Normal),
-  m_pLabel(pLabel),
+	m_pFont(NULL),
   m_fpOnClickCallback(NULL)
 {
-  m_pLeft[ButtonState_Normal]			= pSprite->FindArea("NormalLeft");
-	m_pLeft[ButtonState_Over]				= pSprite->FindArea("OverLeft");
-	m_pLeft[ButtonState_Down]				= pSprite->FindArea("DownLeft"); 
+  m_pLeft[ButtonState_Normal]			= pMetaSprite->FindArea("NormalLeft");
+	m_pLeft[ButtonState_Over]				= pMetaSprite->FindArea("OverLeft");
+	m_pLeft[ButtonState_Down]				= pMetaSprite->FindArea("DownLeft"); 
 
-  m_pCentre[ButtonState_Normal]		= pSprite->FindArea("NormalCentre"); 
-  m_pCentre[ButtonState_Over]			= pSprite->FindArea("OverCentre");
-  m_pCentre[ButtonState_Down]			= pSprite->FindArea("DownCentre"); 
+  m_pCentre[ButtonState_Normal]		= pMetaSprite->FindArea("NormalCentre"); 
+  m_pCentre[ButtonState_Over]			= pMetaSprite->FindArea("OverCentre");
+  m_pCentre[ButtonState_Down]			= pMetaSprite->FindArea("DownCentre"); 
 
-	m_pRight[ButtonState_Normal]		= pSprite->FindArea("NormalRight");
-	m_pRight[ButtonState_Over]			= pSprite->FindArea("OverRight"); 
-  m_pRight[ButtonState_Down]			= pSprite->FindArea("DownRight");
+	m_pRight[ButtonState_Normal]		= pMetaSprite->FindArea("NormalRight");
+	m_pRight[ButtonState_Over]			= pMetaSprite->FindArea("OverRight"); 
+  m_pRight[ButtonState_Down]			= pMetaSprite->FindArea("DownRight");
 
 	m_xFrameSize = xrect(m_pLeft[0]->xRect.Width(), 0, m_pRight[0]->xRect.Width(), 0);
+
+	if (pMetaFont)
+		m_pFont = new CFont(pMetaFont);
 }
 
 // =============================================================================
@@ -56,6 +59,8 @@ CButtonComponent::CButtonComponent(CSpriteMetadata* pSprite, CLabelElement* pLab
 // =============================================================================
 CButtonComponent::~CButtonComponent()
 {
+	if (m_pFont)
+		delete m_pFont;
 }
 
 // =============================================================================
@@ -65,8 +70,8 @@ void CButtonComponent::Render()
 {
   CRowElement::Render(m_pLeft[m_iButtonState]->xRect, m_pCentre[m_iButtonState]->xRect, m_pRight[m_iButtonState]->xRect);
 
-  //if (m_pLabel)
-  //  m_pFont->Render(m_xLabel.c_str(), GetPosition() + (XPOINT(Width(), GetHeight() - m_pFont->GetFontHeight()) / 2), HGETEXT_CENTER);  }
+  if (m_pFont)
+    m_pFont->Render(m_xText.c_str(), xrect(0, 0, GetSize()) + GetPosition(), HGETEXT_CENTER | HGETEXT_MIDDLE);
 }
 
 //##############################################################################
@@ -78,19 +83,19 @@ void CButtonComponent::Render()
 // =============================================================================
 // Nat Ryall                                                         12-May-2008
 // =============================================================================
-CInputComponent::CInputComponent(CSpriteMetadata* pSprite, CFontMetadata* pFont) : CRowElement(ElementType_Input, pSprite),
+CInputComponent::CInputComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont) : CRowElement(ElementType_Input, pMetaSprite),
 	m_bMasked(false),
 	m_iCharLimit(32),
 	m_iCharOffset(0),
 	m_iFlashTimer(0)
 {
-	m_pLeft = pSprite->FindArea("Left"); 
-	m_pCentre = pSprite->FindArea("Centre"); 
-	m_pRight = pSprite->FindArea("Right");
+	m_pLeft = pMetaSprite->FindArea("Left"); 
+	m_pCentre = pMetaSprite->FindArea("Centre"); 
+	m_pRight = pMetaSprite->FindArea("Right");
 
 	m_xFrameSize = xrect(m_pLeft->xRect.Width(), 0, m_pRight->xRect.Width(), 0);
 
-	m_pFont = new CFont(pFont);
+	m_pFont = new CFont(pMetaFont);
 }
 
 // =============================================================================
@@ -228,20 +233,20 @@ void CInputComponent::OnKeyChar(xchar cChar)
 // =============================================================================
 // Nat Ryall                                                         11-May-2008
 // =============================================================================
-CWindowComponent::CWindowComponent(CSpriteMetadata* pSprite, CFontMetadata* pFont) : CContainerElement(ElementType_Window, pSprite),
+CWindowComponent::CWindowComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont) : CContainerElement(ElementType_Window, pMetaSprite),
 	m_pFont(NULL),
 	m_bMoveable(false),
 	m_bDragging(false)
 {
-  m_pTL = pSprite->FindArea("TopLeft"); 
-  m_pTC = pSprite->FindArea("TopCentre"); 
-  m_pTR = pSprite->FindArea("TopRight"); 
-  m_pML = pSprite->FindArea("MiddleLeft"); 
-  m_pMC = pSprite->FindArea("MiddleCentre"); 
-  m_pMR = pSprite->FindArea("MiddleRight"); 
-  m_pBL = pSprite->FindArea("BottomLeft"); 
-  m_pBC = pSprite->FindArea("BottomCentre"); 
-  m_pBR = pSprite->FindArea("BottomRight");
+  m_pTL = pMetaSprite->FindArea("TopLeft"); 
+  m_pTC = pMetaSprite->FindArea("TopCentre"); 
+  m_pTR = pMetaSprite->FindArea("TopRight"); 
+  m_pML = pMetaSprite->FindArea("MiddleLeft"); 
+  m_pMC = pMetaSprite->FindArea("MiddleCentre"); 
+  m_pMR = pMetaSprite->FindArea("MiddleRight"); 
+  m_pBL = pMetaSprite->FindArea("BottomLeft"); 
+  m_pBC = pMetaSprite->FindArea("BottomCentre"); 
+  m_pBR = pMetaSprite->FindArea("BottomRight");
 
   m_xFrameSize = xrect
   (
@@ -251,8 +256,8 @@ CWindowComponent::CWindowComponent(CSpriteMetadata* pSprite, CFontMetadata* pFon
     m_pBC->xRect.Height()
   );
 
-	if (pFont)
-		m_pFont = new CFont(pFont);
+	if (pMetaFont)
+		m_pFont = new CFont(pMetaFont);
 }
 
 // =============================================================================
@@ -274,7 +279,7 @@ void CWindowComponent::Render()
 
 	// Render the window title.
 	if (m_pFont)
-		m_pFont->Render(m_xTitle.c_str(), GetPosition() + xpoint(m_xFrameSize.iLeft + 1, (m_xFrameSize.iTop - m_pFont->GetFontHeight()) / 2), HGETEXT_LEFT);
+		m_pFont->Render(m_xTitle.c_str(), xrect(m_xFrameSize.iLeft + 2, 0, m_xFrameSize.iLeft + m_iWidth, m_xFrameSize.iTop) + GetPosition(), HGETEXT_LEFT | HGETEXT_MIDDLE);
 }
 
 //##############################################################################
@@ -292,14 +297,14 @@ void CWindowComponent::Render()
 // =============================================================================
 // Nat Ryall                                                         13-May-2008
 // =============================================================================
-CCheckComponent::CCheckComponent(CSpriteMetadata* pSprite, CLabelComponent* pLabel) : CCheckElement(ElementType_Check, pSprite, pLabel),
+CCheckComponent::CCheckComponent(CSpriteMetadata* pMetaSprite, CLabelComponent* pLabel) : CCheckElement(ElementType_Check, pMetaSprite, pLabel),
 	m_iCheckState(CheckState_Normal)
 {
-	m_pBox[CheckState_Normal]		= pSprite->FindArea("Normal"); 
-	m_pBox[CheckState_Over]			= pSprite->FindArea("Over"); 
-	m_pBox[CheckState_Down]			= pSprite->FindArea("Down"); 
+	m_pBox[CheckState_Normal]		= pMetaSprite->FindArea("Normal"); 
+	m_pBox[CheckState_Over]			= pMetaSprite->FindArea("Over"); 
+	m_pBox[CheckState_Down]			= pMetaSprite->FindArea("Down"); 
 
-	m_pCheck = pSprite->FindArea("Check"); 
+	m_pCheck = pMetaSprite->FindArea("Check"); 
 }
 
 // =============================================================================

@@ -1251,10 +1251,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Media\Metadata\Menus.mta"
-				>
-			</File>
-			<File
 				RelativePath="..\Media\Metadata\Sprites.mta"
 				>
 			</File>
