@@ -276,7 +276,6 @@ void CMenuScreen::Load()
 	CProgressComponent* pProgress = new CProgressComponent(_SPRITE("Test-Progress"));
 	pProgress->SetWidth(190);
 	pProgress->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 155));
-	pProgress->SetProgress(0.8f);
 	
 	pWindow->Attach(pButton);
 	pWindow->Attach(pInput);
@@ -291,6 +290,10 @@ void CMenuScreen::Load()
 	pWindow->Attach(pProgress);
 
 	InterfaceManager.GetScreen()->Attach(pWindow);
+
+	m_pInput = pInput;
+	m_pCheck = pCheck;
+	m_pProgress = pProgress;
 }
 
 // =============================================================================
@@ -324,6 +327,10 @@ void CMenuScreen::Update()
 
   // Update the interface.
   InterfaceManager.Update();
+
+	// DEBUG.
+	m_pInput->SetMasked(m_pCheck->IsChecked());
+	m_pProgress->SetProgress(m_pProgress->GetProgress() + 0.00001f);
 }
 
 // =============================================================================

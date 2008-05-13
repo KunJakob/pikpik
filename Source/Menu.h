@@ -24,6 +24,7 @@
 #include <Background.h>
 #include <Font.h>
 #include <Interface.h>
+#include <Component.h>
 
 //##############################################################################
 #pragma endregion
@@ -214,6 +215,11 @@ protected:
 
 	// The currently active menu group.
 	t_MenuGroupIndex m_iMenuGroup;
+
+	// DEBUG
+	CInputComponent* m_pInput;
+	CCheckComponent* m_pCheck;
+	CProgressComponent* m_pProgress;
 };
 
 //##############################################################################
