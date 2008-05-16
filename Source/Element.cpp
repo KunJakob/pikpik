@@ -202,9 +202,8 @@ void CContainerElement::Render(xrect& xTL, xrect& xTC, xrect& xTR, xrect& xML, x
 // =============================================================================
 // Nat Ryall                                                          9-May-2008
 // =============================================================================
-CCheckElement::CCheckElement(t_ElementType iElementType, CSpriteMetadata* pSprite, CLabelElement* pLabel) : CInterfaceElement(iElementType),
+CCheckElement::CCheckElement(t_ElementType iElementType, CSpriteMetadata* pSprite) : CInterfaceElement(iElementType),
 	m_pSprite(NULL),
-	m_pLabel(pLabel),
 	m_bChecked(false)
 {
 	m_pSprite = new CBasicSprite(pSprite);

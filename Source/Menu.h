@@ -80,7 +80,7 @@ public:
 	friend CMenuScreen;
 
 	// Callbacks.
-	typedef void (*t_fpLinkSelectedCallback)();
+	typedef xfunction(0)<> t_fpLinkSelectedCallback;
 
 	/**
 	* Constructor.
@@ -197,10 +197,19 @@ public:
   */
   void SetMenuGroup(t_MenuGroupIndex iMenuGroup);
 
-  // The join window.
-  //CWindow* m_pJoinWindow;
-
 protected:
+	// Menu link actions.
+	void Callback_ShowMainMenu();
+	void Callback_ShowPlayMenu();
+	void Callback_ShowOnlineMenu();
+	void Callback_ShowJoinInterface();
+	void Callback_StartLobby();
+	void Callback_StartGame();
+	void Callback_QuitGame();
+
+	// Callback implementations.
+	void Debug_HideWindow(CButtonComponent* pButton, xpoint xOffset);
+
 	// The font metadata to render the links with.
 	CFontMetadata* m_pFont;
 
@@ -215,6 +224,9 @@ protected:
 
 	// The currently active menu group.
 	t_MenuGroupIndex m_iMenuGroup;
+
+	// The next screen to process.
+	t_ScreenIndex m_iNextScreen;
 
 	// DEBUG
 	CInputComponent* m_pInput;

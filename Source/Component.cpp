@@ -370,14 +370,19 @@ void CWindowComponent::Render()
 // =============================================================================
 // Nat Ryall                                                         13-May-2008
 // =============================================================================
-CCheckComponent::CCheckComponent(CSpriteMetadata* pMetaSprite, CLabelComponent* pLabel) : CCheckElement(ElementType_Check, pMetaSprite, pLabel),
-	m_iCheckState(CheckState_Normal)
+CCheckComponent::CCheckComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont) : CCheckElement(ElementType_Check, pMetaSprite),
+	m_iCheckState(CheckState_Normal),
+	m_pFont(NULL),
+	m_fpOnCheckCallback(NULL)
 {
 	m_pBox[CheckState_Normal]		= pMetaSprite->FindArea("Normal"); 
 	m_pBox[CheckState_Over]			= pMetaSprite->FindArea("Over"); 
 	m_pBox[CheckState_Down]			= pMetaSprite->FindArea("Down"); 
 
 	m_pCheck = pMetaSprite->FindArea("Check"); 
+
+	if (pMetaFont)
+		m_pFont = new CFont(pMetaFont);
 }
 
 // =============================================================================
@@ -385,6 +390,8 @@ CCheckComponent::CCheckComponent(CSpriteMetadata* pMetaSprite, CLabelComponent* 
 // =============================================================================
 CCheckComponent::~CCheckComponent()
 {
+	if (m_pFont)
+		delete m_pFont;
 }
 
 // =============================================================================
@@ -392,10 +399,29 @@ CCheckComponent::~CCheckComponent()
 // =============================================================================
 void CCheckComponent::Render()
 {
-	CCheckElement::Render(m_pBox[m_iCheckState]->xRect);
+	xrect xArea = m_pBox[m_iCheckState]->xRect;
+	CCheckElement::Render(xArea);
 
 	if (m_bChecked)
 		CCheckElement::Render(m_pCheck->xRect);
+
+	if (m_pFont)
+	{		
+		xint iX = xArea.Width() + (xArea.Width() / 2);
+		m_pFont->Render(m_xText.c_str(), xrect(iX, 0, iX + m_pFont->GetStringWidth(m_xText.c_str()), xArea.Height()) + GetPosition(), HGETEXT_LEFT | HGETEXT_MIDDLE);
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         16-May-2008
+// =============================================================================
+void CCheckComponent::OnMouseUp(xpoint xPosition)
+{
+	m_bChecked = !m_bChecked;
+	m_iCheckState = CheckState_Over;
+
+	if (m_fpOnCheckCallback)
+		m_fpOnCheckCallback(this, m_bChecked);
 }
 
 //##############################################################################
@@ -407,7 +433,7 @@ void CCheckComponent::Render()
 // =============================================================================
 // Nat Ryall                                                         13-May-2008
 // =============================================================================
-CRadioComponent::CRadioComponent(xint iRadioGroup, CSpriteMetadata* pSprite, CLabelComponent* pLabel) : CCheckComponent(pSprite, pLabel),
+CRadioComponent::CRadioComponent(xint iRadioGroup, CSpriteMetadata* pSprite, CFontMetadata* pFont) : CCheckComponent(pSprite, pFont),
 	m_iRadioGroup(iRadioGroup)
 {
 	m_iType = ElementType_Radio;

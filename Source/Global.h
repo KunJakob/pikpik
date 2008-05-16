@@ -151,6 +151,7 @@ typedef XLIST<CPlayer*> t_PlayerList;
 //
 //##############################################################################
 using namespace Xen;
+using namespace fastdelegate;
 
 //##############################################################################
 #pragma endregion

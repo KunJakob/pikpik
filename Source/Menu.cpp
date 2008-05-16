@@ -29,19 +29,6 @@
 //##############################################################################
 #pragma endregion
 
-#pragma region Static
-//##############################################################################
-//
-//                                   STATIC
-//
-//##############################################################################
-
-// The next screen to process.
-static t_ScreenIndex s_iNextScreen = ScreenIndex_Invalid;
-
-//##############################################################################
-#pragma endregion
-
 #pragma region Elements
 //##############################################################################
 //
@@ -99,73 +86,6 @@ void CMenuLink::RePosition(XUINT iElementIndex, XUINT iNumElements)
 //##############################################################################
 #pragma endregion
 
-#pragma region Callbacks
-//##############################################################################
-//
-//                                 CALLBACKS
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         27-Apr-2008
-// =============================================================================
-void Callback_ShowMainMenu()
-{
-  _GLOBAL.pMenu->SetMenuGroup(MenuGroupIndex_Main);
-}
-
-// =============================================================================
-// Nat Ryall                                                         27-Apr-2008
-// =============================================================================
-void Callback_ShowPlayMenu()
-{
-	_GLOBAL.pMenu->SetMenuGroup(MenuGroupIndex_Play);
-}
-
-// =============================================================================
-// Nat Ryall                                                         27-Apr-2008
-// =============================================================================
-void Callback_ShowOnlineMenu()
-{
-	_GLOBAL.pMenu->SetMenuGroup(MenuGroupIndex_Online);
-}
-
-// =============================================================================
-// Nat Ryall                                                          5-May-2008
-// =============================================================================
-void Callback_ShowJoinInterface()
-{
-  _GLOBAL.pMenu->SetMenuGroup(MenuGroupIndex_None);
-  //_GLOBAL.pMenu->m_pJoinWindow->SetVisible(true);
-}
-
-// =============================================================================
-// Nat Ryall                                                         27-Apr-2008
-// =============================================================================
-void Callback_StartLobby()
-{
-	s_iNextScreen = ScreenIndex_SplashScreen;
-}
-
-// =============================================================================
-// Nat Ryall                                                         13-Apr-2008
-// =============================================================================
-void Callback_StartGame()
-{
-	s_iNextScreen = ScreenIndex_GameScreen;
-}
-
-// =============================================================================
-// Nat Ryall                                                         13-Apr-2008
-// =============================================================================
-void Callback_QuitGame()
-{
-	_TERMINATE;
-}
-
-//##############################################################################
-#pragma endregion
-
 #pragma region Definition
 //##############################################################################
 //
@@ -196,19 +116,19 @@ void CMenuScreen::Load()
   CMenuLink* pLinkList[] = 
   {
     // Main.
-    new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Play Online",		&Callback_ShowOnlineMenu),
+		new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Play Online",		xbind(this, &CMenuScreen::Callback_ShowOnlineMenu)),
     new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Tutorial",	    NULL),
     new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Options",		    NULL),
     new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Credits",		    NULL),
-    new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Exit",			    &Callback_QuitGame),
+    new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Exit",			    xbind(this, &CMenuScreen::Callback_QuitGame)),
 
     // Play.
-    new CMenuLink(MenuGroupIndex_Play,		m_pFont, "Back",			    &Callback_ShowMainMenu),
+    new CMenuLink(MenuGroupIndex_Play,		m_pFont, "Back",			    xbind(this, &CMenuScreen::Callback_ShowMainMenu)),
 
     // Online.
-    new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Join",			    &Callback_ShowJoinInterface),
-    new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Create",		    &Callback_StartGame),
-    new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Back",			    &Callback_ShowMainMenu),
+    new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Join",			    xbind(this, &CMenuScreen::Callback_ShowJoinInterface)),
+    new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Create",				xbind(this, &CMenuScreen::Callback_StartGame)),
+    new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Back",			    xbind(this, &CMenuScreen::Callback_ShowMainMenu)),
   };
 
   for (XUINT iA = 0; iA < (sizeof(pLinkList) / sizeof(CMenuLink*)); ++iA)
@@ -232,7 +152,7 @@ void CMenuScreen::Load()
   SetMenuGroup(MenuGroupIndex_Main);
 
   // Initialise statics.
-  s_iNextScreen = ScreenIndex_Invalid;
+  m_iNextScreen = ScreenIndex_Invalid;
 
   // Interface.
 	CWindowComponent* pWindow = new CWindowComponent(_SPRITE("Test-Window"), _FONT("Test-WindowFont"));
@@ -244,34 +164,50 @@ void CMenuScreen::Load()
 	CButtonComponent* pButton = new CButtonComponent(_SPRITE("Test-Button"), _FONT("Test-Font"));
 	pButton->SetWidth(190);
 	pButton->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 5));
-	pButton->SetText("Continue");
+	pButton->SetText("Reset Position");
+	pButton->SetClickCallback(xbind(this, &CMenuScreen::Debug_HideWindow));
 
 	CInputComponent* pInput = new CInputComponent(_SPRITE("Test-Input"), _FONT("Test-Font"));
 	pInput->SetWidth(190);
 	pInput->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 35));
 	pInput->SetMasked(false);
 
-	CCheckComponent* pCheck = new CCheckComponent(_SPRITE("Test-Check"));
+	CCheckComponent* pCheck = new CCheckComponent(_SPRITE("Test-Check"), _FONT("Test-Font"));
 	pCheck->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 65));
+	pCheck->SetText("Mask Input");
 
 	CRadioComponent* pRadio[7] = 
 	{
-		new CRadioComponent(0, _SPRITE("Test-Radio")),
-		new CRadioComponent(0, _SPRITE("Test-Radio")),
-		new CRadioComponent(0, _SPRITE("Test-Radio")),
-		new CRadioComponent(0, _SPRITE("Test-Radio")),
-		new CRadioComponent(1, _SPRITE("Test-Radio")),
-		new CRadioComponent(1, _SPRITE("Test-Radio")),
-		new CRadioComponent(1, _SPRITE("Test-Radio")),
+		new CRadioComponent(0, _SPRITE("Test-Radio"), _FONT("Test-Font")),
+		new CRadioComponent(0, _SPRITE("Test-Radio"), _FONT("Test-Font")),
+		new CRadioComponent(0, _SPRITE("Test-Radio"), _FONT("Test-Font")),
+		new CRadioComponent(0, _SPRITE("Test-Radio"), _FONT("Test-Font")),
+		new CRadioComponent(1, _SPRITE("Test-Radio"), _FONT("Test-Font")),
+		new CRadioComponent(1, _SPRITE("Test-Radio"), _FONT("Test-Font")),
+		new CRadioComponent(1, _SPRITE("Test-Radio"), _FONT("Test-Font")),
 	};
 
 	pRadio[0]->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 95));
-	pRadio[1]->SetPosition(pWindow->GetInnerPosition() + xpoint(35, 95));
-	pRadio[2]->SetPosition(pWindow->GetInnerPosition() + xpoint(65, 95));
-	pRadio[3]->SetPosition(pWindow->GetInnerPosition() + xpoint(95, 95));
+	pRadio[0]->SetText("A1");
+
+	pRadio[1]->SetPosition(pWindow->GetInnerPosition() + xpoint(55, 95));
+	pRadio[1]->SetText("A2");
+
+	pRadio[2]->SetPosition(pWindow->GetInnerPosition() + xpoint(105, 95));
+	pRadio[2]->SetText("A3");
+
+	pRadio[3]->SetPosition(pWindow->GetInnerPosition() + xpoint(155, 95));
+	pRadio[3]->SetText("A4");
+
 	pRadio[4]->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 125));
-	pRadio[5]->SetPosition(pWindow->GetInnerPosition() + xpoint(35, 125));
-	pRadio[6]->SetPosition(pWindow->GetInnerPosition() + xpoint(65, 125));
+	pRadio[4]->SetText("B1");
+
+	pRadio[5]->SetPosition(pWindow->GetInnerPosition() + xpoint(55, 125));
+	pRadio[5]->SetText("B2");
+
+	pRadio[6]->SetPosition(pWindow->GetInnerPosition() + xpoint(105, 125));
+	pRadio[6]->SetText("B3");
+
 
 	CProgressComponent* pProgress = new CProgressComponent(_SPRITE("Test-Progress"));
 	pProgress->SetWidth(190);
@@ -316,21 +252,19 @@ void CMenuScreen::Update()
 		return;
 	}
 
-	if (s_iNextScreen != ScreenIndex_Invalid)
+	// Transition or update this screen.
+	if (m_iNextScreen != ScreenIndex_Invalid)
 	{
-		ScreenManager::Push(s_iNextScreen);
-		s_iNextScreen = ScreenIndex_Invalid;
+		ScreenManager::Push(m_iNextScreen);
+		m_iNextScreen = ScreenIndex_Invalid;
 	}
 
-	// Update the background.
 	m_pBackground->Update();
-
-  // Update the interface.
   InterfaceManager.Update();
 
 	// DEBUG.
 	m_pInput->SetMasked(m_pCheck->IsChecked());
-	m_pProgress->SetProgress(m_pProgress->GetProgress() + 0.00001f);
+	m_pProgress->SetProgress(m_pProgress->GetProgress() + 0.01f);
 }
 
 // =============================================================================
@@ -339,8 +273,6 @@ void CMenuScreen::Update()
 void CMenuScreen::Render()
 {
 	m_pBackground->Render();
-
-  // Render the interface.
   InterfaceManager.Render();
 }
 
@@ -362,6 +294,70 @@ void CMenuScreen::SetMenuGroup(t_MenuGroupIndex iMenuGroup)
   }
 
 	m_iMenuGroup = iMenuGroup;
+}
+
+// =============================================================================
+// Nat Ryall                                                         27-Apr-2008
+// =============================================================================
+void CMenuScreen::Callback_ShowMainMenu()
+{
+	SetMenuGroup(MenuGroupIndex_Main);
+}
+
+// =============================================================================
+// Nat Ryall                                                         27-Apr-2008
+// =============================================================================
+void CMenuScreen::Callback_ShowPlayMenu()
+{
+	SetMenuGroup(MenuGroupIndex_Play);
+}
+
+// =============================================================================
+// Nat Ryall                                                         27-Apr-2008
+// =============================================================================
+void CMenuScreen::Callback_ShowOnlineMenu()
+{
+	SetMenuGroup(MenuGroupIndex_Online);
+}
+
+// =============================================================================
+// Nat Ryall                                                          5-May-2008
+// =============================================================================
+void CMenuScreen::Callback_ShowJoinInterface()
+{
+	SetMenuGroup(MenuGroupIndex_None);
+}
+
+// =============================================================================
+// Nat Ryall                                                         27-Apr-2008
+// =============================================================================
+void CMenuScreen::Callback_StartLobby()
+{
+	m_iNextScreen = ScreenIndex_SplashScreen;
+}
+
+// =============================================================================
+// Nat Ryall                                                         13-Apr-2008
+// =============================================================================
+void CMenuScreen::Callback_StartGame()
+{
+	m_iNextScreen = ScreenIndex_GameScreen;
+}
+
+// =============================================================================
+// Nat Ryall                                                         13-Apr-2008
+// =============================================================================
+void CMenuScreen::Callback_QuitGame()
+{
+	_TERMINATE;
+}
+
+// =============================================================================
+// Nat Ryall                                                         16-May-2008
+// =============================================================================
+void CMenuScreen::Debug_HideWindow(CButtonComponent* pButton, xpoint xOffset)
+{
+	pButton->GetParent()->SetPosition(xpoint());
 }
 
 //##############################################################################

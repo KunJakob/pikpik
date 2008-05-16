@@ -337,16 +337,13 @@ public:
 
 protected:
 	// Internal constructor to prevent instantiation of this class.
-	CCheckElement(t_ElementType iElementType, CSpriteMetadata* pSprite, CLabelElement* pLabel);
+	CCheckElement(t_ElementType iElementType, CSpriteMetadata* pSprite);
 
 	// Render the element at the current position using the specified rect area.
 	void Render(xrect& xArea);
 
 	// The element sprite.
 	CBasicSprite* m_pSprite;
-
-	// The label element, can be NULL.
-	CLabelElement* m_pLabel;
 
 	// The element's checked status.
 	xbool m_bChecked;

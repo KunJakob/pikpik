@@ -68,7 +68,7 @@ class CButtonComponent : public CRowElement
 {
 public:
   // Callbacks.
-  typedef void (*t_OnClickCallback)(xpoint /*Offset*/);
+	typedef xfunction(2)<CButtonComponent* /*Button*/, xpoint /*Offset*/> t_OnClickCallback;
 
   // Initialise the button with the button image and label.
   CButtonComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont = NULL);
@@ -98,7 +98,7 @@ public:
 	}
 
   // Set the callback to execute if the button is clicked.
-  void SetClickCallback(t_OnClickCallback fpCallback)
+	void SetClickCallback(t_OnClickCallback fpCallback)
   {
     m_fpOnClickCallback = fpCallback;
   }
@@ -128,7 +128,7 @@ protected:
     m_iButtonState = ButtonState_Over;
 
     if (m_fpOnClickCallback)
-      m_fpOnClickCallback(InterfaceManager.GetMousePosition() - GetPosition());
+      m_fpOnClickCallback(this, InterfaceManager.GetMousePosition() - GetPosition());
   }
 
   // The button states.
@@ -409,8 +409,11 @@ class CListComponent : public CContainerElement
 class CCheckComponent : public CCheckElement
 {
 public:
+	// Callbacks
+	typedef xfunction(2)<CCheckComponent* /*Component*/, xbool /*Checked*/> t_OnCheckCallback;
+
 	// Initialise the element.
-	CCheckComponent(CSpriteMetadata* pMetaSprite, CLabelComponent* pLabel = NULL);
+	CCheckComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont = NULL);
 
 	// Deinitialise the element.
 	virtual ~CCheckComponent();
@@ -421,13 +424,34 @@ public:
 	// Get the width of the element.
 	virtual xint GetWidth()
 	{
-		return m_pBox[m_iCheckState]->xRect.Width();
+		if (m_pFont && m_xText.length())
+			return m_pBox[m_iCheckState]->xRect.Width() + (m_pBox[m_iCheckState]->xRect.Width() / 2) + m_pFont->GetStringWidth(GetText());
+		else
+			return m_pBox[m_iCheckState]->xRect.Width();
 	}
 
 	// Get the height of the element.
 	virtual xint GetHeight()
 	{
 		return m_pBox[m_iCheckState]->xRect.Height();
+	}
+
+	// Set the text string to render.
+	inline void SetText(const xchar* pString)
+	{
+		m_xText = pString;
+	}
+
+	// Get the text string to be rendered.
+	inline const xchar* GetText()
+	{
+		return m_xText.c_str();
+	}
+
+	// Set the on check, on uncheck callback.
+	inline void SetCheckCallback(t_OnCheckCallback fpCallback)
+	{
+		m_fpOnCheckCallback = fpCallback;
 	}
 
 protected:
@@ -450,11 +474,7 @@ protected:
 	}
 
 	// Triggered when the left mouse-button is released within the element area.
-	virtual void OnMouseUp(xpoint xPosition) 
-	{
-		m_bChecked = !m_bChecked;
-		m_iCheckState = CheckState_Over;
-	}
+	virtual void OnMouseUp(xpoint xPosition);
 
 	// The check states.
 	enum t_CheckState
@@ -471,6 +491,15 @@ protected:
 
 	// The internal check state.
 	t_CheckState m_iCheckState;
+
+	// The element font.
+	CFont* m_pFont;
+
+	// The element text string.
+	xstring m_xText;
+
+	// The callback to execute when the check component is checked or unchecked.
+	t_OnCheckCallback m_fpOnCheckCallback; 
 };
 
 //##############################################################################
@@ -482,7 +511,7 @@ class CRadioComponent : public CCheckComponent
 {
 public:
 	// Initialise the element.
-	CRadioComponent(xint iRadioGroup, CSpriteMetadata* pMetaSprite, CLabelComponent* pLabel = NULL);
+	CRadioComponent(xint iRadioGroup, CSpriteMetadata* pMetaSprite, CFontMetadata* pFont = NULL);
 
 	// Deinitialise the element.
 	virtual ~CRadioComponent();

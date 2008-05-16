@@ -10,4 +10,6 @@
 		.Text "Quit"
 		.OnClick "Close-Join"
 	}
+	
+	.
 }

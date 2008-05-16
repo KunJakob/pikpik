@@ -81,6 +81,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
   s_pInterface->System_SetState(HGE_SCREENHEIGHT, _SHEIGHT);
   s_pInterface->System_SetState(HGE_SCREENBPP, 32);
 	s_pInterface->System_SetState(HGE_SHOWSPLASH, false);
+	s_pInterface->System_SetState(HGE_FPS, 60);
 
   if(s_pInterface->System_Initiate())
 	{

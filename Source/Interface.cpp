@@ -37,13 +37,15 @@ CInterfaceManager::CInterfaceManager() :
 // =============================================================================
 CInterfaceManager::~CInterfaceManager()
 {
-  delete m_pScreen;
+	delete m_pScreen;
 
   for (xint iA = 0; iA < ElementType_Max; ++iA)
   {
     if (m_pCursor[iA])
       delete m_pCursor[iA];
   }
+
+	XEN_LIST_ERASE_ALL(m_lpElements);
 }
 
 // =============================================================================

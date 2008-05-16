@@ -437,6 +437,18 @@
 					RelativePath="..\Xen\Xen.h"
 					>
 				</File>
+				<Filter
+					Name="External"
+					>
+					<File
+						RelativePath="..\Xen\External\FastDelegate.h"
+						>
+					</File>
+					<File
+						RelativePath="..\Xen\External\FastDelegateBind.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="HGE"
@@ -1244,6 +1256,10 @@
 			>
 			<File
 				RelativePath="..\Media\Metadata\Font.mta"
+				>
+			</File>
+			<File
+				RelativePath="..\Media\Metadata\Interface.mta"
 				>
 			</File>
 			<File
