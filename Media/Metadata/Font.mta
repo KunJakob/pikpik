@@ -1,6 +1,3 @@
-// =============================================================================
-// Interface
-// =============================================================================
 .Font "Test-Font"
 {
 	.File "Font\Arial_11.fnt"
@@ -11,65 +8,4 @@
 {
 	.File "Font\Arial_11.fnt"
 	.Colour 255 255 255
-}
-
-// =============================================================================
-// Menu Screen
-// =============================================================================
-.Font "Menu-Item"
-{
-	.File "Font\ShowcardGothic_36.fnt"
-	.Shadow { .Offset 2 2 }
-}
-
-// =============================================================================
-// Selection Screen
-// =============================================================================
-.Font "Selection-Main"
-{
-	.File "Font\ShowcardGothic_36.fnt"
-	.Align "Centre"
-	.Colour 0 0 0
-	.Shadow 
-	{ 
-		.Colour 255 255 255 
-		.Offset 2 2 
-	}
-}
-
-.Font "Selection-Player"
-{
-	.File "Font\ShowcardGothic_36.fnt"
-	.Align "Centre"
-	.Colour 255 255 255
-	.Shadow 
-	{ 
-		.Colour 0 0 0 
-		.Offset 2 2 
-	}
-}
-
-.Font "Selection-Info"
-{
-	.File "Font\ShowcardGothic_36.fnt"
-	.Align "Centre"
-	.Scale 0.75
-	.Colour 250 215 145
-	.Shadow 
-	{ 
-		.Colour 0 0 0
-		.Offset 2 2 
-	}
-}
-
-.Font "Selection-Character"
-{
-	.File "Font\ShowcardGothic_36.fnt"
-	.Align "Centre"
-	.Colour 255 255 0
-	.Shadow 
-	{ 
-		.Colour 0 0 0
-		.Offset 2 2 
-	}
 }
