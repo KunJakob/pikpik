@@ -317,7 +317,7 @@ public:
   // Initialise the window using a specific graphic.
 	CWindowComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont = NULL);
 
-  // Deinitialise the button and clean up any memory.
+  // Deinitialise the window and clean up any memory.
   virtual ~CWindowComponent();
 
   // Render the button.
@@ -390,6 +390,54 @@ protected:
 
 	// Specifies if the container is being dragged.
 	xbool m_bDragging;
+};
+
+//##############################################################################
+//
+//                                 GROUP BOX
+//
+//##############################################################################
+class CGroupComponent : public CContainerElement
+{
+public:
+	// Initialise the element.
+	CGroupComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont = NULL);
+
+	// Deinitialise the element.
+	virtual ~CGroupComponent();
+
+	// Render the button.
+	virtual void Render();
+
+	// Set the group title text.
+	inline void SetTitle(const xchar* pTitle)
+	{
+		m_xTitle = pTitle;
+	}
+
+	// Get the current group title text.
+	inline const xchar* GetTitle()
+	{
+		return m_xTitle.c_str();
+	}
+
+protected:
+	// Element areas.
+	CSpriteMetadata::CArea* m_pTL;
+	CSpriteMetadata::CArea* m_pTC;
+	CSpriteMetadata::CArea* m_pTR;
+	CSpriteMetadata::CArea* m_pML;
+	CSpriteMetadata::CArea* m_pMC;
+	CSpriteMetadata::CArea* m_pMR;
+	CSpriteMetadata::CArea* m_pBL;
+	CSpriteMetadata::CArea* m_pBC;
+	CSpriteMetadata::CArea* m_pBR;
+
+	// The font for the group title.
+	CFont* m_pFont;
+
+	// The group title.
+	xstring m_xTitle;
 };
 
 //##############################################################################

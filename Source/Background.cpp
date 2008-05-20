@@ -55,9 +55,7 @@ void CBackgroundImage::Update()
 	if (m_iTimer > iScrollInterval)
 	{
 		m_iTimer %= iScrollInterval;
-
 		m_xOffset += xScrollVector;
-		//m_xOffset %= XPOINT(m_pSprite->GetImageWidth(), m_pSprite->GetImageHeight());
 
 		if (m_xOffset.iX < 0)
 			m_xOffset.iX += m_pSprite->GetImageWidth();
@@ -76,7 +74,7 @@ void CBackgroundImage::Update()
 // =============================================================================
 void CBackgroundImage::Render()
 {
-	m_pSprite->Render(m_xArea, XPOINT(), m_xOffset * -1, 1.f, 0.f);
+	m_pSprite->Render(m_xOffset * -1, m_xArea);
 }
 
 //##############################################################################

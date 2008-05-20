@@ -185,10 +185,10 @@ protected:
 	CRowElement(t_ElementType iElementType, CSpriteMetadata* pSprite);
 
 	// Render a control at the current position and current size using the specified rects for each tile.
-	void Render(xrect& xLeft, xrect& xCentre, xrect& xRight, xint iVertOffset = 0);
+	void Render(xrect& xLeft, xrect& xCentre, xrect& xRight, xpoint xOffset = xpoint());
 
 	// Render the centre section of the element by tiling the area repeatedly to fill the space.
-	void RenderCentre(xrect& xCentre, xint iWidth, xint iVertOffset = 0);
+	void RenderCentre(xrect xCentre, xint iWidth, xpoint xOffset = xpoint());
 
 	// The element sprite.
 	CBasicSprite* m_pSprite;

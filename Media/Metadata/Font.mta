@@ -10,6 +10,12 @@
 	.Colour 255 255 255
 }
 
+.Font "Test-GroupFont"
+{
+	.File "Font\Arial_11.fnt"
+	.Colour 0 70 213
+}
+
 .Font "Menu-Item"
 {
 	.File "Font\ShowcardGothic_36.fnt"

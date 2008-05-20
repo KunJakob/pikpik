@@ -308,9 +308,9 @@ void CMap::Render()
 
 		s_pTiles->Render
 		(
-			s_pTileAreas[m_xBlocks[iA].iType]->xRect, 
+			m_xBlocks[iA].GetScreenPosition() - m_xOffset, 
 			s_xCentrePoint, 
-			m_xBlocks[iA].GetScreenPosition() - m_xOffset,
+			s_pTileAreas[m_xBlocks[iA].iType]->xRect,
 			m_xBlocks[iA].fVisibility, 
 			(m_xBlocks[iA].fAngle / 180.0f) * M_PI
 		);

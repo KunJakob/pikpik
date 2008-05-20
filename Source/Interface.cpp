@@ -157,7 +157,7 @@ void CInterfaceManager::Render()
     if (m_pActiveElement && m_pCursor[m_pActiveElement->GetType()])
       pCursor = m_pCursor[m_pActiveElement->GetType()];
 
-    pCursor->Render(pCursor->GetImageRect(), m_xMousePos);
+    pCursor->Render(m_xMousePos);
   }
 }
 

@@ -58,6 +58,7 @@ enum t_ElementType
 	ElementType_Input,
 	ElementType_Progress,
   ElementType_Window,
+	ElementType_Group,
   ElementType_List,
   ElementType_Check,
   ElementType_Radio,

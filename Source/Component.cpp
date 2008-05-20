@@ -357,6 +357,68 @@ void CWindowComponent::Render()
 
 //##############################################################################
 //
+//                                 GROUP BOX
+//
+//##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                         20-May-2008
+// =============================================================================
+CGroupComponent::CGroupComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont) : CContainerElement(ElementType_Group, pMetaSprite),
+	m_pFont(NULL)
+{
+	m_pTL = pMetaSprite->FindArea("TopLeft"); 
+	m_pTC = pMetaSprite->FindArea("TopCentre"); 
+	m_pTR = pMetaSprite->FindArea("TopRight"); 
+	m_pML = pMetaSprite->FindArea("MiddleLeft"); 
+	m_pMC = pMetaSprite->FindArea("MiddleCentre"); 
+	m_pMR = pMetaSprite->FindArea("MiddleRight"); 
+	m_pBL = pMetaSprite->FindArea("BottomLeft"); 
+	m_pBC = pMetaSprite->FindArea("BottomCentre"); 
+	m_pBR = pMetaSprite->FindArea("BottomRight");
+
+	m_xFrameSize = xrect
+	(
+		m_pML->xRect.Width(),
+		m_pTC->xRect.Height(),
+		m_pMR->xRect.Width(),
+		m_pBC->xRect.Height()
+	);
+
+	if (pMetaFont)
+		m_pFont = new CFont(pMetaFont);
+}
+
+// =============================================================================
+// Nat Ryall                                                         20-May-2008
+// =============================================================================
+CGroupComponent::~CGroupComponent()
+{
+	if (m_pFont)
+		delete m_pFont;
+}
+
+// =============================================================================
+// Nat Ryall                                                         20-May-2008
+// =============================================================================
+void CGroupComponent::Render()
+{
+	// Render the container.
+	CContainerElement::Render(m_pTL->xRect, xrect(), m_pTR->xRect, m_pML->xRect, m_pMC->xRect, m_pMR->xRect, m_pBL->xRect, m_pBC->xRect, m_pBR->xRect);
+
+	if (m_pFont)
+	{
+		xint iTitleWidth = m_pFont->GetStringWidth(m_xTitle.c_str());
+		CRowElement::RenderCentre(m_pTC->xRect, m_pTC->xRect.Width() - iTitleWidth, xpoint(0, 0));
+	}
+
+	// Render the window title.
+	if (m_pFont)
+		m_pFont->Render(m_xTitle.c_str(), xrect(m_xFrameSize.iLeft + 2, 0, m_xFrameSize.iLeft + m_iWidth, m_xFrameSize.iTop) + GetPosition(), HGETEXT_LEFT | HGETEXT_MIDDLE);
+}
+
+//##############################################################################
+//
 //                                  LIST BOX
 //
 //##############################################################################

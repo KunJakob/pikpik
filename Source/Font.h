@@ -133,17 +133,17 @@ public:
 	/**
 	* Get the font height.
 	*/
-	XUINT GetFontHeight()
+	xint GetFontHeight()
 	{
-		return (XUINT)m_pMetadata->GetFont()->GetHeight();
+		return (xint)m_pMetadata->GetFont()->GetHeight();
 	}
 
 	/**
 	* Get the width of a string of characters using the specified font.
 	*/
-	XUINT GetStringWidth(const XCHAR* pString)
+	xint GetStringWidth(const XCHAR* pString)
 	{
-		return (XUINT)m_pMetadata->GetFont()->GetStringWidth(pString);
+		return (xint)m_pMetadata->GetFont()->GetStringWidth(pString);
 	}
 
 	/**

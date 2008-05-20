@@ -130,6 +130,21 @@
 	.Area "BottomRight"		{ .Size 61 75 3  3  }
 }
 
+.Sprite "Test-Group"
+{
+	.File "Surfaces\Test-Group.png"
+	
+	.Area "TopLeft"			{ .Rect 0  0  7  7  }
+	.Area "TopCentre"		{ .Rect 7  0  35 7  }
+	.Area "TopRight"		{ .Rect 35 0  42 7  }
+	.Area "MiddleLeft"		{ .Rect 0  7  7  35 }
+	.Area "MiddleCentre"	{ .Rect 7  7  35 35 }
+	.Area "MiddleRight"		{ .Rect 35 7  42 35 }
+	.Area "BottomLeft"		{ .Rect 0  35 7  42 }
+	.Area "BottomCentre"	{ .Rect 7  35 35 42 }
+	.Area "BottomRight"		{ .Rect 35 35 42 42 }
+}
+
 .Sprite "Test-Button"
 {
 	.File "Surfaces\Test-Button.png"

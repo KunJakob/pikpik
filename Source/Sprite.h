@@ -191,43 +191,48 @@ public:
 
 	/**
 	* Render the sprite with the specified attributes.
-	* @param xArea The coordinates within the image to render.
-	* @param xAnchor The area relative anchor point to use when positioning and rotating the sprite.
 	* @param xPosition The screen position to render at.
+	* @param xAnchor The area relative anchor point to use when positioning and rotating the sprite.
+	* @param xArea The coordinates within the image to render.
 	* @param fAlpha The alpha level between 0.0 and 1.0 to render the sprite at.
 	* @param fAngle The angle in radians to render at using the centre of the image as an anchor.
 	*/
-	void Render(XRECT xArea, XPOINT xAnchor, XPOINT xPosition, XFLOAT fAlpha, XFLOAT fAngle);
+	void Render(XPOINT xPosition, XPOINT xAnchor, XRECT xArea, XFLOAT fAlpha, XFLOAT fAngle);
 
   /**
   * Render the sprite with the specified attributes.
-  * @param xArea The coordinates within the image to render.
   * @param xAnchor The area relative anchor point to use when positioning and rotating the sprite.
   * @param xPosition The screen position to render at.
+	* @param xArea The coordinates within the image to render.
   */
-  void Render(XRECT xArea, XPOINT xAnchor, XPOINT xPosition)
+  inline void Render(XPOINT xPosition, XPOINT xAnchor, XRECT xArea)
   {
-    Render(xArea, xAnchor, xPosition, 1.f, 0.f);
-  }
-
-  /**
-  * Render the sprite with the specified attributes.
-  * @param xArea The coordinates within the image to render.
-  * @param xPosition The screen position to render at.
-  */
-  void Render(XRECT xArea, XPOINT xPosition)
-  {
-    Render(xArea, XPOINT(), xPosition, 1.f, 0.f);
+    Render(xPosition, xAnchor, xArea, 1.f, 0.f);
   }
 
   /**
   * Render the sprite with the specified attributes.
   * @param xPosition The screen position to render at.
+	* @param xArea The coordinates within the image to render.
   */
-  void Render(XPOINT xPosition)
+  inline void Render(XPOINT xPosition, XRECT xArea)
   {
-    Render(GetImageRect(), XPOINT(), xPosition, 1.f, 0.f);
+    Render(xPosition, XPOINT(), xArea, 1.f, 0.f);
   }
+
+  /**
+  * Render the sprite with the specified attributes.
+  * @param xPosition The screen position to render at.
+  */
+  inline void Render(XPOINT xPosition)
+  {
+    Render(xPosition, XPOINT(), GetImageRect(), 1.f, 0.f);
+  }
+
+	/**
+	* Render the sprite, tiling the image to the rect.
+	*/
+	//void RenderTiled(XPOINT xPosition, XPOINT xSize, XPOINT xAnchor, XRECT xArea, XFLOAT fAlpha);
 
 	/**
 	* Get the width of the entire sprite image.

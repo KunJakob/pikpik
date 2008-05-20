@@ -208,10 +208,14 @@ void CMenuScreen::Load()
 	pRadio[6]->SetPosition(pWindow->GetInnerPosition() + xpoint(105, 125));
 	pRadio[6]->SetText("B3");
 
-
 	CProgressComponent* pProgress = new CProgressComponent(_SPRITE("Test-Progress"));
 	pProgress->SetWidth(190);
 	pProgress->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 155));
+
+	CGroupComponent* pGroup = new CGroupComponent(_SPRITE("Test-Group"), _FONT("Test-GroupFont"));
+	pGroup->SetSize(190, 100);
+	pGroup->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 185));
+	pGroup->SetTitle("Connection Info");
 	
 	pWindow->Attach(pButton);
 	pWindow->Attach(pInput);
@@ -224,6 +228,7 @@ void CMenuScreen::Load()
 	pWindow->Attach(pRadio[5]);
 	pWindow->Attach(pRadio[6]);
 	pWindow->Attach(pProgress);
+	pWindow->Attach(pGroup);
 
 	InterfaceManager.GetScreen()->Attach(pWindow);
 
@@ -264,7 +269,7 @@ void CMenuScreen::Update()
 
 	// DEBUG.
 	m_pInput->SetMasked(m_pCheck->IsChecked());
-	m_pProgress->SetProgress(m_pProgress->GetProgress() + 0.01f);
+	m_pProgress->SetProgress(m_pProgress->GetProgress() + 0.001f);
 }
 
 // =============================================================================

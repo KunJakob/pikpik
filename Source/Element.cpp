@@ -79,7 +79,7 @@ CImageElement::~CImageElement()
 void CImageElement::Render()
 {
 	if (m_pArea)
-		m_pSprite->Render(m_pArea->xRect, GetPosition());
+		m_pSprite->Render(GetPosition(), m_pArea->xRect);
 	else
 		m_pSprite->Render(GetPosition());
 }
@@ -113,18 +113,21 @@ CRowElement::~CRowElement()
 // =============================================================================
 // Nat Ryall                                                         11-May-2008
 // =============================================================================
-void CRowElement::Render(xrect& xLeft, xrect& xCentre, xrect& xRight, xint iVertOffset)
+void CRowElement::Render(xrect& xLeft, xrect& xCentre, xrect& xRight, xpoint xOffset)
 {
-  m_pSprite->Render(xLeft, GetPosition() + xpoint(0, iVertOffset));
-  m_pSprite->Render(xRight, GetPosition() + xpoint(m_xFrameSize.iLeft + m_iWidth, iVertOffset));
+  m_pSprite->Render(GetPosition() + xOffset, xLeft);
+  m_pSprite->Render(GetPosition() + xOffset + xpoint(m_xFrameSize.iLeft + m_iWidth, 0), xRight);
 
-	RenderCentre(xCentre, m_iWidth, iVertOffset);
+	if (xCentre.Width())
+		RenderCentre(xCentre, m_iWidth, xOffset);
+
+	//m_pSprite->RenderTiled(GetPosition() + xOffset, xCentre, 1.f);
 }
 
 // =============================================================================
 // Nat Ryall                                                         13-May-2008
 // =============================================================================
-void CRowElement::RenderCentre(xrect& xCentre, xint iWidth, xint iVertOffset)
+void CRowElement::RenderCentre(xrect xCentre, xint iWidth, xpoint xOffset)
 {
 	for (xint iX = 0, iDrawWidth = 0; iX < iWidth; iX += iDrawWidth)
 	{
@@ -133,7 +136,7 @@ void CRowElement::RenderCentre(xrect& xCentre, xint iWidth, xint iVertOffset)
 		xrect xTileRect = xCentre;
 		xTileRect.iRight = xTileRect.iLeft + iDrawWidth;
 
-		m_pSprite->Render(xTileRect, GetPosition() + xpoint(m_xFrameSize.iLeft + iX, iVertOffset));
+		m_pSprite->Render(GetPosition() + xOffset + xpoint(m_xFrameSize.iLeft + iX, 0), xTileRect);
 	}
 }
 
@@ -166,29 +169,24 @@ CContainerElement::~CContainerElement()
 void CContainerElement::Render(xrect& xTL, xrect& xTC, xrect& xTR, xrect& xML, xrect& xMC, xrect& xMR, xrect& xBL, xrect& xBC, xrect& xBR)
 {
   // Top.
-  CRowElement::Render(xTL, xTC, xTR, 0);
+  CRowElement::Render(xTL, xTC, xTR);
 
   // Middle
   for (xint iY = 0, iDrawHeight = 0; iY < m_iHeight; iY += iDrawHeight)
   {
     iDrawHeight = Math::Clamp<xuint>(m_iHeight - iY, 0, xMC.Height());
 
-    xint iAreaBottom = xMC.iTop + iDrawHeight;
-
     xrect xLeft = xML;
-    xLeft.iBottom = iAreaBottom;
-
     xrect xCentre = xMC;
-    xCentre.iBottom = iAreaBottom;
+		xrect xRight = xMR;
 
-    xrect xRight = xMR;
-    xRight.iBottom = iAreaBottom;
+		xLeft.iBottom = xCentre.iBottom = xRight.iBottom = xMC.iTop + iDrawHeight;
 
-    CRowElement::Render(xLeft, xCentre, xRight, xTC.Height() + iY);
+    CRowElement::Render(xLeft, xCentre, xRight, xpoint(0, xTC.Height() + iY));
   }
 
   // Bottom.
-  CRowElement::Render(xBL, xBC, xBR, xTC.Height() + m_iHeight);
+  CRowElement::Render(xBL, xBC, xBR, xpoint(0, xTC.Height() + m_iHeight));
 }
 
 //##############################################################################
@@ -222,7 +220,7 @@ CCheckElement::~CCheckElement()
 // =============================================================================
 void CCheckElement::Render(xrect& xArea)
 {
-	m_pSprite->Render(xArea, GetPosition());
+	m_pSprite->Render(GetPosition(), xArea);
 }
 
 //##############################################################################

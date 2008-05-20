@@ -191,7 +191,7 @@ CSpriteMetadata::CAnimation* CSpriteMetadata::FindAnimation(const XCHAR* pName)
 // =============================================================================
 // Nat Ryall                                                         23-Apr-2008
 // =============================================================================
-void CBasicSprite::Render(XRECT xArea, XPOINT xAnchor, XPOINT xPosition, XFLOAT fAlpha, XFLOAT fAngle)
+void CBasicSprite::Render(XPOINT xPosition, XPOINT xAnchor, XRECT xArea, XFLOAT fAlpha, XFLOAT fAngle)
 {
 	hgeSprite* pSprite = m_pMetadata->GetSprite();
 
@@ -228,8 +228,7 @@ CSprite::CSprite(CSpriteMetadata* pMetadata) : CBasicSprite(pMetadata), CRendera
 // =============================================================================
 void CSprite::Render()
 {
-	XRECT xArea = m_pArea ? m_pArea->xRect : GetImageRect();
-	CBasicSprite::Render(xArea, m_xAnchor, m_xPosition, m_fAlpha, m_fAngle);
+	CBasicSprite::Render(m_xPosition, m_xAnchor, m_pArea ? m_pArea->xRect : GetImageRect(), m_fAlpha, m_fAngle);
 }
 
 //##############################################################################
