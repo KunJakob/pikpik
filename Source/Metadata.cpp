@@ -166,7 +166,7 @@ void CMetadata::UpdateTokenise()
   {
     m_iTokenOffset += 2;
 
-    while (m_pData[m_iTokenOffset] != '\n' && m_pData[m_iTokenOffset] != NULL)
+    while (m_pData[m_iTokenOffset] != NULL && m_pData[m_iTokenOffset] != '\n')
       m_iTokenOffset++;
 
     return;
@@ -176,7 +176,7 @@ void CMetadata::UpdateTokenise()
   XUINT iTokenStart = m_iTokenOffset;
   XBOOL bQuotes = false;
 
-  while ((bQuotes || !iswspace(m_pData[m_iTokenOffset])) && m_pData[m_iTokenOffset] != NULL)
+  while (m_pData[m_iTokenOffset] != NULL && (bQuotes || !iswspace(m_pData[m_iTokenOffset])))
   {
     if (m_pData[m_iTokenOffset] == '"')
     {
@@ -199,12 +199,12 @@ void CMetadata::UpdateTokenise()
     // Terminate the string and add it to the token list.
     m_pData[m_iTokenOffset] = NULL;
     m_lpTokens.push_back(&m_pData[iTokenStart]);
-
-    if (m_iTokenOffset == m_iFileSize)
-      m_iTask = ST_ParseTokens;
   }
   else
     m_iTokenOffset++;
+
+	if (m_iTokenOffset == m_iFileSize)
+		m_iTask = ST_ParseTokens;
 }
 
 // =============================================================================

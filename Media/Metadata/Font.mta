@@ -9,3 +9,9 @@
 	.File "Font\Arial_11.fnt"
 	.Colour 255 255 255
 }
+
+.Font "Menu-Item"
+{
+	.File "Font\ShowcardGothic_36.fnt"
+	.Shadow { .Offset 2 2 }
+}
