@@ -207,7 +207,7 @@ void CMenuScreen::Load()
 
 	pRadio[6]->SetPosition(pWindow->GetInnerPosition() + xpoint(105, 125));
 	pRadio[6]->SetText("B3");
-	pRadio[6]->m_pExtendedData = (void*)pRadio[5];
+	pRadio[6]->m_pExtendedData = (void*)"SECRET";
 
 	CProgressComponent* pProgress = new CProgressComponent(_SPRITE("Test-Progress"));
 	pProgress->SetWidth(190);
@@ -269,6 +269,15 @@ void CMenuScreen::Update()
   InterfaceManager.Update();
 
 	// DEBUG.
+	if (CRadioComponent* pRadio = CRadioComponent::GetChecked(1))
+	{
+		if (pRadio->m_pExtendedData && stricmp((const char*)pRadio->m_pExtendedData, "SECRET") == 0)
+		{
+			m_pInput->SetText("You found the SECRET!");
+			m_pCheck->SetChecked(false);
+		}
+	}
+
 	m_pInput->SetMasked(m_pCheck->IsChecked());
 	m_pProgress->SetProgress(m_pProgress->GetProgress() + 0.001f);
 }
