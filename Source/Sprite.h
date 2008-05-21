@@ -231,8 +231,46 @@ public:
 
 	/**
 	* Render the sprite, tiling the image to the rect.
+	* @param xPosition The screen position to render at.
+	* @param xSize The size of the area from the position to tile over.
+	* @param xAnchor The area relative anchor point to use when positioning and rotating the sprite.
+	* @param xArea The coordinates within the image to render.
+	* @param fAlpha The alpha level between 0.0 and 1.0 to render the sprite at.
 	*/
-	//void RenderTiled(XPOINT xPosition, XPOINT xSize, XPOINT xAnchor, XRECT xArea, XFLOAT fAlpha);
+	void RenderTiled(XPOINT xPosition, XPOINT xSize, XPOINT xAnchor, XRECT xArea, XFLOAT fAlpha);
+
+	/**
+	* Render the sprite, tiling the image to the rect.
+	* @param xPosition The screen position to render at.
+	* @param xSize The size of the area from the position to tile over.
+	* @param xAnchor The area relative anchor point to use when positioning and rotating the sprite.
+	* @param xArea The coordinates within the image to render.
+	*/
+	inline void RenderTiled(XPOINT xPosition, XPOINT xSize, XPOINT xAnchor, XRECT xArea)
+	{
+		RenderTiled(xPosition, xSize, xAnchor, xArea, 1.f);
+	}
+
+	/**
+	* Render the sprite, tiling the image to the rect.
+	* @param xPosition The screen position to render at.
+	* @param xSize The size of the area from the position to tile over.
+	* @param xArea The coordinates within the image to render.
+	*/
+	inline void RenderTiled(XPOINT xPosition, XPOINT xSize, XRECT xArea)
+	{
+		RenderTiled(xPosition, xSize, XPOINT(), xArea, 1.f);
+	}
+
+	/**
+	* Render the sprite, tiling the image to the rect.
+	* @param xPosition The screen position to render at.
+	* @param xSize The size of the area from the position to tile over.
+	*/
+	inline void RenderTiled(XPOINT xPosition, XPOINT xSize)
+	{
+		RenderTiled(xPosition, xSize, XPOINT(), GetImageRect(), 1.f);
+	}
 
 	/**
 	* Get the width of the entire sprite image.

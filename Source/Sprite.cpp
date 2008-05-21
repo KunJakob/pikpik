@@ -205,6 +205,39 @@ void CBasicSprite::Render(XPOINT xPosition, XPOINT xAnchor, XRECT xArea, XFLOAT 
 		pSprite->Render((float)xPosition.iX, (float)xPosition.iY);
 };
 
+// =============================================================================
+// Nat Ryall                                                         21-May-2008
+// =============================================================================
+void CBasicSprite::RenderTiled(XPOINT xPosition, XPOINT xSize, XPOINT xAnchor, XRECT xArea, XFLOAT fAlpha)
+{
+	xpoint xOffset;
+	xpoint xTile;
+
+	if (xSize.iY == 0)
+		xSize.iY = xArea.Height();
+
+	if (xSize.iX == 0)
+		xSize.iX = xArea.Width();
+
+	while (xOffset.iY < xSize.iY)
+	{
+		xTile.iY = Math::Clamp<xint>(xSize.iY - xOffset.iY, 0, xArea.Height());
+
+		while (xOffset.iX < xSize.iX)
+		{
+			xTile.iX = Math::Clamp<xint>(xSize.iX - xOffset.iX, 0, xArea.Width());
+
+			xrect xTileArea = xArea + xrect(0, 0, xTile.iX - xArea.Width(), xTile.iY - xArea.Height());
+			Render(xPosition + xOffset, xAnchor, xTileArea, fAlpha, 0.f);
+
+			xOffset.iX += xTile.iX;
+		}
+
+		xOffset.iX = 0;
+		xOffset.iY += xTile.iY;
+	}
+}
+
 //##############################################################################
 
 //##############################################################################

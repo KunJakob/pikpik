@@ -294,7 +294,7 @@ CProgressComponent::~CProgressComponent()
 void CProgressComponent::Render()
 {
 	CRowElement::Render(m_pL->xRect, m_pC->xRect, m_pR->xRect);
-	CRowElement::RenderCentre(m_pProgress->xRect, (xint)((xfloat)m_iWidth * m_fProgress));
+	m_pSprite->RenderTiled(GetPosition() + xpoint(m_xFrameSize.iLeft, 0), xpoint((xint)((xfloat)m_iWidth * m_fProgress), 0), m_pProgress->xRect);
 }
 
 //##############################################################################
@@ -404,17 +404,17 @@ CGroupComponent::~CGroupComponent()
 void CGroupComponent::Render()
 {
 	// Render the container.
-	CContainerElement::Render(m_pTL->xRect, xrect(), m_pTR->xRect, m_pML->xRect, m_pMC->xRect, m_pMR->xRect, m_pBL->xRect, m_pBC->xRect, m_pBR->xRect);
-
-	if (m_pFont)
-	{
-		xint iTitleWidth = m_pFont->GetStringWidth(m_xTitle.c_str());
-		CRowElement::RenderCentre(m_pTC->xRect, m_pTC->xRect.Width() - iTitleWidth, xpoint(0, 0));
-	}
+	CContainerElement::Render(m_pTL->xRect, m_pFont ? xrect() : m_pTC->xRect, m_pTR->xRect, m_pML->xRect, m_pMC->xRect, m_pMR->xRect, m_pBL->xRect, m_pBC->xRect, m_pBR->xRect);
 
 	// Render the window title.
 	if (m_pFont)
-		m_pFont->Render(m_xTitle.c_str(), xrect(m_xFrameSize.iLeft + 2, 0, m_xFrameSize.iLeft + m_iWidth, m_xFrameSize.iTop) + GetPosition(), HGETEXT_LEFT | HGETEXT_MIDDLE);
+	{
+		xint iTitleWidth = m_pFont->GetStringWidth(m_xTitle.c_str()) + 3;
+		xint iTitleHeight = max(m_xFrameSize.Height(), m_pFont->GetFontHeight()) / 2;
+
+		m_pFont->Render(m_xTitle.c_str(), GetPosition() + xpoint(m_xFrameSize.iLeft + 2, -iTitleHeight), HGETEXT_LEFT);
+		m_pSprite->RenderTiled(GetPosition() + xpoint(m_xFrameSize.iLeft + iTitleWidth, 0), xpoint(m_iWidth - iTitleWidth, 0), m_pTC->xRect);
+	}
 }
 
 //##############################################################################
