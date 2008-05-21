@@ -513,17 +513,32 @@ CRadioComponent::~CRadioComponent()
 // =============================================================================
 void CRadioComponent::OnMouseUp(xpoint xPosition)
 {
+	CRadioComponent* pRadio = GetChecked(m_iRadioGroup);
+
+	if (pRadio)
+		pRadio->SetChecked(false);
+	
+	m_bChecked = true;
+	m_iCheckState = CheckState_Over;
+}
+
+// =============================================================================
+// Nat Ryall                                                         21-May-2008
+// =============================================================================
+CRadioComponent* CRadioComponent::GetChecked(xint iRadioGroup)
+{
 	XEN_LIST_FOREACH(t_ElementList, ppElement, InterfaceManager.GetElementList())
 	{
 		if ((*ppElement)->GetType() == ElementType_Radio)
 		{
 			CRadioComponent* pRadio = (CRadioComponent*)*ppElement;
 
-			if (pRadio->GetRadioGroup() == m_iRadioGroup)
-				pRadio->SetChecked(false);
+			if (pRadio->GetRadioGroup() == iRadioGroup && pRadio->IsChecked())
+				return pRadio;
 		}
 	}
-		
-	m_bChecked = true;
-	m_iCheckState = CheckState_Over;
+
+	return NULL;
 }
+
+//##############################################################################

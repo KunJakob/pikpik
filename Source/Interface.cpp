@@ -263,6 +263,7 @@ void CInterfaceManager::RenderElement(CInterfaceElement* pElement)
 // Nat Ryall                                                         30-Apr-2008
 // =============================================================================
 CInterfaceElement::CInterfaceElement(t_ElementType iType) :
+	m_pExtendedData(NULL),
   m_pParent(NULL),
   m_iType(iType),
   m_bVisible(true),

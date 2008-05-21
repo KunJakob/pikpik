@@ -351,6 +351,9 @@ public:
 	// Bring the element to the front on the parent element.
 	void ToFront();
 
+	// Variable for holding custom data, bound to this object.
+	void* m_pExtendedData;
+
 protected:
   // Set the element type and initialise the element.
   CInterfaceElement(t_ElementType iType);

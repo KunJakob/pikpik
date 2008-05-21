@@ -570,6 +570,9 @@ public:
 		return m_iRadioGroup;
 	}
 
+	// Get the currently selected component for the specified radio group or NULL if no component is selected.
+	static CRadioComponent* GetChecked(xint iRadioGroup);
+
 protected:
 	// Triggered when the left mouse-button is released within the element area.
 	virtual void OnMouseUp(xpoint xPosition);

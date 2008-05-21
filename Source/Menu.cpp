@@ -207,6 +207,7 @@ void CMenuScreen::Load()
 
 	pRadio[6]->SetPosition(pWindow->GetInnerPosition() + xpoint(105, 125));
 	pRadio[6]->SetText("B3");
+	pRadio[6]->m_pExtendedData = (void*)pRadio[5];
 
 	CProgressComponent* pProgress = new CProgressComponent(_SPRITE("Test-Progress"));
 	pProgress->SetWidth(190);
