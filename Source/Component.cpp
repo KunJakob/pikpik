@@ -403,11 +403,13 @@ CGroupComponent::~CGroupComponent()
 // =============================================================================
 void CGroupComponent::Render()
 {
+	bool bTitle = m_pFont && m_xTitle.length();
+
 	// Render the container.
-	CContainerElement::Render(m_pTL->xRect, m_pFont ? xrect() : m_pTC->xRect, m_pTR->xRect, m_pML->xRect, m_pMC->xRect, m_pMR->xRect, m_pBL->xRect, m_pBC->xRect, m_pBR->xRect);
+	CContainerElement::Render(m_pTL->xRect, bTitle ? xrect() : m_pTC->xRect, m_pTR->xRect, m_pML->xRect, m_pMC->xRect, m_pMR->xRect, m_pBL->xRect, m_pBC->xRect, m_pBR->xRect);
 
 	// Render the window title.
-	if (m_pFont)
+	if (bTitle)
 	{
 		xint iTitleWidth = m_pFont->GetStringWidth(m_xTitle.c_str()) + 3;
 		xint iTitleHeight = max(m_xFrameSize.Height(), m_pFont->GetFontHeight()) / 2;
