@@ -77,8 +77,10 @@ void CPlayer::Update()
 		{
 			if (this == _GLOBAL.pActivePlayer)
 			{
+				// Check player input for all directions.
 				for (XUINT iA = 0; iA < AdjacentDir_Max; ++iA)
 				{
+					// If we can move, begin the transition to the next block.
 					if (_HGE->Input_GetKeyState(HGEK_LEFT + iA) && m_pCurrentBlock->pAdjacents[iA] && IsPassable(m_pCurrentBlock->pAdjacents[iA]))
 					{
 						m_pTargetBlock = m_pCurrentBlock->pAdjacents[iA];
@@ -87,6 +89,9 @@ void CPlayer::Update()
 						m_fTransition = 0.f;
 
 						SetState(PlayerState_Move);
+
+						// Don't waste a frame just checking input, move if we're going to move.
+						Update();
 					}
 				}
 			}
@@ -108,9 +113,6 @@ void CPlayer::Update()
 				m_pTargetBlock = NULL;
 
 				SetState(PlayerState_Idle);
-
-				// Update now so that if we wish to continue moving, we don't waste a frame checking input.
-				Update();
 			}
 		}
 		break;
