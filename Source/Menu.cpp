@@ -269,14 +269,14 @@ void CMenuScreen::Update()
   InterfaceManager.Update();
 
 	// DEBUG.
-	if (CRadioComponent* pRadio = CRadioComponent::GetChecked(1))
+	/*if (CRadioComponent* pRadio = CRadioComponent::GetChecked(1))
 	{
 		if (pRadio->m_pExtendedData && stricmp((const char*)pRadio->m_pExtendedData, "SECRET") == 0)
 		{
 			m_pInput->SetText("You found the SECRET!");
 			m_pCheck->SetChecked(false);
 		}
-	}
+	}*/
 
 	m_pInput->SetMasked(m_pCheck->IsChecked());
 	m_pProgress->SetProgress(m_pProgress->GetProgress() + 0.001f);

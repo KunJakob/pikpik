@@ -255,6 +255,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Source\Lobby.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Lobby.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\Main.cpp"
 				>
 			</File>

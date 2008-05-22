@@ -95,19 +95,22 @@ void CPlayer::Update()
 
 	case PlayerState_Move:
 		{
+			// Move the player along their path.
+			m_iTime = Math::Clamp<XUINT>(m_iTime + _TIMEDELTA, 0, m_iMoveTime);
+			m_fTransition = Math::Clamp((XFLOAT)m_iTime / (XFLOAT)m_iMoveTime, 0.f, 1.f);
+
+			m_pSprite->SetPosition(m_pCurrentBlock->GetScreenPosition() + (((m_pTargetBlock->GetScreenPosition() - m_pCurrentBlock->GetScreenPosition()) * m_iTime) / m_iMoveTime));
+			
+			// See if we have arrived at the next block.
 			if (m_pSprite->GetPosition() == m_pTargetBlock->GetScreenPosition())
 			{
 				m_pCurrentBlock = m_pTargetBlock;
 				m_pTargetBlock = NULL;
 
 				SetState(PlayerState_Idle);
-			}
-			else
-			{
-				m_iTime = Math::Clamp<XUINT>(m_iTime + _TIMEDELTA, 0, m_iMoveTime);
-				m_fTransition = Math::Clamp((XFLOAT)m_iTime / (XFLOAT)m_iMoveTime, 0.f, 1.f);
 
-				m_pSprite->SetPosition(m_pCurrentBlock->GetScreenPosition() + (((m_pTargetBlock->GetScreenPosition() - m_pCurrentBlock->GetScreenPosition()) * m_iTime) / m_iMoveTime));
+				// Update now so that if we wish to continue moving, we don't waste a frame checking input.
+				Update();
 			}
 		}
 		break;
