@@ -280,8 +280,7 @@ CAnimatedSprite::CAnimatedSprite(CSpriteMetadata* pMetadata) : CSprite(pMetadata
 	m_pAnimation(NULL),
 	m_bPlaying(false),
 	m_iFrameTimer(0),
-	m_fpEvent(NULL),
-	m_pEventData(NULL)
+	m_fpEvent(NULL)
 {
 }
 
@@ -325,7 +324,7 @@ void CAnimatedSprite::SetFrame(CSpriteMetadata::CFrame* pFrame)
 	m_pArea = m_pFrame->pArea;
 
 	if (m_pFrame->pEvent && m_fpEvent)
-		m_fpEvent(this, m_pFrame->pEvent, m_pEventData);
+		m_fpEvent(this, m_pFrame->pEvent);
 }
 
 // =============================================================================

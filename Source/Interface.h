@@ -77,11 +77,18 @@ typedef XLIST<CInterfaceElement*> t_ElementList;
 //                             INTERFACE MANAGER
 //
 //##############################################################################
-class CInterfaceManager : public Templates::CSingletonT<CInterfaceManager>
+class CInterfaceManager //: public Templates::CSingletonT<CInterfaceManager>
 {
 public:
 	// Friend.
 	friend CInterfaceElement;
+
+	// Singleton instance.
+	static inline CInterfaceManager& Get() 
+	{
+		static CInterfaceManager s_Instance;
+		return s_Instance;
+	}
 
   // Initialise the interface manager.
   CInterfaceManager();

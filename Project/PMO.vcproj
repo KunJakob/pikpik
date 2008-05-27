@@ -279,6 +279,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Source\Match.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Match.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\Menu.cpp"
 				>
 			</File>
@@ -295,6 +303,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Source\Play.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Play.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\Player.cpp"
 				>
 			</File>
@@ -303,11 +319,27 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Source\Power.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Power.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\Property.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\Source\Property.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Radar.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Radar.h"
 				>
 			</File>
 			<File
@@ -348,6 +380,14 @@
 			</File>
 			<File
 				RelativePath="..\Source\Sprite.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Trap.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Trap.h"
 				>
 			</File>
 		</Filter>

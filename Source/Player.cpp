@@ -53,7 +53,7 @@ CPlayer::CPlayer(t_PlayerType iType, const XCHAR* pSpriteName) : CRenderable(Ren
 	m_pSprite = new CAnimatedSprite(_SPRITE(pSpriteName));
 	m_pSprite->SetAnimation("Idle", true);
 	m_pSprite->SetAnchor(m_pSprite->GetAreaCentre());
-	m_pSprite->SetEventCallback(&OnAnimationEvent, this);
+	m_pSprite->SetEventCallback(xbind(this, &CPlayer::OnAnimationEvent));
 
 	SetName("Unknown");
 }
@@ -81,17 +81,20 @@ void CPlayer::Update()
 				for (XUINT iA = 0; iA < AdjacentDir_Max; ++iA)
 				{
 					// If we can move, begin the transition to the next block.
-					if (_HGE->Input_GetKeyState(HGEK_LEFT + iA) && m_pCurrentBlock->pAdjacents[iA] && IsPassable(m_pCurrentBlock->pAdjacents[iA]))
+					if (_HGE->Input_GetKeyState(HGEK_LEFT + iA))
 					{
-						m_pTargetBlock = m_pCurrentBlock->pAdjacents[iA];
-						m_iTransitionDir = (t_AdjacentDir)iA;
-						m_iTime = 0;
-						m_fTransition = 0.f;
+						if (!m_pCurrentBlock->pAdjacents[iA] || IsPassable(m_pCurrentBlock->pAdjacents[iA]))
+						{
+							m_pTargetBlock = m_pCurrentBlock->pAdjacents[iA];
+							m_iTransitionDir = (t_AdjacentDir)iA;
+							m_iTime = 0;
+							m_fTransition = 0.f;
 
-						SetState(PlayerState_Move);
+							SetState(m_pCurrentBlock->pAdjacents[iA] ? PlayerState_Move : PlayerState_Warp);
 
-						// Don't waste a frame just checking input, move if we're going to move.
-						Update();
+							// Don't waste a frame just checking input, move if we're going to move.
+							Update();
+						}
 					}
 				}
 			}
@@ -117,8 +120,18 @@ void CPlayer::Update()
 		}
 		break;
 
+	case PlayerState_Warp:
+		{
+			// Get a list of matching warp points.
+			// Randomise the list and pick one that isn't the one we're on.
+			// Teleport to the next warp point.
+		}
+		break;
+
 	case PlayerState_Die:
 		{
+			// Burst into particle dust, the ghost should keep moving.
+			// Restart the round.
 		}
 		break;
 	}
@@ -159,16 +172,14 @@ void CPlayer::SetState(t_PlayerState iState)
 // =============================================================================
 // Nat Ryall                                                         16-Apr-2008
 // =============================================================================
-void CPlayer::OnAnimationEvent(CAnimatedSprite* pSprite, const XCHAR* pEvent, void* pObject)
+void CPlayer::OnAnimationEvent(CAnimatedSprite* pSprite, const XCHAR* pEvent)
 {
-	CPlayer* pPlayer = (CPlayer*)pObject;
-
 	if (strcmp(pEvent, "Eat") == 0)
 	{
-		if (pPlayer->m_pTargetBlock)
+		if (m_pTargetBlock)
 		{
-			if (pPlayer->m_pTargetBlock->iType == TileType_Pellet || pPlayer->m_pTargetBlock->iType == TileType_Power)
-				pPlayer->m_pTargetBlock->iType = TileType_Eaten;
+			if (m_pTargetBlock->iType == TileType_Pellet || m_pTargetBlock->iType == TileType_Power)
+				m_pTargetBlock->iType = TileType_Eaten;
 		}
 	}
 }

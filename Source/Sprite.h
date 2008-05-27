@@ -493,7 +493,7 @@ class CAnimatedSprite : public CSprite
 {
 public:
 	// Callbacks.
-	typedef void (*t_AnimationEventCallback)(CAnimatedSprite* /*Sprite*/, const XCHAR* /*Event*/, void* /*EventData*/);
+	typedef xfunction(2)<CAnimatedSprite* /*Sprite*/, const XCHAR* /*Event*/> t_AnimationEventCallback;
 
 	/**
 	* Constructor.
@@ -630,10 +630,9 @@ public:
 	* Set the callback to be executed if any events are specified
 	* @param fpCallback Specify NULL to disable this callback.
 	*/
-	void SetEventCallback(t_AnimationEventCallback fpCallback, void* pEventData = NULL)
+	void SetEventCallback(t_AnimationEventCallback fpCallback)
 	{
 		m_fpEvent = fpCallback;
-		m_pEventData = pEventData;
 	}
 
 protected:
@@ -651,9 +650,6 @@ protected:
 
 	// The animation event callback.
 	t_AnimationEventCallback m_fpEvent;
-
-	// The custom animation event data to be passed to the callback.
-	void* m_pEventData;
 };
 
 ////##############################################################################

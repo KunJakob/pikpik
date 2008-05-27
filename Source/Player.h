@@ -30,6 +30,7 @@ enum t_PlayerState
 	PlayerState_None,
 	PlayerState_Idle,
 	PlayerState_Move,
+	PlayerState_Warp,
 	PlayerState_Die,
 };
 
@@ -125,7 +126,7 @@ protected:
 	/**
 	* Called when an animation event occurs.
 	*/
-	static void OnAnimationEvent(CAnimatedSprite* pSprite, const XCHAR* pEvent, void* pObject);
+	void OnAnimationEvent(CAnimatedSprite* pSprite, const XCHAR* pEvent);
 
 	// The type of the derived class.
 	t_PlayerType m_iType;

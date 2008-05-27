@@ -78,37 +78,36 @@ void WorldTransform(CRenderable* pRenderable)
 // =============================================================================
 // Nat Ryall                                                         29-Apr-2008
 // =============================================================================
-HTEXTURE GenerateFieldMask(XUINT iInnerRadius, XUINT iOuterRadius)
+HTEXTURE GenerateFieldMask(xint iInnerRadius, xint iOuterRadius)
 {
-  XUINT iRadiusDifference = iOuterRadius - iInnerRadius;
+  xint iRadiusDifference = iOuterRadius - iInnerRadius;
   
-  static XUINT s_iWidth = _SWIDTH;
-  static XUINT s_iHeight = _SHEIGHT;
-
-  static XPOINT s_xCentre = XPOINT(_HSWIDTH, _HSHEIGHT);
+  static xint s_iWidth = _SWIDTH;
+  static xint s_iHeight = _SHEIGHT;
+  static xpoint s_xCentre = xpoint(_HSWIDTH, _HSHEIGHT);
 
   HTEXTURE hFieldMask = _HGE->Texture_Create(s_iWidth, s_iHeight);
 
   DWORD* pTexMem = _HGE->Texture_Lock(hFieldMask, false);
   {
-    for (XUINT iY = 0; iY < s_iHeight; ++iY)
+    for (xint iY = 0; iY < s_iHeight; ++iY)
     {
-      for (XUINT iX = 0; iX < s_iWidth; ++iX)
+      for (xint iX = 0; iX < s_iWidth; ++iX)
       {
         DWORD* pPixel = &pTexMem[iX + (iY * s_iWidth)];
-        XUINT iAlpha = 255;
+        xint iAlpha = 255;
 
-        XPOINT xDistance = XPOINT(abs((int)iX - (int)s_xCentre.iX), abs((int)iY - (int)s_xCentre.iY));
+        xpoint xDistance = xpoint(abs(iX - s_xCentre.iX), abs(iY - s_xCentre.iY));
         xDistance *= xDistance;
 
-        XUINT iDistance = (XUINT)sqrt((XFLOAT)xDistance.iX + (XFLOAT)xDistance.iY);
+        xint iDistance = (xint)sqrt((xfloat)xDistance.iX + (xfloat)xDistance.iY);
 
         if (iDistance < iInnerRadius)
           iAlpha = 0;
         else if (iDistance < iOuterRadius)
           iAlpha = ((iDistance - iInnerRadius) * 255) / iRadiusDifference;
 
-        *pPixel = ARGB(Math::Clamp<XUINT>(iAlpha, 0, 255), 0, 0, 0);
+        *pPixel = ARGB(Math::Clamp<xint>(iAlpha, 0, 255), 0, 0, 0);
       }
     }
   }
@@ -132,7 +131,7 @@ HTEXTURE GenerateFieldMask(XUINT iInnerRadius, XUINT iOuterRadius)
 // =============================================================================
 void CGameScreen::Load()
 {
-	_GLOBAL.pActiveMap = new CMap(XFORMAT("M%03d", 4));
+	_GLOBAL.pActiveMap = new CMap(XFORMAT("M%03d", 3));
 
 	_GLOBAL.lpPlayers.push_back(new CPacMan(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_PacMan)));
 	_GLOBAL.lpPlayers.push_back(new CGhost(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_Ghost)));
@@ -172,12 +171,14 @@ void CGameScreen::Unload()
 // =============================================================================
 void CGameScreen::Update()
 {
+	// Exit the game.
 	if (_HGE->Input_KeyDown(HGEK_ESCAPE))
 	{
 		ScreenManager::Pop();
 		return;
 	}
 
+	// Switch between players.
 	if (_HGE->Input_KeyDown(HGEK_SPACE))
 	{
 		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, _GLOBAL.lpPlayers)
