@@ -116,7 +116,8 @@ void CMenuScreen::Load()
   CMenuLink* pLinkList[] = 
   {
     // Main.
-		new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Play Online",		xbind(this, &CMenuScreen::Callback_ShowOnlineMenu)),
+		new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Offline",				xbind(this, &CMenuScreen::Callback_StartGame)),
+		new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Online",				xbind(this, &CMenuScreen::Callback_ShowOnlineMenu)),
     new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Tutorial",	    NULL),
     new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Options",		    NULL),
     new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Credits",		    NULL),
@@ -126,8 +127,8 @@ void CMenuScreen::Load()
     new CMenuLink(MenuGroupIndex_Play,		m_pFont, "Back",			    xbind(this, &CMenuScreen::Callback_ShowMainMenu)),
 
     // Online.
-    new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Join",			    xbind(this, &CMenuScreen::Callback_ShowJoinInterface)),
-    new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Create",				xbind(this, &CMenuScreen::Callback_StartGame)),
+    new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Join Game",			NULL),
+    new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Create Game",		NULL),
     new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Back",			    xbind(this, &CMenuScreen::Callback_ShowMainMenu)),
   };
 
