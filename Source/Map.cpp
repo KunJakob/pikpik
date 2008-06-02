@@ -304,19 +304,19 @@ void CMap::AddVisiblePaths(CMapBlock* pBase, XFLOAT fVisibility)
 // =============================================================================
 void CMap::Render()
 {
-  xfloat fEnergy = _GLOBAL.fSpectrum * 0.1f;
-  
-  static xfloat fColours[3] = {1.f, 0.f, 0.f};
+  // Blend the colours based on the music energy.
+  static xfloat fColours[3] = {0.f, 1.f, 0.f};
   static xfloat* pLink[3] = {&fColours[0], &fColours[1], &fColours[2]};
   static xbool bUp[3] = {true, true, true};
 
   for (xint iA = 0; iA < 3; ++iA)
   {
-    xfloat fAmount = fEnergy * (iA + 1);
+    xfloat fChannelEnergy = _GLOBAL.fMusicEnergy * (iA + 1);
 
     if (bUp[iA])
     {
-      *pLink[iA] += fAmount;
+      *pLink[iA] += fChannelEnergy;
+      //bUp[iA] = (*pLink[iA] > 1.f);
 
       if (*pLink[iA] > 1.f)
       {
@@ -326,7 +326,8 @@ void CMap::Render()
     }
     else
     {
-      *pLink[iA] -= fAmount;
+      *pLink[iA] -= fChannelEnergy;
+      //bUp[iA] = (*pLink[iA] < 0.f);
 
       if (*pLink[iA] < 0.f)
       {
@@ -334,11 +335,11 @@ void CMap::Render()
         bUp[iA] = true;
       }
     }
+
+    //*pLink[iA] = Math::Clamp(*pLink[iA], 0.f, 1.f);
   }
 
-
-
-
+  // Draw the map.
 	for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
 	{
 		static XPOINT s_xCentrePoint = XPOINT(24, 24);

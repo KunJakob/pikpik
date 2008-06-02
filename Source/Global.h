@@ -192,7 +192,7 @@ public:
 	CPlayer* pActivePlayer;
 
 	// The music spectrum range 0.f to 1.f.
-	xfloat fSpectrum;
+	xfloat fMusicEnergy;
 };
 
 //##############################################################################

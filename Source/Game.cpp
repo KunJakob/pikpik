@@ -132,17 +132,17 @@ xfloat GetSpectrumValue(FMOD::Channel* pChannel)
 
 	for (xint iA = 0; iA < 64; ++iA)
 	{
-		if (fSpectrum[iA] > fMax)
-			fMax = fSpectrum[iA];
+	if (fSpectrum[iA] > fMax)
+	fMax = fSpectrum[iA];
 	}
 
 	xfloat fNormalise = 1.f / fMax;
 
 	for (xint iA = 0; iA < 64; ++iA)
-		fSpectrum[iA] *= fNormalise;
+	fSpectrum[iA] *= fNormalise;
 
 	for (xint iA = 0; iA < 64; ++iA)
-		fAverage += fSpectrum[iA];*/
+	fAverage += fSpectrum[iA];*/
 
 	//xfloat fValue = (fFrequency / 2.f) / 64.f;
 
@@ -188,7 +188,7 @@ void CGameScreen::Load()
 	m_pFieldMask = new hgeSprite(GenerateFieldMask(48 * 1, 48 * 5), 0, 0, _SWIDTH, _SHEIGHT);
 
 	// Start the game music.
-	_GLOBAL.fSpectrum = 0.f;
+	_GLOBAL.fMusicEnergy = 0.f;
 
 	_FMOD->createStream("Audio\\Level-Test.mp3", FMOD_SOFTWARE, 0, &m_pMusic);
 	_FMOD->playSound(FMOD_CHANNEL_FREE, m_pMusic, false, &m_pChannel);
@@ -245,7 +245,7 @@ void CGameScreen::Update()
 
 	// Calculate the spectrum value.
 	//_GLOBAL.fSpectrum = GetSpectrumValue(m_pChannel);
-	XLOG("[CGameScreen] Spectrum: %f", _GLOBAL.fSpectrum);
+	XLOG("[CGameScreen] Spectrum: %f", _GLOBAL.fMusicEnergy);
 }
 
 // =============================================================================
@@ -257,43 +257,56 @@ void CGameScreen::Render()
 		m_pFieldMask->Render(0, 0);
 
 	// Spectrum analysis.
-#define SACCURACY 2048
-#define SHACCURACY 32
+	const static xint s_iIterations = 2048;
+	const static xint s_iSearch = 8;
 
-	xfloat fSpectrumL[SACCURACY];
-	m_pChannel->getSpectrum(fSpectrumL, SACCURACY, 0, FMOD_DSP_FFT_WINDOW_HANNING);
-	xfloat fSpectrumR[SACCURACY];
-	m_pChannel->getSpectrum(fSpectrumR, SACCURACY, 1, FMOD_DSP_FFT_WINDOW_HANNING);
+	xfloat fSpectrum[2][s_iIterations];
 
-	xfloat fSpectrum[SHACCURACY];
-	
-	for (xint iA = 0; iA < SHACCURACY; ++iA)
-		fSpectrum[iA] = fSpectrumL[iA] + fSpectrumR[iA];
+	m_pChannel->getSpectrum(fSpectrum[0], s_iIterations, 0, FMOD_DSP_FFT_WINDOW_HANNING);
+	m_pChannel->getSpectrum(fSpectrum[1], s_iIterations, 1, FMOD_DSP_FFT_WINDOW_HANNING);
 
-	xfloat fX = 10.f, fY = 10.f;
-	xfloat fAverage = 0.f;
-	xfloat fCount = 0.f;
+	xfloat fStrength[s_iSearch];
 
-	for (xint iA = 0; iA < SHACCURACY; ++iA)
+	for (xint iA = 0; iA < s_iSearch; ++iA)
+		fStrength[iA] = fSpectrum[0][iA] + fSpectrum[1][iA];
+
+	xfloat fAverageStrength = 0.f;
+
+	for (xint iA = 4; iA < s_iSearch; ++iA)
+		fAverageStrength += fStrength[iA];
+
+	fAverageStrength /= 4.f;
+
+	_GLOBAL.fMusicEnergy = fAverageStrength * 0.1f;
+
+	// Draw the beat-spectrum.
+	xfloat fX = 0.f;
+
+	for (xint iA = 4; iA < s_iSearch; ++iA)
 	{
-		xfloat fDistance = fSpectrum[iA] * 200.f;
-		
-		for (xint iB = 0; iB < 10; ++iB)
+		for (xint iB = 0; iB < 8; ++iB)
 		{
-			_HGE->Gfx_RenderLine(fX, fY + 100.f, fX, fY + (100.f - fDistance), 0xFFFF00FF);
+			_HGE->Gfx_RenderLine(fX, 0.f, fX, fStrength[iA] * 200.f, 0xFFFF00FF);
 			fX += 1.f;
-		}
-
-		if ((fSpectrum[iA] * 5.f) > 0.3f && (fSpectrum[iA] * 5.f) < 0.7f)
-		{
-			fAverage += fSpectrum[iA];
-			fCount += 1.f;
 		}
 
 		fX += 1.f;
 	}
 
-	_GLOBAL.fSpectrum = fSpectrum[5];
+	/*xfloat fWaveDataL[s_iIterations];
+	m_pChannel->getWaveData(fWaveDataL, s_iIterations, 0);
+	xfloat fWaveDataR[s_iIterations];
+	m_pChannel->getWaveData(fWaveDataR, s_iIterations, 1);
+
+	xfloat fEnergy = 0.f;
+
+	for (xint iA = 1; iA < s_iIterations; ++iA)
+	fEnergy += abs(fWaveDataL[iA] - fWaveDataL[iA - 1]);// + abs(fWaveDataR[iA]);
+
+	fEnergy /= s_iIterations;
+	_GLOBAL.fMusicEnergy = fEnergy * 0.25f;//Math::Clamp(fEnergy - 0.2f, 0.0f, 0.8f) * 0.1f;
+
+	_HGE->Gfx_RenderLine(10.f, 10.f, 10.f, 10.f + (fEnergy * 100.f), 0xFFFFFFFF);*/
 }
 
 //##############################################################################
