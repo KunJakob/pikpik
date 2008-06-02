@@ -316,27 +316,15 @@ void CMap::Render()
     if (bUp[iA])
     {
       *pLink[iA] += fChannelEnergy;
-      //bUp[iA] = (*pLink[iA] > 1.f);
-
-      if (*pLink[iA] > 1.f)
-      {
-        *pLink[iA] = 1.f;
-        bUp[iA] = false;
-      }
+      bUp[iA] = !(*pLink[iA] > 1.f);
     }
     else
     {
       *pLink[iA] -= fChannelEnergy;
-      //bUp[iA] = (*pLink[iA] < 0.f);
-
-      if (*pLink[iA] < 0.f)
-      {
-        *pLink[iA] = 0.f;
-        bUp[iA] = true;
-      }
+      bUp[iA] = (*pLink[iA] < 0.f);
     }
 
-    //*pLink[iA] = Math::Clamp(*pLink[iA], 0.f, 1.f);
+    *pLink[iA] = Math::Clamp(*pLink[iA], 0.f, 1.f);
   }
 
   // Draw the map.
@@ -344,10 +332,10 @@ void CMap::Render()
 	{
 		static XPOINT s_xCentrePoint = XPOINT(24, 24);
 
-		if (m_xBlocks[iA].IsWall())
+		if (m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsBase())
 			s_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, fColours[0], fColours[1], fColours[2]));
 		else
-			s_pTiles->GetMetadata()->GetSprite()->SetColor(0xFFFFFFFF);
+			s_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, 1.f - fColours[0], 1.f - fColours[1], 1.f - fColours[2]));
 
 		s_pTiles->Render
 		(

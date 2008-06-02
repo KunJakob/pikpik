@@ -242,10 +242,6 @@ void CGameScreen::Update()
 
 	// Calculate the map offset.
 	s_xOffset = _GLOBAL.pActivePlayer->GetSprite()->GetPosition() - XPOINT(_HSWIDTH, _HSHEIGHT);
-
-	// Calculate the spectrum value.
-	//_GLOBAL.fSpectrum = GetSpectrumValue(m_pChannel);
-	XLOG("[CGameScreen] Spectrum: %f", _GLOBAL.fMusicEnergy);
 }
 
 // =============================================================================
@@ -286,27 +282,12 @@ void CGameScreen::Render()
 	{
 		for (xint iB = 0; iB < 8; ++iB)
 		{
-			_HGE->Gfx_RenderLine(fX, 0.f, fX, fStrength[iA] * 200.f, 0xFFFF00FF);
+			_HGE->Gfx_RenderLine(fX, 0.f, fX, fStrength[iA] * 200.f, 0xFF333333);
 			fX += 1.f;
 		}
 
 		fX += 1.f;
 	}
-
-	/*xfloat fWaveDataL[s_iIterations];
-	m_pChannel->getWaveData(fWaveDataL, s_iIterations, 0);
-	xfloat fWaveDataR[s_iIterations];
-	m_pChannel->getWaveData(fWaveDataR, s_iIterations, 1);
-
-	xfloat fEnergy = 0.f;
-
-	for (xint iA = 1; iA < s_iIterations; ++iA)
-	fEnergy += abs(fWaveDataL[iA] - fWaveDataL[iA - 1]);// + abs(fWaveDataR[iA]);
-
-	fEnergy /= s_iIterations;
-	_GLOBAL.fMusicEnergy = fEnergy * 0.25f;//Math::Clamp(fEnergy - 0.2f, 0.0f, 0.8f) * 0.1f;
-
-	_HGE->Gfx_RenderLine(10.f, 10.f, 10.f, 10.f + (fEnergy * 100.f), 0xFFFFFFFF);*/
 }
 
 //##############################################################################
