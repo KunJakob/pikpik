@@ -258,7 +258,7 @@ void CGameScreen::Render()
 
 	// Spectrum analysis.
 #define SACCURACY 2048
-#define SHACCURACY 28
+#define SHACCURACY 32
 
 	xfloat fSpectrumL[SACCURACY];
 	m_pChannel->getSpectrum(fSpectrumL, SACCURACY, 0, FMOD_DSP_FFT_WINDOW_HANNING);
@@ -280,7 +280,7 @@ void CGameScreen::Render()
 		
 		for (xint iB = 0; iB < 10; ++iB)
 		{
-			//_HGE->Gfx_RenderLine(fX, fY + 100.f, fX, fY + (100.f - fDistance), 0xFFFF00FF);
+			_HGE->Gfx_RenderLine(fX, fY + 100.f, fX, fY + (100.f - fDistance), 0xFFFF00FF);
 			fX += 1.f;
 		}
 

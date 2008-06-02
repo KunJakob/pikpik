@@ -304,15 +304,47 @@ void CMap::AddVisiblePaths(CMapBlock* pBase, XFLOAT fVisibility)
 // =============================================================================
 void CMap::Render()
 {
+  xfloat fEnergy = _GLOBAL.fSpectrum * 0.1f;
+  
+  static xfloat fColours[3] = {1.f, 0.f, 0.f};
+  static xfloat* pLink[3] = {&fColours[0], &fColours[1], &fColours[2]};
+  static xbool bUp[3] = {true, true, true};
+
+  for (xint iA = 0; iA < 3; ++iA)
+  {
+    xfloat fAmount = fEnergy * (iA + 1);
+
+    if (bUp[iA])
+    {
+      *pLink[iA] += fAmount;
+
+      if (*pLink[iA] > 1.f)
+      {
+        *pLink[iA] = 1.f;
+        bUp[iA] = false;
+      }
+    }
+    else
+    {
+      *pLink[iA] -= fAmount;
+
+      if (*pLink[iA] < 0.f)
+      {
+        *pLink[iA] = 0.f;
+        bUp[iA] = true;
+      }
+    }
+  }
+
+
+
+
 	for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
 	{
 		static XPOINT s_xCentrePoint = XPOINT(24, 24);
 
 		if (m_xBlocks[iA].IsWall())
-		{
-			xfloat fColourStrength = (_GLOBAL.fSpectrum * .85f) + .15f;
-			s_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, fColourStrength, fColourStrength, fColourStrength));
-		}
+			s_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, fColours[0], fColours[1], fColours[2]));
 		else
 			s_pTiles->GetMetadata()->GetSprite()->SetColor(0xFFFFFFFF);
 
