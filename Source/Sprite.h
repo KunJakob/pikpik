@@ -5,7 +5,7 @@
 * @author Nat Ryall
 * @date 10/02/2008
 *
-*	Sprites are management objects for specific 2D images that can be rendered
+* Sprites are management objects for specific 2D images that can be rendered
 * to the screen with various parameters. Sprites are based off of sprite
 * metadata that is loaded and parsed in the ResourceManager.
 *

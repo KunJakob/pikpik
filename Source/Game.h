@@ -54,8 +54,12 @@ protected:
 	// The map background.
 	CBackground m_Background;
 
-  // The field mask.
-  hgeSprite* m_pFieldMask;
+	// The field mask.
+	hgeSprite* m_pFieldMask;
+
+	// The background music.
+	FMOD::Sound* m_pMusic;
+	FMOD::Channel* m_pChannel;
 };
 
 //##############################################################################

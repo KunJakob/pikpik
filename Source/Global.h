@@ -18,6 +18,9 @@
 // Main.
 #include <Main.h>
 
+// Tools.
+#include <Tools.h>
+
 // Xen.
 #include <Xen/Xen.h>
 
@@ -36,6 +39,9 @@
 #include <HGE/hgestrings.h>
 #include <HGE/hgevector.h>
 
+// FMOD.
+#include <FMOD/fmod.hpp>
+
 // Standard Lib.
 #include <list>
 #include <vector>
@@ -51,28 +57,29 @@
 //##############################################################################
 
 // Screen options.
-#define _SWIDTH         800
-#define _SHEIGHT        600
-#define _HSWIDTH        400
-#define _HSHEIGHT       300
+#define _SWIDTH				800
+#define _SHEIGHT			600
+#define _HSWIDTH			400
+#define _HSHEIGHT			300
 
 // Game options.
 #define _MAXPLAYERS			5
 #define _MAXNAMELEN			15
 
 // Shortcuts.
-#define _GLOBAL					CGlobal::Get()
-#define _HGE						Application::GetInterface()
+#define _GLOBAL				CGlobal::Get()
+#define _HGE				Application::GetInterface()
+#define _FMOD				Application::GetSoundSystem()
 #define _TERMINATE			Application::Terminate()
 #define _TIMEDELTA			Application::GetTimeDelta()
 #define _TIMEDELTAF			_HGE->Timer_GetDelta()
 
 // Colour manipulations.
 #define COLOURF(COLF) \
-				(xuchar)(COLF * 255.0f)
+		(xuchar)((COLF) * 255.f)
 
 #define ARGBF(A, R, G, B) \
-				ARGB(COLOURF(A), COLOURF(R), COLOURF(G), COLOURF(B))
+		ARGB(COLOURF(A), COLOURF(R), COLOURF(G), COLOURF(B))
 
 //##############################################################################
 #pragma endregion
@@ -103,7 +110,7 @@ enum t_PlayerType
 enum t_ScreenIndex
 {
 	ScreenIndex_Invalid,
-  ScreenIndex_SplashScreen,
+	ScreenIndex_SplashScreen,
 	ScreenIndex_MenuScreen,
 	ScreenIndex_GameScreen,
 	ScreenIndex_SelectionScreen,
@@ -114,14 +121,14 @@ enum t_ScreenIndex
 enum t_LayerIndex
 {
 	// Menu.
-	LayerIndex_Background		= 0,
-	LayerIndex_Elements			= 1,
+	LayerIndex_Background			= 0,
+	LayerIndex_Elements				= 1,
 
 	// Game.
 	LayerIndex_Map					= 0,
 	LayerIndex_Items				= 1,
 	LayerIndex_Player				= 2,
-	LayerIndex_Effects			= 3,
+	LayerIndex_Effects				= 3,
 	LayerIndex_Radar				= 4,
 };
 
@@ -133,7 +140,7 @@ enum t_RenderableType
 	RenderableType_Map,
 	RenderableType_Player,
 	RenderableType_Text,
-  RenderableType_Dialog,
+	RenderableType_Dialog,
 };
 
 // Common list types.
@@ -162,11 +169,18 @@ using namespace fastdelegate;
 //                                   GLOBAL
 //
 //##############################################################################
-class CGlobal : public Templates::CSingletonT<CGlobal>
+class CGlobal
 {
 public:
-  // The menu class.
-  CMenuScreen* pMenu;
+	// Singleton instance.
+	static inline CGlobal& Get() 
+	{
+		static CGlobal s_Instance;
+		return s_Instance;
+	}
+
+	// The menu class.
+	CMenuScreen* pMenu;
     
 	// The currently active map.
 	CMap* pActiveMap;
@@ -176,6 +190,9 @@ public:
 
 	// The currently active player on the local machine.
 	CPlayer* pActivePlayer;
+
+	// The music spectrum range 0.f to 1.f.
+	xfloat fSpectrum;
 };
 
 //##############################################################################

@@ -11,12 +11,10 @@
 // Local.
 #include <Main.h>
 
-// Screens.
+// Other.
 #include <Splash.h>
 #include <Menu.h>
 #include <Game.h>
-
-// Other.
 #include <Windows.h>
 #include <Resource.h>
 
@@ -46,6 +44,9 @@ typedef XLIST<CScreen*> t_ScreenList;
 // HGE.
 static HGE* s_pInterface = NULL;
 
+// Sound.
+static FMOD::System* s_pSoundSystem = NULL;
+
 // Flow Control.
 static XBOOL s_bTerminate = false;
 
@@ -70,39 +71,47 @@ static t_ScreenList s_lpScreens;
 // =============================================================================
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
-  s_pInterface = hgeCreate(HGE_VERSION);
+	s_pInterface = hgeCreate(HGE_VERSION);
 
-  s_pInterface->System_SetState(HGE_FRAMEFUNC, &Application::Update);
-  s_pInterface->System_SetState(HGE_RENDERFUNC, &Application::Render);
-  s_pInterface->System_SetState(HGE_TITLE, "PMO");
-  s_pInterface->System_SetState(HGE_USESOUND, false);
-  s_pInterface->System_SetState(HGE_WINDOWED, true);
-  s_pInterface->System_SetState(HGE_SCREENWIDTH, _SWIDTH);
-  s_pInterface->System_SetState(HGE_SCREENHEIGHT, _SHEIGHT);
-  s_pInterface->System_SetState(HGE_SCREENBPP, 32);
+	s_pInterface->System_SetState(HGE_FRAMEFUNC, &Application::Update);
+	s_pInterface->System_SetState(HGE_RENDERFUNC, &Application::Render);
+	s_pInterface->System_SetState(HGE_TITLE, "PMO");
+	s_pInterface->System_SetState(HGE_USESOUND, false);
+	s_pInterface->System_SetState(HGE_WINDOWED, true);
+	s_pInterface->System_SetState(HGE_SCREENWIDTH, _SWIDTH);
+	s_pInterface->System_SetState(HGE_SCREENHEIGHT, _SHEIGHT);
+	s_pInterface->System_SetState(HGE_SCREENBPP, 32);
 	s_pInterface->System_SetState(HGE_SHOWSPLASH, false);
 	s_pInterface->System_SetState(HGE_FPS, 60);
 
-  if(s_pInterface->System_Initiate())
+	if (FMOD::System_Create(&s_pSoundSystem) == FMOD_OK)
 	{
-		try
-		{
-			Application::Initialise();
-			s_pInterface->System_Start();
-			Application::Deinitialise();
-		}
-		catch (Xen::CException xException)
-		{
-			XLOG(xException.GetDetailedMessage().c_str());
-		}
-  }
+		FMOD_RESULT eSoundResult = s_pSoundSystem->init(32, FMOD_INIT_NORMAL, NULL);
 
-  s_pInterface->System_Shutdown();
-  s_pInterface->Release();
+		if (eSoundResult == FMOD_OK && s_pInterface->System_Initiate())
+		{
+			try
+			{
+				Application::Initialise();
+				s_pInterface->System_Start();
+				Application::Deinitialise();
+			}
+			catch (Xen::CException xException)
+			{
+				XLOG(xException.GetDetailedMessage().c_str());
+			}
 
+			s_pInterface->System_Shutdown();
+		}
+
+		s_pSoundSystem->release();
+		s_pSoundSystem = NULL;
+	}
+
+	s_pInterface->Release();
 	s_pInterface = NULL;
 
-  return 0;
+	return 0;
 }
 
 //##############################################################################
@@ -156,14 +165,16 @@ XBOOL Application::Update()
 {
 	s_iTimeDelta = (XUINT)(_TIMEDELTAF * 1000.f);
 
-  Xen::ModuleManager::Update();
+	s_pSoundSystem->update();
+
+	Xen::ModuleManager::Update();
 
 	hgeInputEvent hgEvent;
 
-  while (s_pInterface->Input_GetEvent(&hgEvent))
+	while (s_pInterface->Input_GetEvent(&hgEvent))
 		Xen::ScreenManager::Event(hgEvent.type, &hgEvent);
 
-  return s_bTerminate;
+	return s_bTerminate;
 }
 
 // =============================================================================
@@ -171,13 +182,13 @@ XBOOL Application::Update()
 // =============================================================================
 XBOOL Application::Render()
 {
-  s_pInterface->Gfx_BeginScene();
+	s_pInterface->Gfx_BeginScene();
 
-  Xen::ModuleManager::Render();
+	Xen::ModuleManager::Render();
 
-  s_pInterface->Gfx_EndScene();
+	s_pInterface->Gfx_EndScene();
 
-  return false;
+	return false;
 }
 
 // =============================================================================
@@ -185,7 +196,7 @@ XBOOL Application::Render()
 // =============================================================================
 void Application::Terminate()
 {
-  s_bTerminate = true;
+	s_bTerminate = true;
 }
 
 // =============================================================================
@@ -202,6 +213,14 @@ HGE* Application::GetInterface()
 XUINT Application::GetTimeDelta()
 {
 	return s_iTimeDelta;
+}
+
+// =============================================================================
+// Nat Ryall                                                          2-Jun-2008
+// =============================================================================
+FMOD::System* Application::GetSoundSystem()
+{
+	return s_pSoundSystem;
 }
 
 //##############################################################################

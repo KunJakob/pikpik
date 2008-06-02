@@ -101,18 +101,20 @@ public:
 		s_pMetadata = new CMetadata(".\\Metadata\\Maps.mta");
 		s_pTiles = new CBasicSprite(_SPRITE("Map-Tiles"));
 
-		s_pTileAreas[TileType_Blank]				= s_pTiles->GetMetadata()->FindArea("Blank");
-		s_pTileAreas[TileType_Pellet]				= s_pTiles->GetMetadata()->FindArea("Pellet");
-		s_pTileAreas[TileType_Power]				= s_pTiles->GetMetadata()->FindArea("Power");
-		s_pTileAreas[TileType_Eaten]				= s_pTiles->GetMetadata()->FindArea("Eaten");
-		s_pTileAreas[TileType_Solo]					= s_pTiles->GetMetadata()->FindArea("Solo");
-		s_pTileAreas[TileType_Tunnel]				= s_pTiles->GetMetadata()->FindArea("Tunnel");
-		s_pTileAreas[TileType_Cap]					= s_pTiles->GetMetadata()->FindArea("Cap");
-		s_pTileAreas[TileType_Corner]				= s_pTiles->GetMetadata()->FindArea("Corner");
+		s_pTileAreas[TileType_Blank]			= s_pTiles->GetMetadata()->FindArea("Blank");
+		s_pTileAreas[TileType_Pellet]			= s_pTiles->GetMetadata()->FindArea("Pellet");
+		s_pTileAreas[TileType_Power]			= s_pTiles->GetMetadata()->FindArea("Power");
+		s_pTileAreas[TileType_Eaten]			= s_pTiles->GetMetadata()->FindArea("Eaten");
+		s_pTileAreas[TileType_Solo]				= s_pTiles->GetMetadata()->FindArea("Solo");
+		s_pTileAreas[TileType_Tunnel]			= s_pTiles->GetMetadata()->FindArea("Tunnel");
+		s_pTileAreas[TileType_Cap]				= s_pTiles->GetMetadata()->FindArea("Cap");
+		s_pTileAreas[TileType_Corner]			= s_pTiles->GetMetadata()->FindArea("Corner");
 		s_pTileAreas[TileType_Junction]			= s_pTiles->GetMetadata()->FindArea("Junction");
-		s_pTileAreas[TileType_Intersection] = s_pTiles->GetMetadata()->FindArea("Intersection");
+		s_pTileAreas[TileType_Intersection]		= s_pTiles->GetMetadata()->FindArea("Intersection");
 		s_pTileAreas[TileType_Entrance]			= s_pTiles->GetMetadata()->FindArea("Entrance");
-		s_pTileAreas[TileType_Base]					= s_pTiles->GetMetadata()->FindArea("Base");
+		s_pTileAreas[TileType_Base]				= s_pTiles->GetMetadata()->FindArea("Base");
+
+		s_pTiles->GetMetadata()->GetSprite()->SetBlendMode(BLEND_COLORMUL | BLEND_ALPHABLEND);
 	}
 
 	// Update.
@@ -193,8 +195,8 @@ CMap::CMap(const XCHAR* pID) : CRenderable(RenderableType_Map)
 			pBlock->iType = TileType_Blank;
 			pBlock->fAngle = 0.f;
 			pBlock->xPosition = XPOINT(iX, iY);
-			pBlock->bEaten = false;
 			pBlock->fVisibility = 0.f;
+			pBlock->bEaten = false;
 
 			pBlock->pAdjacents[AdjacentDir_Left]		= (iIndex % m_iWidth > 0) ? &m_xBlocks[iIndex - 1] : NULL;
 			pBlock->pAdjacents[AdjacentDir_Up]			= (iIndex >= m_iWidth) ? &m_xBlocks[iIndex - m_iWidth] : NULL;
@@ -305,6 +307,14 @@ void CMap::Render()
 	for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
 	{
 		static XPOINT s_xCentrePoint = XPOINT(24, 24);
+
+		if (m_xBlocks[iA].IsWall())
+		{
+			xfloat fColourStrength = (_GLOBAL.fSpectrum * .85f) + .15f;
+			s_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, fColourStrength, fColourStrength, fColourStrength));
+		}
+		else
+			s_pTiles->GetMetadata()->GetSprite()->SetColor(0xFFFFFFFF);
 
 		s_pTiles->Render
 		(

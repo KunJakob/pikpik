@@ -1,81 +1,51 @@
 #pragma once
 
-#pragma region Include
+/**
+* @file Tools.h
+* @author Nat Ryall
+* @date 2/06/2008
+* @brief Helper functions for the project.
+*
+* Copyright © SAPIAN
+*/
+
 //##############################################################################
 //
 //                                   INCLUDE
 //
 //##############################################################################
 
-// Xen.
+// Global.
 #include <Xen/Xen.h>
 
-// HGE.
-#include <hge/hge.h>
-
 //##############################################################################
-#pragma endregion
 
 //##############################################################################
 //
 //                                   TYPES
 //
 //##############################################################################
-namespace FMOD
-{
-	class System;
-}
+
+// Namespaces.
+using namespace Xen;
 
 //##############################################################################
 
-#pragma region Declaration
 //##############################################################################
 //
 //                                 DECLARATION
 //
 //##############################################################################
-namespace Application
+namespace ToolBox
 {
-	/**
-	* Initialise the application.
-	*/
-	void Initialise();
+	// Get a colour value using a float.
+	//xuint GetColourValue(xfloat fColour); 
 
-	/**
-	* Deinitialise the application.
-	*/
-	void Deinitialise();
+	// Get a colour, including alpha, using floats.
+	//xuint GetColour(xfloat fA, xfloat fR, xfloat fG, xfloat fB);
 
-	/**
-	* The game update callback.
-	*/
-	XBOOL Update();
-
-	/**
-	* The game render callback.
-	*/
-	XBOOL Render();
-
-	/**
-	* Call to terminate the application.
-	*/
-	void Terminate();
-
-	/**
-	* Get the application renderer interface.
-	*/
-	HGE* GetInterface();
-
-	/**
-	* Get the current time delta in milliseconds.
-	*/
-	XUINT GetTimeDelta();
-
-	/**
-	* Get the sound interface.
-	*/
-	FMOD::System* GetSoundSystem();
+	// Get a colour using floats.
+	//xuint GetColour(xfloat fR, xfloat fG, xfloat fB);
 }
 
 //##############################################################################
-#pragma endregion

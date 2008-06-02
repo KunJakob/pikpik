@@ -50,21 +50,21 @@ class CScreenElement;
 // The types of interface elements.
 enum t_ElementType
 {
-  ElementType_Unknown,
+	ElementType_Unknown,
 	ElementType_Screen,
 	ElementType_Label,
 	ElementType_Image,
 	ElementType_Button,
 	ElementType_Input,
 	ElementType_Progress,
-  ElementType_Window,
+	ElementType_Window,
 	ElementType_Group,
-  ElementType_List,
-  ElementType_Check,
-  ElementType_Radio,
+	ElementType_List,
+	ElementType_Check,
+	ElementType_Radio,
 	ElementType_Scroll,
-  ElementType_MenuLink,
-  /*MAX*/ElementType_Max,
+	ElementType_MenuLink,
+	/*MAX*/ElementType_Max,
 };
 
 // Lists.
@@ -90,26 +90,26 @@ public:
 		return s_Instance;
 	}
 
-  // Initialise the interface manager.
-  CInterfaceManager();
+	// Initialise the interface manager.
+	CInterfaceManager();
 
-  // Deinitialise the interface manager.
-  ~CInterfaceManager();
+	// Deinitialise the interface manager.
+	~CInterfaceManager();
 
 	// Reset the settings to defaults and clear all elements.
 	void Reset();
 
-  // Called to update and fire events for elements.
-  virtual void Update();
+	// Called to update and fire events for elements.
+	virtual void Update();
 
-  // Called to render elements.
-  virtual void Render();
+	// Called to render elements.
+	virtual void Render();
 
-  // Get the base screen element that all other elements should attach to.
-  CScreenElement* GetScreen()
-  {
-    return m_pScreen;
-  }
+	// Get the base screen element that all other elements should attach to.
+	CScreenElement* GetScreen()
+	{
+		return m_pScreen;
+	}
 
 	// Get a list of all existing elements.
 	inline t_ElementList& GetElementList()
@@ -129,14 +129,14 @@ public:
 		XEN_LIST_REMOVE(t_MetadataList, m_lpMetadata, pMetadata);
 	}
 
-  // Set the cursor image for a specific element type.
-  void SetCursor(t_ElementType iType, CSpriteMetadata* pMetadata);
+	// Set the cursor image for a specific element type.
+	void SetCursor(t_ElementType iType, CSpriteMetadata* pMetadata);
 
-  // Set the default cursor image.
-  void SetCursor(CSpriteMetadata* pMetadata)
-  {
-    SetCursor(ElementType_Unknown, pMetadata);
-  }
+	// Set the default cursor image.
+	void SetCursor(CSpriteMetadata* pMetadata)
+	{
+		SetCursor(ElementType_Unknown, pMetadata);
+	}
 
 	// Get the first visible or "active" element that is currently under the mouse.
 	CInterfaceElement* GetActiveElement()
@@ -159,11 +159,11 @@ public:
 		return m_pFocusedElement;
 	}
 
-  // Check if a specific element is the focused element.
-  xbool IsFocusedElement(CInterfaceElement* pElement)
-  {
-    return m_pFocusedElement == pElement;
-  }
+	// Check if a specific element is the focused element.
+	xbool IsFocusedElement(CInterfaceElement* pElement)
+	{
+		return m_pFocusedElement == pElement;
+	}
 
 	// Get the current mouse position.
 	xpoint GetMousePosition()
@@ -180,11 +180,11 @@ public:
 		return _HGE->Input_GetKeyState(HGEK_LBUTTON);
 	}
 
-  // Switch the debug renderer on or off.
-  void SetDebugRender(xbool bDebug)
-  {
-    m_bDebugRender = bDebug;
-  }
+	// Switch the debug renderer on or off.
+	void SetDebugRender(xbool bDebug)
+	{
+		m_bDebugRender = bDebug;
+	}
 
 protected:
 	// Register an element with the system. This is done automatically when the element is constructed.
@@ -199,26 +199,26 @@ protected:
 		XEN_LIST_REMOVE(t_ElementList, m_lpElements, pElement);
 	}
 
-  // Recursive function called on each element. Called in reverse render order.
-  void UpdateElement(CInterfaceElement* pElement);
+	// Recursive function called on each element. Called in reverse render order.
+	void UpdateElement(CInterfaceElement* pElement);
 
-  // Recursive function called on each element.
-  void RenderElement(CInterfaceElement* pElement);
+	// Recursive function called on each element.
+	void RenderElement(CInterfaceElement* pElement);
 
-  // The base container object.
-  CScreenElement* m_pScreen;
+	// The base container object.
+	CScreenElement* m_pScreen;
 
-  // The cursor sprite.
-  CBasicSprite* m_pCursor[ElementType_Max];
+	// The cursor sprite.
+	CBasicSprite* m_pCursor[ElementType_Max];
 
-  // The current mouse position.
-  xpoint m_xMousePos;
+	// The current mouse position.
+	xpoint m_xMousePos;
 
-  // The last mouse position.
-  xpoint m_xLastMousePos;
+	// The last mouse position.
+	xpoint m_xLastMousePos;
 
-  // The active element the mouse is over.
-  CInterfaceElement* m_pActiveElement;
+	// The active element the mouse is over.
+	CInterfaceElement* m_pActiveElement;
 
 	// The last focused element.
 	CInterfaceElement* m_pFocusedElement;
@@ -230,11 +230,11 @@ protected:
 	t_MetadataList m_lpMetadata;
 
 private:
-  // Tracking variable for finding the current active element.
-  xbool m_bFoundActive;
+	// Tracking variable for finding the current active element.
+	xbool m_bFoundActive;
 
-  // Specifies if debug rendering is used.
-  xbool m_bDebugRender;
+	// Specifies if debug rendering is used.
+	xbool m_bDebugRender;
 };
 
 //##############################################################################
@@ -247,56 +247,56 @@ private:
 class CInterfaceElement
 {
 public:
-  // Friend.
-  friend CInterfaceManager;
+	// Friend.
+	friend CInterfaceManager;
 
-  // Virtual destructor to ensure proper cleanup of all child classes.
-  virtual ~CInterfaceElement();
+	// Virtual destructor to ensure proper cleanup of all child classes.
+	virtual ~CInterfaceElement();
 
-  // Optional update virtual function for this element. Called each frame when visible.
-  virtual void Update() {}
-  
-  // Required render virtual function for this element. Called each frame when visible.
-  virtual void Render() = 0;
+	// Optional update virtual function for this element. Called each frame when visible.
+	virtual void Update() {}
 
-  // Get the parent element that this element belongs to. Returns NULL if top-level.
-  CInterfaceElement* GetParent() 
-  { 
-    return m_pParent; 
-  }
+	// Required render virtual function for this element. Called each frame when visible.
+	virtual void Render() = 0;
 
-  // Get the type of the element assigned at construction time.
-  inline xuint GetType()
-  {
-    return m_iType;
-  }
+	// Get the parent element that this element belongs to. Returns NULL if top-level.
+	CInterfaceElement* GetParent() 
+	{ 
+		return m_pParent; 
+	}
 
-  // Set the visibility of the element. This will also disable the element when invisible.
-  inline void SetVisible(xbool bVisible)
-  {
-    m_bVisible = bVisible;
-  }
+	// Get the type of the element assigned at construction time.
+	inline xuint GetType()
+	{
+		return m_iType;
+	}
 
-  // Check if the element is visible.
-  inline xbool IsVisible()
-  {
-    return m_bVisible;
-  }
+	// Set the visibility of the element. This will also disable the element when invisible.
+	inline void SetVisible(xbool bVisible)
+	{
+		m_bVisible = bVisible;
+	}
 
-  // Set the enabled status of the element. This will prevent input notifications for this element.
-  inline void SetEnabled(xbool bEnabled)
-  {
-    m_bEnabled = bEnabled;
-  }
+	// Check if the element is visible.
+	inline xbool IsVisible()
+	{
+		return m_bVisible;
+	}
 
-  // Check if the element is enabled.
-  inline xbool IsEnabled()
-  {
-    return m_bEnabled;
-  }
+	// Set the enabled status of the element. This will prevent input notifications for this element.
+	inline void SetEnabled(xbool bEnabled)
+	{
+		m_bEnabled = bEnabled;
+	}
 
-  // Get the width of the element. This must be overloaded.
-  virtual xint GetWidth() = 0;
+	// Check if the element is enabled.
+	inline xbool IsEnabled()
+	{
+		return m_bEnabled;
+	}
+
+	// Get the width of the element. This must be overloaded.
+	virtual xint GetWidth() = 0;
 
 	// Get the height of the element. This must be overloaded.
 	virtual xint GetHeight() = 0;
@@ -319,8 +319,8 @@ public:
 		return GetArea();
 	}
 
-  // Set the screen position of the element.
-  inline void SetPosition(xpoint xPosition)
+	// Set the screen position of the element.
+	inline void SetPosition(xpoint xPosition)
 	{
 		Move(xPosition - m_xPosition);
 	}
@@ -329,10 +329,10 @@ public:
 	void Move(xpoint xOffset);
 
 	// Get the screen position of the element.
-  inline xpoint GetPosition()
-  {
-    return m_xPosition;
-  }
+	inline xpoint GetPosition()
+	{
+		return m_xPosition;
+	}
 
 	// Get the position of the element relative to it's parent element.
 	inline xpoint GetLocalPosition()
@@ -343,11 +343,11 @@ public:
 			return GetPosition();
 	}
 
-  // Attach a child element to this element.
-  void Attach(CInterfaceElement* pElement);
-  
-  // Detach a specific child element from this element.
-  void Detach(CInterfaceElement* pElement);
+	// Attach a child element to this element.
+	void Attach(CInterfaceElement* pElement);
+
+	// Detach a specific child element from this element.
+	void Detach(CInterfaceElement* pElement);
 
 	// Detach all child elements from this element.
 	inline void DetachAll()
@@ -362,53 +362,53 @@ public:
 	void* m_pExtendedData;
 
 protected:
-  // Set the element type and initialise the element.
-  CInterfaceElement(t_ElementType iType);
+	// Set the element type and initialise the element.
+	CInterfaceElement(t_ElementType iType);
 
-  // Triggered when focus is applied to the element.
-  virtual void OnFocus() {}
+	// Triggered when focus is applied to the element.
+	virtual void OnFocus() {}
 
 	// Triggered when focus is lost from the element.
-  virtual void OnBlur() {}
+	virtual void OnBlur() {}
 
 	// Triggered when the mouse enters the element.
-  virtual void OnMouseEnter() {}
+	virtual void OnMouseEnter() {}
 
 	// Triggered when the mouse leaves the element. 
-  virtual void OnMouseLeave() {}
+	virtual void OnMouseLeave() {}
 
-  // Triggered when the left mouse-button is pressed within the element area.
-  virtual void OnMouseDown(xpoint xPosition) {}
+	// Triggered when the left mouse-button is pressed within the element area.
+	virtual void OnMouseDown(xpoint xPosition) {}
 
 	// Triggered when the left mouse-button is released within the element area.
-  virtual void OnMouseUp(xpoint xPosition) {}
+	virtual void OnMouseUp(xpoint xPosition) {}
 
 	// Triggered when the mouse is moved within the element area.
 	virtual void OnMouseMove(xpoint xDifference, xbool bMouseDown) {}
 
 	// Triggered when a keyboard key is pressed whilst the element is in focus.
-  virtual void OnKeyDown(xint iVirtualKey) {}
+	virtual void OnKeyDown(xint iVirtualKey) {}
 
 	// Triggered when a keyboard key is released whilst the element is in focus.
-  virtual void OnKeyUp(xint iVirtualKey) {}
+	virtual void OnKeyUp(xint iVirtualKey) {}
 
 	// Triggered when an ASCII key is input on the keyboard whilst the element is in focus.
 	virtual void OnKeyChar(xchar cChar) {}
 
-  // The parent element or NULL if top level.
-  CInterfaceElement* m_pParent;
+	// The parent element or NULL if top level.
+	CInterfaceElement* m_pParent;
 
-  // The type of the element.
-  t_ElementType m_iType;
+	// The type of the element.
+	t_ElementType m_iType;
 
-  // Specifies if the element is visible.
-  xbool m_bVisible;
+	// Specifies if the element is visible.
+	xbool m_bVisible;
 
-  // Specifies if the element is enabled and will accept events.
-  xbool m_bEnabled;
+	// Specifies if the element is enabled and will accept events.
+	xbool m_bEnabled;
 
-  // A list of child elements.
-  t_ElementList m_lpChildElements;
+	// A list of child elements.
+	t_ElementList m_lpChildElements;
 
 private:
 	// The screen position of the element.

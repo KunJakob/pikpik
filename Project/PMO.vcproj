@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(SolutionDir)HGE\lib\hge.lib $(SolutionDir)HGE\lib\hgehelp.lib ws2_32.lib"
+				AdditionalDependencies="$(SolutionDir)HGE\Lib\hge.lib $(SolutionDir)HGE\Lib\hgehelp.lib $(SolutionDir)FMOD\Lib\fmodex_vc.lib ws2_32.lib"
 				LinkIncremental="2"
 				IgnoreDefaultLibraryNames="libc"
 				GenerateDebugInformation="true"
@@ -141,7 +141,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(SolutionDir)HGE\lib\hge.lib $(SolutionDir)HGE\lib\hgehelp.lib ws2_32.lib"
+				AdditionalDependencies="$(SolutionDir)HGE\Lib\hge.lib $(SolutionDir)HGE\Lib\hgehelp.lib $(SolutionDir)FMOD\Lib\fmodex_vc.lib ws2_32.lib"
 				LinkIncremental="1"
 				IgnoreDefaultLibraryNames="libc"
 				GenerateDebugInformation="true"
@@ -380,6 +380,14 @@
 			</File>
 			<File
 				RelativePath="..\Source\Sprite.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Tools.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Tools.h"
 				>
 			</File>
 			<File
@@ -1295,6 +1303,34 @@
 				</File>
 				<File
 					RelativePath="..\RakNet\Types.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="FMOD"
+				>
+				<File
+					RelativePath="..\FMOD\fmod.h"
+					>
+				</File>
+				<File
+					RelativePath="..\FMOD\fmod.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\FMOD\fmod_codec.h"
+					>
+				</File>
+				<File
+					RelativePath="..\FMOD\fmod_dsp.h"
+					>
+				</File>
+				<File
+					RelativePath="..\FMOD\fmod_errors.h"
+					>
+				</File>
+				<File
+					RelativePath="..\FMOD\fmod_output.h"
 					>
 				</File>
 			</Filter>

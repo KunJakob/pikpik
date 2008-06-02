@@ -40,9 +40,9 @@
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
 CMenuLink::CMenuLink(XUINT iGroupIndex, CFontMetadata* pFont, const XCHAR* pText, t_fpLinkSelectedCallback fpCallback) : CInterfaceElement(ElementType_MenuLink),
-	m_iGroupIndex(iGroupIndex),
-	m_pText(NULL),
-	m_fpLinkSelectedCallback(fpCallback)
+m_iGroupIndex(iGroupIndex),
+m_pText(NULL),
+m_fpLinkSelectedCallback(fpCallback)
 {
 	m_pText = new CText(pFont);
 	m_pText->SetString(pText);
@@ -69,7 +69,7 @@ void CMenuLink::Update()
 // =============================================================================
 void CMenuLink::Render()
 {
-  m_pText->Render();
+	m_pText->Render();
 }
 
 // =============================================================================
@@ -77,7 +77,7 @@ void CMenuLink::Render()
 // =============================================================================
 void CMenuLink::RePosition(XUINT iElementIndex, XUINT iNumElements)
 {
-  XPOINT xPosition = XPOINT(_HSWIDTH - (GetWidth() / 2), _HSHEIGHT - (iNumElements * (GetHeight() / 2)) + iElementIndex * (GetHeight() + 5));
+	XPOINT xPosition = XPOINT(_HSWIDTH - (GetWidth() / 2), _HSHEIGHT - (iNumElements * (GetHeight() / 2)) + iElementIndex * (GetHeight() + 5));
 
 	SetPosition(xPosition);
 	m_pText->SetPosition(xPosition);
@@ -98,64 +98,66 @@ void CMenuLink::RePosition(XUINT iElementIndex, XUINT iNumElements)
 // =============================================================================
 void CMenuScreen::Load()
 {
-  _GLOBAL.pMenu = this;
+	_GLOBAL.pMenu = this;
 
-  // Initialise the render resources.
-  m_pBackground = new CBackgroundImage("Menu-Background");
-  m_pFont = _FONT("Menu-Item");
+	// Initialise the render resources.
+	m_pBackground = new CBackgroundImage("Menu-Background");
+	m_pFont = _FONT("Menu-Default");
 
-  // Initialise interface.
-  InterfaceManager.SetCursor(_SPRITE("Cursor-Main"));
-  InterfaceManager.SetCursor(ElementType_Button, _SPRITE("Cursor-Click"));
+	// Initialise interface.
+	InterfaceManager.SetCursor(_SPRITE("Cursor-Main"));
+	InterfaceManager.SetCursor(ElementType_Button, _SPRITE("Cursor-Click"));
 	InterfaceManager.SetCursor(ElementType_Input, _SPRITE("Cursor-Write"));
-  InterfaceManager.SetCursor(ElementType_MenuLink, _SPRITE("Cursor-Click"));
+	InterfaceManager.SetCursor(ElementType_MenuLink, _SPRITE("Cursor-Click"));
 
-  // Initialise the menu links.
-  m_iMenuGroup = MenuGroupIndex_None;
+	// Initialise the menu links.
+	m_iMenuGroup = MenuGroupIndex_None;
 
-  CMenuLink* pLinkList[] = 
-  {
-    // Main.
-		new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Offline",				xbind(this, &CMenuScreen::Callback_StartGame)),
-		new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Online",				xbind(this, &CMenuScreen::Callback_ShowOnlineMenu)),
-    new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Tutorial",	    NULL),
-    new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Options",		    NULL),
-    new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Credits",		    NULL),
-    new CMenuLink(MenuGroupIndex_Main,		m_pFont, "Exit",			    xbind(this, &CMenuScreen::Callback_QuitGame)),
+	CFontMetadata* pHighlight = _FONT("Menu-Highlighted"); // TODO: Unmemoryleak this.
 
-    // Play.
-    new CMenuLink(MenuGroupIndex_Play,		m_pFont, "Back",			    xbind(this, &CMenuScreen::Callback_ShowMainMenu)),
+	CMenuLink* pLinkList[] = 
+	{
+		// Main.
+		new CMenuLink(MenuGroupIndex_Main,		pHighlight,		"Online",			xbind(this, &CMenuScreen::Callback_ShowOnlineMenu)),
+		new CMenuLink(MenuGroupIndex_Main,		m_pFont,		"Offline",			xbind(this, &CMenuScreen::Callback_StartGame)),
+		new CMenuLink(MenuGroupIndex_Main,		m_pFont,		"Tutorial",			NULL),
+		new CMenuLink(MenuGroupIndex_Main,		m_pFont,		"Options",			NULL),
+		new CMenuLink(MenuGroupIndex_Main,		m_pFont,		"Credits",		    NULL),
+		new CMenuLink(MenuGroupIndex_Main,		m_pFont,		"Exit",				xbind(this, &CMenuScreen::Callback_QuitGame)),
 
-    // Online.
-    new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Join Game",			NULL),
-    new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Create Game",		NULL),
-    new CMenuLink(MenuGroupIndex_Online,	m_pFont, "Back",			    xbind(this, &CMenuScreen::Callback_ShowMainMenu)),
-  };
+		// Play.
+		new CMenuLink(MenuGroupIndex_Play,		m_pFont,		"Back",				xbind(this, &CMenuScreen::Callback_ShowMainMenu)),
 
-  for (XUINT iA = 0; iA < (sizeof(pLinkList) / sizeof(CMenuLink*)); ++iA)
-  {
-    m_lpMenuLinks[pLinkList[iA]->m_iGroupIndex].push_back(pLinkList[iA]);
-    InterfaceManager.GetScreen()->Attach(pLinkList[iA]);
-  }
+		// Online.
+		new CMenuLink(MenuGroupIndex_Online,	m_pFont,		"Join Game",		NULL),
+		new CMenuLink(MenuGroupIndex_Online,	m_pFont,		"Create Game",		NULL),
+		new CMenuLink(MenuGroupIndex_Online,	m_pFont,		"Back",				xbind(this, &CMenuScreen::Callback_ShowMainMenu)),
+	};
 
-  for (XUINT iGroup = 0; iGroup < MenuGroupIndex_Max; ++iGroup)
-  {
-    XUINT iElementCount = m_lpMenuLinks[iGroup].size();
-    XUINT iElement = 0;
+	for (XUINT iA = 0; iA < (sizeof(pLinkList) / sizeof(CMenuLink*)); ++iA)
+	{
+		m_lpMenuLinks[pLinkList[iA]->m_iGroupIndex].push_back(pLinkList[iA]);
+		InterfaceManager.GetScreen()->Attach(pLinkList[iA]);
+	}
 
-    XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[iGroup])
-    {
-      (*ppMenuLink)->SetVisible(false);
-      (*ppMenuLink)->RePosition(iElement++, iElementCount);
-    }
-  }
+	for (XUINT iGroup = 0; iGroup < MenuGroupIndex_Max; ++iGroup)
+	{
+		XUINT iElementCount = m_lpMenuLinks[iGroup].size();
+		XUINT iElement = 0;
 
-  SetMenuGroup(MenuGroupIndex_Main);
+		XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[iGroup])
+		{
+			(*ppMenuLink)->SetVisible(false);
+			(*ppMenuLink)->RePosition(iElement++, iElementCount);
+		}
+	}
 
-  // Initialise statics.
-  m_iNextScreen = ScreenIndex_Invalid;
+	SetMenuGroup(MenuGroupIndex_Main);
 
-  // Interface.
+	// Initialise statics.
+	m_iNextScreen = ScreenIndex_Invalid;
+
+	// Interface.
 	CWindowComponent* pWindow = new CWindowComponent(_SPRITE("Test-Window"), _FONT("Test-WindowFont"));
 	pWindow->SetInnerSize(200, 300);
 	pWindow->SetPosition(xpoint(10, 10));
@@ -218,7 +220,7 @@ void CMenuScreen::Load()
 	pGroup->SetSize(190, 100);
 	pGroup->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 185));
 	pGroup->SetTitle("Connection Info");
-	
+
 	pWindow->Attach(pButton);
 	pWindow->Attach(pInput);
 	pWindow->Attach(pCheck);
@@ -267,16 +269,16 @@ void CMenuScreen::Update()
 	}
 
 	m_pBackground->Update();
-  InterfaceManager.Update();
+	InterfaceManager.Update();
 
 	// DEBUG.
 	/*if (CRadioComponent* pRadio = CRadioComponent::GetChecked(1))
 	{
-		if (pRadio->m_pExtendedData && stricmp((const char*)pRadio->m_pExtendedData, "SECRET") == 0)
-		{
-			m_pInput->SetText("You found the SECRET!");
-			m_pCheck->SetChecked(false);
-		}
+	if (pRadio->m_pExtendedData && stricmp((const char*)pRadio->m_pExtendedData, "SECRET") == 0)
+	{
+	m_pInput->SetText("You found the SECRET!");
+	m_pCheck->SetChecked(false);
+	}
 	}*/
 
 	m_pInput->SetMasked(m_pCheck->IsChecked());
@@ -289,7 +291,7 @@ void CMenuScreen::Update()
 void CMenuScreen::Render()
 {
 	m_pBackground->Render();
-  InterfaceManager.Render();
+	InterfaceManager.Render();
 }
 
 // =============================================================================
@@ -297,17 +299,17 @@ void CMenuScreen::Render()
 // =============================================================================
 void CMenuScreen::SetMenuGroup(t_MenuGroupIndex iMenuGroup)
 {
-  if (m_iMenuGroup != MenuGroupIndex_None)
-  {
-    XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[m_iMenuGroup])
-      (*ppMenuLink)->SetVisible(false);
-  }
+	if (m_iMenuGroup != MenuGroupIndex_None)
+	{
+		XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[m_iMenuGroup])
+			(*ppMenuLink)->SetVisible(false);
+	}
 
-  if (iMenuGroup != MenuGroupIndex_None)
-  {
-    XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[iMenuGroup])
-      (*ppMenuLink)->SetVisible(true);
-  }
+	if (iMenuGroup != MenuGroupIndex_None)
+	{
+		XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[iMenuGroup])
+			(*ppMenuLink)->SetVisible(true);
+	}
 
 	m_iMenuGroup = iMenuGroup;
 }

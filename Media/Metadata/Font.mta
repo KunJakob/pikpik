@@ -16,8 +16,20 @@
 	.Colour 0 70 213
 }
 
-.Font "Menu-Item"
+.Font "Menu-Default"
 {
 	.File "Font\ShowcardGothic_36.fnt"
 	.Shadow { .Offset 2 2 }
+}
+
+.Font "Menu-Highlighted"
+{
+	.File "Font\ShowcardGothic_36.fnt"
+	.Colour 255 224 128
+	
+	.Shadow 
+	{ 
+		.Colour 128 98 0
+		.Offset 2 2
+	}
 }
