@@ -48,6 +48,7 @@ CPlayer::CPlayer(t_PlayerType iType, const XCHAR* pSpriteName) : CRenderable(Ren
 	m_iTime(0),
 	m_iMoveTime(0),
 	m_fTransition(0.f),
+	m_bLeaving(false),
 	m_iTransitionDir(AdjacentDir_Left)
 {
 	m_pSprite = new CAnimatedSprite(_SPRITE(pSpriteName));
@@ -89,8 +90,14 @@ void CPlayer::Update()
 							m_iTransitionDir = (t_AdjacentDir)iA;
 							m_iTime = 0;
 							m_fTransition = 0.f;
-
-							SetState(m_pCurrentBlock->pAdjacents[iA] ? PlayerState_Move : PlayerState_Warp);
+							
+							if (m_pCurrentBlock->pAdjacents[iA])
+								SetState(PlayerState_Move);
+							else
+							{
+								m_bLeaving = true;
+								SetState(PlayerState_Warp);
+							}
 
 							// Don't waste a frame just checking input, move if we're going to move.
 							Update();
@@ -122,9 +129,45 @@ void CPlayer::Update()
 
 	case PlayerState_Warp:
 		{
-			// Get a list of matching warp points.
-			// Randomise the list and pick one that isn't the one we're on.
-			// Teleport to the next warp point.
+			const static xfloat s_fMoveDir[AdjacentDir_Max] = {-1.f, -1.f, 1.f, 1.f};
+			static xfloat s_fBlockSize = 48.f; //(m_iTransitionDir % 2) ? m_pCurrentBlock->GetHeight() : m_pCurrentBlock->GetWidth();
+
+			xfloat fChange = _TIMEDELTAF * 4.f * s_fBlockSize;
+
+			if (m_bLeaving)
+			{
+				m_fTransition += fChange;
+
+				if (m_fTransition > s_fBlockSize)
+				{
+					m_fTransition = s_fBlockSize;
+					m_pCurrentBlock = _GLOBAL.pActiveMap->GetAdjacentBlock(m_iTransitionDir, m_pCurrentBlock);
+					m_iTransitionDir = (t_AdjacentDir)((m_iTransitionDir + 2) % AdjacentDir_Max);
+					m_bLeaving = false;
+				}
+			}
+			else
+			{
+				m_fTransition -= fChange;
+
+				if (m_fTransition < 0.f)
+				{
+					m_fTransition = 0.f;
+					SetState(PlayerState_Idle);
+				}
+			}
+
+			xpoint xOffset;
+			
+			if (m_iTransitionDir % 2)
+				xOffset.iY = (xint)(m_fTransition * s_fMoveDir[m_iTransitionDir]);
+			else
+				xOffset.iX = (xint)(m_fTransition * s_fMoveDir[m_iTransitionDir]);
+
+			m_pSprite->SetPosition(m_pCurrentBlock->GetScreenPosition() + xOffset);
+
+			if (_GLOBAL.pActivePlayer == this)
+				_GLOBAL.fWorldAlpha = Math::Clamp(1.f - (m_fTransition / s_fBlockSize), 0.f, 1.f);
 		}
 		break;
 
@@ -235,6 +278,13 @@ void CPacMan::SetState(t_PlayerState iState)
 			m_pSprite->SetAngle((XFLOAT)m_iTransitionDir * 90.f, true);
 
 			m_iMoveTime = m_pSprite->GetAnimation()->iAnimationTime;
+		}
+		break;
+
+	case PlayerState_Warp:
+		{
+			m_pSprite->Play("Move");
+			m_pSprite->SetAngle((XFLOAT)m_iTransitionDir * 90.f, true);
 		}
 		break;
 	}

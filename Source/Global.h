@@ -191,8 +191,11 @@ public:
 	// The currently active player on the local machine.
 	CPlayer* pActivePlayer;
 
-	// The music spectrum range 0.f to 1.f.
+	// The music spectrum energy to determine how fast colours transition.
 	xfloat fMusicEnergy;
+
+	// The map overall alpha.
+	xfloat fWorldAlpha;
 };
 
 //##############################################################################

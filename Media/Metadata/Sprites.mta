@@ -51,7 +51,7 @@
 		.Frame { .Area "F2" }
 		.Frame { .Area "F3" }
 		.Frame { .Area "F2" }
-		.Frame { .Area "F1" .Event "Eat" }
+		.Frame { .Area "F1" .Event "Eat" .Loop }
 	}
 }
 

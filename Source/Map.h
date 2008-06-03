@@ -106,6 +106,9 @@ public:
 		return xPosition * 48;
 	}
 
+	// The block index for the parent map.
+	XUINT iIndex;
+
 	// The original map char.
 	XCHAR cChar;
 
@@ -235,6 +238,11 @@ public:
 	{
 		return m_lpSpawnPoints[iPlayerType][rand() % m_lpSpawnPoints[iPlayerType].size()];
 	}
+
+	/**
+	* Get a block in the adjacent direction to the specified block. This will wrap around the map if on the edge.
+	*/
+	CMapBlock* GetAdjacentBlock(t_AdjacentDir iAdjacentDir, CMapBlock* pBlock);
 
 protected:
 	/**

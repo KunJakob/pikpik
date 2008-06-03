@@ -116,42 +116,6 @@ HTEXTURE GenerateFieldMask(xint iInnerRadius, xint iOuterRadius)
 	return hFieldMask;
 }
 
-// =============================================================================
-// Nat Ryall                                                          2-Jun-2008
-// =============================================================================
-xfloat GetSpectrumValue(FMOD::Channel* pChannel)
-{
-	/*xfloat fSpectrum[64];
-	pChannel->getSpectrum(fSpectrum, 64, 0, FMOD_DSP_FFT_WINDOW_RECT);
-
-	xfloat fFrequency = 0.f;
-	pChannel->getFrequency(&fFrequency);
-
-	xfloat fMax = 0.f;
-	xfloat fAverage = 0.f;
-
-	for (xint iA = 0; iA < 64; ++iA)
-	{
-	if (fSpectrum[iA] > fMax)
-	fMax = fSpectrum[iA];
-	}
-
-	xfloat fNormalise = 1.f / fMax;
-
-	for (xint iA = 0; iA < 64; ++iA)
-	fSpectrum[iA] *= fNormalise;
-
-	for (xint iA = 0; iA < 64; ++iA)
-	fAverage += fSpectrum[iA];*/
-
-	//xfloat fValue = (fFrequency / 2.f) / 64.f;
-
-	//float fLevel = 0.f;
-	//pChannel->getSpeakerLevels(FMOD_SPEAKER_MONO, &fLevel, 1);
-
-	return Math::Clamp(1.f, 0.f, 1.f);
-}
-
 //##############################################################################
 #pragma endregion
 
@@ -167,7 +131,8 @@ xfloat GetSpectrumValue(FMOD::Channel* pChannel)
 // =============================================================================
 void CGameScreen::Load()
 {
-	_GLOBAL.pActiveMap = new CMap(XFORMAT("M%03d", 4));
+	_GLOBAL.pActiveMap = new CMap(XFORMAT("M%03d", 1));
+	_GLOBAL.fWorldAlpha = 1.f;
 
 	_GLOBAL.lpPlayers.push_back(new CPacMan(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_PacMan)));
 	_GLOBAL.lpPlayers.push_back(new CGhost(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_Ghost)));
@@ -234,7 +199,9 @@ void CGameScreen::Update()
 				else
 				{
 					ppPlayer++;
+
 					_GLOBAL.pActivePlayer = *ppPlayer;
+					_GLOBAL.fWorldAlpha = 1.f;
 				}
 			}
 		}
@@ -280,9 +247,9 @@ void CGameScreen::Render()
 
 	for (xint iA = 4; iA < s_iSearch; ++iA)
 	{
-		for (xint iB = 0; iB < 8; ++iB)
+		for (xint iB = 0; iB < 4; ++iB)
 		{
-			_HGE->Gfx_RenderLine(fX, 0.f, fX, fStrength[iA] * 200.f, 0xFF333333);
+			_HGE->Gfx_RenderLine(fX, 0.f, fX, fStrength[iA] * 100.f, 0xFF333333);
 			fX += 1.f;
 		}
 

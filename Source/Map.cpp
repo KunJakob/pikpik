@@ -191,6 +191,7 @@ CMap::CMap(const XCHAR* pID) : CRenderable(RenderableType_Map)
 			XUINT iIndex = iX + (iY * m_iWidth); 
 			CMapBlock* pBlock = &m_xBlocks[iIndex];
 
+			pBlock->iIndex = iIndex;
 			pBlock->cChar = pProperty->GetChar(iIndex);
 			pBlock->iType = TileType_Blank;
 			pBlock->fAngle = 0.f;
@@ -208,15 +209,15 @@ CMap::CMap(const XCHAR* pID) : CRenderable(RenderableType_Map)
 	for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
 	{
 		CMapBlock* pBlock = &m_xBlocks[iA];
-		
+
 		switch (pBlock->cChar)
 		{
-		// Special.
+			// Special.
 		case '*': pBlock->iType = TileType_Pellet;		break;
 		case '@': pBlock->iType = TileType_Power;			break;
 		case '=': pBlock->iType = TileType_Entrance;	break;
 
-		// Wall.
+			// Wall.
 		case '#':
 			{
 				XUINT iMask = 0;
@@ -232,7 +233,7 @@ CMap::CMap(const XCHAR* pID) : CRenderable(RenderableType_Map)
 			}
 			break;
 
-		// Spawn.
+			// Spawn.
 		case '$': 
 			pBlock->iType = TileType_Blank;
 			m_lpSpawnPoints[PlayerType_PacMan].push_back(pBlock); 
@@ -264,8 +265,11 @@ void CMap::Update()
 		for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
 			m_xBlocks[iA].fVisibility = 0.f;
 
-		AddVisiblePaths(_GLOBAL.pActivePlayer->m_pCurrentBlock, 1.0f - _GLOBAL.pActivePlayer->m_fTransition);
-		AddVisiblePaths(_GLOBAL.pActivePlayer->m_pTargetBlock, _GLOBAL.pActivePlayer->m_fTransition);
+		if (_GLOBAL.pActivePlayer->m_iState != PlayerState_Warp)
+		{
+			AddVisiblePaths(_GLOBAL.pActivePlayer->m_pCurrentBlock, 1.0f - _GLOBAL.pActivePlayer->m_fTransition);
+			AddVisiblePaths(_GLOBAL.pActivePlayer->m_pTargetBlock, _GLOBAL.pActivePlayer->m_fTransition);
+		}
 
 		for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
 		{
@@ -304,47 +308,73 @@ void CMap::AddVisiblePaths(CMapBlock* pBase, XFLOAT fVisibility)
 // =============================================================================
 void CMap::Render()
 {
-  // Blend the colours based on the music energy.
-  static xfloat fColours[3] = {0.f, 1.f, 0.f};
-  static xfloat* pLink[3] = {&fColours[0], &fColours[1], &fColours[2]};
-  static xbool bUp[3] = {true, true, true};
+	// Blend the colours based on the music energy.
+	const static xfloat s_fMinColour = 0.2f;
+	const static xfloat s_fMaxColour = 1.0f;
 
-  for (xint iA = 0; iA < 3; ++iA)
-  {
-    xfloat fChannelEnergy = _GLOBAL.fMusicEnergy * (iA + 1);
+	static xfloat s_fColours[3] = {0.5f, 0.5f, 0.5f};
+	static xbool s_bUp[3] = {rand() % 2 == 0, rand() % 2 == 0, rand() % 2 == 0};
 
-    if (bUp[iA])
-    {
-      *pLink[iA] += fChannelEnergy;
-      bUp[iA] = !(*pLink[iA] > 1.f);
-    }
-    else
-    {
-      *pLink[iA] -= fChannelEnergy;
-      bUp[iA] = (*pLink[iA] < 0.f);
-    }
+	for (xint iA = 0; iA < 3; ++iA)
+	{
+		xfloat fChannelEnergy = _GLOBAL.fMusicEnergy * (iA + 1);
 
-    *pLink[iA] = Math::Clamp(*pLink[iA], 0.f, 1.f);
-  }
+		if (s_bUp[iA])
+		{
+			s_fColours[iA] += fChannelEnergy;
+			s_bUp[iA] = !(s_fColours[iA] > s_fMaxColour);
+		}
+		else
+		{
+			s_fColours[iA] -= fChannelEnergy;
+			s_bUp[iA] = (s_fColours[iA] < s_fMinColour);
+		}
 
-  // Draw the map.
+		s_fColours[iA] = Math::Clamp(s_fColours[iA], s_fMinColour, s_fMaxColour);
+	}
+
+	// Draw the map.
 	for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
 	{
 		static XPOINT s_xCentrePoint = XPOINT(24, 24);
 
 		if (m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsBase())
-			s_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, fColours[0], fColours[1], fColours[2]));
+			s_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, s_fColours[0], s_fColours[1], s_fColours[2]));
 		else
-			s_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, 1.f - fColours[0], 1.f - fColours[1], 1.f - fColours[2]));
+			s_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, 1.f - s_fColours[0], 1.f - s_fColours[1], 1.f - s_fColours[2]));
+			//s_pTiles->GetMetadata()->GetSprite()->SetColor(0xFFFFFFFF);
 
 		s_pTiles->Render
 		(
 			m_xBlocks[iA].GetScreenPosition() - m_xOffset, 
 			s_xCentrePoint, 
 			s_pTileAreas[m_xBlocks[iA].iType]->xRect,
-			m_xBlocks[iA].fVisibility, 
+			m_xBlocks[iA].fVisibility * _GLOBAL.fWorldAlpha, 
 			(m_xBlocks[iA].fAngle / 180.0f) * M_PI
 		);
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                          3-Jun-2008
+// =============================================================================
+CMapBlock* CMap::GetAdjacentBlock(t_AdjacentDir iAdjacentDir, CMapBlock* pBlock)
+{
+	if (pBlock->pAdjacents[iAdjacentDir])
+		return pBlock->pAdjacents[iAdjacentDir];
+	else
+	{
+		xuint iIndex = pBlock->iIndex;
+
+		switch (iAdjacentDir)
+		{
+		case AdjacentDir_Left:		return &m_xBlocks[iIndex + m_iWidth - 1];
+		case AdjacentDir_Up:		return &m_xBlocks[m_iBlockCount - m_iWidth + iIndex];
+		case AdjacentDir_Right:		return &m_xBlocks[iIndex - m_iWidth + 1];
+		case AdjacentDir_Down:		return &m_xBlocks[iIndex % m_iWidth];
+
+		default:					return NULL;
+		}
 	}
 }
 

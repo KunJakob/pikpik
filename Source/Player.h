@@ -152,6 +152,9 @@ protected:
 	// The transition distance between two blocks clamped to the range 0.0 to 1.0.
 	XFLOAT m_fTransition;
 
+	// Determines if the player is leaving or entering the map.
+	XBOOL m_bLeaving;
+
 	// The transition direction.
 	t_AdjacentDir m_iTransitionDir;
 
