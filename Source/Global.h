@@ -97,6 +97,7 @@ class CSprite;
 class CPlayer;
 class CMenuScreen;
 class CMap;
+class CFont;
 
 // The player identifier type.
 enum t_PlayerType
@@ -196,6 +197,9 @@ public:
 
 	// The map overall alpha.
 	xfloat fWorldAlpha;
+
+	// The global game font.
+	CFont* pGameFont;
 };
 
 //##############################################################################

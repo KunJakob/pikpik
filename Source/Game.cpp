@@ -116,6 +116,34 @@ HTEXTURE GenerateFieldMask(xint iInnerRadius, xint iOuterRadius)
 	return hFieldMask;
 }
 
+// =============================================================================
+// Nat Ryall                                                          3-Jun-2008
+// =============================================================================
+void CalculateMusicEnergy(FMOD::Channel* pChannel)
+{
+	const static xint s_iIterations = 2048;
+	const static xint s_iSearch = 8;
+
+	xfloat fSpectrum[2][s_iIterations];
+
+	pChannel->getSpectrum(fSpectrum[0], s_iIterations, 0, FMOD_DSP_FFT_WINDOW_HANNING);
+	pChannel->getSpectrum(fSpectrum[1], s_iIterations, 1, FMOD_DSP_FFT_WINDOW_HANNING);
+
+	xfloat fStrength[s_iSearch];
+
+	for (xint iA = 0; iA < s_iSearch; ++iA)
+		fStrength[iA] = fSpectrum[0][iA] + fSpectrum[1][iA];
+
+	xfloat fAverageStrength = 0.f;
+
+	for (xint iA = 4; iA < s_iSearch; ++iA)
+		fAverageStrength += fStrength[iA];
+
+	fAverageStrength /= 4.f;
+
+	_GLOBAL.fMusicEnergy = fAverageStrength * 0.1f;
+}
+
 //##############################################################################
 #pragma endregion
 
@@ -135,9 +163,9 @@ void CGameScreen::Load()
 	_GLOBAL.fWorldAlpha = 1.f;
 
 	_GLOBAL.lpPlayers.push_back(new CPacMan(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_PacMan)));
-	_GLOBAL.lpPlayers.push_back(new CGhost(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_Ghost)));
-	_GLOBAL.lpPlayers.push_back(new CGhost(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_Ghost)));
-	_GLOBAL.lpPlayers.push_back(new CGhost(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_Ghost)));
+	_GLOBAL.lpPlayers.push_back(new CGhost(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_Ghost), 0xFFF3D6B4));
+	_GLOBAL.lpPlayers.push_back(new CGhost(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_Ghost), 0xFF9BC887));
+	_GLOBAL.lpPlayers.push_back(new CGhost(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_Ghost), 0xFFD1AFC0));
 
 	_GLOBAL.pActivePlayer = _GLOBAL.lpPlayers.front();
 
@@ -209,6 +237,9 @@ void CGameScreen::Update()
 
 	// Calculate the map offset.
 	s_xOffset = _GLOBAL.pActivePlayer->GetSprite()->GetPosition() - XPOINT(_HSWIDTH, _HSHEIGHT);
+
+	// Calculate the music energy using spectrum analysis.
+	CalculateMusicEnergy(m_pChannel);
 }
 
 // =============================================================================
@@ -219,42 +250,15 @@ void CGameScreen::Render()
 	if (_GLOBAL.pActivePlayer->GetType() == PlayerType_Ghost)
 		m_pFieldMask->Render(0, 0);
 
-	// Spectrum analysis.
-	const static xint s_iIterations = 2048;
-	const static xint s_iSearch = 8;
+	const char* pMusicTitle = "Unknown";
 
-	xfloat fSpectrum[2][s_iIterations];
-
-	m_pChannel->getSpectrum(fSpectrum[0], s_iIterations, 0, FMOD_DSP_FFT_WINDOW_HANNING);
-	m_pChannel->getSpectrum(fSpectrum[1], s_iIterations, 1, FMOD_DSP_FFT_WINDOW_HANNING);
-
-	xfloat fStrength[s_iSearch];
-
-	for (xint iA = 0; iA < s_iSearch; ++iA)
-		fStrength[iA] = fSpectrum[0][iA] + fSpectrum[1][iA];
-
-	xfloat fAverageStrength = 0.f;
-
-	for (xint iA = 4; iA < s_iSearch; ++iA)
-		fAverageStrength += fStrength[iA];
-
-	fAverageStrength /= 4.f;
-
-	_GLOBAL.fMusicEnergy = fAverageStrength * 0.1f;
-
-	// Draw the beat-spectrum.
-	xfloat fX = 0.f;
-
-	for (xint iA = 4; iA < s_iSearch; ++iA)
-	{
-		for (xint iB = 0; iB < 4; ++iB)
-		{
-			_HGE->Gfx_RenderLine(fX, 0.f, fX, fStrength[iA] * 100.f, 0xFF333333);
-			fX += 1.f;
-		}
-
-		fX += 1.f;
-	}
+	FMOD_TAG fmArtist;
+	FMOD_TAG fmTitle;
+	
+	if (m_pMusic->getTag("ARTIST", 0, &fmArtist) == FMOD_OK && m_pMusic->getTag("TITLE", 0, &fmTitle) == FMOD_OK && fmArtist.data && fmTitle.data)
+		pMusicTitle = XFORMAT("%s - %s", fmArtist.data, fmTitle.data);
+	
+	_GLOBAL.pGameFont->Render(pMusicTitle, xpoint(10, 10), HGETEXT_LEFT);
 }
 
 //##############################################################################

@@ -132,7 +132,7 @@ void CPlayer::Update()
 			const static xfloat s_fMoveDir[AdjacentDir_Max] = {-1.f, -1.f, 1.f, 1.f};
 			static xfloat s_fBlockSize = 48.f; //(m_iTransitionDir % 2) ? m_pCurrentBlock->GetHeight() : m_pCurrentBlock->GetWidth();
 
-			xfloat fChange = _TIMEDELTAF * 4.f * s_fBlockSize;
+			xfloat fChange = _TIMEDELTAF * m_iMoveTime;
 
 			if (m_bLeaving)
 			{
@@ -273,18 +273,12 @@ void CPacMan::SetState(t_PlayerState iState)
 		break;
 
 	case PlayerState_Move:
+	case PlayerState_Warp:
 		{
 			m_pSprite->Play("Move");
 			m_pSprite->SetAngle((XFLOAT)m_iTransitionDir * 90.f, true);
 
 			m_iMoveTime = m_pSprite->GetAnimation()->iAnimationTime;
-		}
-		break;
-
-	case PlayerState_Warp:
-		{
-			m_pSprite->Play("Move");
-			m_pSprite->SetAngle((XFLOAT)m_iTransitionDir * 90.f, true);
 		}
 		break;
 	}
@@ -305,8 +299,9 @@ void CPacMan::SetState(t_PlayerState iState)
 // =============================================================================
 // Nat Ryall                                                         16-Apr-2008
 // =============================================================================
-CGhost::CGhost(CMapBlock* pSpawnBlock) : CPlayer(PlayerType_Ghost, "Player-Ghost"),
-	m_pEyes(NULL)
+CGhost::CGhost(CMapBlock* pSpawnBlock, xuint iColour) : CPlayer(PlayerType_Ghost, "Player-Ghost"),
+	m_pEyes(NULL),
+	m_iColour(iColour)
 {
 	m_pCurrentBlock = pSpawnBlock;
 
@@ -341,13 +336,15 @@ void CGhost::Update()
 // =============================================================================
 void CGhost::Render()
 {
+	m_pSprite->GetMetadata()->GetSprite()->SetColor(m_iColour);
+
 	CPlayer::Render();
 
 	m_pEyes->SetPosition(m_pSprite->GetPosition());
 	
-	if (_GLOBAL.pActivePlayer->GetType() == PlayerType_Ghost)
-		m_pEyes->SetAlpha(1.f);
-	else
+	//if (_GLOBAL.pActivePlayer->GetType() == PlayerType_Ghost)
+	//	m_pEyes->SetAlpha(1.f);
+	//else
 		m_pEyes->SetAlpha(m_pSprite->GetAlpha());
 
 	m_pEyes->Render();
@@ -368,11 +365,12 @@ void CGhost::SetState(t_PlayerState iState)
 		break;
 
 	case PlayerState_Move:
+	case PlayerState_Warp:
 		{
 			m_pEyes->SetArea(XFORMAT("F%d", m_iTransitionDir + 1));
 			m_iMoveTime = m_pSprite->GetAnimation()->iAnimationTime;
 
-			if (m_pCurrentBlock->iType == TileType_Entrance || m_pTargetBlock->iType == TileType_Entrance)
+			if (m_pCurrentBlock->iType == TileType_Entrance || (m_pTargetBlock && m_pTargetBlock->iType == TileType_Entrance))
 				m_iMoveTime *= 4;
 		}
 		break;

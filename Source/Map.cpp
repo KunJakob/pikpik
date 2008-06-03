@@ -341,8 +341,8 @@ void CMap::Render()
 		if (m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsBase())
 			s_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, s_fColours[0], s_fColours[1], s_fColours[2]));
 		else
-			s_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, 1.f - s_fColours[0], 1.f - s_fColours[1], 1.f - s_fColours[2]));
-			//s_pTiles->GetMetadata()->GetSprite()->SetColor(0xFFFFFFFF);
+			//s_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, 1.f - s_fColours[0], 1.f - s_fColours[1], 1.f - s_fColours[2]));
+			s_pTiles->GetMetadata()->GetSprite()->SetColor(0xFFFFFFFF);
 
 		s_pTiles->Render
 		(

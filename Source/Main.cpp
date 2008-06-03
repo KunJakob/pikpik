@@ -144,6 +144,9 @@ void Application::Initialise()
 	s_lpScreens.push_back(new CGameScreen);
 
 	ScreenManager::Set(ScreenIndex_SplashScreen);
+
+	// Initialise the game font.
+	_GLOBAL.pGameFont = new CFont(_FONT("Default"));
 }
 
 // =============================================================================
@@ -151,6 +154,9 @@ void Application::Initialise()
 // =============================================================================
 void Application::Deinitialise()
 {
+	// Free the font.
+	delete _GLOBAL.pGameFont;
+
 	// Deinitialise all modules.
 	Xen::ModuleManager::Deinitialise();
 

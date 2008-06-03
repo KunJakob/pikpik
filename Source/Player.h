@@ -214,7 +214,7 @@ public:
 	/**
 	* Constructor.
 	*/
-	CGhost(CMapBlock* pSpawnBlock);
+	CGhost(CMapBlock* pSpawnBlock, xuint iColour);
 
 	/**
 	* Destructor.
@@ -239,6 +239,9 @@ public:
 protected:
 	// The ghost's eyes.
 	CSprite* m_pEyes;
+
+	// The ghost's colour.
+	xuint m_iColour;
 };
 
 //##############################################################################

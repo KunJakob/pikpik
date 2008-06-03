@@ -1,3 +1,8 @@
+.Font "Default"
+{
+	.File "Font\Aharoni_16.fnt"
+}
+
 .Font "Test-Font"
 {
 	.File "Font\Arial_11.fnt"
