@@ -1,7 +1,0 @@
-.Audio "Generic-Test"
-{
-	.File "Audio\Level-Test.mp3"
-	.Stream
-	
-	.BeatStep 1.0
-}

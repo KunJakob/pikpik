@@ -131,22 +131,26 @@ void Application::Initialise()
 {
 	srand(GetTickCount());
 
+	// Load the strings.
+	_GLOBAL.pLocale = new CMetadata(".\\Metadata\\Strings.mta");
+
 	// Load all relevant metadata.
 	ResourceManager::RegisterMetadata(new CMetadata(".\\Metadata\\Sprites.mta"));
 	ResourceManager::RegisterMetadata(new CMetadata(".\\Metadata\\Font.mta"));
+
+	// Initialise the game font.
+	_GLOBAL.pGameFont = new CFont(_FONT("Default"));
 
 	// Initialise all modules.
 	Xen::ModuleManager::Initialise();
 
 	// Create all the screen instances.
-	s_lpScreens.push_back(new CSplashScreen);
+	s_lpScreens.push_back(new CLogoScreen);
+	s_lpScreens.push_back(new CWarningScreen);
 	s_lpScreens.push_back(new CMenuScreen);
 	s_lpScreens.push_back(new CGameScreen);
 
-	ScreenManager::Set(ScreenIndex_SplashScreen);
-
-	// Initialise the game font.
-	_GLOBAL.pGameFont = new CFont(_FONT("Default"));
+	ScreenManager::Set(ScreenIndex_LogoScreen);
 }
 
 // =============================================================================
@@ -154,6 +158,9 @@ void Application::Initialise()
 // =============================================================================
 void Application::Deinitialise()
 {
+	// Free the string metadata.
+	delete _GLOBAL.pLocale;
+
 	// Free the font.
 	delete _GLOBAL.pGameFont;
 

@@ -1,1 +1,35 @@
-.PhotoWarning "Photosensitive Seizure Warning\n\nThis game contains flashing images and colours. If you, or anyone in your family, have an epileptic condition, consult your physician prior to playing. We take no responsibility for any symptoms you may experience whilst playing this game."
+// --------------------------------------------------------------------------------
+// Splash
+// --------------------------------------------------------------------------------
+.Splash_PhotoWarning 
+"This game contains flashing images and colours. If you, or anyone in your family, have an epileptic condition, consult your physician prior to playing. We take no responsibility for any symptoms you may experience whilst playing this game."
+
+// --------------------------------------------------------------------------------
+// Menu
+// --------------------------------------------------------------------------------
+.Menu_Online 
+"Online"
+
+.Menu_Offline
+"Offline"
+
+.Menu_Tutorial
+"Tutorial"
+
+.Menu_Options 
+"Options"
+
+.Menu_Credits
+"Credits"
+
+.Menu_Exit
+"Exit"
+
+.Menu_Back
+"Back"
+
+.Menu_OnlineJoin
+"Join Game"
+
+.Menu_OnlineCreate
+"Create Game"

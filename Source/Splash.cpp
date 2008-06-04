@@ -13,44 +13,33 @@
 
 // Other.
 #include <Renderer.h>
+#include <Font.h>
 
 //##############################################################################
 #pragma endregion
 
-#pragma region Macros
+#pragma region Logo
 //##############################################################################
 //
-//                                   MACROS
-//
-//##############################################################################
-#define SPLASH_FADETIME 500
-#define SPLASH_DISPLAYTIME 1000
-
-//##############################################################################
-#pragma endregion
-
-#pragma region Definition
-//##############################################################################
-//
-//                                 DEFINITION
+//                                     LOGO
 //
 //##############################################################################
 
 // =============================================================================
 // Nat Ryall                                                          6-Apr-2008
 // =============================================================================
-void CSplashScreen::Load()
+void CLogoScreen::Load()
 {
 	m_pImage = new CSprite(_SPRITE("Logo-SAPIAN"));
 
 	m_pImage->SetAnchor(m_pImage->GetAreaCentre());
-  m_pImage->SetPosition(XPOINT(_HSWIDTH, _HSHEIGHT));
+	m_pImage->SetPosition(XPOINT(_HSWIDTH, _HSHEIGHT));
 }
 
 // =============================================================================
 // Nat Ryall                                                          6-Apr-2008
 // =============================================================================
-void CSplashScreen::Unload()
+void CLogoScreen::Unload()
 {
 	delete m_pImage;
 }
@@ -58,24 +47,22 @@ void CSplashScreen::Unload()
 // =============================================================================
 // Nat Ryall                                                          6-Apr-2008
 // =============================================================================
-void CSplashScreen::Wake()
+void CLogoScreen::Wake()
 {
-	m_iStage = SplashScreenStage_FadeIn;
-	m_iElapsedTime = 0;
-	m_fAlpha = 0.0f;
+	CFadeScreen::Reset();
 }
 
 // =============================================================================
 // Nat Ryall                                                          6-Apr-2008
 // =============================================================================
-void CSplashScreen::Event(xuint iEventType, void* pEventInfo)
+void CLogoScreen::Event(xuint iEventType, void* pEventInfo)
 {
 	switch (iEventType)
 	{
-	case INPUT_MBUTTONDOWN:
-	case INPUT_KEYDOWN:
+	case INPUT_MBUTTONUP:
+	case INPUT_KEYUP:
 		{
-			ScreenManager::Set(ScreenIndex_MenuScreen);
+			OnFadeComplete();
 		}
 		break;
 	}
@@ -84,50 +71,9 @@ void CSplashScreen::Event(xuint iEventType, void* pEventInfo)
 // =============================================================================
 // Nat Ryall                                                          6-Apr-2008
 // =============================================================================
-void CSplashScreen::Update()
+void CLogoScreen::Update()
 {
-	m_iElapsedTime += _TIMEDELTA;
-
-	switch (m_iStage)
-	{
-	case SplashScreenStage_FadeIn:
-		{
-			if (m_iElapsedTime > SPLASH_FADETIME)
-			{
-				m_iElapsedTime -= SPLASH_FADETIME;
-
-				m_fAlpha = 1.0f;
-				m_iStage = SplashScreenStage_Display;
-			}
-			else
-				m_fAlpha = (float)m_iElapsedTime / (float)SPLASH_FADETIME;
-		}
-		break;
-
-	case SplashScreenStage_Display:
-		{
-			if (m_iElapsedTime > SPLASH_DISPLAYTIME)
-			{
-				m_iElapsedTime -= SPLASH_DISPLAYTIME;
-				m_iStage = SplashScreenStage_FadeOut;
-			}
-		}
-		break;
-
-	case SplashScreenStage_FadeOut:
-		if (m_iElapsedTime > SPLASH_FADETIME)
-		{
-			m_iElapsedTime = 0;
-
-			m_fAlpha = 0.0f;
-			m_iStage = SplashScreenStage_None;
-
-			ScreenManager::Set(ScreenIndex_MenuScreen);
-		}
-		else
-			m_fAlpha = 1.0f - ((float)m_iElapsedTime / (float)SPLASH_FADETIME);
-		break;
-	}
+	CFadeScreen::Update();
 
 	m_pImage->SetAlpha(m_fAlpha);
 }
@@ -135,12 +81,72 @@ void CSplashScreen::Update()
 // =============================================================================
 // Nat Ryall                                                          6-Apr-2008
 // =============================================================================
-void CSplashScreen::Render()
+void CLogoScreen::Render()
 {
-	XUCHAR cBackgroundColour = (XUCHAR)(m_fAlpha * 20.0f);
-	_HGE->Gfx_Clear(ARGB(0, cBackgroundColour, cBackgroundColour, cBackgroundColour));
+	xfloat fColour = m_fAlpha * .08f;
+	_HGE->Gfx_Clear(ARGBF(1.f, fColour, fColour, fColour));
 
 	m_pImage->Render();
+}
+
+// =============================================================================
+// Nat Ryall                                                          4-Jun-2008
+// =============================================================================
+void CLogoScreen::OnFadeComplete()
+{
+	ScreenManager::Set(ScreenIndex_WarningScreen);
+}
+
+//##############################################################################
+#pragma endregion
+
+#pragma region Warning
+//##############################################################################
+//
+//                                   WARNING
+//
+//##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                          6-Apr-2008
+// =============================================================================
+void CWarningScreen::Event(xuint iEventType, void* pEventInfo)
+{
+	switch (iEventType)
+	{
+	case INPUT_MBUTTONUP:
+	case INPUT_KEYUP:
+		{
+			OnFadeComplete();
+		}
+		break;
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                          4-Jun-2008
+// =============================================================================
+void CWarningScreen::Render()
+{
+	xfloat fColour = m_fAlpha * .08f;
+	_HGE->Gfx_Clear(ARGBF(1.f, fColour, fColour, fColour));
+
+	static xrect s_xRect(_HSWIDTH - 250, 0, _HSWIDTH + 250, _SHEIGHT);
+
+	_GLOBAL.pGameFont->Render
+	(
+		_LOCALE("Splash_PhotoWarning"),
+		s_xRect,
+		HGETEXT_CENTER | HGETEXT_MIDDLE
+	);
+}
+
+// =============================================================================
+// Nat Ryall                                                          4-Jun-2008
+// =============================================================================
+void CWarningScreen::OnFadeComplete()
+{
+	ScreenManager::Set(ScreenIndex_MenuScreen);
 }
 
 //##############################################################################

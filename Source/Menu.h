@@ -211,7 +211,8 @@ protected:
 	void Debug_HideWindow(CButtonComponent* pButton, xpoint xOffset);
 
 	// The font metadata to render the links with.
-	CFontMetadata* m_pFont;
+	CFontMetadata* m_pMenuDefault;
+	CFontMetadata* m_pMenuHighlight;
 
 	// A list of all the menu elements.
 	t_MenuLinkList m_lpMenuLinks[MenuGroupIndex_Max];

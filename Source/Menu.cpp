@@ -102,7 +102,9 @@ void CMenuScreen::Load()
 
 	// Initialise the render resources.
 	m_pBackground = new CBackgroundImage("Menu-Background");
-	m_pFont = _FONT("Menu-Default");
+
+	m_pMenuDefault = _FONT("Menu-Default");
+	m_pMenuHighlight = _FONT("Menu-Highlighted");
 
 	// Initialise interface.
 	InterfaceManager.SetCursor(_SPRITE("Cursor-Main"));
@@ -113,25 +115,23 @@ void CMenuScreen::Load()
 	// Initialise the menu links.
 	m_iMenuGroup = MenuGroupIndex_None;
 
-	CFontMetadata* pHighlight = _FONT("Menu-Highlighted"); // TODO: Unmemoryleak this.
-
 	CMenuLink* pLinkList[] = 
 	{
 		// Main.
-		new CMenuLink(MenuGroupIndex_Main,		pHighlight,		"Online",			xbind(this, &CMenuScreen::Callback_ShowOnlineMenu)),
-		new CMenuLink(MenuGroupIndex_Main,		m_pFont,		"Offline",			xbind(this, &CMenuScreen::Callback_StartGame)),
-		new CMenuLink(MenuGroupIndex_Main,		m_pFont,		"Tutorial",			NULL),
-		new CMenuLink(MenuGroupIndex_Main,		m_pFont,		"Options",			NULL),
-		new CMenuLink(MenuGroupIndex_Main,		m_pFont,		"Credits",		    NULL),
-		new CMenuLink(MenuGroupIndex_Main,		m_pFont,		"Exit",				xbind(this, &CMenuScreen::Callback_QuitGame)),
+		new CMenuLink(MenuGroupIndex_Main,		m_pMenuHighlight,	_LOCALE("Menu_Online"),			xbind(this, &CMenuScreen::Callback_ShowOnlineMenu)),
+		new CMenuLink(MenuGroupIndex_Main,		m_pMenuDefault,		_LOCALE("Menu_Offline"),		xbind(this, &CMenuScreen::Callback_StartGame)),
+		new CMenuLink(MenuGroupIndex_Main,		m_pMenuDefault,		_LOCALE("Menu_Tutorial"),		NULL),
+		new CMenuLink(MenuGroupIndex_Main,		m_pMenuDefault,		_LOCALE("Menu_Options"),		NULL),
+		new CMenuLink(MenuGroupIndex_Main,		m_pMenuDefault,		_LOCALE("Menu_Credits"),		NULL),
+		new CMenuLink(MenuGroupIndex_Main,		m_pMenuDefault,		_LOCALE("Menu_Exit"),			xbind(this, &CMenuScreen::Callback_QuitGame)),
 
 		// Play.
-		new CMenuLink(MenuGroupIndex_Play,		m_pFont,		"Back",				xbind(this, &CMenuScreen::Callback_ShowMainMenu)),
+		new CMenuLink(MenuGroupIndex_Play,		m_pMenuHighlight,	_LOCALE("Menu_Back"),			xbind(this, &CMenuScreen::Callback_ShowMainMenu)),
 
 		// Online.
-		new CMenuLink(MenuGroupIndex_Online,	m_pFont,		"Join Game",		NULL),
-		new CMenuLink(MenuGroupIndex_Online,	m_pFont,		"Create Game",		NULL),
-		new CMenuLink(MenuGroupIndex_Online,	m_pFont,		"Back",				xbind(this, &CMenuScreen::Callback_ShowMainMenu)),
+		new CMenuLink(MenuGroupIndex_Online,	m_pMenuDefault,		_LOCALE("Menu_OnlineJoin"),		NULL),
+		new CMenuLink(MenuGroupIndex_Online,	m_pMenuDefault,		_LOCALE("Menu_OnlineCreate"),	NULL),
+		new CMenuLink(MenuGroupIndex_Online,	m_pMenuHighlight,	_LOCALE("Menu_Back"),			xbind(this, &CMenuScreen::Callback_ShowMainMenu)),
 	};
 
 	for (XUINT iA = 0; iA < (sizeof(pLinkList) / sizeof(CMenuLink*)); ++iA)
@@ -158,7 +158,7 @@ void CMenuScreen::Load()
 	m_iNextScreen = ScreenIndex_Invalid;
 
 	// Interface.
-	CWindowComponent* pWindow = new CWindowComponent(_SPRITE("Test-Window"), _FONT("Test-WindowFont"));
+	/*CWindowComponent* pWindow = new CWindowComponent(_SPRITE("Test-Window"), _FONT("Test-WindowFont"));
 	pWindow->SetInnerSize(200, 300);
 	pWindow->SetPosition(xpoint(10, 10));
 	pWindow->SetMoveable(true);
@@ -232,13 +232,13 @@ void CMenuScreen::Load()
 	pWindow->Attach(pRadio[5]);
 	pWindow->Attach(pRadio[6]);
 	pWindow->Attach(pProgress);
-	pWindow->Attach(pGroup);
+	pWindow->Attach(pGroup);*/
 
-	InterfaceManager.GetScreen()->Attach(pWindow);
+	//InterfaceManager.GetScreen()->Attach(pWindow);
 
-	m_pInput = pInput;
+	/*m_pInput = pInput;
 	m_pCheck = pCheck;
-	m_pProgress = pProgress;
+	m_pProgress = pProgress;*/
 }
 
 // =============================================================================
@@ -246,6 +246,11 @@ void CMenuScreen::Load()
 // =============================================================================
 void CMenuScreen::Unload()
 {
+	//delete m_pMenuDefault;
+	//delete m_pMenuHighlight; 
+
+	// TODO: Fix the above.
+
 	delete m_pBackground;
 }
 
@@ -281,8 +286,8 @@ void CMenuScreen::Update()
 	}
 	}*/
 
-	m_pInput->SetMasked(m_pCheck->IsChecked());
-	m_pProgress->SetProgress(m_pProgress->GetProgress() + 0.001f);
+	//m_pInput->SetMasked(m_pCheck->IsChecked());
+	//m_pProgress->SetProgress(m_pProgress->GetProgress() + 0.001f);
 }
 
 // =============================================================================
@@ -343,7 +348,6 @@ void CMenuScreen::Callback_ShowOnlineMenu()
 // =============================================================================
 void CMenuScreen::Callback_ShowJoinInterface()
 {
-	SetMenuGroup(MenuGroupIndex_None);
 }
 
 // =============================================================================
@@ -351,7 +355,6 @@ void CMenuScreen::Callback_ShowJoinInterface()
 // =============================================================================
 void CMenuScreen::Callback_StartLobby()
 {
-	m_iNextScreen = ScreenIndex_SplashScreen;
 }
 
 // =============================================================================

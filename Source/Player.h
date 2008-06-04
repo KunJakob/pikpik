@@ -104,6 +104,12 @@ public:
 		return m_cName;
 	}
 
+	// Get the current map block this player is on.
+	inline CMapBlock* GetCurrentBlock()
+	{
+		return m_pCurrentBlock;
+	}
+
 protected:
 	/**
 	* Constructor.

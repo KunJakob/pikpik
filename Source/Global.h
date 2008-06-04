@@ -61,6 +61,7 @@
 #define _SHEIGHT			600
 #define _HSWIDTH			400
 #define _HSHEIGHT			300
+#define _SRECT				xrect(0, 0, _SWIDTH, _SHEIGHT)
 
 // Game options.
 #define _MAXPLAYERS			5
@@ -73,6 +74,7 @@
 #define _TERMINATE			Application::Terminate()
 #define _TIMEDELTA			Application::GetTimeDelta()
 #define _TIMEDELTAF			_HGE->Timer_GetDelta()
+#define _LOCALE(NAME)		_GLOBAL.pLocale->GetProperty(NAME)->GetString()
 
 // Colour manipulations.
 #define COLOURF(COLF) \
@@ -111,7 +113,8 @@ enum t_PlayerType
 enum t_ScreenIndex
 {
 	ScreenIndex_Invalid,
-	ScreenIndex_SplashScreen,
+	ScreenIndex_LogoScreen,
+	ScreenIndex_WarningScreen,
 	ScreenIndex_MenuScreen,
 	ScreenIndex_GameScreen,
 	ScreenIndex_SelectionScreen,
@@ -200,6 +203,9 @@ public:
 
 	// The global game font.
 	CFont* pGameFont;
+
+	// The global game strings.
+	CMetadata* pLocale;
 };
 
 //##############################################################################

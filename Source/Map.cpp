@@ -245,6 +245,13 @@ CMap::CMap(const XCHAR* pID) : CRenderable(RenderableType_Map)
 			break;
 		}
 	}
+
+	// Initialise the colourisation.
+	for (xint iA = 0; iA < 3; ++iA)
+	{
+		m_fColours[iA] = .5f;
+		m_bUp[iA] = (rand() % 2 == 0);
+	}
 }
 
 // =============================================================================
@@ -312,25 +319,22 @@ void CMap::Render()
 	const static xfloat s_fMinColour = 0.2f;
 	const static xfloat s_fMaxColour = 1.0f;
 
-	static xfloat s_fColours[3] = {0.5f, 0.5f, 0.5f};
-	static xbool s_bUp[3] = {rand() % 2 == 0, rand() % 2 == 0, rand() % 2 == 0};
-
 	for (xint iA = 0; iA < 3; ++iA)
 	{
 		xfloat fChannelEnergy = _GLOBAL.fMusicEnergy * (iA + 1);
 
-		if (s_bUp[iA])
+		if (m_bUp[iA])
 		{
-			s_fColours[iA] += fChannelEnergy;
-			s_bUp[iA] = !(s_fColours[iA] > s_fMaxColour);
+			m_fColours[iA] += fChannelEnergy;
+			m_bUp[iA] = !(m_fColours[iA] > s_fMaxColour);
 		}
 		else
 		{
-			s_fColours[iA] -= fChannelEnergy;
-			s_bUp[iA] = (s_fColours[iA] < s_fMinColour);
+			m_fColours[iA] -= fChannelEnergy;
+			m_bUp[iA] = (m_fColours[iA] < s_fMinColour);
 		}
 
-		s_fColours[iA] = Math::Clamp(s_fColours[iA], s_fMinColour, s_fMaxColour);
+		m_fColours[iA] = Math::Clamp(m_fColours[iA], s_fMinColour, s_fMaxColour);
 	}
 
 	// Draw the map.
@@ -339,9 +343,9 @@ void CMap::Render()
 		static XPOINT s_xCentrePoint = XPOINT(24, 24);
 
 		if (m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsBase())
-			s_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, s_fColours[0], s_fColours[1], s_fColours[2]));
+			s_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, m_fColours[0], m_fColours[1], m_fColours[2]));
 		else
-			//s_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, 1.f - s_fColours[0], 1.f - s_fColours[1], 1.f - s_fColours[2]));
+			//s_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, 1.f - m_fColours[0], 1.f - m_fColours[1], 1.f - m_fColours[2]));
 			s_pTiles->GetMetadata()->GetSprite()->SetColor(0xFFFFFFFF);
 
 		s_pTiles->Render
@@ -376,6 +380,28 @@ CMapBlock* CMap::GetAdjacentBlock(t_AdjacentDir iAdjacentDir, CMapBlock* pBlock)
 		default:					return NULL;
 		}
 	}
+}
+
+// =============================================================================
+// Nat Ryall                                                          4-Jun-2008
+// =============================================================================
+CMapBlock* CMap::GetSpawnBlock(t_PlayerType iPlayerType)
+{
+	CMapBlock* pBlock = NULL;
+	
+	do
+	{
+		pBlock = m_lpSpawnPoints[iPlayerType][rand() % m_lpSpawnPoints[iPlayerType].size()];
+
+		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, _GLOBAL.lpPlayers)
+		{
+			if ((*ppPlayer)->GetCurrentBlock() == pBlock)
+				pBlock = NULL;
+		}
+	}
+	while (!pBlock);
+
+	return pBlock;
 }
 
 //##############################################################################

@@ -234,10 +234,7 @@ public:
 	/**
 	* Get a random player spawn block.
 	*/
-	CMapBlock* GetSpawnBlock(t_PlayerType iPlayerType)
-	{
-		return m_lpSpawnPoints[iPlayerType][rand() % m_lpSpawnPoints[iPlayerType].size()];
-	}
+	CMapBlock* GetSpawnBlock(t_PlayerType iPlayerType);
 
 	/**
 	* Get a block in the adjacent direction to the specified block. This will wrap around the map if on the edge.
@@ -268,6 +265,10 @@ protected:
 
 	// The current map offset in pixels.
 	XPOINT m_xOffset;
+
+	// The map colourisation.
+	xfloat m_fColours[3];
+	xbool m_bUp[3];
 };
 
 //##############################################################################
