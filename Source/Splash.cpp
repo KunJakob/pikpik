@@ -94,7 +94,7 @@ void CLogoScreen::Render()
 // =============================================================================
 void CLogoScreen::OnFadeComplete()
 {
-	ScreenManager::Set(ScreenIndex_WarningScreen);
+	_GLOBAL.iNextScreen = ScreenIndex_WarningScreen;
 }
 
 //##############################################################################
@@ -137,7 +137,8 @@ void CWarningScreen::Render()
 	(
 		_LOCALE("Splash_PhotoWarning"),
 		s_xRect,
-		HGETEXT_CENTER | HGETEXT_MIDDLE
+		HGETEXT_CENTER | HGETEXT_MIDDLE,
+		m_fAlpha
 	);
 }
 
@@ -146,7 +147,7 @@ void CWarningScreen::Render()
 // =============================================================================
 void CWarningScreen::OnFadeComplete()
 {
-	ScreenManager::Set(ScreenIndex_MenuScreen);
+	_GLOBAL.iNextScreen = ScreenIndex_MenuScreen;
 }
 
 //##############################################################################

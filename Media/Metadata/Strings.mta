@@ -8,10 +8,10 @@
 // Menu
 // --------------------------------------------------------------------------------
 .Menu_Online 
-"Online"
+"Multiplayer"
 
 .Menu_Offline
-"Offline"
+"Practice"
 
 .Menu_Tutorial
 "Tutorial"

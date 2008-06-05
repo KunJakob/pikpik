@@ -158,6 +158,8 @@ void Application::Initialise()
 // =============================================================================
 void Application::Deinitialise()
 {
+	_GLOBAL.iNextScreen = ScreenIndex_Invalid;
+
 	// Free the string metadata.
 	delete _GLOBAL.pLocale;
 
@@ -176,6 +178,12 @@ void Application::Deinitialise()
 // =============================================================================
 XBOOL Application::Update()
 {
+	if (_GLOBAL.iNextScreen != ScreenIndex_Invalid)
+	{
+		Xen::ScreenManager::Set(_GLOBAL.iNextScreen);
+		_GLOBAL.iNextScreen = ScreenIndex_Invalid;
+	}
+
 	s_iTimeDelta = (XUINT)(_TIMEDELTAF * 1000.f);
 
 	s_pSoundSystem->update();

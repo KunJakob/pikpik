@@ -206,6 +206,9 @@ public:
 
 	// The global game strings.
 	CMetadata* pLocale;
+
+	// The next screen to show.
+	t_ScreenIndex iNextScreen;
 };
 
 //##############################################################################

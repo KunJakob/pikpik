@@ -1,6 +1,7 @@
 .Font "Default"
 {
 	.File "Font\Aharoni_16.fnt"
+	.Spacing 1.25
 }
 
 .Font "Test-Font"

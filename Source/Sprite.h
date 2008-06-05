@@ -199,35 +199,35 @@ public:
 	*/
 	void Render(XPOINT xPosition, XPOINT xAnchor, XRECT xArea, XFLOAT fAlpha, XFLOAT fAngle);
 
-  /**
-  * Render the sprite with the specified attributes.
-  * @param xAnchor The area relative anchor point to use when positioning and rotating the sprite.
-  * @param xPosition The screen position to render at.
+	/**
+	* Render the sprite with the specified attributes.
+	* @param xAnchor The area relative anchor point to use when positioning and rotating the sprite.
+	* @param xPosition The screen position to render at.
 	* @param xArea The coordinates within the image to render.
-  */
-  inline void Render(XPOINT xPosition, XPOINT xAnchor, XRECT xArea)
-  {
-    Render(xPosition, xAnchor, xArea, 1.f, 0.f);
-  }
+	*/
+	inline void Render(XPOINT xPosition, XPOINT xAnchor, XRECT xArea)
+	{
+		Render(xPosition, xAnchor, xArea, 1.f, 0.f);
+	}
 
-  /**
-  * Render the sprite with the specified attributes.
-  * @param xPosition The screen position to render at.
+	/**
+	* Render the sprite with the specified attributes.
+	* @param xPosition The screen position to render at.
 	* @param xArea The coordinates within the image to render.
-  */
-  inline void Render(XPOINT xPosition, XRECT xArea)
-  {
-    Render(xPosition, XPOINT(), xArea, 1.f, 0.f);
-  }
+	*/
+	inline void Render(XPOINT xPosition, XRECT xArea)
+	{
+		Render(xPosition, XPOINT(), xArea, 1.f, 0.f);
+	}
 
-  /**
-  * Render the sprite with the specified attributes.
-  * @param xPosition The screen position to render at.
-  */
-  inline void Render(XPOINT xPosition)
-  {
-    Render(xPosition, XPOINT(), GetImageRect(), 1.f, 0.f);
-  }
+	/**
+	* Render the sprite with the specified attributes.
+	* @param xPosition The screen position to render at.
+	*/
+	inline void Render(XPOINT xPosition)
+	{
+		Render(xPosition, XPOINT(), GetImageRect(), 1.f, 0.f);
+	}
 
 	/**
 	* Render the sprite, tiling the image to the rect.
@@ -288,13 +288,13 @@ public:
 		return (XUINT)_HGE->Texture_GetHeight(m_pMetadata->GetSprite()->GetTexture(), true);
 	}
 
-  /**
-  * Get the rect of the entire sprite image.
-  */
-  XRECT GetImageRect()
-  {
-    return XRECT(0, 0, (XUINT)GetImageWidth(), (XUINT)GetImageHeight());
-  }
+	/**
+	* Get the rect of the entire sprite image.
+	*/
+	XRECT GetImageRect()
+	{
+		return XRECT(0, 0, (XUINT)GetImageWidth(), (XUINT)GetImageHeight());
+	}
 
 	/**
 	* Get the sprite metadata structure. This is for advanced use only.

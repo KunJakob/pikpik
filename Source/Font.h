@@ -86,12 +86,14 @@ public:
 	}
 
 public:
-	CFontFile* pFile;									// The font file used for rendering.
+	CFontFile* pFile;			// The font file used for rendering.
 
-	XFLOAT fScale;										// The font scale.
-	XUINT iColour;										// The font colour.
-	XPOINT xShadowOffset;							// The font shadow offset.
-	XUINT iShadowColour;							// The font shadow colour.
+	XFLOAT fScale;				// The font scale.
+	XUINT iColour;				// The font colour.
+	XFLOAT fSpacing;			// The spacing between lines.
+	XFLOAT fTracking;			// The spacing between letters.
+	XPOINT xShadowOffset;		// The font shadow offset.
+	XUINT iShadowColour;		// The font shadow colour.
 };
 
 //##############################################################################
@@ -119,8 +121,29 @@ public:
 	* @param pString The text string to render to the screen using this font.
 	* @param xRect The aligned screen area to render in.
 	* @param iAlign The font alignment relative to the position. Use HGETEXT_*.
+	* @param fAlpha The alpha level between 0.0 and 1.0 to render the text at.
 	*/
-	void Render(const xchar* pString, xrect xRect, xuint iAlign);
+	void Render(const xchar* pString, xrect xRect, xuint iAlign, xfloat fAlpha);
+
+	/**
+	* Render the font with the specified attributes.
+	* @param pString The text string to render to the screen using this font.
+	* @param xPosition The horizontally-aligned screen position to render using.
+	* @param iAlign The font alignment relative to the position. Use HGETEXT_*.
+	* @param fAlpha The alpha level between 0.0 and 1.0 to render the text at.
+	*/
+	void Render(const xchar* pString, xpoint xPosition, xuint iAlign, xfloat fAlpha);
+
+	/**
+	* Render the font with the specified attributes.
+	* @param pString The text string to render to the screen using this font.
+	* @param xRect The aligned screen area to render in.
+	* @param iAlign The font alignment relative to the position. Use HGETEXT_*.
+	*/
+	inline void Render(const xchar* pString, xrect xRect, xuint iAlign)
+	{
+		Render(pString, xRect, iAlign, 1.f);
+	}
 
 	/**
 	* Render the font with the specified attributes.
@@ -128,7 +151,10 @@ public:
 	* @param xPosition The horizontally-aligned screen position to render using.
 	* @param iAlign The font alignment relative to the position. Use HGETEXT_*.
 	*/
-	void Render(const xchar* pString, xpoint xPosition, xuint iAlign);
+	inline void Render(const xchar* pString, xpoint xPosition, xuint iAlign)
+	{
+		Render(pString, xPosition, iAlign, 1.f);
+	}
 
 	/**
 	* Get the font height.

@@ -475,59 +475,51 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath="..\..\include\hgeanim.h"
+				RelativePath="..\..\hgeanim.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\hgecolor.h"
+				RelativePath="..\..\hgecolor.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\hgedistort.h"
+				RelativePath="..\..\hgedistort.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\hgefont.h"
+				RelativePath="..\..\hgefont.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\hgegui.h"
+				RelativePath="..\..\hgegui.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\hgeguictrls.h"
+				RelativePath="..\..\hgeguictrls.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\hgeparticle.h"
+				RelativePath="..\..\hgeparticle.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\hgerect.h"
+				RelativePath="..\..\hgerect.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\hgeresource.h"
+				RelativePath="..\..\hgeresource.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\hgesprite.h"
+				RelativePath="..\..\hgesprite.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\hgestrings.h"
+				RelativePath="..\..\hgestrings.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\hgevector.h"
-				>
-			</File>
-			<File
-				RelativePath="parser.h"
-				>
-			</File>
-			<File
-				RelativePath="resources.h"
+				RelativePath="..\..\hgevector.h"
 				>
 			</File>
 		</Filter>
