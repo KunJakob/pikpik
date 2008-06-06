@@ -1367,6 +1367,26 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="Resource"
+			>
+			<File
+				RelativePath=".\PMO.rc"
+				>
+			</File>
+			<File
+				RelativePath=".\Resource.h"
+				>
+			</File>
+			<Filter
+				Name="Icons"
+				>
+				<File
+					RelativePath=".\Application.ico"
+					>
+				</File>
+			</Filter>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>
