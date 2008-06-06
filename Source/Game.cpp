@@ -159,7 +159,7 @@ void CalculateMusicEnergy(FMOD::Channel* pChannel)
 // =============================================================================
 void CGameScreen::Load()
 {
-	_GLOBAL.pActiveMap = new CMap(XFORMAT("M%03d", 1));
+	_GLOBAL.pActiveMap = new CMap(XFORMAT("M%03d", 5));
 	_GLOBAL.fWorldAlpha = 1.f;
 
 	_GLOBAL.lpPlayers.push_back(new CPacMan(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_PacMan)));

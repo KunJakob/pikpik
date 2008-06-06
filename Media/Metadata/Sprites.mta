@@ -12,7 +12,7 @@
 {
 	.File "Surfaces\Map-Blocks.png"
 	
-	.Area "Blank"			{ .Rect 144 0 192 48 }
+	.Area "Blank"			{ .Rect 0   0 48  48 }
 	.Area "Pellet"			{ .Rect 48  0 96  48 }
 	.Area "Power"			{ .Rect 96  0 144 48 }
 	.Area "Eaten"			{ .Rect 144 0 192 48 }
