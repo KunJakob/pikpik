@@ -212,9 +212,6 @@ CMap::CMap(const XCHAR* pID) : CRenderable(RenderableType_Map)
 
 		switch (pBlock->cChar)
 		{
-		// Blank.
-		case ',': pBlock->iType = TileType_Blank;		break;
-
 		// Special.
 		case '*': pBlock->iType = TileType_Pellet;		break;
 		case '@': pBlock->iType = TileType_Power;		break;
@@ -305,7 +302,7 @@ void CMap::AddVisiblePaths(CMapBlock* pBase, XFLOAT fVisibility)
 	{
 		CMapBlock* pBlock = pBase;
 
-		while (pBlock->pAdjacents[iA] && !pBlock->pAdjacents[iA]->IsWall())
+		while (pBlock->pAdjacents[iA] && !pBlock->pAdjacents[iA]->IsWall() && !pBlock->pAdjacents[iA]->IsBase())
 		{
 			pBlock = pBlock->pAdjacents[iA];
 			pBlock->fVisibility += fVisibility;

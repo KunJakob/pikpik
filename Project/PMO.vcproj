@@ -63,9 +63,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(SolutionDir)HGE\Lib\hge.lib $(SolutionDir)HGE\Lib\hgehelp.lib $(SolutionDir)FMOD\Lib\fmodex_vc.lib ws2_32.lib"
+				AdditionalDependencies="$(SolutionDir)HGE\Lib\hge.lib $(SolutionDir)HGE\Lib\hgehelp.lib $(SolutionDir)FMOD\Lib\fmodex_vc.lib $(SolutionDir)RakNet\Lib\raknet_dll.lib ws2_32.lib"
 				LinkIncremental="2"
-				IgnoreDefaultLibraryNames="libc"
+				IgnoreDefaultLibraryNames="libc;libcmt"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -141,9 +141,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(SolutionDir)HGE\Lib\hge.lib $(SolutionDir)HGE\Lib\hgehelp.lib $(SolutionDir)FMOD\Lib\fmodex_vc.lib ws2_32.lib"
+				AdditionalDependencies="$(SolutionDir)HGE\Lib\hge.lib $(SolutionDir)HGE\Lib\hgehelp.lib $(SolutionDir)FMOD\Lib\fmodex_vc.lib $(SolutionDir)RakNet\Lib\raknet_dll.lib ws2_32.lib"
 				LinkIncremental="1"
-				IgnoreDefaultLibraryNames="libc"
+				IgnoreDefaultLibraryNames="libc;libcmt"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -574,743 +574,463 @@
 				Name="RakNet"
 				>
 				<File
-					RelativePath="..\RakNet\_FindFirst.cpp"
+					RelativePath="..\RakNet\Source\_FindFirst.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\_FindFirst.h"
+					RelativePath="..\RakNet\Source\AsynchronousFileIO.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\AsynchronousFileIO.cpp"
+					RelativePath="..\RakNet\Source\AutopatcherPatchContext.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\AsynchronousFileIO.h"
+					RelativePath="..\RakNet\Source\AutopatcherRepositoryInterface.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\AutopatcherPatchContext.h"
+					RelativePath="..\RakNet\Source\AutoRPC.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\AutopatcherRepositoryInterface.h"
+					RelativePath="..\RakNet\Source\BigTypes.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\AutoRPC.cpp"
+					RelativePath="..\RakNet\Source\BitStream.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\AutoRPC.h"
+					RelativePath="..\RakNet\Source\BitStream_NoTemplate.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\BigTypes.h"
+					RelativePath="..\RakNet\Source\CheckSum.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\BitStream.cpp"
+					RelativePath="..\RakNet\Source\ClientContextStruct.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\BitStream.h"
+					RelativePath="..\RakNet\Source\CommandParserInterface.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\BitStream_NoTemplate.cpp"
+					RelativePath="..\RakNet\Source\ConnectionGraph.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\BitStream_NoTemplate.h"
+					RelativePath="..\RakNet\Source\ConsoleServer.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\CheckSum.cpp"
+					RelativePath="..\RakNet\Source\DataBlockEncryptor.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\CheckSum.h"
+					RelativePath="..\RakNet\Source\DataCompressor.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\ClientContextStruct.h"
+					RelativePath="..\RakNet\Source\DirectoryDeltaTransfer.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\CommandParserInterface.cpp"
+					RelativePath="..\RakNet\Source\DS_BinarySearchTree.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\CommandParserInterface.h"
+					RelativePath="..\RakNet\Source\DS_BPlusTree.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\ConnectionGraph.cpp"
+					RelativePath="..\RakNet\Source\DS_BytePool.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\ConnectionGraph.h"
+					RelativePath="..\RakNet\Source\DS_ByteQueue.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\ConsoleServer.cpp"
+					RelativePath="..\RakNet\Source\DS_Heap.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\ConsoleServer.h"
+					RelativePath="..\RakNet\Source\DS_HuffmanEncodingTree.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DataBlockEncryptor.cpp"
+					RelativePath="..\RakNet\Source\DS_HuffmanEncodingTreeFactory.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DataBlockEncryptor.h"
+					RelativePath="..\RakNet\Source\DS_HuffmanEncodingTreeNode.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DataCompressor.cpp"
+					RelativePath="..\RakNet\Source\DS_LinkedList.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DataCompressor.h"
+					RelativePath="..\RakNet\Source\DS_List.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DirectoryDeltaTransfer.cpp"
+					RelativePath="..\RakNet\Source\DS_Map.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DirectoryDeltaTransfer.h"
+					RelativePath="..\RakNet\Source\DS_MemoryPool.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_BinarySearchTree.h"
+					RelativePath="..\RakNet\Source\DS_OrderedChannelHeap.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_BPlusTree.h"
+					RelativePath="..\RakNet\Source\DS_OrderedList.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_BytePool.cpp"
+					RelativePath="..\RakNet\Source\DS_Queue.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_BytePool.h"
+					RelativePath="..\RakNet\Source\DS_QueueLinkedList.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_ByteQueue.cpp"
+					RelativePath="..\RakNet\Source\DS_RangeList.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_ByteQueue.h"
+					RelativePath="..\RakNet\Source\DS_Table.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_Heap.h"
+					RelativePath="..\RakNet\Source\DS_Tree.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_HuffmanEncodingTree.cpp"
+					RelativePath="..\RakNet\Source\DS_WeightedGraph.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_HuffmanEncodingTree.h"
+					RelativePath="..\RakNet\Source\EmailSender.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_HuffmanEncodingTreeFactory.h"
+					RelativePath="..\RakNet\Source\EpochTimeToString.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_HuffmanEncodingTreeNode.h"
+					RelativePath="..\RakNet\Source\Export.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_LinkedList.h"
+					RelativePath="..\RakNet\Source\ExtendedOverlappedPool.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_List.h"
+					RelativePath="..\RakNet\Source\FileList.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_Map.h"
+					RelativePath="..\RakNet\Source\FileListTransfer.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_MemoryPool.h"
+					RelativePath="..\RakNet\Source\FileListTransferCBInterface.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_OrderedChannelHeap.h"
+					RelativePath="..\RakNet\Source\FileOperations.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_OrderedList.h"
+					RelativePath="..\RakNet\Source\FormatString.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_Queue.h"
+					RelativePath="..\RakNet\Source\FullyConnectedMesh.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_QueueLinkedList.h"
+					RelativePath="..\RakNet\Source\FunctionThread.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_RangeList.h"
+					RelativePath="..\RakNet\Source\Gen_RPC8.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_Table.cpp"
+					RelativePath="..\RakNet\Source\GetTime.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_Table.h"
+					RelativePath="..\RakNet\Source\GridSectorizer.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_Tree.h"
+					RelativePath="..\RakNet\Source\HTTPConnection.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\DS_WeightedGraph.h"
+					RelativePath="..\RakNet\Source\InternalPacket.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\EmailSender.cpp"
+					RelativePath="..\RakNet\Source\Itoa.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\EmailSender.h"
+					RelativePath="..\RakNet\Source\LightweightDatabaseClient.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\EncodeClassName.cpp"
+					RelativePath="..\RakNet\Source\LightweightDatabaseCommon.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\EpochTimeToString.cpp"
+					RelativePath="..\RakNet\Source\LightweightDatabaseServer.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\EpochTimeToString.h"
+					RelativePath="..\RakNet\Source\LinuxStrings.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\Export.h"
+					RelativePath="..\RakNet\Source\LogCommandParser.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\ExtendedOverlappedPool.cpp"
+					RelativePath="..\RakNet\Source\MessageFilter.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\ExtendedOverlappedPool.h"
+					RelativePath="..\RakNet\Source\MessageIdentifiers.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\FileList.cpp"
+					RelativePath="..\RakNet\Source\MTUSize.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\FileList.h"
+					RelativePath="..\RakNet\Source\NatPunchthrough.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\FileListTransfer.cpp"
+					RelativePath="..\RakNet\Source\NetworkIDManager.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\FileListTransfer.h"
+					RelativePath="..\RakNet\Source\NetworkIDObject.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\FileListTransferCBInterface.h"
+					RelativePath="..\RakNet\Source\PacketConsoleLogger.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\FileOperations.cpp"
+					RelativePath="..\RakNet\Source\PacketFileLogger.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\FileOperations.h"
+					RelativePath="..\RakNet\Source\PacketLogger.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\FormatString.cpp"
+					RelativePath="..\RakNet\Source\PacketPool.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\FormatString.h"
+					RelativePath="..\RakNet\Source\PacketPriority.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\FullyConnectedMesh.cpp"
+					RelativePath="..\RakNet\Source\PluginInterface.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\FullyConnectedMesh.h"
+					RelativePath="..\RakNet\Source\RakAssert.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\FunctionThread.cpp"
+					RelativePath="..\RakNet\Source\RakMemoryOverride.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\FunctionThread.h"
+					RelativePath="..\RakNet\Source\RakNetCommandParser.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\Gen_RPC8.cpp"
+					RelativePath="..\RakNet\Source\RakNetDefines.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\Gen_RPC8.h"
+					RelativePath="..\RakNet\Source\RakNetStatistics.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\GetTime.cpp"
+					RelativePath="..\RakNet\Source\RakNetTransport.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\GetTime.h"
+					RelativePath="..\RakNet\Source\RakNetTypes.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\GridSectorizer.cpp"
+					RelativePath="..\RakNet\Source\RakNetVersion.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\GridSectorizer.h"
+					RelativePath="..\RakNet\Source\RakNetworkFactory.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\InternalPacket.h"
+					RelativePath="..\RakNet\Source\RakPeer.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\LightweightDatabaseClient.cpp"
+					RelativePath="..\RakNet\Source\RakPeerInterface.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\LightweightDatabaseClient.h"
+					RelativePath="..\RakNet\Source\RakSleep.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\LightweightDatabaseCommon.cpp"
+					RelativePath="..\RakNet\Source\RakString.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\LightweightDatabaseCommon.h"
+					RelativePath="..\RakNet\Source\RakThread.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\LightweightDatabaseServer.cpp"
+					RelativePath="..\RakNet\Source\Rand.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\LightweightDatabaseServer.h"
+					RelativePath="..\RakNet\Source\ReadyEvent.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\LinuxStrings.cpp"
+					RelativePath="..\RakNet\Source\RefCountedObj.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\LinuxStrings.h"
+					RelativePath="..\RakNet\Source\ReliabilityLayer.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\LogCommandParser.cpp"
+					RelativePath="..\RakNet\Source\Replica.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\LogCommandParser.h"
+					RelativePath="..\RakNet\Source\ReplicaEnums.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\Makefile.am"
+					RelativePath="..\RakNet\Source\ReplicaManager.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\MessageFilter.cpp"
+					RelativePath="..\RakNet\Source\ReplicaManager2.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\MessageFilter.h"
+					RelativePath="..\RakNet\Source\Rijndael-Boxes.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\MessageIdentifiers.h"
+					RelativePath="..\RakNet\Source\Rijndael.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\MTUSize.h"
+					RelativePath="..\RakNet\Source\Router.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\NatPunchthrough.cpp"
+					RelativePath="..\RakNet\Source\RouterInterface.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\NatPunchthrough.h"
+					RelativePath="..\RakNet\Source\RPCMap.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\NetworkIDManager.cpp"
+					RelativePath="..\RakNet\Source\RPCNode.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\NetworkIDManager.h"
+					RelativePath="..\RakNet\Source\RSACrypt.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\NetworkIDObject.cpp"
+					RelativePath="..\RakNet\Source\SHA1.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\NetworkIDObject.h"
+					RelativePath="..\RakNet\Source\SimpleMutex.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\PacketConsoleLogger.cpp"
+					RelativePath="..\RakNet\Source\SimpleTCPServer.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\PacketConsoleLogger.h"
+					RelativePath="..\RakNet\Source\SingleProducerConsumer.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\PacketFileLogger.cpp"
+					RelativePath="..\RakNet\Source\SocketLayer.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\PacketFileLogger.h"
+					RelativePath="..\RakNet\Source\StringCompressor.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\PacketLogger.cpp"
+					RelativePath="..\RakNet\Source\StringTable.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\PacketLogger.h"
+					RelativePath="..\RakNet\Source\SuperFastHash.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\PacketPool.h"
+					RelativePath="..\RakNet\Source\SystemAddressList.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\PacketPriority.h"
+					RelativePath="..\RakNet\Source\TableSerializer.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\PluginInterface.cpp"
+					RelativePath="..\RakNet\Source\TCPInterface.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\PluginInterface.h"
+					RelativePath="..\RakNet\Source\TelnetTransport.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\RakAssert.h"
+					RelativePath="..\RakNet\Source\ThreadPool.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\RakMemoryOverride.cpp"
+					RelativePath="..\RakNet\Source\ThreadsafePacketLogger.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\RakMemoryOverride.h"
+					RelativePath="..\RakNet\Source\TransportInterface.h"
 					>
 				</File>
 				<File
-					RelativePath="..\RakNet\RakNet.vcproj"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RakNet3.0.vcproj"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RakNet3.0.vcproj.user"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RakNet_vc8.vcproj"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RakNetCommandParser.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RakNetCommandParser.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RakNetDefines.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RakNetStatistics.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RakNetStatistics.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RakNetTransport.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RakNetTransport.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RakNetTypes.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RakNetTypes.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RakNetVersion.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RakNetworkFactory.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RakNetworkFactory.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RakPeer.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RakPeer.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RakPeerInterface.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RakSleep.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RakSleep.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RakString.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RakString.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\Rand.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\Rand.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\ReadyEvent.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\ReadyEvent.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RefCountedObj.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\ReliabilityLayer.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\ReliabilityLayer.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\Replica.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\ReplicaEnums.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\ReplicaManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\ReplicaManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\ReplicaManager2.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\ReplicaManager2.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\Rijndael-Boxes.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\rijndael.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\Rijndael.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\Router.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\Router.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RouterInterface.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RPCMap.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RPCMap.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RPCNode.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\RSACrypt.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\SHA1.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\SHA1.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\SimpleMutex.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\SimpleMutex.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\SimpleTCPServer.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\SingleProducerConsumer.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\SocketLayer.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\SocketLayer.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\StringCompressor.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\StringCompressor.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\StringTable.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\StringTable.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\SystemAddressList.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\SystemAddressList.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\TableSerializer.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\TableSerializer.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\TCPInterface.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\TCPInterface.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\TelnetTransport.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\TelnetTransport.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\ThreadPool.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\ThreadsafePacketLogger.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\ThreadsafePacketLogger.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\TransportInterface.h"
-					>
-				</File>
-				<File
-					RelativePath="..\RakNet\Types.h"
+					RelativePath="..\RakNet\Source\Types.h"
 					>
 				</File>
 			</Filter>
