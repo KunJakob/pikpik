@@ -194,10 +194,7 @@ protected:
 	}
 
 	// Deregister an element from the system. This is done automatically when the element is destructed.
-	inline void DeregisterElement(CInterfaceElement* pElement)
-	{
-		XEN_LIST_REMOVE(t_ElementList, m_lpElements, pElement);
-	}
+	void DeregisterElement(CInterfaceElement* pElement);
 
 	// Recursive function called on each element. Called in reverse render order.
 	void UpdateElement(CInterfaceElement* pElement);

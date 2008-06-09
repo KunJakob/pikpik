@@ -22,13 +22,13 @@
 // Nat Ryall                                                          1-May-2008
 // =============================================================================
 CInterfaceManager::CInterfaceManager() :
-  m_pScreen(NULL),
-  m_pActiveElement(NULL),
-  m_pFocusedElement(NULL),
-  m_bFoundActive(false),
-  m_bDebugRender(false)
+m_pScreen(NULL),
+m_pActiveElement(NULL),
+m_pFocusedElement(NULL),
+m_bFoundActive(false),
+m_bDebugRender(false)
 {
-  m_pScreen = new CScreenElement();
+	m_pScreen = new CScreenElement();
 	Reset();
 }
 
@@ -39,11 +39,11 @@ CInterfaceManager::~CInterfaceManager()
 {
 	delete m_pScreen;
 
-  for (xint iA = 0; iA < ElementType_Max; ++iA)
-  {
-    if (m_pCursor[iA])
-      delete m_pCursor[iA];
-  }
+	for (xint iA = 0; iA < ElementType_Max; ++iA)
+	{
+		if (m_pCursor[iA])
+			delete m_pCursor[iA];
+	}
 
 	XEN_LIST_ERASE_ALL(m_lpElements);
 }
@@ -58,8 +58,8 @@ void CInterfaceManager::Reset()
 
 	m_pScreen->DetachAll();
 
-  for (xint iA = 0; iA < ElementType_Max; ++iA)
-    m_pCursor[iA] = NULL;
+	for (xint iA = 0; iA < ElementType_Max; ++iA)
+		m_pCursor[iA] = NULL;
 }
 
 // =============================================================================
@@ -67,43 +67,45 @@ void CInterfaceManager::Reset()
 // =============================================================================
 void CInterfaceManager::Update()
 {
-  m_xLastMousePos = m_xMousePos;
+	m_xLastMousePos = m_xMousePos;
 
-  xfloat fX;
-  xfloat fY;
+	xfloat fX;
+	xfloat fY;
 
-  _HGE->Input_GetMousePos(&fX, &fY);
-  m_xMousePos = xpoint((xint)fX, (xint)fY);
+	_HGE->Input_GetMousePos(&fX, &fY);
+	m_xMousePos = xpoint((xint)fX, (xint)fY);
 
 	if (m_pActiveElement)
 		m_pActiveElement->OnMouseMove(m_xMousePos - m_xLastMousePos, IsMouseDown());
 
-  m_bFoundActive = false;
+	m_bFoundActive = false;
 
-  UpdateElement(m_pScreen);
+	UpdateElement(m_pScreen);
 
 	if (m_pFocusedElement)
 	{
 		CInterfaceElement* pElement = m_pFocusedElement;
 
 		do 
+		{
 			pElement->ToFront();
+		}
 		while (pElement = pElement->m_pParent);
 
-    // Check key presses.
-    if (xint iChar = _HGE->Input_GetChar())
+		// Check key presses.
+		if (xint iChar = _HGE->Input_GetChar())
 		{
-      if (iChar >= ' ' && iChar <= '~')
+			if (iChar >= ' ' && iChar <= '~')
 				m_pFocusedElement->OnKeyChar((xchar)iChar);
 		}
 
-    if (xint iKey = _HGE->Input_GetKey())
-    {
-      if (_HGE->Input_GetKeyState(iKey))
-        m_pFocusedElement->OnKeyDown(iKey);
-      else
-        m_pFocusedElement->OnKeyUp(iKey);
-    }
+		if (xint iKey = _HGE->Input_GetKey())
+		{
+			if (_HGE->Input_GetKeyState(iKey))
+				m_pFocusedElement->OnKeyDown(iKey);
+			else
+				m_pFocusedElement->OnKeyUp(iKey);
+		}
 	}
 }
 
@@ -112,53 +114,53 @@ void CInterfaceManager::Update()
 // =============================================================================
 void CInterfaceManager::Render()
 {
-  RenderElement(m_pScreen);
+	RenderElement(m_pScreen);
 
 	if (m_bDebugRender)
-  {
-    if (m_pActiveElement)
-    {
-      xrect xRect = m_pActiveElement->GetArea();
-      xuint iColour = ARGB(255, 32, 32, 32);
+	{
+		if (m_pActiveElement)
+		{
+			xrect xRect = m_pActiveElement->GetArea();
+			xuint iColour = ARGB(255, 32, 32, 32);
 
-      hgeQuad xQuad;
-      memset(&xQuad, 0, sizeof(hgeQuad));
+			hgeQuad xQuad;
+			memset(&xQuad, 0, sizeof(hgeQuad));
 
-      xQuad.v[0].x = (float)xRect.iLeft;
-      xQuad.v[0].y = (float)xRect.iTop;
-      xQuad.v[1].x = (float)xRect.iRight;
-      xQuad.v[1].y = (float)xRect.iTop;
-      xQuad.v[3].x = (float)xRect.iLeft;
-      xQuad.v[3].y = (float)xRect.iBottom;
-      xQuad.v[2].x = (float)xRect.iRight;
-      xQuad.v[2].y = (float)xRect.iBottom;
+			xQuad.v[0].x = (float)xRect.iLeft;
+			xQuad.v[0].y = (float)xRect.iTop;
+			xQuad.v[1].x = (float)xRect.iRight;
+			xQuad.v[1].y = (float)xRect.iTop;
+			xQuad.v[3].x = (float)xRect.iLeft;
+			xQuad.v[3].y = (float)xRect.iBottom;
+			xQuad.v[2].x = (float)xRect.iRight;
+			xQuad.v[2].y = (float)xRect.iBottom;
 
-      xQuad.v[0].col = xQuad.v[1].col = xQuad.v[2].col = xQuad.v[3].col = iColour;
+			xQuad.v[0].col = xQuad.v[1].col = xQuad.v[2].col = xQuad.v[3].col = iColour;
 
-      _HGE->Gfx_RenderQuad(&xQuad);
-    }
+			_HGE->Gfx_RenderQuad(&xQuad);
+		}
 
-    if (m_pFocusedElement)
-    {
-      xrect xRect = m_pFocusedElement->GetFocusArea() + xrect(2, 2, -1, -1);
-      xuint iColour = ARGB(255, 255, 0, 0);
+		if (m_pFocusedElement)
+		{
+			xrect xRect = m_pFocusedElement->GetFocusArea() + xrect(2, 2, -1, -1);
+			xuint iColour = ARGB(255, 255, 0, 0);
 
-      _HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iTop, iColour);
-      _HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iBottom, iColour);
-      _HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iBottom, iColour);
-      _HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iTop, iColour);
-    }
-  }
+			_HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iTop, iColour);
+			_HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iBottom, iColour);
+			_HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iBottom, iColour);
+			_HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iTop, iColour);
+		}
+	}
 
-  if (_HGE->Input_IsMouseOver() && m_pCursor[ElementType_Unknown])
-  {
-    CBasicSprite* pCursor = m_pCursor[ElementType_Unknown];
+	if (_HGE->Input_IsMouseOver() && m_pCursor[ElementType_Unknown])
+	{
+		CBasicSprite* pCursor = m_pCursor[ElementType_Unknown];
 
-    if (m_pActiveElement && m_pCursor[m_pActiveElement->GetType()])
-      pCursor = m_pCursor[m_pActiveElement->GetType()];
+		if (m_pActiveElement && m_pCursor[m_pActiveElement->GetType()])
+			pCursor = m_pCursor[m_pActiveElement->GetType()];
 
-    pCursor->Render(m_xMousePos);
-  }
+		pCursor->Render(m_xMousePos);
+	}
 }
 
 // =============================================================================
@@ -166,10 +168,10 @@ void CInterfaceManager::Render()
 // =============================================================================
 void CInterfaceManager::SetCursor(t_ElementType iType, CSpriteMetadata* pMetadata)
 {
-  if (m_pCursor[iType])
-    delete m_pCursor[iType];
+	if (m_pCursor[iType])
+		delete m_pCursor[iType];
 
-  m_pCursor[iType] = new CBasicSprite(pMetadata);
+	m_pCursor[iType] = new CBasicSprite(pMetadata);
 }
 
 // =============================================================================
@@ -200,41 +202,41 @@ XBOOL CInterfaceManager::IsMouseOver(CInterfaceElement* pElement)
 // =============================================================================
 void CInterfaceManager::UpdateElement(CInterfaceElement* pElement)
 {
-  // Iterate through all children in reverse-render order.
-  XEN_LIST_FOREACH_R(t_ElementList, ppElement, pElement->m_lpChildElements)
-    UpdateElement(*ppElement);
+	// Iterate through all children in reverse-render order.
+	XEN_LIST_FOREACH_R(t_ElementList, ppElement, pElement->m_lpChildElements)
+		UpdateElement(*ppElement);
 
-  if (pElement->IsVisible() && pElement->IsEnabled())
-  {
-    if (Math::Intersect(m_xMousePos, pElement->GetArea()))
-    {
-      // If we are the first element intersecting, we become the active element.
-      if (!m_bFoundActive)
-      {
-        m_bFoundActive = true;
+	if (pElement->IsVisible() && pElement->IsEnabled())
+	{
+		if (Math::Intersect(m_xMousePos, pElement->GetArea()))
+		{
+			// If we are the first element intersecting, we become the active element.
+			if (!m_bFoundActive)
+			{
+				m_bFoundActive = true;
 
-        if (m_pActiveElement && m_pActiveElement != pElement)
-          m_pActiveElement->OnMouseLeave();
+				if (m_pActiveElement && m_pActiveElement != pElement)
+					m_pActiveElement->OnMouseLeave();
 
-        m_pActiveElement = pElement;
-        m_pActiveElement->OnMouseEnter();
-      }
+				m_pActiveElement = pElement;
+				m_pActiveElement->OnMouseEnter();
+			}
 
-      // If we're the active element, check for mouse clicks.
-      if (m_pActiveElement == pElement)
-      {
-        if (_HGE->Input_KeyDown(HGEK_LBUTTON))
-        {
-          SetFocus(pElement);
-          pElement->OnMouseDown(m_xMousePos);
-        }
-        else if (_HGE->Input_KeyUp(HGEK_LBUTTON))
-          pElement->OnMouseUp(m_xMousePos);
-      }
-    }
-  }
+			// If we're the active element, check for mouse clicks.
+			if (m_pActiveElement == pElement)
+			{
+				if (_HGE->Input_KeyDown(HGEK_LBUTTON))
+				{
+					SetFocus(pElement);
+					pElement->OnMouseDown(m_xMousePos);
+				}
+				else if (_HGE->Input_KeyUp(HGEK_LBUTTON))
+					pElement->OnMouseUp(m_xMousePos);
+			}
+		}
+	}
 
-  pElement->Update();
+	pElement->Update();
 }
 
 // =============================================================================
@@ -242,13 +244,27 @@ void CInterfaceManager::UpdateElement(CInterfaceElement* pElement)
 // =============================================================================
 void CInterfaceManager::RenderElement(CInterfaceElement* pElement)
 {
-  if (pElement->IsVisible())
-  {
-    pElement->Render();
+	if (pElement->IsVisible())
+	{
+		pElement->Render();
 
-    XEN_LIST_FOREACH(t_ElementList, ppElement, pElement->m_lpChildElements)
-      RenderElement(*ppElement);
-  }
+		XEN_LIST_FOREACH(t_ElementList, ppElement, pElement->m_lpChildElements)
+			RenderElement(*ppElement);
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         09-Jun-2008
+// =============================================================================
+void CInterfaceManager::DeregisterElement(CInterfaceElement* pElement)
+{
+	if (pElement == m_pActiveElement)
+		m_pActiveElement = NULL;
+	
+	if (pElement == m_pFocusedElement)
+		m_pFocusedElement = NULL;
+
+	XEN_LIST_REMOVE(t_ElementList, m_lpElements, pElement);
 }
 
 //##############################################################################
@@ -264,10 +280,10 @@ void CInterfaceManager::RenderElement(CInterfaceElement* pElement)
 // =============================================================================
 CInterfaceElement::CInterfaceElement(t_ElementType iType) :
 	m_pExtendedData(NULL),
-  m_pParent(NULL),
-  m_iType(iType),
-  m_bVisible(true),
-  m_bEnabled(true)
+	m_pParent(NULL),
+	m_iType(iType),
+	m_bVisible(true),
+	m_bEnabled(true)
 {
 	InterfaceManager.RegisterElement(this);
 }
@@ -296,8 +312,8 @@ void CInterfaceElement::Move(xpoint xOffset)
 // =============================================================================
 void CInterfaceElement::Attach(CInterfaceElement* pElement)
 {
-  pElement->m_pParent = this;
-  m_lpChildElements.push_back(pElement);
+	pElement->m_pParent = this;
+	m_lpChildElements.push_back(pElement);
 }
 
 // =============================================================================
@@ -305,7 +321,7 @@ void CInterfaceElement::Attach(CInterfaceElement* pElement)
 // =============================================================================
 void CInterfaceElement::Detach(CInterfaceElement* pElement)
 {
-  XEN_LIST_REMOVE(t_ElementList, m_lpChildElements, pElement);
+	XEN_LIST_REMOVE(t_ElementList, m_lpChildElements, pElement);
 }
 
 // =============================================================================

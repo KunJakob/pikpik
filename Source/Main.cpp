@@ -15,6 +15,7 @@
 #include <Splash.h>
 #include <Menu.h>
 #include <Game.h>
+#include <Lobby.h>
 #include <Windows.h>
 #include <Resource.h>
 //#include <Network.h>
@@ -150,6 +151,7 @@ void Application::Initialise()
 	s_lpScreens.push_back(new CWarningScreen);
 	s_lpScreens.push_back(new CMenuScreen);
 	s_lpScreens.push_back(new CGameScreen);
+	s_lpScreens.push_back(new CLobbyScreen);
 
 	ScreenManager::Set(ScreenIndex_LogoScreen);
 }

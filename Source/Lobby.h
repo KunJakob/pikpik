@@ -25,6 +25,21 @@
 
 //##############################################################################
 //
+//                                   TYPES
+//
+//##############################################################################
+
+// The lobby state.
+enum t_LobbyState
+{
+	LobbyState_None,
+	LobbyState_JoinScreen,
+};
+
+//##############################################################################
+
+//##############################################################################
+//
 //                                LOBBY SCREEN
 //
 //##############################################################################
@@ -53,6 +68,14 @@ public:
 	//virtual void Event(XIN xuint iEventType, XIN void* pEventInfo) {}
 
 protected:
+	// The join screen address box.
+	CInputComponent* m_pAddressBox;
+
+	// The join screen join button.
+	CButtonComponent* m_pJoinButton;
+
+	// The join screen back button.
+	//CButtonComponent* m_pBackButton;
 };
 
 //##############################################################################

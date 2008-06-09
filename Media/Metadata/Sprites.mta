@@ -203,31 +203,31 @@
 {
 	.File "Surfaces\Menu-Input.png"
 	
-	.Area "Left"			{ .Size 0  0 32  96 }
-	.Area "Centre"			{ .Size 32 0 96  96 }
-	.Area "Right"			{ .Size 96 0 128 96 }	
+	.Area "Left"			{ .Rect 0  0 32  96 }
+	.Area "Centre"			{ .Rect 32 0 96  96 }
+	.Area "Right"			{ .Rect 96 0 128 96 }	
 }
 
 .Sprite "Menu-Button"
 {
 	.File "Surfaces\Menu-Button.png"
 	
-	.Area "NormalLeft"		{ .Size 0   0 32  96 }
-	.Area "NormalCentre"	{ .Size 32  0 96  96 }
-	.Area "NormalRight"		{ .Size 96  0 128 96 }
-	.Area "OverLeft"		{ .Size 128 0 160 96 }
-	.Area "OverCentre"		{ .Size 160 0 224 96 }
-	.Area "OverRight"		{ .Size 224 0 256 96 }
-	.Area "DownLeft"		{ .Size 256 0 288 96 }
-	.Area "DownCentre"		{ .Size 288 0 352 96 }
-	.Area "DownRight"		{ .Size 352 0 384 96 }
+	.Area "NormalLeft"		{ .Rect 0   0 32  96 }
+	.Area "NormalCentre"	{ .Rect 32  0 96  96 }
+	.Area "NormalRight"		{ .Rect 96  0 128 96 }
+	.Area "OverLeft"		{ .Rect 128 0 160 96 }
+	.Area "OverCentre"		{ .Rect 160 0 224 96 }
+	.Area "OverRight"		{ .Rect 224 0 256 96 }
+	.Area "DownLeft"		{ .Rect 256 0 288 96 }
+	.Area "DownCentre"		{ .Rect 288 0 352 96 }
+	.Area "DownRight"		{ .Rect 352 0 384 96 }
 }
 
 .Sprite "Menu-Status"
 {
 	.File "Surfaces\Menu-Status.png"
 	
-	.Area "Left"			{ .Size 0  0 32  152 }
-	.Area "Centre"			{ .Size 32 0 96  152 }
-	.Area "Right"			{ .Size 96 0 128 152 }	
+	.Area "Left"			{ .Rect 0  0 32  152 }
+	.Area "Centre"			{ .Rect 32 0 96  152 }
+	.Area "Right"			{ .Rect 96 0 128 152 }	
 }

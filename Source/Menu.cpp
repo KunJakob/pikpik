@@ -129,7 +129,7 @@ void CMenuScreen::Load()
 		new CMenuLink(MenuGroupIndex_Play,		m_pMenuHighlight,	_LOCALE("Menu_Back"),			xbind(this, &CMenuScreen::Callback_ShowMainMenu)),
 
 		// Online.
-		new CMenuLink(MenuGroupIndex_Online,	m_pMenuDefault,		_LOCALE("Menu_OnlineJoin"),		NULL),
+		new CMenuLink(MenuGroupIndex_Online,	m_pMenuDefault,		_LOCALE("Menu_OnlineJoin"),		xbind(this, &CMenuScreen::Callback_JoinLobby)),
 		new CMenuLink(MenuGroupIndex_Online,	m_pMenuDefault,		_LOCALE("Menu_OnlineCreate"),	NULL),
 		new CMenuLink(MenuGroupIndex_Online,	m_pMenuHighlight,	_LOCALE("Menu_Back"),			xbind(this, &CMenuScreen::Callback_ShowMainMenu)),
 	};
@@ -152,93 +152,10 @@ void CMenuScreen::Load()
 		}
 	}
 
-	SetMenuGroup(MenuGroupIndex_Main);
+	m_iLastMenuGroup = MenuGroupIndex_Main;
 
 	// Initialise statics.
 	m_iNextScreen = ScreenIndex_Invalid;
-
-	// Interface.
-	/*CWindowComponent* pWindow = new CWindowComponent(_SPRITE("Test-Window"), _FONT("Test-WindowFont"));
-	pWindow->SetInnerSize(200, 300);
-	pWindow->SetPosition(xpoint(10, 10));
-	pWindow->SetMoveable(true);
-	pWindow->SetTitle("Window #1");
-
-	CButtonComponent* pButton = new CButtonComponent(_SPRITE("Test-Button"), _FONT("Test-Font"));
-	pButton->SetWidth(190);
-	pButton->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 5));
-	pButton->SetText("Reset Position");
-	pButton->SetClickCallback(xbind(this, &CMenuScreen::Debug_HideWindow));
-
-	CInputComponent* pInput = new CInputComponent(_SPRITE("Test-Input"), _FONT("Test-Font"));
-	pInput->SetWidth(190);
-	pInput->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 35));
-	pInput->SetMasked(false);
-
-	CCheckComponent* pCheck = new CCheckComponent(_SPRITE("Test-Check"), _FONT("Test-Font"));
-	pCheck->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 65));
-	pCheck->SetText("Mask Input");
-
-	CRadioComponent* pRadio[7] = 
-	{
-		new CRadioComponent(0, _SPRITE("Test-Radio"), _FONT("Test-Font")),
-		new CRadioComponent(0, _SPRITE("Test-Radio"), _FONT("Test-Font")),
-		new CRadioComponent(0, _SPRITE("Test-Radio"), _FONT("Test-Font")),
-		new CRadioComponent(0, _SPRITE("Test-Radio"), _FONT("Test-Font")),
-		new CRadioComponent(1, _SPRITE("Test-Radio"), _FONT("Test-Font")),
-		new CRadioComponent(1, _SPRITE("Test-Radio"), _FONT("Test-Font")),
-		new CRadioComponent(1, _SPRITE("Test-Radio"), _FONT("Test-Font")),
-	};
-
-	pRadio[0]->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 95));
-	pRadio[0]->SetText("A1");
-
-	pRadio[1]->SetPosition(pWindow->GetInnerPosition() + xpoint(55, 95));
-	pRadio[1]->SetText("A2");
-
-	pRadio[2]->SetPosition(pWindow->GetInnerPosition() + xpoint(105, 95));
-	pRadio[2]->SetText("A3");
-
-	pRadio[3]->SetPosition(pWindow->GetInnerPosition() + xpoint(155, 95));
-	pRadio[3]->SetText("A4");
-
-	pRadio[4]->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 125));
-	pRadio[4]->SetText("B1");
-
-	pRadio[5]->SetPosition(pWindow->GetInnerPosition() + xpoint(55, 125));
-	pRadio[5]->SetText("B2");
-
-	pRadio[6]->SetPosition(pWindow->GetInnerPosition() + xpoint(105, 125));
-	pRadio[6]->SetText("B3");
-	pRadio[6]->m_pExtendedData = (void*)"SECRET";
-
-	CProgressComponent* pProgress = new CProgressComponent(_SPRITE("Test-Progress"));
-	pProgress->SetWidth(190);
-	pProgress->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 155));
-
-	CGroupComponent* pGroup = new CGroupComponent(_SPRITE("Test-Group"), _FONT("Test-GroupFont"));
-	pGroup->SetSize(190, 100);
-	pGroup->SetPosition(pWindow->GetInnerPosition() + xpoint(5, 185));
-	pGroup->SetTitle("Connection Info");
-
-	pWindow->Attach(pButton);
-	pWindow->Attach(pInput);
-	pWindow->Attach(pCheck);
-	pWindow->Attach(pRadio[0]);
-	pWindow->Attach(pRadio[1]);
-	pWindow->Attach(pRadio[2]);
-	pWindow->Attach(pRadio[3]);
-	pWindow->Attach(pRadio[4]);
-	pWindow->Attach(pRadio[5]);
-	pWindow->Attach(pRadio[6]);
-	pWindow->Attach(pProgress);
-	pWindow->Attach(pGroup);*/
-
-	//InterfaceManager.GetScreen()->Attach(pWindow);
-
-	/*m_pInput = pInput;
-	m_pCheck = pCheck;
-	m_pProgress = pProgress;*/
 }
 
 // =============================================================================
@@ -255,12 +172,29 @@ void CMenuScreen::Unload()
 }
 
 // =============================================================================
+// Nat Ryall                                                         09-Jun-2008
+// =============================================================================
+void CMenuScreen::Wake()
+{
+	SetMenuGroup(m_iLastMenuGroup);
+}
+
+// =============================================================================
+// Nat Ryall                                                         09-Jun-2008
+// =============================================================================
+void CMenuScreen::Sleep()
+{
+	m_iLastMenuGroup = m_iMenuGroup;
+	SetMenuGroup(MenuGroupIndex_None);
+}
+
+// =============================================================================
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
 void CMenuScreen::Update()
 {
 	// Allow "ESC" to exit the game.
-	if (_HGE->Input_KeyDown(HGEK_ESCAPE))
+	if (_HGE->Input_KeyDown(HGEK_ESCAPE) && m_iMenuGroup == MenuGroupIndex_Main)
 	{
 		_TERMINATE;
 		return;
@@ -275,19 +209,6 @@ void CMenuScreen::Update()
 
 	m_pBackground->Update();
 	InterfaceManager.Update();
-
-	// DEBUG.
-	/*if (CRadioComponent* pRadio = CRadioComponent::GetChecked(1))
-	{
-	if (pRadio->m_pExtendedData && stricmp((const char*)pRadio->m_pExtendedData, "SECRET") == 0)
-	{
-	m_pInput->SetText("You found the SECRET!");
-	m_pCheck->SetChecked(false);
-	}
-	}*/
-
-	//m_pInput->SetMasked(m_pCheck->IsChecked());
-	//m_pProgress->SetProgress(m_pProgress->GetProgress() + 0.001f);
 }
 
 // =============================================================================
@@ -346,8 +267,9 @@ void CMenuScreen::Callback_ShowOnlineMenu()
 // =============================================================================
 // Nat Ryall                                                          5-May-2008
 // =============================================================================
-void CMenuScreen::Callback_ShowJoinInterface()
+void CMenuScreen::Callback_JoinLobby()
 {
+	m_iNextScreen = ScreenIndex_LobbyScreen;
 }
 
 // =============================================================================

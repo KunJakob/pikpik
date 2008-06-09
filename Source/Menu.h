@@ -170,12 +170,12 @@ public:
 	/**
 	* Called once when the screen is placed at the top of the stack.
 	*/
-	virtual void Wake() {}
+	virtual void Wake();
 
 	/**
 	* Called once when the screen goes out of scope either through destruction or another screen is placed above this on the stack.
 	*/
-	virtual void Sleep() {}
+	virtual void Sleep();
 
 	/**
 	* Called each frame to update the screen when active.
@@ -202,7 +202,7 @@ protected:
 	void Callback_ShowMainMenu();
 	void Callback_ShowPlayMenu();
 	void Callback_ShowOnlineMenu();
-	void Callback_ShowJoinInterface();
+	void Callback_JoinLobby();
 	void Callback_StartLobby();
 	void Callback_StartGame();
 	void Callback_QuitGame();
@@ -225,6 +225,9 @@ protected:
 
 	// The currently active menu group.
 	t_MenuGroupIndex m_iMenuGroup;
+
+	// The last active menu group.
+	t_MenuGroupIndex m_iLastMenuGroup;
 
 	// The next screen to process.
 	t_ScreenIndex m_iNextScreen;
