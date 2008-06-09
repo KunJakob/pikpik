@@ -17,6 +17,7 @@
 #include <Game.h>
 #include <Windows.h>
 #include <Resource.h>
+//#include <Network.h>
 
 //##############################################################################
 #pragma endregion
@@ -185,6 +186,8 @@ XBOOL Application::Update()
 	}
 
 	s_iTimeDelta = (XUINT)(_TIMEDELTAF * 1000.f);
+
+	//Network.Update();
 
 	s_pSoundSystem->update();
 

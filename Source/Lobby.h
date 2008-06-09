@@ -31,74 +31,28 @@
 class CLobbyScreen : public CScreen
 {
 public:
-	/**
-	* Initialise the screen.
-	*/
+	// Initialise.
 	CLobbyScreen();
 
-	/**
-	* Deinitialise the screen.
-	*/
+	// Deinitialise
 	virtual ~CLobbyScreen();
 	
-	/**
-	* Called when the screen is first added to the screen stack.
-	*/
-	virtual void Load() {}
+	// Called when the screen is first added to the screen stack.
+	virtual void Load();
 
-	/**
-	* Called when the screen is removed from the screen stack.
-	*/
-	virtual void Unload() {}
+	// Called when the screen is removed from the screen stack.
+	virtual void Unload();
 
-	/**
-	* Called once when the screen is placed at the top of the stack.
-	*/
-	virtual void Wake() {}
+	// Called each frame to update the screen when active.
+	virtual void Update();
 
-	/**
-	* Called once when the screen goes out of scope either through destruction or another screen is placed above this on the stack.
-	*/
-	virtual void Sleep() {}
+	// Called each frame to render the screen when active.
+	virtual void Render();
 
-	/**
-	* Called each frame to update the screen when active.
-	*/
-	virtual void Update() {}
-
-	/**
-	* Called each frame to render the screen when active.
-	*/
-	virtual void Render() {}
-
-	/**
-	* Called when a game-specific event is executed when active.
-	*/
-	virtual void Event(XIN xuint iEventType, XIN void* pEventInfo) {}
+	// Called when a game-specific event is executed when active.
+	//virtual void Event(XIN xuint iEventType, XIN void* pEventInfo) {}
 
 protected:
-	// Create and initialise the lobby interface.
-	void CreateInterface();
-
-	// Create a specific window for the lobby.
-	void CreatePlayerList();
-	void CreateOptionsWindow();
-	void CreateChatWindow();
-
-	// The player list interface object.
-	class CPlayerList
-	{
-	public:
-	}
-	m_oPlayerList;
-
-	// The options window interface object.
-	class COptionsWindow
-	{
-	public:
-		CWindowComponent* m_pMainWindow;
-	}
-	m_oOptionsWindow;
 };
 
 //##############################################################################

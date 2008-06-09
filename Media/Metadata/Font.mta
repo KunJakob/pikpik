@@ -39,3 +39,60 @@
 		.Offset 2 2
 	}
 }
+
+.Font "Lobby-Title"
+{
+	.File "Font\ShowcardGothic_36.fnt"
+	.Colour 228 217 191
+	
+	.Shadow 
+	{ 
+		.Offset 2 2
+	}
+}
+
+.Font "Lobby-Peer"
+{
+	.File "Font\ShowcardGothic_36.fnt"
+	
+	.Shadow 
+	{
+		.Offset 2 2
+	}
+}
+
+.Font "Menu-Button"
+{
+	.File "Font\ShowcardGothic_36.fnt"
+	.Colour 228 217 191
+	
+	.Shadow 
+	{ 
+		.Colour 71 59 33
+		.Offset 3 3
+	}
+}
+
+.Font "Menu-Input"
+{
+	.File "Font\ShowcardGothic_36.fnt"
+	.Colour 71 59 33
+	
+	.Shadow 
+	{ 
+		.Colour 156 140 105
+		.Offset 3 3
+	}
+}
+
+.Font "Menu-Status"
+{
+	.File "Font\ShowcardGothic_36.fnt"
+	.Colour 228 217 191
+	
+	.Shadow 
+	{ 
+		.Colour 71 59 33
+		.Offset 3 3
+	}
+}

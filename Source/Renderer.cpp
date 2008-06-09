@@ -116,7 +116,7 @@ void RenderManager::Reset()
 // =============================================================================
 void RenderManager::Add(XUINT iLayer, CRenderable* pRenderable)
 {
-	XASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
+	XMASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
 	s_xLayers[iLayer].lpRenderables.push_back(pRenderable);
 }
 
@@ -134,7 +134,7 @@ void RenderManager::Remove(CRenderable* pRenderable)
 // =============================================================================
 void RenderManager::EnableLayer(XUINT iLayer)
 {
-	XASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
+	XMASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
 	s_xLayers[iLayer].bEnabled = true;
 }
 
@@ -143,7 +143,7 @@ void RenderManager::EnableLayer(XUINT iLayer)
 // =============================================================================
 void RenderManager::DisableLayer(XUINT iLayer)
 {
-	XASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
+	XMASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
 	s_xLayers[iLayer].bEnabled = false;
 }
 
@@ -152,7 +152,7 @@ void RenderManager::DisableLayer(XUINT iLayer)
 // =============================================================================
 XBOOL RenderManager::IsLayerEnabled(XUINT iLayer)
 {
-	XASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
+	XMASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
 	return s_xLayers[iLayer].bEnabled;
 }
 
@@ -161,7 +161,7 @@ XBOOL RenderManager::IsLayerEnabled(XUINT iLayer)
 // =============================================================================
 void RenderManager::SetRenderCallback(XUINT iLayer, t_fpRenderCallback fpCallback)
 {
-	XASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
+	XMASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
 	s_xLayers[iLayer].fpRenderCallback = fpCallback;
 }
 

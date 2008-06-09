@@ -65,7 +65,7 @@ public:
 
 			for (; ppCollideWith != s_lpCollidables.end(); ppCollideWith++)
 			{
-				XASSERT(*ppCollidable != *ppCollideWith, "Collidables should never match.");
+				XMASSERT(*ppCollidable != *ppCollideWith, "Collidables should never match.");
 
 				if ((*ppCollidable)->IsCollidable(*ppCollideWith) && (*ppCollideWith)->IsCollidable(*ppCollidable))
 				{

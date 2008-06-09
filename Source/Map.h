@@ -220,7 +220,8 @@ public:
 	*/
 	CMapBlock* GetBlock(XUINT iBlockIndex)
 	{
-		XASSERT(iBlockIndex < (m_iWidth * m_iHeight), "Block index requested is out of bounds.");
+		XMASSERT(iBlockIndex < (m_iWidth * m_iHeight), "Block index requested is out of bounds.");
+		return &m_xBlocks[iBlockIndex];
 	}
 
 	/**
