@@ -103,7 +103,7 @@ void CLobbyScreen::Start(t_LobbyStartMode iStartMode)
 		break;
 	
 	case LobbyStartMode_Create:
-		SetState(LobbyState_Connecting);
+		SetState(LobbyState_Creating);
 		break;
 	}
 }
