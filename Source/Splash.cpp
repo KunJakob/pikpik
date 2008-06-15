@@ -55,7 +55,7 @@ void CLogoScreen::Wake()
 // =============================================================================
 // Nat Ryall                                                          6-Apr-2008
 // =============================================================================
-void CLogoScreen::Event(xuint iEventType, void* pEventInfo)
+void CLogoScreen::Notify(xuint iEventType, void* pEventInfo)
 {
 	switch (iEventType)
 	{
@@ -110,7 +110,7 @@ void CLogoScreen::OnFadeComplete()
 // =============================================================================
 // Nat Ryall                                                          6-Apr-2008
 // =============================================================================
-void CWarningScreen::Event(xuint iEventType, void* pEventInfo)
+void CWarningScreen::Notify(xuint iEventType, void* pEventInfo)
 {
 	switch (iEventType)
 	{

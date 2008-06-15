@@ -14,8 +14,10 @@
 #include <Global.h>
 
 // Other.
-#include <RakNetworkFactory.h>
-#include <RakPeerInterface.h>
+#include <RakNet/RakNetworkFactory.h>
+#include <RakNet/RakPeerInterface.h>
+#include <RakNet/MessageIdentifiers.h>
+#include <RakNet/BitStream.h>
 
 //##############################################################################
 
@@ -35,6 +37,9 @@
 //                                   TYPES
 //
 //##############################################################################
+
+// Namespaces.
+using namespace RakNet;
 
 // Predeclare.
 class CNetworkPeer;
@@ -60,7 +65,7 @@ typedef xlist<CNetworkPeer*> t_NetworkPeerList;
 class CNetworkCallbacks
 {
 public:
-	xfunction(0)<> m_fpConnectionEstablished;
+	xfunction(1)<xbool /*Succeeded*/> m_fpConnectionCompleted;
 	xfunction(0)<> m_fpConnectionLost;
 	xfunction(1)<CNetworkPeer* /*Peer*/> m_fpPeerJoined;
 	xfunction(1)<CNetworkPeer* /*Peer*/> m_fpPeerLeaving;
@@ -88,10 +93,10 @@ public:
 	CNetwork();
 
 	// Initialise the network system as a host.
-	void StartHost();
+	void StartHost(xint iMaxPeers);
 
 	// Initialise the network system as a client.
-	void StartClient();
+	void StartClient(const xchar* pHostAddress, xint iHostPort);
 
 	// Deinitialise the network system.
 	void Stop();
@@ -131,13 +136,19 @@ protected:
 	void Reset();
 
 	// Process all host notifications.
-	void ProcessHostNotifications(xchar cIdentifier, Packet* pPacket, xchar* pData, xint iDataSize);
+	void ProcessHostNotifications(xchar cIdentifier, Packet* pPacket, xuchar* pData, xint iDataSize);
 
 	// Process all client notifications.
-	void ProcessClientNotifications(xchar cIdentifier, Packet* pPacket, xchar* pData, xint iDataSize);
+	void ProcessClientNotifications(xchar cIdentifier, Packet* pPacket, xuchar* pData, xint iDataSize);
+
+	// Process an incoming packet and dispatch to any callbacks.
+	void ProcessPacket(BitStream* pStream);
 
 	// Create a new peer object.
 	CNetworkPeer* CreatePeer();
+
+	// Geterate a new peer ID. Valid only on the host.
+	xint GetUniquePeerID();
 
 	// Destroy an existing peer if it exists by system address.
 	void DestroyPeer(SystemAddress* pAddress);
@@ -150,6 +161,9 @@ protected:
 
 	// Find an exisiting peer by peer ID.
 	CNetworkPeer* FindPeer(xint iPeerID);
+
+	// Forcefully disconnect a peer from the local machine. Valid only on the host.
+	void DisconnectPeer(CNetworkPeer* pPeer);
 
 	// The local interface.
 	RakPeerInterface* m_pInterface;
@@ -171,13 +185,16 @@ protected:
 class CNetworkPeer
 {
 public:
+	// Specifies if the peer is hosting.
+	xbool m_bHost;
+
 	// Specifies if the peer is local to the machine.
 	xbool m_bLocal;
 
 	// The unique network ID.
 	xint m_iID;
 
-	// The internal system address managed by RakNet.
+	// The internal system address managed by RakNet. This is not valid, client to client.
 	SystemAddress m_xAddress;
 
 	// The network peer custom data.

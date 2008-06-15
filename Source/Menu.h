@@ -102,39 +102,39 @@ public:
 	*/
 	virtual void Render();
 
-  /**
-  * Get the element width in pixels.
-  */
-  virtual xint GetWidth()
-  {
-    return m_pText->GetStringWidth();
-  }
+	/**
+	* Get the element width in pixels.
+	*/
+	virtual xint GetWidth()
+	{
+		return m_pText->GetStringWidth();
+	}
 
-  /**
-  * Get the element height in pixels.
-  */
-  virtual xint GetHeight()
-  {
-    return m_pText->GetFontHeight();
-  }
+	/**
+	* Get the element height in pixels.
+	*/
+	virtual xint GetHeight()
+	{
+		return m_pText->GetFontHeight();
+	}
 
 protected:
 	/**
 	* Re-position the menu link in relation to other links.
 	*/
-	void RePosition(XUINT iElementIndex, XUINT iNumElements);
+	void RePosition(xuint iElementIndex, xuint iNumElements);
 
-  /**
-  * Called when the mouse is released when the element is active.
-  */
-  virtual void OnMouseUp(XPOINT xPosition)
-  {
-    if (m_fpLinkSelectedCallback)
-      m_fpLinkSelectedCallback();
-  }
+	/**
+	* Called when the mouse is released when the element is active.
+	*/
+	virtual void OnMouseUp(xpoint xPosition)
+	{
+		if (m_fpLinkSelectedCallback)
+			m_fpLinkSelectedCallback();
+	}
 
 	// The group index of the element. This us used to enable/disable elements in groups.
-	XUINT m_iGroupIndex;
+	xuint m_iGroupIndex;
 
 	// The text to render for the link.
 	CText* m_pText;
@@ -190,12 +190,12 @@ public:
 	/**
 	* Called when a game-specific event is executed when active.
 	*/
-	virtual void Event(XIN xuint iEventType, XIN void* pEventInfo) {}
+	virtual void Notify(XIN xuint iEventType, XIN void* pEventInfo) {}
 
-  /**
-  * Set the menu group to render.
-  */
-  void SetMenuGroup(t_MenuGroupIndex iMenuGroup);
+	/**
+	* Set the menu group to render.
+	*/
+	void SetMenuGroup(t_MenuGroupIndex iMenuGroup);
 
 protected:
 	// Menu link actions.

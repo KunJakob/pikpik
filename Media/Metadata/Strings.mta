@@ -33,3 +33,15 @@
 
 .Menu_OnlineCreate
 "Create Game"
+
+// --------------------------------------------------------------------------------
+// Status
+// --------------------------------------------------------------------------------
+.Status_Creating
+"Creating Game"
+
+.Status_Connecting
+"Connecting"
+
+.Status_Joining
+"Joining Game"

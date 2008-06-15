@@ -102,7 +102,7 @@ public:
 	/**
 	* Called when a game-specific event is executed when active.
 	*/
-	virtual void Event(XIN xuint iEventType, XIN void* pEventInfo) {}
+	virtual void Notify(XIN xuint iEventType, XIN void* pEventInfo) {}
 
 	/**
 	* Add a player to the selection screen.

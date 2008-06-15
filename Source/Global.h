@@ -100,6 +100,7 @@ class CPlayer;
 class CMenuScreen;
 class CMap;
 class CFont;
+class CLobbyScreen;
 
 // The player identifier type.
 enum t_PlayerType
@@ -183,8 +184,11 @@ public:
 		return s_Instance;
 	}
 
-	// The menu class.
+	// The menu screen.
 	CMenuScreen* pMenu;
+
+	// The lobby screen.
+	CLobbyScreen* pLobby;
     
 	// The currently active map.
 	CMap* pActiveMap;

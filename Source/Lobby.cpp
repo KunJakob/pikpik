@@ -32,6 +32,7 @@
 // =============================================================================
 CLobbyScreen::CLobbyScreen() : CScreen(ScreenIndex_LobbyScreen)
 {
+	_GLOBAL.pLobby = this;
 }
 
 // =============================================================================
@@ -39,12 +40,162 @@ CLobbyScreen::CLobbyScreen() : CScreen(ScreenIndex_LobbyScreen)
 // =============================================================================
 CLobbyScreen::~CLobbyScreen()
 {
+	_GLOBAL.pLobby = NULL;
 }
 
 // =============================================================================
 // Nat Ryall                                                         09-Jun-2008
 // =============================================================================
 void CLobbyScreen::Load()
+{
+	m_pJoinInterface = new CJoinInterface();
+	m_pStatusBox = new CStatusBox();
+}
+
+// =============================================================================
+// Nat Ryall                                                         09-Jun-2008
+// =============================================================================
+void CLobbyScreen::Unload()
+{
+	delete m_pJoinInterface;
+	delete m_pStatusBox;
+}
+
+// =============================================================================
+// Nat Ryall                                                         09-Jun-2008
+// =============================================================================
+void CLobbyScreen::Update()
+{
+	// Allow "ESC" to exit the screen.
+	if (_HGE->Input_KeyUp(HGEK_ESCAPE))
+	{
+		switch (m_iState)
+		{
+		case LobbyState_JoinInterface:
+			ScreenManager::Pop();
+			break;
+		}
+
+		ScreenManager::Pop();
+	}
+
+	UpdateParent();
+}
+
+// =============================================================================
+// Nat Ryall                                                         09-Jun-2008
+// =============================================================================
+void CLobbyScreen::Render()
+{
+	RenderParent();
+}
+
+// =============================================================================
+// Nat Ryall                                                         09-Jun-2008
+// =============================================================================
+void CLobbyScreen::Start(t_LobbyStartMode iStartMode)
+{
+	switch (iStartMode)
+	{
+	case LobbyStartMode_Join:
+		SetState(LobbyState_JoinInterface);
+		break;
+	
+	case LobbyStartMode_Create:
+		SetState(LobbyState_Connecting);
+		break;
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         15-Jun-2008
+// =============================================================================
+void CLobbyScreen::SetState(t_LobbyState iState)
+{
+	InterfaceManager.GetScreen()->DetachAll();
+
+	switch (iState)
+	{
+	case LobbyState_JoinInterface:
+		m_pJoinInterface->AttachElements();
+		break;
+
+	case LobbyState_Creating:
+		m_pStatusBox->AttachElements();
+		m_pStatusBox->SetText(_LOCALE("Status_Creating"));
+		break;
+
+	case LobbyState_Connecting:
+		m_pStatusBox->AttachElements();
+		m_pStatusBox->SetText(_LOCALE("Status_Connecting"));
+		break;
+
+	case LobbyState_Joining:
+		m_pStatusBox->AttachElements();
+		m_pStatusBox->SetText(_LOCALE("Status_Joining"));
+		break;
+	}
+
+	m_iState = iState;
+}
+
+//##############################################################################
+
+//##############################################################################
+//
+//                               STATUS SCREEN
+//
+//##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                         09-Jun-2008
+// =============================================================================
+CStatusBox::CStatusBox()
+{
+	m_pStatusBox = new CProgressComponent(_SPRITE("Menu-Status"));
+	m_pStatusBox->SetInnerWidth(500);
+	m_pStatusBox->SetPosition(xpoint(_HSWIDTH - (m_pStatusBox->GetWidth() / 2), _HSHEIGHT - (m_pStatusBox->GetHeight() / 2)));
+	m_pStatusBox->SetEnabled(false);
+
+	CFontMetadata* pFont = _FONT("Menu-Status");
+
+	m_pLabel = new CLabelComponent(pFont);
+	m_pLabel->SetAlignment(HGETEXT_CENTER);
+	m_pLabel->SetPosition(xpoint(_HSWIDTH, _HSHEIGHT - ((xint)pFont->GetFont()->GetHeight() / 2)));
+}
+
+// =============================================================================
+// Nat Ryall                                                         09-Jun-2008
+// =============================================================================
+CStatusBox::~CStatusBox()
+{
+	InterfaceManager.GetScreen()->Detach(m_pStatusBox);
+	delete m_pStatusBox;
+
+	InterfaceManager.GetScreen()->Detach(m_pLabel);
+	delete m_pLabel;
+}
+
+// =============================================================================
+// Nat Ryall                                                         09-Jun-2008
+// =============================================================================
+void CStatusBox::SetText(const xchar* pStatus)
+{
+	m_pLabel->SetText(pStatus);
+}
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                 JOIN SCREEN
+//
+//##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                         15-Jun-2008
+// =============================================================================
+CJoinInterface::CJoinInterface()
 {
 	m_pAddressBox = new CInputComponent(_SPRITE("Menu-Input"), _FONT("Menu-Input"));
 	m_pAddressBox->SetInnerWidth(300);
@@ -62,38 +213,15 @@ void CLobbyScreen::Load()
 }
 
 // =============================================================================
-// Nat Ryall                                                         09-Jun-2008
+// Nat Ryall                                                         15-Jun-2008
 // =============================================================================
-void CLobbyScreen::Unload()
+CJoinInterface::~CJoinInterface()
 {
 	InterfaceManager.GetScreen()->Detach(m_pAddressBox);
 	delete m_pAddressBox;
 
 	InterfaceManager.GetScreen()->Detach(m_pJoinButton);
 	delete m_pJoinButton;
-}
-
-// =============================================================================
-// Nat Ryall                                                         09-Jun-2008
-// =============================================================================
-void CLobbyScreen::Update()
-{
-	// Allow "ESC" to exit the screen.
-	if (_HGE->Input_KeyDown(HGEK_ESCAPE))
-	{
-		ScreenManager::Pop();	
-		return;
-	}
-
-	ExecuteParentUpdate();
-}
-
-// =============================================================================
-// Nat Ryall                                                         09-Jun-2008
-// =============================================================================
-void CLobbyScreen::Render()
-{
-	ExecuteParentRender();
 }
 
 //##############################################################################

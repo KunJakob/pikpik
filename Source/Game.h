@@ -45,7 +45,7 @@ public:
 	virtual void Update();
 	virtual void Render();
 
-	virtual void Event(xuint iEventType, void* pEventInfo) {}
+	virtual void Notify(xuint iEventType, void* pEventInfo) {}
 
 	virtual void Sleep() {}
 	virtual void Unload();

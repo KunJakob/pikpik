@@ -67,23 +67,23 @@ public:
 class CButtonComponent : public CRowElement
 {
 public:
-  // Callbacks.
+	// Callbacks.
 	typedef xfunction(2)<CButtonComponent* /*Button*/, xpoint /*Offset*/> t_OnClickCallback;
 
-  // Initialise the button with the button image and label.
-  CButtonComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont = NULL);
+	// Initialise the button with the button image and label.
+	CButtonComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont = NULL);
 
-  // Deinitialise the button and clean up any memory.
-  virtual ~CButtonComponent();
+	// Deinitialise the button and clean up any memory.
+	virtual ~CButtonComponent();
 
-  // Render the button.
-  virtual void Render();
+	// Render the button.
+	virtual void Render();
 
-  // Get the height of the button.
-  virtual xint GetHeight()
-  {
-    return m_pC[m_iButtonState]->xRect.Height();
-  }
+	// Get the height of the button.
+	virtual xint GetHeight()
+	{
+		return m_pC[m_iButtonState]->xRect.Height();
+	}
 
 	// Set the button text label.
 	inline void SetText(const xchar* pText)
@@ -97,56 +97,56 @@ public:
 		return m_xText.c_str();
 	}
 
-  // Set the callback to execute if the button is clicked.
+	// Set the callback to execute if the button is clicked.
 	void SetClickCallback(t_OnClickCallback fpCallback)
-  {
-    m_fpOnClickCallback = fpCallback;
-  }
+	{
+		m_fpOnClickCallback = fpCallback;
+	}
 
 protected:
-  // Triggered when the mouse enters this element.
-  virtual void OnMouseEnter() 
-  {
-    m_iButtonState = InterfaceManager.IsMouseDown() ? ButtonState_Down : ButtonState_Over;
-  }
+	// Triggered when the mouse enters this element.
+	virtual void OnMouseEnter() 
+	{
+		m_iButtonState = InterfaceManager.IsMouseDown() ? ButtonState_Down : ButtonState_Over;
+	}
 
-  // Triggered when the mouse leaves this element.
-  virtual void OnMouseLeave()
-  {
-    m_iButtonState = ButtonState_Normal;
-  }
+	// Triggered when the mouse leaves this element.
+	virtual void OnMouseLeave()
+	{
+		m_iButtonState = ButtonState_Normal;
+	}
 
-  // Triggered when the left mouse-button is pressed within the element area when the element is active.
-  virtual void OnMouseDown(xpoint xPosition)
-  {
-    m_iButtonState = ButtonState_Down;
-  }
+	// Triggered when the left mouse-button is pressed within the element area when the element is active.
+	virtual void OnMouseDown(xpoint xPosition)
+	{
+		m_iButtonState = ButtonState_Down;
+	}
 
-  // Triggered when the left mouse-button is released within the element area when the element is active.
-  virtual void OnMouseUp(xpoint xPosition) 
-  {
-    m_iButtonState = ButtonState_Over;
+	// Triggered when the left mouse-button is released within the element area when the element is active.
+	virtual void OnMouseUp(xpoint xPosition) 
+	{
+		m_iButtonState = ButtonState_Over;
 
-    if (m_fpOnClickCallback)
-      m_fpOnClickCallback(this, InterfaceManager.GetMousePosition() - GetPosition());
-  }
+		if (m_fpOnClickCallback)
+			m_fpOnClickCallback(this, InterfaceManager.GetMousePosition() - GetPosition());
+	}
 
-  // The button states.
-  enum t_ButtonState
-  {
-    ButtonState_Normal,
-    ButtonState_Over,
-    ButtonState_Down,
+	// The button states.
+	enum t_ButtonState
+	{
+		ButtonState_Normal,
+		ButtonState_Over,
+		ButtonState_Down,
 		/*MAX*/ButtonState_Max,
-  };
+	};
 
 	// Element areas.
 	CSpriteMetadata::CArea* m_pL[ButtonState_Max];
 	CSpriteMetadata::CArea* m_pC[ButtonState_Max];
 	CSpriteMetadata::CArea* m_pR[ButtonState_Max];
 
-  // The internal button state.
-  t_ButtonState m_iButtonState;
+	// The internal button state.
+	t_ButtonState m_iButtonState;
 
 	// The button font.
 	CFont* m_pFont;
@@ -154,8 +154,8 @@ protected:
 	// The button string.
 	xstring m_xText;
 
-  // The callback to execute if the button is clicked.
-  t_OnClickCallback m_fpOnClickCallback;
+	// The callback to execute if the button is clicked.
+	t_OnClickCallback m_fpOnClickCallback;
 };
 
 //##############################################################################
@@ -226,7 +226,7 @@ protected:
 	{
 		m_iFlashTimer = 0;
 	}
-	
+
 	// Triggered when the left mouse-button is pressed within the element area.
 	virtual void OnMouseDown(xpoint xPosition);
 
@@ -314,14 +314,14 @@ protected:
 class CWindowComponent : public CContainerElement
 {
 public:
-  // Initialise the window using a specific graphic.
+	// Initialise the window using a specific graphic.
 	CWindowComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont = NULL);
 
-  // Deinitialise the window and clean up any memory.
-  virtual ~CWindowComponent();
+	// Deinitialise the window and clean up any memory.
+	virtual ~CWindowComponent();
 
-  // Render the button.
-  virtual void Render();
+	// Render the button.
+	virtual void Render();
 
 	// Set the window title text.
 	inline void SetTitle(const xchar* pTitle)

@@ -77,7 +77,7 @@ typedef XLIST<CInterfaceElement*> t_ElementList;
 //                             INTERFACE MANAGER
 //
 //##############################################################################
-class CInterfaceManager //: public Templates::CSingletonT<CInterfaceManager>
+class CInterfaceManager //: public CInterfaceElement
 {
 public:
 	// Friend.
@@ -118,16 +118,16 @@ public:
 	}
 
 	// Register a metadata object with the system.
-	inline void RegisterMetadata(CMetadata* pMetadata)
+	/*inline void RegisterMetadata(CMetadata* pMetadata)
 	{
 		m_lpMetadata.push_back(pMetadata);
-	}
+	}*/
 
 	// Remove a metadata object from the system.
-	inline void DeregisterMetadata(CMetadata* pMetadata)
+	/*inline void DeregisterMetadata(CMetadata* pMetadata)
 	{
 		XEN_LIST_REMOVE(t_MetadataList, m_lpMetadata, pMetadata);
-	}
+	}*/
 
 	// Set the cursor image for a specific element type.
 	void SetCursor(t_ElementType iType, CSpriteMetadata* pMetadata);
@@ -195,6 +195,9 @@ protected:
 
 	// Deregister an element from the system. This is done automatically when the element is destructed.
 	void DeregisterElement(CInterfaceElement* pElement);
+
+	// Safely remove an active element from the interface system.
+	void UnlinkElement(CInterfaceElement* pElement);
 
 	// Recursive function called on each element. Called in reverse render order.
 	void UpdateElement(CInterfaceElement* pElement);
@@ -347,10 +350,10 @@ public:
 	void Detach(CInterfaceElement* pElement);
 
 	// Detach all child elements from this element.
-	inline void DetachAll()
-	{
-		m_lpChildElements.clear();
-	}
+	void DetachAll();
+
+	// Check if the specified element is attached.
+	xbool IsAttached(CInterfaceElement* pElement);
 
 	// Bring the element to the front on the parent element.
 	void ToFront();

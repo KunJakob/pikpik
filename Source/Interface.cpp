@@ -22,11 +22,11 @@
 // Nat Ryall                                                          1-May-2008
 // =============================================================================
 CInterfaceManager::CInterfaceManager() :
-m_pScreen(NULL),
-m_pActiveElement(NULL),
-m_pFocusedElement(NULL),
-m_bFoundActive(false),
-m_bDebugRender(false)
+	m_pScreen(NULL),
+	m_pActiveElement(NULL),
+	m_pFocusedElement(NULL),
+	m_bFoundActive(false),
+	m_bDebugRender(false)
 {
 	m_pScreen = new CScreenElement();
 	Reset();
@@ -91,21 +91,25 @@ void CInterfaceManager::Update()
 			pElement->ToFront();
 		}
 		while (pElement = pElement->m_pParent);
+	}
 
-		// Check key presses.
-		if (xint iChar = _HGE->Input_GetChar())
-		{
-			if (iChar >= ' ' && iChar <= '~')
-				m_pFocusedElement->OnKeyChar((xchar)iChar);
-		}
+	// Check key presses.
+	xint iChar = _HGE->Input_GetChar();
 
-		if (xint iKey = _HGE->Input_GetKey())
-		{
-			if (_HGE->Input_GetKeyState(iKey))
-				m_pFocusedElement->OnKeyDown(iKey);
-			else
-				m_pFocusedElement->OnKeyUp(iKey);
-		}
+	if (m_pFocusedElement && iChar)
+	{
+		if (iChar >= ' ' && iChar <= '~')
+			m_pFocusedElement->OnKeyChar((xchar)iChar);
+	}
+
+	xint iKey = _HGE->Input_GetKey();
+
+	if (m_pFocusedElement && iKey)
+	{
+		if (_HGE->Input_GetKeyState(iKey))
+			m_pFocusedElement->OnKeyDown(iKey);
+		else
+			m_pFocusedElement->OnKeyUp(iKey);
 	}
 }
 
@@ -258,11 +262,8 @@ void CInterfaceManager::RenderElement(CInterfaceElement* pElement)
 // =============================================================================
 void CInterfaceManager::DeregisterElement(CInterfaceElement* pElement)
 {
-	if (pElement == m_pActiveElement)
-		m_pActiveElement = NULL;
-	
-	if (pElement == m_pFocusedElement)
-		m_pFocusedElement = NULL;
+	if (CInterfaceElement* pParent = pElement->m_pParent)
+		pParent->Detach(pElement);
 
 	XEN_LIST_REMOVE(t_ElementList, m_lpElements, pElement);
 }
@@ -313,6 +314,7 @@ void CInterfaceElement::Move(xpoint xOffset)
 void CInterfaceElement::Attach(CInterfaceElement* pElement)
 {
 	pElement->m_pParent = this;
+
 	m_lpChildElements.push_back(pElement);
 }
 
@@ -321,7 +323,38 @@ void CInterfaceElement::Attach(CInterfaceElement* pElement)
 // =============================================================================
 void CInterfaceElement::Detach(CInterfaceElement* pElement)
 {
+	pElement->m_pParent = NULL;
+
 	XEN_LIST_REMOVE(t_ElementList, m_lpChildElements, pElement);
+
+	if (pElement == InterfaceManager.m_pActiveElement)
+		InterfaceManager.m_pActiveElement = NULL;
+
+	if (pElement == InterfaceManager.m_pFocusedElement)
+		InterfaceManager.m_pFocusedElement = NULL;
+}
+
+// =============================================================================
+// Nat Ryall                                                         15-Jun-2008
+// =============================================================================
+void CInterfaceElement::DetachAll()
+{
+	while (m_lpChildElements.size())
+		Detach(m_lpChildElements.front());
+}
+
+// =============================================================================
+// Nat Ryall                                                         15-Jun-2008
+// =============================================================================
+xbool CInterfaceElement::IsAttached(CInterfaceElement* pElement)
+{
+	XEN_LIST_FOREACH(t_ElementList, ppElement, m_lpChildElements)
+	{
+		if (pElement == *ppElement)
+			return true;
+	}
+
+	return false;
 }
 
 // =============================================================================
@@ -331,8 +364,8 @@ void CInterfaceElement::ToFront()
 {
 	if (m_pParent)
 	{
-		m_pParent->Detach(this);
-		m_pParent->Attach(this);
+		XEN_LIST_REMOVE(t_ElementList, m_pParent->m_lpChildElements, this);
+		m_pParent->m_lpChildElements.push_back(this);
 	}
 }
 

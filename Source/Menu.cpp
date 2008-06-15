@@ -40,9 +40,9 @@
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
 CMenuLink::CMenuLink(XUINT iGroupIndex, CFontMetadata* pFont, const XCHAR* pText, t_fpLinkSelectedCallback fpCallback) : CInterfaceElement(ElementType_MenuLink),
-m_iGroupIndex(iGroupIndex),
-m_pText(NULL),
-m_fpLinkSelectedCallback(fpCallback)
+	m_iGroupIndex(iGroupIndex),
+	m_pText(NULL),
+	m_fpLinkSelectedCallback(fpCallback)
 {
 	m_pText = new CText(pFont);
 	m_pText->SetString(pText);
@@ -113,8 +113,6 @@ void CMenuScreen::Load()
 	InterfaceManager.SetCursor(ElementType_MenuLink, _SPRITE("Cursor-Click"));
 
 	// Initialise the menu links.
-	m_iMenuGroup = MenuGroupIndex_None;
-
 	CMenuLink* pLinkList[] = 
 	{
 		// Main.
@@ -134,27 +132,20 @@ void CMenuScreen::Load()
 		new CMenuLink(MenuGroupIndex_Online,	m_pMenuHighlight,	_LOCALE("Menu_Back"),			xbind(this, &CMenuScreen::Callback_ShowMainMenu)),
 	};
 
-	for (XUINT iA = 0; iA < (sizeof(pLinkList) / sizeof(CMenuLink*)); ++iA)
-	{
+	for (xuint iA = 0; iA < (sizeof(pLinkList) / sizeof(CMenuLink*)); ++iA)
 		m_lpMenuLinks[pLinkList[iA]->m_iGroupIndex].push_back(pLinkList[iA]);
-		InterfaceManager.GetScreen()->Attach(pLinkList[iA]);
-	}
 
-	for (XUINT iGroup = 0; iGroup < MenuGroupIndex_Max; ++iGroup)
+	for (xuint iGroup = 0; iGroup < MenuGroupIndex_Max; ++iGroup)
 	{
-		XUINT iElementCount = m_lpMenuLinks[iGroup].size();
-		XUINT iElement = 0;
+		xuint iElementCount = m_lpMenuLinks[iGroup].size();
+		xuint iElement = 0;
 
 		XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[iGroup])
-		{
-			(*ppMenuLink)->SetVisible(false);
 			(*ppMenuLink)->RePosition(iElement++, iElementCount);
-		}
 	}
 
+	// Initialise transition variables.
 	m_iLastMenuGroup = MenuGroupIndex_Main;
-
-	// Initialise statics.
 	m_iNextScreen = ScreenIndex_Invalid;
 }
 
@@ -194,10 +185,18 @@ void CMenuScreen::Sleep()
 void CMenuScreen::Update()
 {
 	// Allow "ESC" to exit the game.
-	if (_HGE->Input_KeyDown(HGEK_ESCAPE) && m_iMenuGroup == MenuGroupIndex_Main)
+	if (_HGE->Input_KeyUp(HGEK_ESCAPE))
 	{
-		_TERMINATE;
-		return;
+		switch (m_iMenuGroup)
+		{
+		case MenuGroupIndex_Main:
+			_TERMINATE;
+			return;
+		
+		case MenuGroupIndex_Online:
+			SetMenuGroup(MenuGroupIndex_Main);
+			break;
+		}
 	}
 
 	// Transition or update this screen.
@@ -225,16 +224,12 @@ void CMenuScreen::Render()
 // =============================================================================
 void CMenuScreen::SetMenuGroup(t_MenuGroupIndex iMenuGroup)
 {
-	if (m_iMenuGroup != MenuGroupIndex_None)
-	{
-		XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[m_iMenuGroup])
-			(*ppMenuLink)->SetVisible(false);
-	}
+	InterfaceManager.GetScreen()->DetachAll();
 
 	if (iMenuGroup != MenuGroupIndex_None)
 	{
 		XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[iMenuGroup])
-			(*ppMenuLink)->SetVisible(true);
+			InterfaceManager.GetScreen()->Attach(*ppMenuLink);
 	}
 
 	m_iMenuGroup = iMenuGroup;

@@ -209,7 +209,7 @@ void CGameScreen::Unload()
 void CGameScreen::Update()
 {
 	// Exit the game.
-	if (_HGE->Input_KeyDown(HGEK_ESCAPE))
+	if (_HGE->Input_KeyUp(HGEK_ESCAPE))
 	{
 		ScreenManager::Pop();
 		return;

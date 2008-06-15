@@ -76,19 +76,19 @@ void CImageComponent::Render()
 // Nat Ryall                                                         11-May-2008
 // =============================================================================
 CButtonComponent::CButtonComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont) : CRowElement(ElementType_Button, pMetaSprite),
-  m_iButtonState(ButtonState_Normal),
+	m_iButtonState(ButtonState_Normal),
 	m_pFont(NULL),
-  m_fpOnClickCallback(NULL)
+	m_fpOnClickCallback(NULL)
 {
-  m_pL[ButtonState_Normal]		= pMetaSprite->FindArea("NormalLeft");
+	m_pL[ButtonState_Normal]		= pMetaSprite->FindArea("NormalLeft");
 	m_pC[ButtonState_Normal]		= pMetaSprite->FindArea("NormalCentre"); 
 	m_pR[ButtonState_Normal]		= pMetaSprite->FindArea("NormalRight");
 	m_pL[ButtonState_Over]			= pMetaSprite->FindArea("OverLeft");
 	m_pC[ButtonState_Over]			= pMetaSprite->FindArea("OverCentre");
 	m_pR[ButtonState_Over]			= pMetaSprite->FindArea("OverRight"); 
 	m_pL[ButtonState_Down]			= pMetaSprite->FindArea("DownLeft"); 
-  m_pC[ButtonState_Down]			= pMetaSprite->FindArea("DownCentre"); 
-  m_pR[ButtonState_Down]			= pMetaSprite->FindArea("DownRight");
+	m_pC[ButtonState_Down]			= pMetaSprite->FindArea("DownCentre"); 
+	m_pR[ButtonState_Down]			= pMetaSprite->FindArea("DownRight");
 
 	m_xFrameSize = xrect(m_pL[0]->xRect.Width(), 0, m_pR[0]->xRect.Width(), 0);
 
@@ -110,10 +110,10 @@ CButtonComponent::~CButtonComponent()
 // =============================================================================
 void CButtonComponent::Render()
 {
-  CRowElement::Render(m_pL[m_iButtonState]->xRect, m_pC[m_iButtonState]->xRect, m_pR[m_iButtonState]->xRect);
+	CRowElement::Render(m_pL[m_iButtonState]->xRect, m_pC[m_iButtonState]->xRect, m_pR[m_iButtonState]->xRect);
 
-  if (m_pFont)
-    m_pFont->Render(m_xText.c_str(), xrect(0, 0, GetSize()) + GetPosition(), HGETEXT_CENTER | HGETEXT_MIDDLE);
+	if (m_pFont)
+		m_pFont->Render(m_xText.c_str(), xrect(0, 0, GetSize()) + GetPosition(), HGETEXT_CENTER | HGETEXT_MIDDLE);
 }
 
 //##############################################################################
@@ -167,7 +167,7 @@ void CInputComponent::Render()
 
 	// Get the render text and render text offset.
 	xstring xRenderText = m_xText;
-	
+
 	if (m_bMasked)
 		xRenderText.replace(0, xRenderText.length(), xRenderText.length(), '*');
 
@@ -270,7 +270,7 @@ void CInputComponent::OnKeyChar(xchar cChar)
 // Nat Ryall                                                         13-May-2008
 // =============================================================================
 CProgressComponent::CProgressComponent(CSpriteMetadata* pMetaSprite) : CRowElement(ElementType_Progress, pMetaSprite),
-	m_fProgress(0.f)
+m_fProgress(0.f)
 {
 	m_pL = pMetaSprite->FindArea("Left");
 	m_pC = pMetaSprite->FindArea("Centre");
@@ -311,23 +311,23 @@ CWindowComponent::CWindowComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* 
 	m_bMoveable(false),
 	m_bDragging(false)
 {
-  m_pTL = pMetaSprite->FindArea("TopLeft"); 
-  m_pTC = pMetaSprite->FindArea("TopCentre"); 
-  m_pTR = pMetaSprite->FindArea("TopRight"); 
-  m_pML = pMetaSprite->FindArea("MiddleLeft"); 
-  m_pMC = pMetaSprite->FindArea("MiddleCentre"); 
-  m_pMR = pMetaSprite->FindArea("MiddleRight"); 
-  m_pBL = pMetaSprite->FindArea("BottomLeft"); 
-  m_pBC = pMetaSprite->FindArea("BottomCentre"); 
-  m_pBR = pMetaSprite->FindArea("BottomRight");
+	m_pTL = pMetaSprite->FindArea("TopLeft"); 
+	m_pTC = pMetaSprite->FindArea("TopCentre"); 
+	m_pTR = pMetaSprite->FindArea("TopRight"); 
+	m_pML = pMetaSprite->FindArea("MiddleLeft"); 
+	m_pMC = pMetaSprite->FindArea("MiddleCentre"); 
+	m_pMR = pMetaSprite->FindArea("MiddleRight"); 
+	m_pBL = pMetaSprite->FindArea("BottomLeft"); 
+	m_pBC = pMetaSprite->FindArea("BottomCentre"); 
+	m_pBR = pMetaSprite->FindArea("BottomRight");
 
-  m_xFrameSize = xrect
-  (
-    m_pML->xRect.Width(),
-    m_pTC->xRect.Height(),
-    m_pMR->xRect.Width(),
-    m_pBC->xRect.Height()
-  );
+	m_xFrameSize = xrect
+	(
+		m_pML->xRect.Width(),
+		m_pTC->xRect.Height(),
+		m_pMR->xRect.Width(),
+		m_pBC->xRect.Height()
+	);
 
 	if (pMetaFont)
 		m_pFont = new CFont(pMetaFont);
@@ -519,7 +519,7 @@ void CRadioComponent::OnMouseUp(xpoint xPosition)
 
 	if (pRadio)
 		pRadio->SetChecked(false);
-	
+
 	m_bChecked = true;
 	m_iCheckState = CheckState_Over;
 }

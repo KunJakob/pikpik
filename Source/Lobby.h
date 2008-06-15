@@ -29,11 +29,25 @@
 //
 //##############################################################################
 
+// Predeclare.
+class CStatusBox;
+class CJoinInterface;
+
+// The lobby start mode.
+enum t_LobbyStartMode
+{
+	LobbyStartMode_Join,
+	LobbyStartMode_Create,
+};
+
 // The lobby state.
 enum t_LobbyState
 {
 	LobbyState_None,
-	LobbyState_JoinScreen,
+	LobbyState_JoinInterface,
+	LobbyState_Creating,
+	LobbyState_Connecting,
+	LobbyState_Joining,
 };
 
 //##############################################################################
@@ -64,8 +78,79 @@ public:
 	// Called each frame to render the screen when active.
 	virtual void Render();
 
-	// Called when a game-specific event is executed when active.
-	//virtual void Event(XIN xuint iEventType, XIN void* pEventInfo) {}
+	// Start the lobby.
+	void Start(t_LobbyStartMode iStartMode);
+
+protected:
+	// Set the internal state.
+	void SetState(t_LobbyState iState);
+
+	// The current lobby state.
+	t_LobbyState m_iState;
+
+	// The join interface.
+	CJoinInterface* m_pJoinInterface;
+
+	// The status box.
+	CStatusBox* m_pStatusBox;
+};
+
+//##############################################################################
+
+//##############################################################################
+//
+//                               STATUS SCREEN
+//
+//##############################################################################
+class CStatusBox
+{
+public:
+	// Constructor.
+	CStatusBox();
+
+	// Destructor.
+	virtual ~CStatusBox();
+
+	// Update the status box with the specified text.
+	void SetText(const xchar* pStatus);
+
+	// Attach all elements to the interface.
+	inline void AttachElements()
+	{
+		InterfaceManager.GetScreen()->Attach(m_pStatusBox);
+		InterfaceManager.GetScreen()->Attach(m_pLabel);
+	}
+
+protected:
+	// The status screen display box.
+	CProgressComponent* m_pStatusBox;
+
+	// The status text.
+	CLabelComponent* m_pLabel;
+};
+
+//##############################################################################
+
+//##############################################################################
+//
+//                               JOIN INTERFACE
+//
+//##############################################################################
+class CJoinInterface
+{
+public:
+	// Constructor.
+	CJoinInterface();
+
+	// Destructor.
+	virtual ~CJoinInterface();
+
+	// Attach all elements to the interface.
+	inline void AttachElements()
+	{
+		InterfaceManager.GetScreen()->Attach(m_pAddressBox);
+		InterfaceManager.GetScreen()->Attach(m_pJoinButton);
+	}
 
 protected:
 	// The join screen address box.
@@ -73,9 +158,6 @@ protected:
 
 	// The join screen join button.
 	CButtonComponent* m_pJoinButton;
-
-	// The join screen back button.
-	//CButtonComponent* m_pBackButton;
 };
 
 //##############################################################################

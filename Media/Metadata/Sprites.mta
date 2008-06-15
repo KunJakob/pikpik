@@ -230,4 +230,5 @@
 	.Area "Left"			{ .Rect 0  0 32  152 }
 	.Area "Centre"			{ .Rect 32 0 96  152 }
 	.Area "Right"			{ .Rect 96 0 128 152 }	
+	.Area "Progress"		{ .Rect 32 0 96  152 }
 }
