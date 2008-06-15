@@ -82,6 +82,9 @@ public:
 	void Start(t_LobbyStartMode iStartMode);
 
 protected:
+	//
+	void OnJoinClicked(CButtonComponent* pButton, xpoint xOffset);
+
 	// Set the internal state.
 	void SetState(t_LobbyState iState);
 
@@ -105,6 +108,9 @@ protected:
 class CStatusBox
 {
 public:
+	// Friends.
+	friend class CLobbyScreen;
+
 	// Constructor.
 	CStatusBox();
 
@@ -139,6 +145,9 @@ protected:
 class CJoinInterface
 {
 public:
+	// Friends.
+	friend class CLobbyScreen;
+
 	// Constructor.
 	CJoinInterface();
 

@@ -51,6 +51,8 @@ void CLobbyScreen::Load()
 {
 	m_pJoinInterface = new CJoinInterface();
 	m_pStatusBox = new CStatusBox();
+
+	m_pJoinInterface->m_pJoinButton->SetClickCallback(xbind(this, &CLobbyScreen::OnJoinClicked));
 }
 
 // =============================================================================
@@ -138,6 +140,14 @@ void CLobbyScreen::SetState(t_LobbyState iState)
 	m_iState = iState;
 }
 
+// =============================================================================
+// Nat Ryall                                                         15-Jun-2008
+// =============================================================================
+void CLobbyScreen::OnJoinClicked(CButtonComponent* pButton, xpoint xOffset)
+{
+	SetState(LobbyState_Connecting);
+}
+
 //##############################################################################
 
 //##############################################################################
@@ -202,7 +212,7 @@ CJoinInterface::CJoinInterface()
 
 	m_pJoinButton = new CButtonComponent(_SPRITE("Menu-Button"), _FONT("Menu-Button"));
 	m_pJoinButton->SetInnerWidth(100);
-	m_pJoinButton->SetText("Join");
+	m_pJoinButton->SetText(_LOCALE("Button_Join"));
 
 	m_pAddressBox->SetPosition(xpoint(_HSWIDTH - ((m_pAddressBox->GetWidth() + m_pJoinButton->GetWidth() + 10) / 2), _HSHEIGHT - (m_pAddressBox->GetHeight() / 2)));
 	m_pJoinButton->SetPosition(m_pAddressBox->GetPosition() + xpoint(m_pAddressBox->GetWidth() + 5, 0));
