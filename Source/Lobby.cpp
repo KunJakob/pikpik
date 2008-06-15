@@ -30,7 +30,8 @@
 // =============================================================================
 // Nat Ryall                                                         22-May-2008
 // =============================================================================
-CLobbyScreen::CLobbyScreen() : CScreen(ScreenIndex_LobbyScreen)
+CLobbyScreen::CLobbyScreen() : CScreen(ScreenIndex_LobbyScreen),
+	m_iState(LobbyState_None)
 {
 	_GLOBAL.pLobby = this;
 }
@@ -71,12 +72,10 @@ void CLobbyScreen::Update()
 	{
 		switch (m_iState)
 		{
-		case LobbyState_JoinInterface:
+		case LobbyState_Join:
 			ScreenManager::Pop();
 			break;
 		}
-
-		ScreenManager::Pop();
 	}
 
 	UpdateParent();
@@ -98,7 +97,7 @@ void CLobbyScreen::Start(t_LobbyStartMode iStartMode)
 	switch (iStartMode)
 	{
 	case LobbyStartMode_Join:
-		SetState(LobbyState_JoinInterface);
+		SetState(LobbyState_Join);
 		break;
 	
 	case LobbyStartMode_Create:
@@ -116,7 +115,7 @@ void CLobbyScreen::SetState(t_LobbyState iState)
 
 	switch (iState)
 	{
-	case LobbyState_JoinInterface:
+	case LobbyState_Join:
 		m_pJoinInterface->AttachElements();
 		break;
 
@@ -207,9 +206,6 @@ CJoinInterface::CJoinInterface()
 
 	m_pAddressBox->SetPosition(xpoint(_HSWIDTH - ((m_pAddressBox->GetWidth() + m_pJoinButton->GetWidth() + 10) / 2), _HSHEIGHT - (m_pAddressBox->GetHeight() / 2)));
 	m_pJoinButton->SetPosition(m_pAddressBox->GetPosition() + xpoint(m_pAddressBox->GetWidth() + 5, 0));
-
-	InterfaceManager.GetScreen()->Attach(m_pAddressBox);
-	InterfaceManager.GetScreen()->Attach(m_pJoinButton);
 }
 
 // =============================================================================

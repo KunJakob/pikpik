@@ -25,6 +25,7 @@
 #include <Font.h>
 #include <Selection.h>
 #include <Component.h>
+#include <Lobby.h>
 
 //##############################################################################
 #pragma endregion
@@ -128,7 +129,7 @@ void CMenuScreen::Load()
 
 		// Online.
 		new CMenuLink(MenuGroupIndex_Online,	m_pMenuDefault,		_LOCALE("Menu_OnlineJoin"),		xbind(this, &CMenuScreen::Callback_JoinLobby)),
-		new CMenuLink(MenuGroupIndex_Online,	m_pMenuDefault,		_LOCALE("Menu_OnlineCreate"),	NULL),
+		new CMenuLink(MenuGroupIndex_Online,	m_pMenuDefault,		_LOCALE("Menu_OnlineCreate"),	xbind(this, &CMenuScreen::Callback_CreateLobby)),
 		new CMenuLink(MenuGroupIndex_Online,	m_pMenuHighlight,	_LOCALE("Menu_Back"),			xbind(this, &CMenuScreen::Callback_ShowMainMenu)),
 	};
 
@@ -147,6 +148,7 @@ void CMenuScreen::Load()
 	// Initialise transition variables.
 	m_iLastMenuGroup = MenuGroupIndex_Main;
 	m_iNextScreen = ScreenIndex_Invalid;
+	m_iLobbyMode = LobbyStartMode_Join;
 }
 
 // =============================================================================
@@ -203,6 +205,14 @@ void CMenuScreen::Update()
 	if (m_iNextScreen != ScreenIndex_Invalid)
 	{
 		ScreenManager::Push(m_iNextScreen);
+
+		switch (m_iNextScreen)
+		{
+		case ScreenIndex_LobbyScreen:
+			_GLOBAL.pLobby->Start(m_iLobbyMode);
+			break;
+		}
+
 		m_iNextScreen = ScreenIndex_Invalid;
 	}
 
@@ -265,6 +275,16 @@ void CMenuScreen::Callback_ShowOnlineMenu()
 void CMenuScreen::Callback_JoinLobby()
 {
 	m_iNextScreen = ScreenIndex_LobbyScreen;
+	m_iLobbyMode = LobbyStartMode_Join;
+}
+
+// =============================================================================
+// Nat Ryall                                                         15-Jun-2008
+// =============================================================================
+void CMenuScreen::Callback_CreateLobby()
+{
+	m_iNextScreen = ScreenIndex_LobbyScreen;
+	m_iLobbyMode = LobbyStartMode_Create;
 }
 
 // =============================================================================

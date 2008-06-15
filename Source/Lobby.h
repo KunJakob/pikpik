@@ -44,7 +44,7 @@ enum t_LobbyStartMode
 enum t_LobbyState
 {
 	LobbyState_None,
-	LobbyState_JoinInterface,
+	LobbyState_Join,
 	LobbyState_Creating,
 	LobbyState_Connecting,
 	LobbyState_Joining,

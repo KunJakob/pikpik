@@ -25,6 +25,7 @@
 #include <Font.h>
 #include <Interface.h>
 #include <Component.h>
+#include <Lobby.h>
 
 //##############################################################################
 #pragma endregion
@@ -203,13 +204,14 @@ protected:
 	void Callback_ShowPlayMenu();
 	void Callback_ShowOnlineMenu();
 	void Callback_JoinLobby();
+	void Callback_CreateLobby();
 	void Callback_StartLobby();
 	void Callback_StartGame();
 	void Callback_QuitGame();
 
 	// Callback implementations.
 	void Debug_HideWindow(CButtonComponent* pButton, xpoint xOffset);
-
+	
 	// The font metadata to render the links with.
 	CFontMetadata* m_pMenuDefault;
 	CFontMetadata* m_pMenuHighlight;
@@ -232,10 +234,8 @@ protected:
 	// The next screen to process.
 	t_ScreenIndex m_iNextScreen;
 
-	// DEBUG
-	CInputComponent* m_pInput;
-	CCheckComponent* m_pCheck;
-	CProgressComponent* m_pProgress;
+	// The lobby start mode.
+	t_LobbyStartMode m_iLobbyMode;
 };
 
 //##############################################################################
