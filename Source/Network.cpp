@@ -31,94 +31,6 @@ CNetwork::CNetwork()
 // =============================================================================
 // Nat Ryall                                                         08-Jun-2008
 // =============================================================================
-void CNetwork::StartHost(xint iMaxPeers)
-{
-	XASSERT(!m_pInterface);
-
-	if (!m_pInterface)
-	{
-		m_bHosting = true;
-		m_pInterface = RakNetworkFactory::GetRakPeerInterface();
-
-		m_xSocket.hostAddress[0] = NULL;
-		m_xSocket.port = 20557;
-
-		m_pInterface->Startup(iMaxPeers, 0, &m_xSocket, 1);
-		m_pInterface->SetMaximumIncomingConnections(iMaxPeers);
-
-		m_pHostPeer = CreatePeer();
-		m_pLocalPeer = m_pHostPeer;
-
-		m_pLocalPeer->m_bHost = true;
-		m_pLocalPeer->m_bLocal = true;
-		m_pLocalPeer->m_iID = 0;
-	}
-}
-
-// =============================================================================
-// Nat Ryall                                                         08-Jun-2008
-// =============================================================================
-void CNetwork::StartClient(const xchar* pHostAddress, xint iHostPort)
-{
-	XASSERT(!m_pInterface);
-
-	if (!m_pInterface)
-	{
-		m_bHosting = false;
-		m_pInterface = RakNetworkFactory::GetRakPeerInterface();
-
-		m_xSocket.hostAddress[0] = NULL;
-		m_xSocket.port = 20558;
-
-		m_pInterface->Startup(1, 0, &m_xSocket, 1);
-		m_pInterface->Connect(pHostAddress, iHostPort, NULL, 0, 0);
-
-		m_pHostPeer = NULL;
-		m_pLocalPeer = NULL;
-	}
-}
-
-// =============================================================================
-// Nat Ryall                                                         08-Jun-2008
-// =============================================================================
-void CNetwork::Stop()
-{
-	XASSERT(m_pInterface);
-
-	if (m_pInterface)
-	{
-		RakNetworkFactory::DestroyRakPeerInterface(m_pInterface);
-		m_pInterface = NULL;
-
-		Reset();
-	}
-}
-
-// =============================================================================
-// Nat Ryall                                                         08-Jun-2008
-// =============================================================================
-void CNetwork::Update()
-{
-	if (m_pInterface)
-	{
-		if (Packet* pPacket = m_pInterface->Receive())
-		{
-			xchar cIdentifier = pPacket->data[0];
-
-			xuchar* pData = &pPacket->data[1];
-			xint iDataSize = pPacket->length;
-
-			ProcessHostNotifications(cIdentifier, pPacket, pData, iDataSize);
-			ProcessClientNotifications(cIdentifier, pPacket, pData, iDataSize);
-			
-			m_pInterface->DeallocatePacket(pPacket);
-		}
-	}
-}
-
-// =============================================================================
-// Nat Ryall                                                         08-Jun-2008
-// =============================================================================
 void CNetwork::Reset()
 {
 	XASSERT(!m_pInterface);
@@ -140,7 +52,208 @@ void CNetwork::Reset()
 		m_xCallbacks.m_fpPeerJoined = NULL;
 		m_xCallbacks.m_fpPeerLeaving = NULL;
 		m_xCallbacks.m_fpPacketReceived = NULL;
+
+		m_bStopPending = false;
 	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         08-Jun-2008
+// =============================================================================
+void CNetwork::Update()
+{
+	if (m_bStopPending)
+		Stop();
+
+	if (m_pInterface)
+	{
+		while (Packet* pPacket = m_pInterface->Receive())
+		{
+			xchar cIdentifier = pPacket->data[0];
+
+			xuchar* pData = &pPacket->data[1];
+			xint iDataSize = pPacket->length;
+
+			static const char* s_pNetworkID[] =
+			{
+				"ID_INTERNAL_PING",
+				"ID_PING",
+				"ID_PING_OPEN_CONNECTIONS",
+				"ID_CONNECTED_PONG",
+				"ID_CONNECTION_REQUEST",
+				"ID_SECURED_CONNECTION_RESPONSE",
+				"ID_SECURED_CONNECTION_CONFIRMATION",
+				"ID_RPC_MAPPING",
+				"ID_DETECT_LOST_CONNECTIONS",
+				"ID_OPEN_CONNECTION_REQUEST",
+				"ID_OPEN_CONNECTION_REPLY",
+				"ID_RPC",
+				"ID_RPC_REPLY",
+				"ID_OUT_OF_BAND_INTERNAL",
+				"ID_CONNECTION_REQUEST_ACCEPTED",
+				"ID_CONNECTION_ATTEMPT_FAILED",
+				"ID_ALREADY_CONNECTED",
+				"ID_NEW_INCOMING_CONNECTION",
+				"ID_NO_FREE_INCOMING_CONNECTIONS",
+				"ID_DISCONNECTION_NOTIFICATION",
+				"ID_CONNECTION_LOST",
+				"ID_RSA_PUBLIC_KEY_MISMATCH",
+				"ID_CONNECTION_BANNED",
+				"ID_INVALID_PASSWORD",
+				"ID_MODIFIED_PACKET",
+				"ID_TIMESTAMP",
+				"ID_PONG",
+				"ID_ADVERTISE_SYSTEM",
+				"ID_REMOTE_DISCONNECTION_NOTIFICATION",
+				"ID_REMOTE_CONNECTION_LOST",
+				"ID_REMOTE_NEW_INCOMING_CONNECTION",
+				"ID_DOWNLOAD_PROGRESS",
+				"ID_FILE_LIST_TRANSFER_HEADER",
+				"ID_FILE_LIST_TRANSFER_FILE",
+				"ID_DDT_DOWNLOAD_REQUEST",
+				"ID_TRANSPORT_STRING",
+				"ID_REPLICA_MANAGER_CONSTRUCTION",
+				"ID_REPLICA_MANAGER_DESTRUCTION",
+				"ID_REPLICA_MANAGER_SCOPE_CHANGE",
+				"ID_REPLICA_MANAGER_SERIALIZE",
+				"ID_REPLICA_MANAGER_DOWNLOAD_COMPLETE",
+				"ID_CONNECTION_GRAPH_REQUEST",
+				"ID_CONNECTION_GRAPH_REPLY",
+				"ID_CONNECTION_GRAPH_UPDATE",
+				"ID_CONNECTION_GRAPH_NEW_CONNECTION",
+				"ID_CONNECTION_GRAPH_CONNECTION_LOST",
+				"ID_CONNECTION_GRAPH_DISCONNECTION_NOTIFICATION",
+				"ID_ROUTE_AND_MULTICAST",
+				"ID_RAKVOICE_OPEN_CHANNEL_REQUEST",
+				"ID_RAKVOICE_OPEN_CHANNEL_REPLY",
+				"ID_RAKVOICE_CLOSE_CHANNEL",
+				"ID_RAKVOICE_DATA",
+				"ID_AUTOPATCHER_GET_CHANGELIST_SINCE_DATE",
+				"ID_AUTOPATCHER_CREATION_LIST",
+				"ID_AUTOPATCHER_DELETION_LIST",
+				"ID_AUTOPATCHER_GET_PATCH",
+				"ID_AUTOPATCHER_PATCH_LIST",
+				"ID_AUTOPATCHER_REPOSITORY_FATAL_ERROR",
+				"ID_AUTOPATCHER_FINISHED_INTERNAL",
+				"ID_AUTOPATCHER_FINISHED",
+				"ID_AUTOPATCHER_RESTART_APPLICATION",
+				"ID_NAT_PUNCHTHROUGH_REQUEST",
+				"ID_NAT_TARGET_NOT_CONNECTED",
+				"ID_NAT_TARGET_CONNECTION_LOST",
+				"ID_NAT_CONNECT_AT_TIME",
+				"ID_NAT_SEND_OFFLINE_MESSAGE_AT_TIME",
+				"ID_DATABASE_QUERY_REQUEST",
+				"ID_DATABASE_UPDATE_ROW",
+				"ID_DATABASE_REMOVE_ROW",
+				"ID_DATABASE_QUERY_REPLY",
+				"ID_DATABASE_UNKNOWN_TABLE",
+				"ID_DATABASE_INCORRECT_PASSWORD",
+				"ID_READY_EVENT_SET",
+				"ID_READY_EVENT_UNSET",
+				"ID_READY_EVENT_ALL_SET",
+				"ID_READY_EVENT_QUERY",
+				"ID_LOBBY_GENERAL",
+				"ID_DATA_PACKET",
+				"ID_PEER_JOINED",
+				"ID_PEER_LEAVING",
+			};
+
+			XLOG("[Network] Packet: %d (%s), %d", cIdentifier, s_pNetworkID[cIdentifier], iDataSize);
+
+			if (m_bHosting)
+				ProcessHostNotifications(cIdentifier, pPacket, pData, iDataSize);
+			else
+				ProcessClientNotifications(cIdentifier, pPacket, pData, iDataSize);
+
+			m_pInterface->DeallocatePacket(pPacket);
+
+			if (m_bStopPending)
+				return;
+		}
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         08-Jun-2008
+// =============================================================================
+void CNetwork::StartHost(xint iMaxPeers, xint iPort, void* pData, xint iDataSize)
+{
+	XASSERT(!m_pInterface);
+
+	if (!m_pInterface)
+	{
+		XLOG("[Network] Starting network as a host.");
+
+		m_bHosting = true;
+		m_pInterface = RakNetworkFactory::GetRakPeerInterface();
+
+		m_xSocket.hostAddress[0] = NULL;
+		m_xSocket.port = iPort;
+
+		m_pInterface->Startup(iMaxPeers, 0, &m_xSocket, 1);
+		m_pInterface->SetMaximumIncomingConnections(iMaxPeers);
+		m_pInterface->SetOccasionalPing(true);
+
+		m_pHostPeer = CreatePeer();
+		m_pLocalPeer = m_pHostPeer;
+
+		m_pLocalPeer->m_bHost = true;
+		m_pLocalPeer->m_bLocal = true;
+		m_pLocalPeer->m_iID = 0;
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         08-Jun-2008
+// =============================================================================
+void CNetwork::StartClient(const xchar* pHostAddress, xint iHostPort, void* pData, xint iDataSize)
+{
+	XASSERT(!m_pInterface);
+
+	if (!m_pInterface)
+	{
+		XLOG("[Network] Starting network as a client.");
+
+		m_bHosting = false;
+		m_pInterface = RakNetworkFactory::GetRakPeerInterface();
+
+		m_xSocket.hostAddress[0] = NULL;
+		m_xSocket.port = 0;
+
+		m_pInterface->Startup(1, 0, &m_xSocket, 1);
+		m_pInterface->Connect(pHostAddress, iHostPort, NULL, 0, 0);
+
+		m_pHostPeer = NULL;
+		m_pLocalPeer = NULL;
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         08-Jun-2008
+// =============================================================================
+void CNetwork::Stop()
+{
+	XASSERT(m_pInterface);
+
+	if (m_pInterface)
+	{
+		XLOG("[Network] Stopping network.");
+
+		m_pInterface->Shutdown(1);
+
+		RakNetworkFactory::DestroyRakPeerInterface(m_pInterface);
+		m_pInterface = NULL;
+
+		Reset();
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         13-Jun-2008
+// =============================================================================
+void CNetwork::DisconnectPeer(CNetworkPeer* pPeer)
+{
+	XMASSERT(false, "DisconnectPeer() is not implemented yet.");
 }
 
 // =============================================================================
@@ -243,7 +356,7 @@ void CNetwork::ProcessHostNotifications(xchar cIdentifier, Packet* pPacket, xuch
 
 					xOutStream.Write((xuint8)ID_PEER_JOINED);
 					xOutStream.Write((xbool)(pJoiningPeer->m_iID == (*ppPeer)->m_iID));
-					xOutStream.Write((xuint16)pJoiningPeer->m_iID);
+					xOutStream.Write((xuint16)(*ppPeer)->m_iID);
 
 					m_pInterface->Send(&xOutStream, HIGH_PRIORITY, RELIABLE, 1, pPacket->systemAddress, false);
 				}
@@ -263,6 +376,7 @@ void CNetwork::ProcessHostNotifications(xchar cIdentifier, Packet* pPacket, xuch
 		break;
 
 	case ID_DISCONNECTION_NOTIFICATION:
+	case ID_CONNECTION_LOST:
 		{
 			CNetworkPeer* pLeavingPeer = FindPeer(&pPacket->systemAddress);
 			
@@ -333,7 +447,7 @@ void CNetwork::ProcessClientNotifications(xchar cIdentifier, Packet* pPacket, xu
 			if (m_xCallbacks.m_fpConnectionLost)
 				m_xCallbacks.m_fpConnectionLost();
 
-			Reset();
+			RequestStop();
 		}
 		break;
 
@@ -396,14 +510,6 @@ void CNetwork::ProcessPacket(BitStream* pStream)
 
 	if (pPeer && m_xCallbacks.m_fpPacketReceived)
 		m_xCallbacks.m_fpPacketReceived(pPeer, pStream);
-}
-
-// =============================================================================
-// Nat Ryall                                                         13-Jun-2008
-// =============================================================================
-void CNetwork::DisconnectPeer(CNetworkPeer* pPeer)
-{
-	XMASSERT(false, "DisconnectPeer() is not implemented yet.");
 }
 
 //##############################################################################

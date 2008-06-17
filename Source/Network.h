@@ -92,26 +92,41 @@ public:
 	// Constructor.
 	CNetwork();
 
-	// Initialise the network system as a host.
-	void StartHost(xint iMaxPeers);
-
-	// Initialise the network system as a client.
-	void StartClient(const xchar* pHostAddress, xint iHostPort);
-
-	// Deinitialise the network system.
-	void Stop();
+	// Reset the system variables.
+	void Reset();
 
 	// Update the network system.
 	void Update();
 
-	// Send a data packet to a remote client.
-	//void Send();
+	// Send a data packet to a remote client or the host if NULL is specified.
+	//void Send(CNetworkPeer* pTo, BitStream* pStream, PacketPriority iPriority, PacketReliability iReliability, xchar iChannel = 2);
+
+	// Initialise the network system as a host.
+	void StartHost(xint iMaxPeers, xint iPort, void* pCustomInfo = NULL, xint iCustomInfoSize = 0);
+
+	// Initialise the network system as a client.
+	void StartClient(const xchar* pHostAddress, xint iHostPort, void* pCustomInfo = NULL, xint iCustomInfoSize = 0);
+
+	// Deinitialise the network system.
+	void Stop();
+
+	// Request that the network system be deinitialised safely at the next available opportunity.
+	inline void RequestStop()
+	{
+		m_bStopPending = true;
+	}
 
 	// Check if the system is running.
 	inline xbool IsRunning()
 	{
 		return m_pInterface != NULL;
 	}
+
+	// Forcefully disconnect a peer from the local machine. Valid only on the host.
+	void DisconnectPeer(CNetworkPeer* pPeer);
+
+	// The local interface.
+	RakPeerInterface* m_pInterface;
 
 	// The network callbacks.
 	CNetworkCallbacks m_xCallbacks;
@@ -132,9 +147,6 @@ public:
 	xbool m_bConnected;
 
 protected:
-	// Reset the system variables.
-	void Reset();
-
 	// Process all host notifications.
 	void ProcessHostNotifications(xchar cIdentifier, Packet* pPacket, xuchar* pData, xint iDataSize);
 
@@ -162,17 +174,14 @@ protected:
 	// Find an exisiting peer by peer ID.
 	CNetworkPeer* FindPeer(xint iPeerID);
 
-	// Forcefully disconnect a peer from the local machine. Valid only on the host.
-	void DisconnectPeer(CNetworkPeer* pPeer);
-
-	// The local interface.
-	RakPeerInterface* m_pInterface;
-
 	// The local socket descriptor.
 	SocketDescriptor m_xSocket;
 
 	// The last used peer ID.
 	xint m_iLastPeerID;
+
+	// Determines if a stop request is pending.
+	xbool m_bStopPending;
 };
 
 //##############################################################################

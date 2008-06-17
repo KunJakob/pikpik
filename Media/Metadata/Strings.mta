@@ -44,10 +44,16 @@
 // Status
 // --------------------------------------------------------------------------------
 .Status_Creating
-"Creating Game"
+"Creating"
 
 .Status_Connecting
-"Connecting to Game"
+"Connecting"
 
 .Status_Joining
-"Joining Game"
+"Joining"
+
+.Status_Leaving
+"Leaving"
+
+.Status_Closing
+"Closing"

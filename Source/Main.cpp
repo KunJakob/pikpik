@@ -18,7 +18,7 @@
 #include <Lobby.h>
 #include <Windows.h>
 #include <Resource.h>
-//#include <Network.h>
+#include <Network.h>
 
 //##############################################################################
 #pragma endregion
@@ -85,6 +85,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	s_pInterface->System_SetState(HGE_SCREENBPP, 32);
 	s_pInterface->System_SetState(HGE_SHOWSPLASH, false);
 	s_pInterface->System_SetState(HGE_FPS, 60);
+	s_pInterface->System_SetState(HGE_DONTSUSPEND, true);
 
 	if (FMOD::System_Create(&s_pSoundSystem) == FMOD_OK)
 	{
@@ -100,6 +101,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			}
 			catch (Xen::CException xException)
 			{
+				MessageBox(s_pInterface->System_GetState(HGE_HWND), xException.GetDetailedMessage().c_str(), "Error", MB_OK | MB_ICONERROR);
 				XLOG(xException.GetDetailedMessage().c_str());
 			}
 
@@ -189,7 +191,7 @@ XBOOL Application::Update()
 
 	s_iTimeDelta = (XUINT)(_TIMEDELTAF * 1000.f);
 
-	//Network.Update();
+	Network.Update();
 
 	s_pSoundSystem->update();
 

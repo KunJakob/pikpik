@@ -20,6 +20,22 @@
 
 // Other.
 #include <Component.h>
+#include <Network.h>
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                   DEFINES
+//
+//##############################################################################
+
+// The port to host on.
+#define HOST_INCOMING_PORT 20557
+
+// The maximum length allowed for any online nickname in bytes (including NULL).
+#define MAX_NICKNAME_LENGTH 16
+#define MAX_NICKNAME_CHARS 15
 
 //##############################################################################
 
@@ -48,6 +64,23 @@ enum t_LobbyState
 	LobbyState_Creating,
 	LobbyState_Connecting,
 	LobbyState_Joining,
+	LobbyState_Lobby,
+	LobbyState_Leaving,
+	LobbyState_Closing,
+};
+
+//##############################################################################
+
+//##############################################################################
+//
+//                             NETWORK PLAYER INFO
+//
+//##############################################################################
+class CNetworkPlayerInfo
+{
+public:
+	// The player's nickname/gamertag with a terminating NULL.
+	char cNickname[MAX_NICKNAME_LENGTH];
 };
 
 //##############################################################################
@@ -81,12 +114,30 @@ public:
 	// Start the lobby.
 	void Start(t_LobbyStartMode iStartMode);
 
+	// Check for an excape keypress and handle accordingly.
+	void QuitCheck();
+
 protected:
-	//
+	// Update the main lobby screen.
+	void UpdateLobby();
+
+	// Render the main lobby screen.
+	void RenderLobby();
+
+	// Callback for when the join button is clicked in the join interface.
 	void OnJoinClicked(CButtonComponent* pButton, xpoint xOffset);
+
+	// Callback for when the network has successfully started.
+	void OnConnectionCompleted(xbool bSuccess);
+
+	// Callback for when the network connection has been lost.
+	void OnConnectionLost();
 
 	// Set the internal state.
 	void SetState(t_LobbyState iState);
+
+	// The lobby startup mode.
+	t_LobbyStartMode m_iStartMode;
 
 	// The current lobby state.
 	t_LobbyState m_iState;
@@ -96,6 +147,9 @@ protected:
 
 	// The status box.
 	CStatusBox* m_pStatusBox;
+
+	// The lobby peer font.
+	CFont* m_pPeerFont;
 };
 
 //##############################################################################
@@ -116,9 +170,6 @@ public:
 
 	// Destructor.
 	virtual ~CStatusBox();
-
-	// Update the status box with the specified text.
-	void SetText(const xchar* pStatus);
 
 	// Attach all elements to the interface.
 	inline void AttachElements()
