@@ -47,6 +47,8 @@ void CNetwork::Reset()
 
 		XEN_LIST_ERASE_ALL(m_lpPeers);
 
+		m_xCallbacks.m_fpNetworkStarted = NULL;
+		m_xCallbacks.m_fpNetworkStopped = NULL;
 		m_xCallbacks.m_fpConnectionCompleted = NULL;
 		m_xCallbacks.m_fpConnectionLost = NULL;
 		m_xCallbacks.m_fpPeerJoined = NULL;
@@ -200,6 +202,9 @@ void CNetwork::StartHost(xint iMaxPeers, xint iPort, void* pData, xint iDataSize
 		m_pLocalPeer->m_bHost = true;
 		m_pLocalPeer->m_bLocal = true;
 		m_pLocalPeer->m_iID = 0;
+
+		if (m_xCallbacks.m_fpNetworkStarted)
+			m_xCallbacks.m_fpNetworkStarted();
 	}
 }
 
@@ -225,6 +230,9 @@ void CNetwork::StartClient(const xchar* pHostAddress, xint iHostPort, void* pDat
 
 		m_pHostPeer = NULL;
 		m_pLocalPeer = NULL;
+
+		if (m_xCallbacks.m_fpNetworkStarted)
+			m_xCallbacks.m_fpNetworkStarted();
 	}
 }
 
@@ -238,6 +246,9 @@ void CNetwork::Stop()
 	if (m_pInterface)
 	{
 		XLOG("[Network] Stopping network.");
+
+		if (m_xCallbacks.m_fpNetworkStopped)
+			m_xCallbacks.m_fpNetworkStopped();
 
 		m_pInterface->Shutdown(1);
 

@@ -121,10 +121,6 @@ void CLobbyScreen::Start(t_LobbyStartMode iStartMode)
 	case LobbyStartMode_Create:
 		{
 			Network.Reset();
-
-			//CNetworkPlayerInfo* pPlayerInfo = new CNetworkPlayerInfo();
-			//strcpy_s(pPlayerInfo->cNickname, MAX_NICKNAME_LENGTH, "Krakken");
-
 			Network.StartHost(16, HOST_INCOMING_PORT);
 
 			SetState(LobbyState_Lobby);
@@ -259,6 +255,27 @@ void CLobbyScreen::OnJoinClicked(CButtonComponent* pButton, xpoint xOffset)
 	Network.StartClient(m_pJoinInterface->m_pAddressBox->GetText(), HOST_INCOMING_PORT);
 
 	SetState(LobbyState_Connecting);
+}
+
+// =============================================================================
+// Nat Ryall                                                         17-Jun-2008
+// =============================================================================
+void CLobbyScreen::OnNetworkStart()
+{
+	//if (Network.m_bHosting)
+	//{
+	//	CNetworkPlayerInfo* pPlayerInfo = new CNetworkPlayerInfo();
+	//	strcpy_s(pPlayerInfo->cNickname, MAX_NICKNAME_LENGTH, "Krakken");
+	//
+	//	Network.m_pLocalPeer->m_pData = pPlayerInfo;
+	//}
+}
+
+// =============================================================================
+// Nat Ryall                                                         17-Jun-2008
+// =============================================================================
+void CLobbyScreen::OnNetworkStop()
+{
 }
 
 // =============================================================================

@@ -127,6 +127,12 @@ protected:
 	// Callback for when the join button is clicked in the join interface.
 	void OnJoinClicked(CButtonComponent* pButton, xpoint xOffset);
 
+	// Callback for when the network is started.
+	void OnNetworkStart();
+
+	// Callback for when the network is stopped.
+	void OnNetworkStop();
+
 	// Callback for when the network has successfully started.
 	void OnConnectionCompleted(xbool bSuccess);
 

@@ -65,6 +65,8 @@ typedef xlist<CNetworkPeer*> t_NetworkPeerList;
 class CNetworkCallbacks
 {
 public:
+	xfunction(0)<> m_fpNetworkStarted;
+	xfunction(0)<> m_fpNetworkStopped;
 	xfunction(1)<xbool /*Succeeded*/> m_fpConnectionCompleted;
 	xfunction(0)<> m_fpConnectionLost;
 	xfunction(1)<CNetworkPeer* /*Peer*/> m_fpPeerJoined;
