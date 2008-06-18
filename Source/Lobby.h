@@ -111,8 +111,11 @@ public:
 	// Called each frame to render the screen when active.
 	virtual void Render();
 
-	// Start the lobby.
+	// Start and initialise the lobby using the specified mode.
 	void Start(t_LobbyStartMode iStartMode);
+
+	// Stop and close the lobby.
+	void Stop();
 
 	// Check for an excape keypress and handle accordingly.
 	void QuitCheck();
@@ -131,16 +134,25 @@ protected:
 	void OnJoinClicked(CButtonComponent* pButton, xpoint xOffset);
 
 	// Callback for when the network is started.
-	void OnNetworkStart();
+	//void OnNetworkStart();
 
 	// Callback for when the network is stopped.
-	void OnNetworkStop();
+	//void OnNetworkStop();
 
 	// Callback for when the network has successfully started.
 	void OnConnectionCompleted(xbool bSuccess);
 
 	// Callback for when the network connection has been lost.
 	void OnConnectionLost();
+
+	// Callback for when a remote peer joins the game.
+	void OnPeerJoined(CNetworkPeer* pPeer);
+
+	// Callback for when a remote peer is just about to leave the game.
+	void OnPeerLeaving(CNetworkPeer* pPeer);
+
+	// Bind all the packet callbacks to the network system.
+	void BindPacketCallbacks();
 
 	// Callback for when a lobby packet is received.
 	void OnReceivePlayerInfo(CNetworkPeer* pFrom, BitStream* pStream);

@@ -180,7 +180,7 @@ void CNetwork::Update()
 // =============================================================================
 // Nat Ryall                                                         18-Jun-2008
 // =============================================================================
-void CNetwork::RegisterReceiveCallback(xuchar cType, t_fpStreamReceived fpCallback)
+void CNetwork::BindReceiveCallback(xuchar cType, t_fpStreamReceived fpCallback)
 {
 	XMASSERT(cType < 256, "The type index cannot exceed 256.");
 
@@ -191,9 +191,9 @@ void CNetwork::RegisterReceiveCallback(xuchar cType, t_fpStreamReceived fpCallba
 // =============================================================================
 // Nat Ryall                                                         18-Jun-2008
 // =============================================================================
-void CNetwork::DismissReceiveCallback(xuchar cType)
+void CNetwork::UnbindReceiveCallback(xuchar cType)
 {
-	RegisterReceiveCallback(cType, NULL);
+	BindReceiveCallback(cType, NULL);
 }
 
 // =============================================================================
@@ -282,6 +282,9 @@ void CNetwork::StartHost(xint iMaxPeers, xint iPort, void* pData, xint iDataSize
 
 		if (m_xCallbacks.m_fpNetworkStarted)
 			m_xCallbacks.m_fpNetworkStarted();
+
+		if (m_xCallbacks.m_fpPeerJoined)
+			m_xCallbacks.m_fpPeerJoined(m_pLocalPeer);
 	}
 }
 
@@ -532,6 +535,8 @@ void CNetwork::ProcessClientNotifications(xchar cIdentifier, Packet* pPacket, xu
 	case ID_DISCONNECTION_NOTIFICATION:
 	case ID_CONNECTION_LOST:
 		{
+			// Destroy all existing peers.
+
 			if (m_xCallbacks.m_fpConnectionLost)
 				m_xCallbacks.m_fpConnectionLost();
 

@@ -106,10 +106,10 @@ public:
 	void Update();
 
 	// Bind a callback function to a specific packet type.
-	void RegisterReceiveCallback(xuchar cType, t_fpStreamReceived fpCallback);
+	void BindReceiveCallback(xuchar cType, t_fpStreamReceived fpCallback);
 
 	// Unbind a callback function from a specific packet type.
-	void DismissReceiveCallback(xuchar cType);
+	void UnbindReceiveCallback(xuchar cType);
 
 	// Send a data packet to a remote peer. "pTo" is the peer to send to when sending from the host and is ignored otherwise.
 	xbool Send(CNetworkPeer* pTo, xuchar cType, BitStream* pStream, PacketPriority iPriority, PacketReliability iReliability, xchar iChannel = 2);

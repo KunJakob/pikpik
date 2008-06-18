@@ -121,9 +121,13 @@ void CLobbyScreen::Start(t_LobbyStartMode iStartMode)
 	case LobbyStartMode_Create:
 		{
 			Network.Reset();
-			Network.StartHost(16, HOST_INCOMING_PORT);
+			
+			Network.m_xCallbacks.m_fpPeerJoined = xbind(this, &CLobbyScreen::OnPeerJoined);
+			Network.m_xCallbacks.m_fpPeerLeaving = xbind(this, &CLobbyScreen::OnPeerLeaving);
 
-			Network.RegisterReceiveCallback(NetworkStreamType_PlayerInfo, xbind(this, &CLobbyScreen::OnReceivePlayerInfo));
+			BindPacketCallbacks();
+			
+			Network.StartHost(16, HOST_INCOMING_PORT);
 
 			SetState(LobbyState_Lobby);
 		}
@@ -131,6 +135,14 @@ void CLobbyScreen::Start(t_LobbyStartMode iStartMode)
 	}
 
 	m_iStartMode = iStartMode;
+}
+
+// =============================================================================
+// Nat Ryall                                                         18-Jun-2008
+// =============================================================================
+void CLobbyScreen::Stop()
+{
+	Network.RequestStop();
 }
 
 // =============================================================================
@@ -253,31 +265,14 @@ void CLobbyScreen::OnJoinClicked(CButtonComponent* pButton, xpoint xOffset)
 
 	Network.m_xCallbacks.m_fpConnectionCompleted = xbind(this, &CLobbyScreen::OnConnectionCompleted);
 	Network.m_xCallbacks.m_fpConnectionLost = xbind(this, &CLobbyScreen::OnConnectionLost);
+	Network.m_xCallbacks.m_fpPeerJoined = xbind(this, &CLobbyScreen::OnPeerJoined);
+	Network.m_xCallbacks.m_fpPeerLeaving = xbind(this, &CLobbyScreen::OnPeerLeaving);
 
 	Network.StartClient(m_pJoinInterface->m_pAddressBox->GetText(), HOST_INCOMING_PORT);
 
+	BindPacketCallbacks();
+
 	SetState(LobbyState_Connecting);
-}
-
-// =============================================================================
-// Nat Ryall                                                         17-Jun-2008
-// =============================================================================
-void CLobbyScreen::OnNetworkStart()
-{
-	//if (Network.m_bHosting)
-	//{
-	//	CNetworkPlayerInfo* pPlayerInfo = new CNetworkPlayerInfo();
-	//	strcpy_s(pPlayerInfo->cNickname, MAX_NICKNAME_LENGTH, "Krakken");
-	//
-	//	Network.m_pLocalPeer->m_pData = pPlayerInfo;
-	//}
-}
-
-// =============================================================================
-// Nat Ryall                                                         17-Jun-2008
-// =============================================================================
-void CLobbyScreen::OnNetworkStop()
-{
 }
 
 // =============================================================================
@@ -286,14 +281,7 @@ void CLobbyScreen::OnNetworkStop()
 void CLobbyScreen::OnConnectionCompleted(xbool bSuccess)
 {
 	if (bSuccess)
-	{
-		BitStream xTestStream;
-		xint iTest = 100;
-		xTestStream.Write(iTest);
-		Network.Send(NULL, NetworkStreamType_PlayerInfo, &xTestStream, LOW_PRIORITY, RELIABLE);
-
 		SetState(LobbyState_Lobby);
-	}
 	else
 		SetState(LobbyState_Join);
 }
@@ -309,12 +297,33 @@ void CLobbyScreen::OnConnectionLost()
 // =============================================================================
 // Nat Ryall                                                         18-Jun-2008
 // =============================================================================
+void CLobbyScreen::OnPeerJoined(CNetworkPeer* pPeer)
+{
+	XLOG("[LobbyScreen] Peer #%d joined the game.", pPeer->m_iID);
+}
+
+// =============================================================================
+// Nat Ryall                                                         18-Jun-2008
+// =============================================================================
+void CLobbyScreen::OnPeerLeaving(CNetworkPeer* pPeer)
+{
+	XLOG("[LobbyScreen] Peer #%d is about to leave the game.", pPeer->m_iID);
+}
+
+// =============================================================================
+// Nat Ryall                                                         18-Jun-2008
+// =============================================================================
+void CLobbyScreen::BindPacketCallbacks()
+{
+	Network.BindReceiveCallback(NetworkStreamType_PlayerInfo, xbind(this, &CLobbyScreen::OnReceivePlayerInfo));
+}
+
+// =============================================================================
+// Nat Ryall                                                         18-Jun-2008
+// =============================================================================
 void CLobbyScreen::OnReceivePlayerInfo(CNetworkPeer* pFrom, BitStream* pStream)
 {
-	xint iTest = 0;
-	pStream->Read(iTest);
-
-	XLOG("[LobbyScreen] Received PlayerInfo Packet! %d", iTest);
+	XLOG("[LobbyScreen] Received player info from peer #%d.", pFrom->m_iID);
 }
 
 //##############################################################################
