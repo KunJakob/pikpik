@@ -30,6 +30,9 @@
 // Shortcuts.
 #define Network CNetwork::Get()
 
+// The maximum ID for network peers is invalid.
+#define NETWORK_PEER_INVALID_ID 0xFFFF
+
 //##############################################################################
 
 //##############################################################################
@@ -52,6 +55,9 @@ enum
 	ID_PEER_LEAVING,
 };
 
+// Callbacks.
+typedef xfunction(2)<CNetworkPeer* /*From*/, BitStream* /*Stream*/> t_fpStreamReceived;
+
 // Lists.
 typedef xlist<CNetworkPeer*> t_NetworkPeerList;
 
@@ -71,7 +77,6 @@ public:
 	xfunction(0)<> m_fpConnectionLost;
 	xfunction(1)<CNetworkPeer* /*Peer*/> m_fpPeerJoined;
 	xfunction(1)<CNetworkPeer* /*Peer*/> m_fpPeerLeaving;
-	xfunction(2)<CNetworkPeer* /*Peer*/, BitStream* /*Stream*/> m_fpPacketReceived;
 };
 
 //##############################################################################
@@ -100,8 +105,17 @@ public:
 	// Update the network system.
 	void Update();
 
-	// Send a data packet to a remote client or the host if NULL is specified.
-	//void Send(CNetworkPeer* pTo, BitStream* pStream, PacketPriority iPriority, PacketReliability iReliability, xchar iChannel = 2);
+	// Bind a callback function to a specific packet type.
+	void RegisterReceiveCallback(xuchar cType, t_fpStreamReceived fpCallback);
+
+	// Unbind a callback function from a specific packet type.
+	void DismissReceiveCallback(xuchar cType);
+
+	// Send a data packet to a remote peer. "pTo" is the peer to send to when sending from the host and is ignored otherwise.
+	xbool Send(CNetworkPeer* pTo, xuchar cType, BitStream* pStream, PacketPriority iPriority, PacketReliability iReliability, xchar iChannel = 2);
+
+	// Send a data packet to all remote peers (via the host if we are a client).
+	xbool Broadcast(CNetworkPeer* pIgnore,  xuchar cType, BitStream* pStream, PacketPriority iPriority, PacketReliability iReliability, xchar iChannel = 2);
 
 	// Initialise the network system as a host.
 	void StartHost(xint iMaxPeers, xint iPort, void* pCustomInfo = NULL, xint iCustomInfoSize = 0);
@@ -149,6 +163,9 @@ public:
 	xbool m_bConnected;
 
 protected:
+	// Relay a data packet from the host machine to all other peers on behalf of the sending peer.
+	void Relay(CNetworkPeer* pSender, BitStream* pStream);
+
 	// Process all host notifications.
 	void ProcessHostNotifications(xchar cIdentifier, Packet* pPacket, xuchar* pData, xint iDataSize);
 
@@ -156,7 +173,7 @@ protected:
 	void ProcessClientNotifications(xchar cIdentifier, Packet* pPacket, xuchar* pData, xint iDataSize);
 
 	// Process an incoming packet and dispatch to any callbacks.
-	void ProcessPacket(BitStream* pStream);
+	void ProcessPacket(Packet* pPacket, BitStream* pStream);
 
 	// Create a new peer object.
 	CNetworkPeer* CreatePeer();
@@ -175,6 +192,9 @@ protected:
 
 	// Find an exisiting peer by peer ID.
 	CNetworkPeer* FindPeer(xint iPeerID);
+
+	// The array of callback type bindings.
+	t_fpStreamReceived m_fpReceiveCallbacks[256];
 
 	// The local socket descriptor.
 	SocketDescriptor m_xSocket;

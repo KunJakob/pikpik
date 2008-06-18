@@ -53,9 +53,11 @@ void CNetwork::Reset()
 		m_xCallbacks.m_fpConnectionLost = NULL;
 		m_xCallbacks.m_fpPeerJoined = NULL;
 		m_xCallbacks.m_fpPeerLeaving = NULL;
-		m_xCallbacks.m_fpPacketReceived = NULL;
 
 		m_bStopPending = false;
+
+		for (xint iA = 0; iA < 256; ++iA)
+			m_fpReceiveCallbacks[iA] = NULL;
 	}
 }
 
@@ -176,6 +178,81 @@ void CNetwork::Update()
 }
 
 // =============================================================================
+// Nat Ryall                                                         18-Jun-2008
+// =============================================================================
+void CNetwork::RegisterReceiveCallback(xuchar cType, t_fpStreamReceived fpCallback)
+{
+	XMASSERT(cType < 256, "The type index cannot exceed 256.");
+
+	if (cType < 256)
+		m_fpReceiveCallbacks[cType] = fpCallback;
+}
+
+// =============================================================================
+// Nat Ryall                                                         18-Jun-2008
+// =============================================================================
+void CNetwork::DismissReceiveCallback(xuchar cType)
+{
+	RegisterReceiveCallback(cType, NULL);
+}
+
+// =============================================================================
+// Nat Ryall                                                         18-Jun-2008
+// =============================================================================
+xbool CNetwork::Send(CNetworkPeer* pTo, xuchar cType, BitStream* pStream, PacketPriority iPriority, PacketReliability iReliability, xchar iChannel)
+{
+	XMASSERT(iChannel >= 2 && iChannel <= 31, "Channel index out of bounds.");
+
+	if (iChannel >= 2 && iChannel <= 31)
+	{
+		if (m_bHosting)
+		{
+			if (!pTo)
+			{
+				XMASSERT(pTo, "You must specify a recepient when sending a packet from the host.");
+				return false;
+			}
+
+			BitStream xFinalStream;
+
+			xFinalStream.Write((xuchar)ID_DATA_PACKET);
+			xFinalStream.Write(cType);
+			xFinalStream.Write(pStream);
+
+			m_pInterface->Send(&xFinalStream, iPriority, iReliability, iChannel, pTo->m_xAddress, false);
+		}
+		else
+		{
+			if (!m_pHostPeer)
+			{
+				XMASSERT(m_pHostPeer, "Cannot send from the client until the host peer is validated.");
+				return false;
+			}
+
+			BitStream xFinalStream;
+
+			xFinalStream.Write((xuchar)ID_DATA_PACKET);
+			xFinalStream.Write(cType);
+			xFinalStream.Write(pStream);
+
+			m_pInterface->Send(&xFinalStream, iPriority, iReliability, iChannel, m_pHostPeer->m_xAddress, false);
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+// =============================================================================
+// Nat Ryall                                                         18-Jun-2008
+// =============================================================================
+xbool CNetwork::Broadcast(CNetworkPeer* pIgnore, xuchar cType, BitStream* pStream, PacketPriority iPriority, PacketReliability iReliability, xchar iChannel /*= 2*/)
+{
+	XMASSERT(false, "Broadcast() is not implemented yet.");
+}
+
+// =============================================================================
 // Nat Ryall                                                         08-Jun-2008
 // =============================================================================
 void CNetwork::StartHost(xint iMaxPeers, xint iPort, void* pData, xint iDataSize)
@@ -276,7 +353,7 @@ CNetworkPeer* CNetwork::CreatePeer()
 
 	pPeer->m_bHost = false;
 	pPeer->m_bLocal = false;
-	pPeer->m_iID = (m_bHosting) ? GetUniquePeerID() : -1;
+	pPeer->m_iID = (m_bHosting) ? GetUniquePeerID() : NETWORK_PEER_INVALID_ID;
 	pPeer->m_pData = NULL;
 
 	pPeer->m_xAddress.binaryAddress = 0;
@@ -292,7 +369,7 @@ CNetworkPeer* CNetwork::CreatePeer()
 // =============================================================================
 xint CNetwork::GetUniquePeerID()
 {
-	return m_iLastPeerID++ % (1 << 8);
+	return m_iLastPeerID++ % (NETWORK_PEER_INVALID_ID - 1);
 }
 
 // =============================================================================
@@ -411,7 +488,7 @@ void CNetwork::ProcessHostNotifications(xchar cIdentifier, Packet* pPacket, xuch
 	// Received a data packet from a client.
 	case ID_DATA_PACKET:
 		{
-			ProcessPacket(&xInStream);
+			ProcessPacket(pPacket, &xInStream);
 		}
 		break;
 	}
@@ -503,7 +580,7 @@ void CNetwork::ProcessClientNotifications(xchar cIdentifier, Packet* pPacket, xu
 	// Received a data packet from the host.
 	case ID_DATA_PACKET:
 		{
-			ProcessPacket(&xInStream);
+			ProcessPacket(pPacket, &xInStream);
 		}
 		break;
 	}
@@ -512,15 +589,19 @@ void CNetwork::ProcessClientNotifications(xchar cIdentifier, Packet* pPacket, xu
 // =============================================================================
 // Nat Ryall                                                         13-Jun-2008
 // =============================================================================
-void CNetwork::ProcessPacket(BitStream* pStream)
+void CNetwork::ProcessPacket(Packet* pPacket, BitStream* pStream)
 {
-	xuint16 iID = 0;
-	pStream->Read(iID);
+	CNetworkPeer* pPeer = FindPeer(&pPacket->systemAddress);
 
-	CNetworkPeer* pPeer = FindPeer(iID);
+	if (pPeer)
+	{
+		xuchar cType = 0;
+		pStream->Read(cType);
 
-	if (pPeer && m_xCallbacks.m_fpPacketReceived)
-		m_xCallbacks.m_fpPacketReceived(pPeer, pStream);
+		if (m_fpReceiveCallbacks[cType])
+			m_fpReceiveCallbacks[cType](pPeer, pStream);
+	}
+	
 }
 
 //##############################################################################

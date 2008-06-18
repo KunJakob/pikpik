@@ -148,6 +148,12 @@ enum t_RenderableType
 	RenderableType_Dialog,
 };
 
+// Network packet types.
+enum t_NetworkStreamType
+{
+	NetworkStreamType_PlayerInfo,
+};
+
 // Common list types.
 typedef XLIST<CMetadata*> t_MetadataList;
 typedef XLIST<CSprite*> t_SpriteList;

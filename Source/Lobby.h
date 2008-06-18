@@ -118,6 +118,9 @@ public:
 	void QuitCheck();
 
 protected:
+	// Set the internal state.
+	void SetState(t_LobbyState iState);
+
 	// Update the main lobby screen.
 	void UpdateLobby();
 
@@ -139,8 +142,8 @@ protected:
 	// Callback for when the network connection has been lost.
 	void OnConnectionLost();
 
-	// Set the internal state.
-	void SetState(t_LobbyState iState);
+	// Callback for when a lobby packet is received.
+	void OnReceivePlayerInfo(CNetworkPeer* pFrom, BitStream* pStream);
 
 	// The lobby startup mode.
 	t_LobbyStartMode m_iStartMode;

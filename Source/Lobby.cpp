@@ -123,6 +123,8 @@ void CLobbyScreen::Start(t_LobbyStartMode iStartMode)
 			Network.Reset();
 			Network.StartHost(16, HOST_INCOMING_PORT);
 
+			Network.RegisterReceiveCallback(NetworkStreamType_PlayerInfo, xbind(this, &CLobbyScreen::OnReceivePlayerInfo));
+
 			SetState(LobbyState_Lobby);
 		}
 		break;
@@ -284,7 +286,14 @@ void CLobbyScreen::OnNetworkStop()
 void CLobbyScreen::OnConnectionCompleted(xbool bSuccess)
 {
 	if (bSuccess)
+	{
+		BitStream xTestStream;
+		xint iTest = 100;
+		xTestStream.Write(iTest);
+		Network.Send(NULL, NetworkStreamType_PlayerInfo, &xTestStream, LOW_PRIORITY, RELIABLE);
+
 		SetState(LobbyState_Lobby);
+	}
 	else
 		SetState(LobbyState_Join);
 }
@@ -295,6 +304,17 @@ void CLobbyScreen::OnConnectionCompleted(xbool bSuccess)
 void CLobbyScreen::OnConnectionLost()
 {
 	SetState(LobbyState_Join);
+}
+
+// =============================================================================
+// Nat Ryall                                                         18-Jun-2008
+// =============================================================================
+void CLobbyScreen::OnReceivePlayerInfo(CNetworkPeer* pFrom, BitStream* pStream)
+{
+	xint iTest = 0;
+	pStream->Read(iTest);
+
+	XLOG("[LobbyScreen] Received PlayerInfo Packet! %d", iTest);
 }
 
 //##############################################################################
