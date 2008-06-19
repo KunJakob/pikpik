@@ -57,3 +57,21 @@
 
 .Status_Closing
 "Closing"
+
+// --------------------------------------------------------------------------------
+// Error
+// --------------------------------------------------------------------------------
+.Error_ConnectFailed
+"Could not connect to %s."
+
+.Error_ConnectionLost
+"The connection to the server was lost."
+
+.Error_EveryoneLeft
+"All other players have left the game."
+
+// --------------------------------------------------------------------------------
+// Confirmation
+// --------------------------------------------------------------------------------
+.Confirmation_SetNickname
+"You currently have no nickname set. Would you like to set one now?"
