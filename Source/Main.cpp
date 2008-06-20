@@ -77,7 +77,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	s_pInterface->System_SetState(HGE_FRAMEFUNC, &Application::Update);
 	s_pInterface->System_SetState(HGE_RENDERFUNC, &Application::Render);
-	s_pInterface->System_SetState(HGE_TITLE, "PMO");
+	s_pInterface->System_SetState(HGE_TITLE, "PikPik");
 	s_pInterface->System_SetState(HGE_USESOUND, false);
 	s_pInterface->System_SetState(HGE_WINDOWED, true);
 	s_pInterface->System_SetState(HGE_SCREENWIDTH, _SWIDTH);
