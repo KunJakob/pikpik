@@ -211,7 +211,7 @@ protected:
 
 	// Callback implementations.
 	void Debug_HideWindow(CButtonComponent* pButton, xpoint xOffset);
-	
+
 	// The font metadata to render the links with.
 	CFontMetadata* m_pMenuDefault;
 	CFontMetadata* m_pMenuHighlight;

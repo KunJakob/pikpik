@@ -71,15 +71,15 @@ public:
 	*/
 	virtual ~CRenderable() {}
 
-  /**
-  * Update the object ready for rendering.
-  */
-  virtual void Update() {}
+	/**
+	* Update the object ready for rendering.
+	*/
+	virtual void Update() {}
 
-  /**
-  * Render the object.
-  */
-  virtual void Render() = 0;
+	/**
+	* Render the object.
+	*/
+	virtual void Render() = 0;
 
 	/**
 	* Get the renderable type assigned to this renderable.
@@ -135,16 +135,16 @@ namespace RenderManager
 	*/
 	void Reset();
 
-  /**
-  * Add a renderable to the system on the specified layer (0 to RENDERER_MAXLAYERS-1).
-  * @note Lower layers are obscured by higher layers.
-  */
-  void Add(XUINT iLayer, CRenderable* pRenderable);
+	/**
+	* Add a renderable to the system on the specified layer (0 to RENDERER_MAXLAYERS-1).
+	* @note Lower layers are obscured by higher layers.
+	*/
+	void Add(XUINT iLayer, CRenderable* pRenderable);
 
-  /**
-  * Find and remove a renderable from the system.
-  */
-  void Remove(CRenderable* pRenderable);
+	/**
+	* Find and remove a renderable from the system.
+	*/
+	void Remove(CRenderable* pRenderable);
 
 	/**
 	* Enable a layer and allow update/rendering. Layers are enabled by default.

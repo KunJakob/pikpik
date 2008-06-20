@@ -129,7 +129,7 @@ void CFont::Render(const xchar* pString, xrect xRect, xuint iAlign, xfloat fAlph
 	pFont->SetScale(m_pMetadata->fScale);
 	pFont->SetSpacing(m_pMetadata->fSpacing);
 	pFont->SetTracking(m_pMetadata->fTracking);
-	
+
 	if (!m_pMetadata->xShadowOffset.IsZero())
 	{
 		xrect xShadowRect = xRect + m_pMetadata->xShadowOffset;

@@ -115,8 +115,8 @@ CRowElement::~CRowElement()
 // =============================================================================
 void CRowElement::Render(xrect& xLeft, xrect& xCentre, xrect& xRight)
 {
-  m_pSprite->Render(GetPosition(), xLeft);
-  m_pSprite->Render(GetPosition() + xpoint(m_xFrameSize.iLeft + m_iWidth, 0), xRight);
+	m_pSprite->Render(GetPosition(), xLeft);
+	m_pSprite->Render(GetPosition() + xpoint(m_xFrameSize.iLeft + m_iWidth, 0), xRight);
 	m_pSprite->RenderTiled(GetPosition() + xpoint(m_xFrameSize.iLeft, 0), xpoint(m_iWidth, 0), xCentre);
 }
 
@@ -150,21 +150,21 @@ void CContainerElement::Render(xrect& xTL, xrect& xTC, xrect& xTR, xrect& xML, x
 {
 	xpoint xPosition = GetPosition();
 
-  // Top.
+	// Top.
 	m_pSprite->Render(xPosition, xTL);
 	m_pSprite->RenderTiled(xPosition + xpoint(m_xFrameSize.iLeft, 0), xpoint(m_iWidth, 0), xTC);
 	m_pSprite->Render(xPosition + xpoint(m_xFrameSize.iLeft + m_iWidth, 0), xTR);
 
 	xPosition.iY += m_xFrameSize.iTop;
 
-  // Middle
+	// Middle
 	m_pSprite->RenderTiled(xPosition, xpoint(0, m_iHeight), xML);
 	m_pSprite->RenderTiled(xPosition + xpoint(m_xFrameSize.iLeft, 0), xpoint(m_iWidth, m_iHeight), xMC);
 	m_pSprite->RenderTiled(xPosition + xpoint(m_xFrameSize.iLeft + m_iWidth, 0), xpoint(0, m_iHeight), xMR);
 
 	xPosition.iY += m_iHeight;
-	
-  // Bottom.
+
+	// Bottom.
 	m_pSprite->Render(xPosition, xBL);
 	m_pSprite->RenderTiled(xPosition + xpoint(m_xFrameSize.iLeft, 0), xpoint(m_iWidth, 0), xBC);
 	m_pSprite->Render(xPosition + xpoint(m_xFrameSize.iLeft + m_iWidth, 0), xBR);

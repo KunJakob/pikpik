@@ -50,7 +50,7 @@ CSelectionScreen::CSelectionScreen() : CScreen(ScreenIndex_SelectionScreen)
 CSelectionScreen::~CSelectionScreen()
 {
 	/*for (XUINT iA = 0; iA < FontType_Max; ++iA)
-		ResourceManager::FreeResource(m_pFont[iA]);*/
+	ResourceManager::FreeResource(m_pFont[iA]);*/
 }
 
 // =============================================================================

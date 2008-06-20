@@ -98,7 +98,7 @@ public:
 
 	// Deinitialise
 	virtual ~CLobbyScreen();
-	
+
 	// Called when the screen is first added to the screen stack.
 	virtual void Load();
 

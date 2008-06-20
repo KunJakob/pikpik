@@ -34,7 +34,7 @@ XCHAR CProperty::GetChar(XUINT iIndex)
 // =============================================================================
 XINT CProperty::GetInt(XUINT iIndex)
 {
-  return atoi(m_lpValues[iIndex]);
+	return atoi(m_lpValues[iIndex]);
 }
 
 // =============================================================================
@@ -42,7 +42,7 @@ XINT CProperty::GetInt(XUINT iIndex)
 // =============================================================================
 XFLOAT CProperty::GetFloat(XUINT iIndex)
 {
-  return (float)atof(m_lpValues[iIndex]);
+	return (float)atof(m_lpValues[iIndex]);
 }
 
 // =============================================================================
@@ -50,7 +50,7 @@ XFLOAT CProperty::GetFloat(XUINT iIndex)
 // =============================================================================
 XBOOL CProperty::GetBool(XUINT iIndex)
 {
-  return (strcmp(GetString(iIndex), "false") == 0 || strcmp(GetString(iIndex), "0")) ? false : true;
+	return (strcmp(GetString(iIndex), "false") == 0 || strcmp(GetString(iIndex), "0")) ? false : true;
 }
 
 // =============================================================================
@@ -58,7 +58,7 @@ XBOOL CProperty::GetBool(XUINT iIndex)
 // =============================================================================
 const XCHAR* CProperty::GetString(XUINT iIndex)
 {
-  return (const XCHAR*)m_lpValues[iIndex];
+	return (const XCHAR*)m_lpValues[iIndex];
 }
 
 //##############################################################################

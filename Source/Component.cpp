@@ -270,7 +270,7 @@ void CInputComponent::OnKeyChar(xchar cChar)
 // Nat Ryall                                                         13-May-2008
 // =============================================================================
 CProgressComponent::CProgressComponent(CSpriteMetadata* pMetaSprite) : CRowElement(ElementType_Progress, pMetaSprite),
-m_fProgress(0.f)
+	m_fProgress(0.f)
 {
 	m_pL = pMetaSprite->FindArea("Left");
 	m_pC = pMetaSprite->FindArea("Centre");
@@ -322,12 +322,12 @@ CWindowComponent::CWindowComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* 
 	m_pBR = pMetaSprite->FindArea("BottomRight");
 
 	m_xFrameSize = xrect
-	(
+		(
 		m_pML->xRect.Width(),
 		m_pTC->xRect.Height(),
 		m_pMR->xRect.Width(),
 		m_pBC->xRect.Height()
-	);
+		);
 
 	if (pMetaFont)
 		m_pFont = new CFont(pMetaFont);
@@ -378,12 +378,12 @@ CGroupComponent::CGroupComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pM
 	m_pBR = pMetaSprite->FindArea("BottomRight");
 
 	m_xFrameSize = xrect
-	(
+		(
 		m_pML->xRect.Width(),
 		m_pTC->xRect.Height(),
 		m_pMR->xRect.Width(),
 		m_pBC->xRect.Height()
-	);
+		);
 
 	if (pMetaFont)
 		m_pFont = new CFont(pMetaFont);

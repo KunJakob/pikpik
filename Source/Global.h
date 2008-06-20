@@ -77,11 +77,8 @@
 #define _LOCALE(NAME)		_GLOBAL.pLocale->GetProperty(NAME)->GetString()
 
 // Colour manipulations.
-#define COLOURF(COLF) \
-		(xuchar)((COLF) * 255.f)
-
-#define ARGBF(A, R, G, B) \
-		ARGB(COLOURF(A), COLOURF(R), COLOURF(G), COLOURF(B))
+#define COLOURF(COLF)		(xuchar)((COLF) * 255.f)
+#define ARGBF(A, R, G, B)	ARGB(COLOURF(A), COLOURF(R), COLOURF(G), COLOURF(B))
 
 //##############################################################################
 #pragma endregion
@@ -195,7 +192,7 @@ public:
 
 	// The lobby screen.
 	CLobbyScreen* pLobby;
-    
+
 	// The currently active map.
 	CMap* pActiveMap;
 

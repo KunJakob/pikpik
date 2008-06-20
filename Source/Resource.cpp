@@ -70,7 +70,7 @@ CResourceFile::CResourceFile(t_ResourceType iResourceType, const XCHAR* pResourc
 // =============================================================================
 // Nat Ryall                                                         22-Apr-2008
 // =============================================================================
-	CResourceMetadata::CResourceMetadata(t_ResourceType iResourceType, CDataset* pDataset) :
+CResourceMetadata::CResourceMetadata(t_ResourceType iResourceType, CDataset* pDataset) :
 	iType(iResourceType),
 	pName(pDataset->GetName())
 {

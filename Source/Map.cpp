@@ -212,12 +212,12 @@ CMap::CMap(const XCHAR* pID) : CRenderable(RenderableType_Map)
 
 		switch (pBlock->cChar)
 		{
-		// Special.
+			// Special.
 		case '*': pBlock->iType = TileType_Pellet;		break;
 		case '@': pBlock->iType = TileType_Power;		break;
 		case '=': pBlock->iType = TileType_Entrance;	break;
 
-		// Wall.
+			// Wall.
 		case '#':
 			{
 				XUINT iMask = 0;
@@ -233,7 +233,7 @@ CMap::CMap(const XCHAR* pID) : CRenderable(RenderableType_Map)
 			}
 			break;
 
-		// Spawn.
+			// Spawn.
 		case '$': 
 			pBlock->iType = TileType_Blank;
 			m_lpSpawnPoints[PlayerType_PacMan].push_back(pBlock); 
@@ -388,7 +388,7 @@ CMapBlock* CMap::GetAdjacentBlock(t_AdjacentDir iAdjacentDir, CMapBlock* pBlock)
 CMapBlock* CMap::GetSpawnBlock(t_PlayerType iPlayerType)
 {
 	CMapBlock* pBlock = NULL;
-	
+
 	do
 	{
 		pBlock = m_lpSpawnPoints[iPlayerType][rand() % m_lpSpawnPoints[iPlayerType].size()];

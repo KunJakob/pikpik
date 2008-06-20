@@ -35,20 +35,20 @@ CDataset::~CDataset()
 // =============================================================================
 XUINT CDataset::GetDatasetCount(const XCHAR* pType)
 {
-  if (!pType)
-    return (XUINT)m_lpDatasets.size();
-  else
-  {
-    XUINT iCount = 0;
+	if (!pType)
+		return (XUINT)m_lpDatasets.size();
+	else
+	{
+		XUINT iCount = 0;
 
-    XEN_LIST_FOREACH(t_DatasetList, ppDataset, m_lpDatasets)
+		XEN_LIST_FOREACH(t_DatasetList, ppDataset, m_lpDatasets)
 		{
-      if (strcmp((*ppDataset)->GetType(), pType) == 0)
-        ++iCount;
-    }
+			if (strcmp((*ppDataset)->GetType(), pType) == 0)
+				++iCount;
+		}
 
-    return iCount;
-  }
+		return iCount;
+	}
 }
 
 // =============================================================================
@@ -56,30 +56,30 @@ XUINT CDataset::GetDatasetCount(const XCHAR* pType)
 // =============================================================================
 CDataset* CDataset::GetDataset(CDataset* pPrev, const XCHAR* pType, const XCHAR* pName)
 {
-  t_DatasetList::iterator ppDataset = m_lpDatasets.begin();
+	t_DatasetList::iterator ppDataset = m_lpDatasets.begin();
 
-  if (pPrev)
-  {
-    for (; ppDataset < m_lpDatasets.end(); ppDataset++)
-    {
-      if (*ppDataset == pPrev)
-      {
-        ppDataset++;
-        break;
-      }
-    }
-  }
+	if (pPrev)
+	{
+		for (; ppDataset < m_lpDatasets.end(); ppDataset++)
+		{
+			if (*ppDataset == pPrev)
+			{
+				ppDataset++;
+				break;
+			}
+		}
+	}
 
-  for (; ppDataset < m_lpDatasets.end(); ppDataset++)
-  {
-    if (strcmp((*ppDataset)->GetType(), pType) == 0)
-    {
-      if (!pName || ((*ppDataset)->GetName() && strcmp((*ppDataset)->GetName(), pName) == 0))
-        return *ppDataset;
-    }
-  }
+	for (; ppDataset < m_lpDatasets.end(); ppDataset++)
+	{
+		if (strcmp((*ppDataset)->GetType(), pType) == 0)
+		{
+			if (!pName || ((*ppDataset)->GetName() && strcmp((*ppDataset)->GetName(), pName) == 0))
+				return *ppDataset;
+		}
+	}
 
-  return NULL;
+	return NULL;
 }
 
 // =============================================================================
@@ -87,20 +87,20 @@ CDataset* CDataset::GetDataset(CDataset* pPrev, const XCHAR* pType, const XCHAR*
 // =============================================================================
 XUINT CDataset::GetPropertyCount(const XCHAR* pType)
 {
-  if (!pType)
-    return (XUINT)m_lpProperties.size();
-  else
-  {
-    XUINT iCount = 0;
+	if (!pType)
+		return (XUINT)m_lpProperties.size();
+	else
+	{
+		XUINT iCount = 0;
 
-   XEN_LIST_FOREACH(t_PropertyList, ppProperty, m_lpProperties)
-    {
-      if (strcmp((*ppProperty)->GetType(), pType) == 0)
-        ++iCount;
-    }
+		XEN_LIST_FOREACH(t_PropertyList, ppProperty, m_lpProperties)
+		{
+			if (strcmp((*ppProperty)->GetType(), pType) == 0)
+				++iCount;
+		}
 
-    return iCount;
-  }
+		return iCount;
+	}
 }
 
 // =============================================================================
@@ -108,27 +108,27 @@ XUINT CDataset::GetPropertyCount(const XCHAR* pType)
 // =============================================================================
 CProperty* CDataset::GetProperty(CProperty* pPrev, const XCHAR* pType)
 {
-  t_PropertyList::iterator ppProperty = m_lpProperties.begin();
+	t_PropertyList::iterator ppProperty = m_lpProperties.begin();
 
-  if (pPrev)
-  {
-    for (; ppProperty < m_lpProperties.end(); ppProperty++)
-    {
-      if (*ppProperty == pPrev)
-      {
-        ppProperty++;
-        break;
-      }
-    }
-  }
+	if (pPrev)
+	{
+		for (; ppProperty < m_lpProperties.end(); ppProperty++)
+		{
+			if (*ppProperty == pPrev)
+			{
+				ppProperty++;
+				break;
+			}
+		}
+	}
 
-  for (; ppProperty < m_lpProperties.end(); ppProperty++)
-  {
-    if (strcmp((*ppProperty)->GetType(), pType) == 0)
-      return *ppProperty;
-  }
+	for (; ppProperty < m_lpProperties.end(); ppProperty++)
+	{
+		if (strcmp((*ppProperty)->GetType(), pType) == 0)
+			return *ppProperty;
+	}
 
-  return NULL;
+	return NULL;
 }
 
 //##############################################################################

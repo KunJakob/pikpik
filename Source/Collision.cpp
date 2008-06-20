@@ -101,9 +101,9 @@ s_Module;
 // Author: Nat Ryall                                           Date: 25-Feb-2008
 // =============================================================================
 CCollidable::CCollidable(t_CollisionGroup iCollisionGroup) :
-  m_iCollisionGroup(iCollisionGroup)
+	m_iCollisionGroup(iCollisionGroup)
 {
-  //CollisionManager::Add(this);
+	//CollisionManager::Add(this);
 }
 
 // =============================================================================
@@ -111,7 +111,7 @@ CCollidable::CCollidable(t_CollisionGroup iCollisionGroup) :
 // =============================================================================
 CCollidable::~CCollidable()
 {
-  //CollisionManager::Remove(this);
+	//CollisionManager::Remove(this);
 }
 
 //##############################################################################
@@ -129,7 +129,7 @@ CCollidable::~CCollidable()
 // =============================================================================
 void CollisionManager::Add(CCollidable* pCollidable)
 {
-  s_lpCollidables.push_back(pCollidable);
+	s_lpCollidables.push_back(pCollidable);
 }
 
 // =============================================================================
@@ -137,7 +137,7 @@ void CollisionManager::Add(CCollidable* pCollidable)
 // =============================================================================
 void CollisionManager::Remove(CCollidable* pCollidable)
 {
-  s_lpCollidables.remove(pCollidable);
+	s_lpCollidables.remove(pCollidable);
 }
 
 // =============================================================================
@@ -145,7 +145,7 @@ void CollisionManager::Remove(CCollidable* pCollidable)
 // =============================================================================
 void CollisionManager::Reset()
 {
-  s_lpCollidables.clear();
+	s_lpCollidables.clear();
 }
 
 //##############################################################################

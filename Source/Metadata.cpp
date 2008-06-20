@@ -24,21 +24,19 @@
 // =============================================================================
 // Author: Nat Ryall                                           Date: 29-Jan-2008
 // =============================================================================
-CMetadata::CMetadata(const XCHAR* pFilePath, XBOOL bExecute) 
-: 
-CDataset(NULL, "Metadata", NULL),
-m_iTask(ST_LoadFile), 
-m_iPercent(0),
-m_pError(NULL),
-m_pFile(NULL),
-m_hFile(INVALID_HANDLE_VALUE),
-m_iFileSize(0),
-m_iBytesRead(0),
-m_pData(NULL),
-m_iTokenOffset(0),
-m_iTokenIndex(0),
-m_pDataset(NULL),
-m_pProperty(NULL)
+CMetadata::CMetadata(const XCHAR* pFilePath, XBOOL bExecute) : CDataset(NULL, "Metadata", NULL),
+	m_iTask(ST_LoadFile), 
+	m_iPercent(0),
+	m_pError(NULL),
+	m_pFile(NULL),
+	m_hFile(INVALID_HANDLE_VALUE),
+	m_iFileSize(0),
+	m_iBytesRead(0),
+	m_pData(NULL),
+	m_iTokenOffset(0),
+	m_iTokenIndex(0),
+	m_pDataset(NULL),
+	m_pProperty(NULL)
 {
 	m_pFile = (XCHAR*)pFilePath;
 	m_pDataset = this;

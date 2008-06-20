@@ -194,7 +194,7 @@ void CMenuScreen::Update()
 		case MenuGroupIndex_Main:
 			_TERMINATE;
 			return;
-		
+
 		case MenuGroupIndex_Online:
 			SetMenuGroup(MenuGroupIndex_Main);
 			break;

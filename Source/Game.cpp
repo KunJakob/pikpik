@@ -254,10 +254,10 @@ void CGameScreen::Render()
 
 	FMOD_TAG fmArtist;
 	FMOD_TAG fmTitle;
-	
+
 	if (m_pMusic->getTag("ARTIST", 0, &fmArtist) == FMOD_OK && m_pMusic->getTag("TITLE", 0, &fmTitle) == FMOD_OK && fmArtist.data && fmTitle.data)
 		pMusicTitle = XFORMAT("%s - %s", fmArtist.data, fmTitle.data);
-	
+
 	_GLOBAL.pGameFont->Render(pMusicTitle, xpoint(10, 10), HGETEXT_LEFT);
 }
 

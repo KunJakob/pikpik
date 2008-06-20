@@ -105,7 +105,7 @@ CSpriteMetadata::CSpriteMetadata(CDataset* pDataset) : CResourceMetadata(Resourc
 
 			if (_PROPERTY_EXISTS(pFrameDataset, "Event"))
 				pFrame->pEvent = _PROPERTY->GetString();
-				
+
 			if (pPrevFrame && pPrevFrame->pNextFrame == NULL)
 				pPrevFrame->pNextFrame = pFrame;
 
