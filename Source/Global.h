@@ -72,6 +72,7 @@
 #define _HGE				Application::GetInterface()
 #define _FMOD				Application::GetSoundSystem()
 #define _TERMINATE			Application::Terminate()
+#define _TIMEMS				GetTickCount()
 #define _TIMEDELTA			Application::GetTimeDelta()
 #define _TIMEDELTAF			_HGE->Timer_GetDelta()
 #define _LOCALE(NAME)		_GLOBAL.pLocale->GetProperty(NAME)->GetString()

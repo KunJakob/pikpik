@@ -14,6 +14,8 @@
 #include <Metadata.h>
 #include <Sprite.h>
 #include <Renderer.h>
+#include <Trap.h>
+#include <Power.h>
 
 //##############################################################################
 #pragma endregion
@@ -77,34 +79,38 @@ public:
 	// Friends.
 	friend CMap;
 
-	/**
-	* Check if the block is a wall tile.
-	*/
+	// Update this block each frame.
+	void Update();
+
+	// Check if the block is a wall tile.
 	XBOOL IsWall()
 	{
 		return cChar == '#';
 	}
 
-	/**
-	* Check if the block is part of a ghost base.
-	*/
+	// Check if the block is part of a ghost base.
 	XBOOL IsBase()
 	{
 		return iType == TileType_Entrance || iType == TileType_Base;
 	}
 
-	/**
-	* Check if the specified player can see this block.
-	*/
+	// Check if the block is edible.
+	xbool IsEdible()
+	{
+		return !bEaten && (iType == TileType_Pellet || iType == TileType_Power);
+	}
+
+	// Check if the specified player can see this block.
 	XBOOL IsVisible(CPlayer* pPlayer);
 
-	/**
-	* Get the screen position of a block.
-	*/
+	// Get the screen position of a block.
 	XPOINT GetScreenPosition()
 	{
 		return xPosition * 48;
 	}
+
+	// Eat this block.
+	void Eat();
 
 	// The block index for the parent map.
 	XUINT iIndex;
@@ -124,11 +130,17 @@ public:
 	// The block "eaten" status.
 	XBOOL bEaten;
 
+	// The "eaten" and "respawn" timer.
+	Tools::CTimer xTimer;
+
 	// The block visibility.
 	XFLOAT fVisibility;
 
-	//CTrap* m_pTrap;
-	//CPower* m_pPower;
+	// The trap (if any) that is bound to this block.
+	CTrap* m_pTrap;
+	
+	// The power (if any) that is bound to this block.
+	CPower* m_pPower;
 
 	// The block adjacents.
 	CMapBlock* pAdjacents[AdjacentDir_Max];
@@ -155,6 +167,9 @@ protected:
 class CMap : public CRenderable
 {
 public:
+	// Friends.
+	friend class CMapBlock;
+
 	/**
 	* Create a new map from metadata.
 	*/
@@ -257,6 +272,9 @@ protected:
 
 	// The total number of blocks in the map.
 	XUINT m_iBlockCount;
+
+	// The total number of pellets eaten.
+	xuint m_iPelletsEaten;
 
 	// The processed map data.
 	CMapBlock* m_xBlocks;

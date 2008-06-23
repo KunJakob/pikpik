@@ -147,11 +147,31 @@ s_Module;
 //##############################################################################
 
 // =============================================================================
+// Nat Ryall                                                         23-Jun-2008
+// =============================================================================
+void CMapBlock::Update()
+{
+	//if (bEaten && xTimer.IsExpired())
+	//	bEaten = false;
+}
+
+// =============================================================================
 // Nat Ryall                                                         17-Apr-2008
 // =============================================================================
 XBOOL CMapBlock::IsVisible(CPlayer* pPlayer)
 {
 	return true;
+}
+
+// =============================================================================
+// Nat Ryall                                                         23-Jun-2008
+// =============================================================================
+void CMapBlock::Eat()
+{
+	bEaten = true;
+	xTimer.ExpireAfter(60000);
+
+	_GLOBAL.pActiveMap->m_iPelletsEaten++;
 }
 
 //##############################################################################
@@ -252,6 +272,9 @@ CMap::CMap(const XCHAR* pID) : CRenderable(RenderableType_Map)
 		m_fColours[iA] = .5f;
 		m_bUp[iA] = (rand() % 2 == 0);
 	}
+
+	// Initialise the map properties.
+	m_iPelletsEaten = 0;
 }
 
 // =============================================================================
@@ -289,6 +312,9 @@ void CMap::Update()
 		for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
 			m_xBlocks[iA].fVisibility = 1.f;
 	}
+
+	for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
+		m_xBlocks[iA].Update();
 }
 
 // =============================================================================
@@ -348,11 +374,13 @@ void CMap::Render()
 			//s_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, 1.f - m_fColours[0], 1.f - m_fColours[1], 1.f - m_fColours[2]));
 			s_pTiles->GetMetadata()->GetSprite()->SetColor(0xFFFFFFFF);
 
+		t_TileType iTileType = m_xBlocks[iA].bEaten ? TileType_Eaten : m_xBlocks[iA].iType;
+
 		s_pTiles->Render
 		(
 			m_xBlocks[iA].GetScreenPosition() - m_xOffset, 
 			s_xCentrePoint, 
-			s_pTileAreas[m_xBlocks[iA].iType]->xRect,
+			s_pTileAreas[iTileType]->xRect,
 			m_xBlocks[iA].fVisibility * _GLOBAL.fWorldAlpha, 
 			(m_xBlocks[iA].fAngle / 180.0f) * M_PI
 		);

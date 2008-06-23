@@ -219,11 +219,8 @@ void CPlayer::OnAnimationEvent(CAnimatedSprite* pSprite, const XCHAR* pEvent)
 {
 	if (strcmp(pEvent, "Eat") == 0)
 	{
-		if (m_pTargetBlock)
-		{
-			if (m_pTargetBlock->iType == TileType_Pellet || m_pTargetBlock->iType == TileType_Power)
-				m_pTargetBlock->iType = TileType_Eaten;
-		}
+		if (m_pTargetBlock && m_pTargetBlock->IsEdible())
+			m_pTargetBlock->Eat();
 	}
 }
 

@@ -294,15 +294,18 @@ void CAnimatedSprite::Update()
 		if (m_pFrame->iDelay)
 			m_iFrameTimer += _TIMEDELTA;
 
-		if (m_iFrameTimer >= m_pFrame->iDelay)
+		while (m_iFrameTimer >= m_pFrame->iDelay)
 		{
 			if (m_pFrame->pNextFrame)
 			{
-				m_iFrameTimer %= m_pFrame->iDelay;
+				m_iFrameTimer -= m_pFrame->iDelay;
 				SetFrame(m_pFrame->pNextFrame);
 			}
 			else
+			{
 				m_bPlaying = false;
+				break;
+			}
 		}
 	}
 }
