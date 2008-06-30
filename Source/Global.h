@@ -15,6 +15,14 @@
 //
 //##############################################################################
 
+// RakNet.
+#include <RakNet/TCPInterface.h>
+#include <RakNet/HTTPConnection.h>
+#include <RakNet/RakNetworkFactory.h>
+#include <RakNet/RakPeerInterface.h>
+#include <RakNet/MessageIdentifiers.h>
+#include <RakNet/BitStream.h>
+
 // Main.
 #include <Main.h>
 

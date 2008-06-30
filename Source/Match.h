@@ -33,6 +33,20 @@
 
 //##############################################################################
 //
+//                                   TYPES
+//
+//##############################################################################
+
+// Predeclare.
+class CSession;
+
+// Lists.
+typedef xvlist<CSession*> t_SessionList;
+
+//##############################################################################
+
+//##############################################################################
+//
 //                               MATCH MANAGER
 //
 //##############################################################################
@@ -46,7 +60,47 @@ public:
 		return s_Instance;
 	}
 
+	// Constructor.
+	CMatchManager();
+
+	// Destructor.
+	virtual ~CMatchManager();
+
+	// Initialise the matchmaking service.
+	void Initialise();
+
+	// Deinitialise the matchmaking service.
+	void Deinitialise();
+
+	// Create a new session with the specified properties.
+	CSession* CreateSession(xint iSlots);
+
 protected:
+	// The TCP interface to the managing webserver.
+	TCPInterface* m_pTCP;
+
+	// The HTTP connection to the managing webserver.
+	HTTPConnection* m_pHTTP;
+
+	// The internal session list.
+	t_SessionList m_lpSessions;
+};
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                   SESSION
+//
+//##############################################################################
+class CSession
+{
+public:
+	// The number of used player slots in the session.
+	xint m_iUsedSlots;
+
+	// The total number of player slots available in the session.
+	xint m_iTotalSlots;
 };
 
 //##############################################################################
