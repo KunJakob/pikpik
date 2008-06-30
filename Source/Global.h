@@ -101,7 +101,7 @@ class CFont;
 class CLobbyScreen;
 
 // The player identifier type.
-enum t_PlayerBrainType
+enum t_PlayerType
 {
 	PlayerType_Ghost,
 	PlayerType_PacMan,

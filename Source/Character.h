@@ -44,11 +44,11 @@ enum t_CharacterScreenMode
 //                               CHARACTER SCREEN
 //
 //##############################################################################
-class CCharacterScreen : CScreen
+class CCharacterScreen : public CScreen
 {
 public:
 	// Constructor.
-	CCharacterScreen() : CScreen(ScreenIndex_CharacterScreen) {}
+	CCharacterScreen();
 
 	// Destructor.
 	virtual ~CCharacterScreen() {}

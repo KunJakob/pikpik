@@ -171,7 +171,7 @@ void CMapBlock::Eat()
 	if (!bEaten)
 	{
 		bEaten = true;
-		xTimer.ExpireAfter(60000);
+		//xTimer.ExpireAfter(60000);
 
 		_GLOBAL.pActiveMap->m_iPelletsEaten++;
 	}

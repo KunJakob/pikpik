@@ -67,7 +67,7 @@ public:
 	virtual void Render();
 
 	// Get the type of the player.
-	t_PlayerBrainType GetType()
+	t_PlayerType GetType()
 	{
 		return m_iType;
 	}
@@ -104,7 +104,7 @@ public:
 
 protected:
 	// Constuctor.
-	CPlayer(t_PlayerBrainType iType, const XCHAR* pSpriteName);
+	CPlayer(t_PlayerType iType, const XCHAR* pSpriteName);
 
 	// Called to change the state of the player object.
 	virtual void SetState(t_PlayerState iState);
@@ -119,7 +119,7 @@ protected:
 	void OnAnimationEvent(CAnimatedSprite* pSprite, const XCHAR* pEvent);
 
 	// The type of the derived class.
-	t_PlayerBrainType m_iType;
+	t_PlayerType m_iType;
 
 	// The state of the player.
 	t_PlayerState m_iState;
