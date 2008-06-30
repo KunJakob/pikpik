@@ -19,6 +19,7 @@
 #include <Windows.h>
 #include <Resource.h>
 #include <Network.h>
+#include <Character.h>
 
 //##############################################################################
 #pragma endregion
@@ -154,8 +155,15 @@ void Application::Initialise()
 	s_lpScreens.push_back(new CMenuScreen);
 	s_lpScreens.push_back(new CGameScreen);
 	s_lpScreens.push_back(new CLobbyScreen);
+	s_lpScreens.push_back(new CCharacterScreen);
 
 	ScreenManager::Set(ScreenIndex_LogoScreen);
+
+	// Create all the available players.
+	_GLOBAL.lpPlayers.push_back(new CPacMan(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_PacMan)));
+	_GLOBAL.lpPlayers.push_back(new CGhost(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_Ghost), 0xFF40F0F0));
+	_GLOBAL.lpPlayers.push_back(new CGhost(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_Ghost), 0xFFF0F040));
+	_GLOBAL.lpPlayers.push_back(new CGhost(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_Ghost), 0xFFF040F0));
 }
 
 // =============================================================================
@@ -163,6 +171,7 @@ void Application::Initialise()
 // =============================================================================
 void Application::Deinitialise()
 {
+	// Clear the screen.
 	_GLOBAL.iNextScreen = ScreenIndex_Invalid;
 
 	// Free the string metadata.
@@ -176,6 +185,9 @@ void Application::Deinitialise()
 
 	// Free all screen instances.
 	XEN_LIST_ERASE_ALL(s_lpScreens);
+
+	// Free all the players.
+	XEN_LIST_ERASE_ALL(_GLOBAL.lpPlayers);
 }
 
 // =============================================================================
@@ -253,4 +265,5 @@ FMOD::System* Application::GetSoundSystem()
 
 //##############################################################################
 #pragma endregion
+
 

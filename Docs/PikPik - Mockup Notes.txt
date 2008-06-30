@@ -1,0 +1,74 @@
+- Splash Screens
+- Main Menu
+  - Child Menus
+- Join Screen
+- Create Screen
+- Status Screen
+- Lobby
+  - Player Listing
+    - Host Highlighted
+    - Voice Icons
+    - Nickname Area
+    - Ready Indicator
+  - Ready Button
+  - Leave Button
+  - Game Options
+    - "Match map to number of players"
+    - "Enable traps"
+    - "Enable power-ups"
+    - "Enable radar"
+    - "Rounds per game: ??"
+  - All Ready = Start Game Button
+- Character Select
+- Interface
+  - Radar
+  - Power-up
+  - Traps
+- Gameplay
+  - Power-up
+  - Traps
+  - Capture
+  - General Play
+  - Finished
+  - Score
+  - Countdown
+  - Visibility
+- Scores
+- Transition Flow
+- Options Screen
+  - Set Nickname
+  - Change Music Volume
+  - Change SFX Volume
+- OSD
+  - Status Message (Queued)
+- Tutorial Screen
+  - Steps and Buttons
+- Practice Screen
+- Credits Screen
+
+Matchmaking
+--------------------------------------------------
+When matchmaking is implemented, need to add in a "Join Random Server" button to change the server. Each server should
+have a unique ID and a generated password that only the host knows about. If the host migrates, he/she passes the
+password to the new host. The password is needed to make any changes to the session. To maintain the session, it needs
+to have a "ping" sent every 30 seconds with the password. If no ping is sent, the session closes down.
+
+http://www.sapian.net/match.php?create&sessid=058617546-43100582-01048578&pass=1HE4196D8A
+- Check the session ID for validitiy by verifying the last number against the others as a checksum.
+- Check the IP against all currently active sessions.
+- Create the new session and mark the creation time.
+- Reset the countdown timestamp.
+
+http://www.sapian.net/match.php?ping&sessid=058617546-43100582-01048578&pass=1HE4196D8A
+- Check the session ID.
+- Verify the password.
+- Reset the countdown timestamp.
+
+http://www.sapian.net/match.php?list
+- Get all valid sessions.
+- Verify that the countdown is still valid or archive if not.
+- List all valid sessions.
+
+http://www.sapian.net/match.php?update&sessid=058617546-43100582-01048578&pass=1HE4196D8A&started=no&avail=3&filled=2&players=Krakken,Steve
+- Verify session info and retrieve data.
+- Update specific information.

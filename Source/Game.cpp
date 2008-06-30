@@ -162,11 +162,6 @@ void CGameScreen::Load()
 	_GLOBAL.pActiveMap = new CMap(XFORMAT("M%03d", 5));
 	_GLOBAL.fWorldAlpha = 1.f;
 
-	_GLOBAL.lpPlayers.push_back(new CPacMan(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_PacMan)));
-	_GLOBAL.lpPlayers.push_back(new CGhost(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_Ghost), 0xFF40F0F0));
-	_GLOBAL.lpPlayers.push_back(new CGhost(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_Ghost), 0xFFF0F040));
-	_GLOBAL.lpPlayers.push_back(new CGhost(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_Ghost), 0xFFF040F0));
-
 	_GLOBAL.pActivePlayer = _GLOBAL.lpPlayers.front();
 
 	RenderManager::Add(LayerIndex_Background, &m_Background);
@@ -199,7 +194,6 @@ void CGameScreen::Unload()
 
 	RenderManager::Reset();
 
-	XEN_LIST_ERASE_ALL(_GLOBAL.lpPlayers);
 	delete _GLOBAL.pActiveMap;
 }
 

@@ -168,10 +168,13 @@ XBOOL CMapBlock::IsVisible(CPlayer* pPlayer)
 // =============================================================================
 void CMapBlock::Eat()
 {
-	bEaten = true;
-	xTimer.ExpireAfter(60000);
+	if (!bEaten)
+	{
+		bEaten = true;
+		xTimer.ExpireAfter(60000);
 
-	_GLOBAL.pActiveMap->m_iPelletsEaten++;
+		_GLOBAL.pActiveMap->m_iPelletsEaten++;
+	}
 }
 
 //##############################################################################

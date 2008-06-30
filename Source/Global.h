@@ -101,7 +101,7 @@ class CFont;
 class CLobbyScreen;
 
 // The player identifier type.
-enum t_PlayerType
+enum t_PlayerBrainType
 {
 	PlayerType_Ghost,
 	PlayerType_PacMan,
@@ -118,6 +118,7 @@ enum t_ScreenIndex
 	ScreenIndex_GameScreen,
 	ScreenIndex_SelectionScreen,
 	ScreenIndex_LobbyScreen,
+	ScreenIndex_CharacterScreen,
 };
 
 // Layer index.

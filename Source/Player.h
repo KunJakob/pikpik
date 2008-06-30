@@ -24,6 +24,14 @@
 //
 //##############################################################################
 
+// The player types.
+enum t_PlayerBrainType
+{
+	PlayerBrainType_Local,
+	PlayerBrainType_AI,
+	PlayerBrainType_Remote,
+};
+
 // The possible player states.
 enum t_PlayerState
 {
@@ -49,56 +57,40 @@ public:
 	// Friends.
 	friend CMap;
 
-	/**
-	* Destructor.
-	*/
+	// Destructor.
 	virtual ~CPlayer();
 
-	/**
-	* Update the object ready for rendering.
-	*/
+	// Update the object ready for rendering.
 	virtual void Update();
 
-	/**
-	* Render the object.
-	*/
+	// Render the object.
 	virtual void Render();
 
-	/**
-	* Get the type of the player.
-	*/
-	t_PlayerType GetType()
+	// Get the type of the player.
+	t_PlayerBrainType GetType()
 	{
 		return m_iType;
 	}
 
-	/**
-	* Get the current state of the player.
-	*/
+	// Get the current state of the player.
 	t_PlayerState GetState()
 	{
 		return m_iState;
 	}
 
-	/**
-	* Get the internal sprite.
-	*/
+	// Get the internal sprite.
 	CAnimatedSprite* GetSprite()
 	{
 		return m_pSprite;
 	}
 
-	/**
-	* Set the player's name.
-	*/
+	// Set the player's name.
 	void SetName(const XCHAR* pName)
 	{
 		strcpy_s(m_cName, _MAXNAMELEN + 1, pName);
 	}
 
-	/**
-	* Get the player's name.
-	*/
+	// Get the player's name.
 	const XCHAR* GetName()
 	{
 		return m_cName;
@@ -111,31 +103,23 @@ public:
 	}
 
 protected:
-	/**
-	* Constructor.
-	*/
-	CPlayer(t_PlayerType iType, const XCHAR* pSpriteName);
+	// Constuctor.
+	CPlayer(t_PlayerBrainType iType, const XCHAR* pSpriteName);
 
-	/**
-	* Called to change the state of the player object.
-	*/
+	// Called to change the state of the player object.
 	virtual void SetState(t_PlayerState iState);
 
-	/**
-	* Check if the specified block is passable.
-	*/
+	// Check if the specified block is passable.
 	virtual XBOOL IsPassable(CMapBlock* pBlock)
 	{
 		return !pBlock->IsWall();
 	}
 
-	/**
-	* Called when an animation event occurs.
-	*/
+	// Called when an animation event occurs.
 	void OnAnimationEvent(CAnimatedSprite* pSprite, const XCHAR* pEvent);
 
 	// The type of the derived class.
-	t_PlayerType m_iType;
+	t_PlayerBrainType m_iType;
 
 	// The state of the player.
 	t_PlayerState m_iState;
@@ -180,28 +164,20 @@ protected:
 class CPacMan : public CPlayer
 {
 public:
-	/**
-	* Constructor.
-	*/
+	// Costructor.
 	CPacMan(CMapBlock* pSpawnBlock);
 
-	/**
-	* Update the object ready for rendering.
-	*/
+	// Update the object ready for rendering.
 	virtual void Update();
 
 protected:
-	/**
-	* Check if the specified block is passable.
-	*/
+	// Check if the specified block is passable.
 	virtual XBOOL IsPassable(CMapBlock* pBlock)
 	{
 		return CPlayer::IsPassable(pBlock) && pBlock->cChar != '=';
 	}
 
-	/**
-	* Called to change the state of the player object.
-	*/
+	// Called to change the state of the player object.
 	virtual void SetState(t_PlayerState iState);
 };
 
@@ -217,29 +193,19 @@ protected:
 class CGhost : public CPlayer
 {
 public:
-	/**
-	* Constructor.
-	*/
+	// Constructor.
 	CGhost(CMapBlock* pSpawnBlock, xuint iColour);
 
-	/**
-	* Destructor.
-	*/
+	// Destructor.
 	~CGhost();
 
-	/**
-	* Update the object ready for rendering.
-	*/
+	// Update the object ready for rendering.
 	virtual void Update();
 
-	/**
-	* Render the object.
-	*/
+	// Render the object.
 	virtual void Render();
 
-	/**
-	* Called to change the state of the player object.
-	*/
+	// Called to change the state of the player object.
 	virtual void SetState(t_PlayerState iState);
 
 protected:
