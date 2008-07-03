@@ -168,7 +168,7 @@ void Application::Initialise()
 
 	// Initialise the matchmaking system.
 	MatchManager.Initialise();
-	MatchManager.CreateSession(5);
+	MatchManager.CreateSession(5, NULL);
 }
 
 // =============================================================================

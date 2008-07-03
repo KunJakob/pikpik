@@ -89,8 +89,9 @@ void HTTPConnection::Update(void)
 
 	if(state == RAK_HTTP_ESTABLISHED)
 	{
-		RakString request("GET %s HTTP/1.0\r\n"
+		RakString request("POST %s HTTP/1.0\r\n"
 			"Host: %s\r\n"
+			"User-Agent: SMM-1\r\n"
 			"Content-Type: application/octet-stream\r\n"
 			"Content-Length: %u\r\n"
 			"\r\n"

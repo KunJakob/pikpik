@@ -1415,6 +1415,34 @@
 				</File>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="Web"
+			>
+			<File
+				RelativePath="..\Web\_constant.php"
+				>
+			</File>
+			<File
+				RelativePath="..\Web\_match_create.php"
+				>
+			</File>
+			<File
+				RelativePath="..\Web\_mysql.php"
+				>
+			</File>
+			<File
+				RelativePath="..\Web\_mysql_config.php"
+				>
+			</File>
+			<File
+				RelativePath="..\Web\_stream.php"
+				>
+			</File>
+			<File
+				RelativePath="..\Web\match.php"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>
