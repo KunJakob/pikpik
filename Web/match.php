@@ -4,9 +4,11 @@
 	include("_mysql.php");
 	include("_stream.php");
 	include("_constant.php");
+	include("_result.php");
 	
 	// Initialise shared variables.
-	$mysql_database = "matchservice";
+	$mysql_database 	= "matchservice";
+	$current_time		= time();
 	
 	// Read in the stream values.
 	$stream_values = Stream_GenerateAssocArray();
@@ -17,8 +19,12 @@
 		//include("_match_public.php");
 	}
 	
+	// Verify from application.
+	// "REQUEST_METHOD" == "POST"
+	// "HTTP_USER_AGENT" == "SMM-1"
+	
 	// Establish a connection with the MySQL database.
-	MySQL_Start();
+	SQL_Connect();
 	
 	// Process the command.
 	if (isset($_GET["list"]))
@@ -53,6 +59,6 @@
 	}
 	
 	// Close the MySQL connection.
-	MySQL_Stop();
+	SQL_Disconnect();
 	
 ?>

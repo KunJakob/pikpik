@@ -8,7 +8,7 @@
 
 	// Connect to the MySQL server as specified in the config and return the connection object.
 	// This can be called repeatedly to regain the connection handle if it is lost.
-	function MySQL_Start()
+	function SQL_Connect()
 	{
 		global $_mysql_connection, $_mysql_hostname, $_mysql_username, $_mysql_password;
 		
@@ -17,7 +17,7 @@
 	}
 	
 	// Close the connection to the MySQL server.
-	function MySQL_Stop()
+	function SQL_Disconnect()
 	{
 		global $_mysql_connection;
 	
@@ -29,7 +29,7 @@
 	}
 	
 	// Perform a query using the existing connection on the specified database.
-	function MySQL_CreateQuery($database_name, $query)
+	function SQL_Query($database_name, $query)
 	{
 		global $_mysql_connection;
 		
@@ -46,13 +46,13 @@
 	
 	// Free the MySQL query result.
 	// Once the data has been retrieved, this can be executed without fear of losing any data.
-	function MySQL_FreeQuery($query_result)
+	function SQL_FreeQueryResult($query_result)
 	{
 		mysql_free_result($query_result);
 	}
 	
 	// Get the number of rows returned from the query.
-	function MySQL_GetNumRows($query_result)
+	function SQL_GetNumRows($query_result)
 	{
 		global $_mysql_connection;
 		
@@ -65,7 +65,7 @@
 	}
 	
 	// Fetch the data for the next result row from the query.
-	function MySQL_FetchRow($query_result)
+	function SQL_FetchRow($query_result)
 	{
 		global $_mysql_connection;
 		

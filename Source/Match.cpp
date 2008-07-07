@@ -215,9 +215,9 @@ CSession* CMatchManager::CreateSession(xint iTotalSlots, t_OnCreateSessionComple
 
 	xQuery.AddValue("gid", _MATCHGID);
 	xQuery.AddValue("sid", GenerateSessionID().c_str());
-	xQuery.AddValue("title", "_PIKPIK_");
-	xQuery.AddValue("slots", 5);
-	xQuery.AddValue("info", "noradar:notraps");
+	xQuery.AddValue("title", "PikPik");
+	xQuery.AddValue("slots", iTotalSlots);
+	xQuery.AddValue("info", "");
 
 	m_pHTTP->Post("/match.php?create", xQuery.GetQuery());
 	
@@ -317,17 +317,17 @@ void CMatchManager::DestroySession(CSession* pSession, t_OnDestroySessionComplet
 // =============================================================================
 xstring CMatchManager::GenerateSessionID()
 {
-	static const xchar* s_pChars = "0123456789";
+	static const xchar* s_pChars = "0123456789ABCDEF";
 	static const xint s_iNumChars = strlen(s_pChars);
 
 	xstring sSessionID = "";
 
-	for (xint iA = 0; iA < 3; ++iA)
+	for (xint iA = 0; iA < 4; ++iA)
 	{
 		for (xint iB = 0; iB < 8; ++iB)
 			sSessionID += s_pChars[rand() % s_iNumChars];
 
-		if (iA != 2)
+		if (iA != 3)
 			sSessionID += '-';
 	}
 
@@ -359,5 +359,3 @@ void CSession::RemovePlayer(xstring sName)
 }
 
 //##############################################################################
-
-
