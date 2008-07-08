@@ -186,7 +186,7 @@ xint CMatchResult::GetInt(const xchar* pKey)
 // =============================================================================
 // Nat Ryall                                                         30-Jun-2008
 // =============================================================================
-CMatchManager::CMatchManager() :
+CMatch::CMatch() :
 	m_pTCP(NULL),
 	m_pHTTP(NULL),
 	m_iOperation(MatchOperation_None),
@@ -202,7 +202,7 @@ CMatchManager::CMatchManager() :
 // =============================================================================
 // Nat Ryall                                                         30-Jun-2008
 // =============================================================================
-CMatchManager::~CMatchManager()
+CMatch::~CMatch()
 {
 	Deinitialise();
 }
@@ -210,7 +210,7 @@ CMatchManager::~CMatchManager()
 // =============================================================================
 // Nat Ryall                                                         30-Jun-2008
 // =============================================================================
-void CMatchManager::Initialise()
+void CMatch::Initialise()
 {
 	if (!m_pTCP)
 	{
@@ -224,7 +224,7 @@ void CMatchManager::Initialise()
 // =============================================================================
 // Nat Ryall                                                         30-Jun-2008
 // =============================================================================
-void CMatchManager::Deinitialise()
+void CMatch::Deinitialise()
 {
 	if (m_pHTTP)
 	{
@@ -245,7 +245,7 @@ void CMatchManager::Deinitialise()
 // =============================================================================
 // Nat Ryall                                                         02-Jul-2008
 // =============================================================================
-void CMatchManager::Update()
+void CMatch::Update()
 {
 	if (m_iOperation != MatchOperation_None)
 	{
@@ -291,7 +291,7 @@ void CMatchManager::Update()
 // =============================================================================
 // Nat Ryall                                                         02-Jul-2008
 // =============================================================================
-xbool CMatchManager::ListSessions(t_OnListSessionsCompleted fpCallback)
+xbool CMatch::ListSessions(t_OnListSessionsCompleted fpCallback)
 {
 	XMASSERT(false, "Operation is not yet implemented.");
 
@@ -309,27 +309,27 @@ xbool CMatchManager::ListSessions(t_OnListSessionsCompleted fpCallback)
 // =============================================================================
 // Nat Ryall                                                         02-Jul-2008
 // =============================================================================
-CSession* CMatchManager::CreateSession(xint iTotalSlots, t_OnCreateSessionCompleted fpCallback)
+CSession* CMatch::CreateSession(xint iTotalSlots, t_OnCreateSessionCompleted fpCallback)
 {
 	XMASSERT(m_iOperation == MatchOperation_None, "An operation is already processing.");
 
 	if (m_iOperation == MatchOperation_None)
 	{
 		// Create a new session object.
-		CSession* pSession = new CSession();
+		m_pSession = new CSession();
 
-		pSession->m_iStatus = SessionStatus_Creating;
-		pSession->m_bOwned = true;
-		pSession->m_sSessionID = GenerateSessionID().c_str();
-		pSession->m_iTotalSlots = iTotalSlots;
-		pSession->m_sTitle = "PikPik";
+		m_pSession->m_iStatus = SessionStatus_Creating;
+		m_pSession->m_bOwned = true;
+		m_pSession->m_sSessionID = GenerateSessionID().c_str();
+		m_pSession->m_iTotalSlots = iTotalSlots;
+		m_pSession->m_sTitle = "PikPik";
 
 		// Generate and send the operation query.
 		CMatchQuery xQuery;
 
 		xQuery.AddValue("gid", _MATCHGID);
-		xQuery.AddValue("sid", pSession->m_sSessionID);
-		xQuery.AddValue("title", pSession->m_sTitle);
+		xQuery.AddValue("sid", m_pSession->m_sSessionID);
+		xQuery.AddValue("title", m_pSession->m_sTitle);
 		xQuery.AddValue("slots", iTotalSlots);
 
 		m_pHTTP->Post("/match.php?create", xQuery.GetQuery());
@@ -338,7 +338,7 @@ CSession* CMatchManager::CreateSession(xint iTotalSlots, t_OnCreateSessionComple
 		m_iOperation = MatchOperation_CreateSession;
 		m_fpOnCreateSessionCompleted = fpCallback;
 
-		return pSession;
+		return m_pSession;
 	}
 
 	return NULL;
@@ -347,7 +347,7 @@ CSession* CMatchManager::CreateSession(xint iTotalSlots, t_OnCreateSessionComple
 // =============================================================================
 // Nat Ryall                                                         03-Jul-2008
 // =============================================================================
-xbool CMatchManager::PingSession(CSession* pSession, t_OnPingSessionCompleted fpCallback)
+xbool CMatch::PingSession(CSession* pSession, t_OnPingSessionCompleted fpCallback)
 {
 	XMASSERT(false, "Operation is not yet implemented.");
 
@@ -364,7 +364,7 @@ xbool CMatchManager::PingSession(CSession* pSession, t_OnPingSessionCompleted fp
 // =============================================================================
 // Nat Ryall                                                         02-Jul-2008
 // =============================================================================
-xbool CMatchManager::UpdateSession(CSession* pSession, t_OnUpdateSessionCompleted fpCallback)
+xbool CMatch::UpdateSession(CSession* pSession, t_OnUpdateSessionCompleted fpCallback)
 {
 	XMASSERT(false, "Operation is not yet implemented.");
 
@@ -385,7 +385,7 @@ xbool CMatchManager::UpdateSession(CSession* pSession, t_OnUpdateSessionComplete
 // =============================================================================
 // Nat Ryall                                                         02-Jul-2008
 // =============================================================================
-void CMatchManager::DestroySession(CSession* pSession, t_OnDestroySessionCompleted fpCallback)
+void CMatch::DestroySession(CSession* pSession, t_OnDestroySessionCompleted fpCallback)
 {
 	XMASSERT(false, "Operation is not yet implemented.");
 
@@ -400,7 +400,7 @@ void CMatchManager::DestroySession(CSession* pSession, t_OnDestroySessionComplet
 // =============================================================================
 // Nat Ryall                                                         08-Jul-2008
 // =============================================================================
-void CMatchManager::ProcessResult(RakNet::RakString* pResult)
+void CMatch::ProcessResult(RakNet::RakString* pResult)
 {
 	CMatchResult xResult;
 
@@ -415,16 +415,20 @@ void CMatchManager::ProcessResult(RakNet::RakString* pResult)
 	// Create Session.
 	case MatchOperation_CreateSession:
 		{
+			if (bSuccess)
+			{
+				m_pSession->m_iStatus = SessionStatus_Active;
+				m_pSession->m_sPassword = xResult.GetString("pass");
+			}
+			else
+			{
+				delete m_pSession;
+				m_pSession = NULL;
+			}
+
 			if (m_fpOnCreateSessionCompleted)
 			{
-				if (bSuccess)
-					m_fpOnCreateSessionCompleted(true, m_pSession);
-				else
-				{
-					delete m_pSession;
-					m_fpOnCreateSessionCompleted(false, NULL);
-				}
-
+				m_fpOnCreateSessionCompleted(iError, m_pSession);
 				m_fpOnCreateSessionCompleted = NULL;
 			}
 		}
@@ -435,7 +439,7 @@ void CMatchManager::ProcessResult(RakNet::RakString* pResult)
 // =============================================================================
 // Nat Ryall                                                         02-Jul-2008
 // =============================================================================
-xstring CMatchManager::GenerateSessionID()
+xstring CMatch::GenerateSessionID()
 {
 	static const xchar* s_pChars = "0123456789ABCDEF";
 	static const xint s_iNumChars = strlen(s_pChars);

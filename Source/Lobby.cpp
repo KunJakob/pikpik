@@ -120,16 +120,8 @@ void CLobbyScreen::Start(t_LobbyStartMode iStartMode)
 	
 	case LobbyStartMode_Create:
 		{
-			Network.Reset();
-			
-			Network.m_xCallbacks.m_fpPeerJoined = xbind(this, &CLobbyScreen::OnPeerJoined);
-			Network.m_xCallbacks.m_fpPeerLeaving = xbind(this, &CLobbyScreen::OnPeerLeaving);
-
-			BindPacketCallbacks();
-			
-			Network.StartHost(16, HOST_INCOMING_PORT);
-
-			SetState(LobbyState_Lobby);
+			CSession* pSession = Match.CreateSession(4, xbind(this, &CLobbyScreen::OnCreateSessionCompleted));
+			SetState(LobbyState_Creating);
 		}
 		break;
 	}
@@ -253,6 +245,31 @@ void CLobbyScreen::RenderLobby()
 	{
 		m_pPeerFont->Render(XFORMAT("Peer_%02d", (*ppPeer)->m_iID), xpoint(50, 50 + iPeerOffset), HGETEXT_LEFT);
 		iPeerOffset += 40;
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         08-Jul-2008
+// =============================================================================
+void CLobbyScreen::OnCreateSessionCompleted(t_MatchResultError iError, CSession* pSession)
+{
+	if (iError == MatchResultError_Success)
+	{
+		Network.Reset();
+
+		Network.m_xCallbacks.m_fpPeerJoined = xbind(this, &CLobbyScreen::OnPeerJoined);
+		Network.m_xCallbacks.m_fpPeerLeaving = xbind(this, &CLobbyScreen::OnPeerLeaving);
+
+		BindPacketCallbacks();
+
+		Network.StartHost(16, HOST_INCOMING_PORT);
+
+		SetState(LobbyState_Lobby);
+	}
+	else
+	{
+		SetState(LobbyState_None);
+		ScreenManager::Pop();
 	}
 }
 

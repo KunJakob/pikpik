@@ -27,7 +27,7 @@
 //##############################################################################
 
 // Singleton accessor.
-#define MatchManager CMatchManager::Get()
+#define Match CMatch::Get()
 
 // Query & result headers.
 #define MATCH_QUERY_HEADER "match://"
@@ -157,31 +157,31 @@ protected:
 
 //##############################################################################
 //
-//                               MATCH MANAGER
+//                                   MATCH
 //
 //##############################################################################
-class CMatchManager
+class CMatch
 {
 public:
 	// Callbacks.
-	typedef xfunction(3)<xbool /*Success*/, xint /*SessionCount*/, CSession* /*Sessions*/> t_OnListSessionsCompleted;
-	typedef xfunction(2)<xbool /*Success*/, CSession* /*Session*/> t_OnCreateSessionCompleted;
-	typedef xfunction(1)<xbool /*Success*/> t_OnPingSessionCompleted;
-	typedef xfunction(2)<xbool /*Success*/, CSession* /*Session*/> t_OnUpdateSessionCompleted;
-	typedef xfunction(1)<xbool /*Success*/> t_OnDestroySessionCompleted;
+	typedef xfunction(3)<t_MatchResultError /*Error*/, xint /*SessionCount*/, CSession* /*Sessions*/> t_OnListSessionsCompleted;
+	typedef xfunction(2)<t_MatchResultError /*Error*/, CSession* /*Session*/> t_OnCreateSessionCompleted;
+	typedef xfunction(1)<t_MatchResultError /*Error*/> t_OnPingSessionCompleted;
+	typedef xfunction(2)<t_MatchResultError /*Error*/, CSession* /*Session*/> t_OnUpdateSessionCompleted;
+	typedef xfunction(1)<t_MatchResultError /*Error*/> t_OnDestroySessionCompleted;
 
 	// Singleton instance.
-	static inline CMatchManager& Get() 
+	static inline CMatch& Get() 
 	{
-		static CMatchManager s_Instance;
+		static CMatch s_Instance;
 		return s_Instance;
 	}
 
 	// Constructor.
-	CMatchManager();
+	CMatch();
 
 	// Destructor.
-	virtual ~CMatchManager();
+	virtual ~CMatch();
 
 	// Initialise the matchmaking service.
 	void Initialise();
@@ -257,7 +257,7 @@ class CSession
 {
 public:
 	// Friends.
-	friend class CMatchManager;
+	friend class CMatch;
 
 	//
 	void AddPlayer(xstring sName);

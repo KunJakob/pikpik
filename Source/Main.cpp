@@ -167,8 +167,7 @@ void Application::Initialise()
 	//_GLOBAL.lpPlayers.push_back(new CGhost(_GLOBAL.pActiveMap->GetSpawnBlock(PlayerType_Ghost), 0xFFF040F0));
 
 	// Initialise the matchmaking system.
-	MatchManager.Initialise();
-	//MatchManager.CreateSession(5, NULL);
+	Match.Initialise();
 }
 
 // =============================================================================
@@ -193,6 +192,9 @@ void Application::Deinitialise()
 
 	// Free all the players.
 	XEN_LIST_ERASE_ALL(_GLOBAL.lpPlayers);
+
+	// Deinitialise the matchmaking system.
+	Match.Deinitialise();
 }
 
 // =============================================================================
@@ -209,6 +211,7 @@ XBOOL Application::Update()
 	s_iTimeDelta = (XUINT)(_TIMEDELTAF * 1000.f);
 
 	Network.Update();
+	Match.Update();
 
 	s_pSoundSystem->update();
 

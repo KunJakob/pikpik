@@ -21,6 +21,7 @@
 // Other.
 #include <Component.h>
 #include <Network.h>
+#include <Match.h>
 
 //##############################################################################
 
@@ -129,6 +130,9 @@ protected:
 
 	// Render the main lobby screen.
 	void RenderLobby();
+
+	// Callback for when the session has created.
+	void OnCreateSessionCompleted(t_MatchResultError iError, CSession* pSession);
 
 	// Callback for when the join button is clicked in the join interface.
 	void OnJoinClicked(CButtonComponent* pButton, xpoint xOffset);
