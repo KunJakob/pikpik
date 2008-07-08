@@ -40,6 +40,9 @@
 .Button_Join
 "Join"
 
+.Button_Back
+"Back"
+
 // --------------------------------------------------------------------------------
 // Status
 // --------------------------------------------------------------------------------
@@ -61,6 +64,21 @@
 // --------------------------------------------------------------------------------
 // Error
 // --------------------------------------------------------------------------------
+.Error_Unknown
+"An unknown error has occured."
+
+.Error_OwnerExists
+"There is already an active session for this server."
+
+.Error_SessionExists
+"There is already a session with this session ID."
+
+.Error_InvalidSession
+"The session ID specified does not exist."
+
+.Error_InvalidPassword
+"The password specified does not match the session ID specified."
+
 .Error_ConnectFailed
 "Could not connect to %s."
 

@@ -32,7 +32,6 @@
 // =============================================================================
 CMatchQuery::CMatchQuery()
 {
-	m_pHeader = "match://";
 	Reset();
 }
 
@@ -41,7 +40,7 @@ CMatchQuery::CMatchQuery()
 // =============================================================================
 void CMatchQuery::Reset()
 {
-	m_sQuery = m_pHeader;
+	m_sQuery = MATCH_QUERY_HEADER;
 }
 
 // =============================================================================
@@ -54,13 +53,21 @@ void CMatchQuery::AddValue(const xchar* pKey, const xchar* pValue)
 
 	if (sKey.length() && sValue.length())
 	{
-		if (m_sQuery.length() != strlen(m_pHeader))
+		if (m_sQuery.length() != strlen(MATCH_QUERY_HEADER))
 			m_sQuery += '&';
 
 		m_sQuery += sKey;
 		m_sQuery += '=';
 		m_sQuery += sValue;
 	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         08-Jul-2008
+// =============================================================================
+void CMatchQuery::AddValue(const xchar* pKey, xstring& sValue)
+{
+	AddValue(pKey, sValue.c_str());
 }
 
 // =============================================================================
@@ -86,6 +93,92 @@ xstring CMatchQuery::FormatString(xstring sString)
 
 //##############################################################################
 //
+//                                MATCH RESULT
+//
+//##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                         08-Jul-2008
+// =============================================================================
+t_MatchResultError CMatchResult::ProcessResult(const xchar* pResult)
+{
+	m_lpPairs.clear();
+
+	// Make sure the header checks out so that we know we have a valid result.
+	if (pResult && strncmp(pResult, MATCH_RESULT_HEADER, strlen(MATCH_RESULT_HEADER)) == 0)
+	{
+		pResult += strlen(MATCH_RESULT_HEADER);
+
+		// Copy the result string into internal memory so that we can manipulate it.
+		xchar* pLocalResult = NULL;
+		xint iResultLen = strlen(pResult);
+
+		if (iResultLen)
+		{
+			pLocalResult = new xchar[++iResultLen];
+			strcpy_s(pLocalResult, iResultLen, pResult);
+		}
+		else
+			return MatchResultError_InvalidHeader;
+
+		// Tokenise the key-pairs.
+		static xchar* s_pSeparators = "&";
+
+		xchar* pContext = NULL;
+		xchar* pToken = strtok_s(pLocalResult, s_pSeparators, &pContext);
+
+		while (pToken)
+		{
+			xchar* pValue = strchr(pToken, '=');
+			*pValue = 0;
+			++pValue;
+
+			if (strlen(pToken) && strlen(pValue))
+				m_lpPairs[pToken] = pValue;
+
+			pToken = strtok_s(NULL, s_pSeparators, &pContext);
+		}
+
+		delete [] pLocalResult;
+		pLocalResult = NULL;
+
+		if (KeyExists("error"))
+			return (t_MatchResultError)GetInt("error");
+		else
+			return MatchResultError_InvalidHeader;
+	}
+	else
+		return MatchResultError_InvalidHeader;
+}
+
+// =============================================================================
+// Nat Ryall                                                         08-Jul-2008
+// =============================================================================
+xbool CMatchResult::KeyExists(const xchar* pKey)
+{
+	return m_lpPairs.find(pKey) != m_lpPairs.end();
+}
+
+// =============================================================================
+// Nat Ryall                                                         08-Jul-2008
+// =============================================================================
+const xchar* CMatchResult::GetString(const xchar* pKey)
+{
+	return m_lpPairs[pKey].c_str();
+}
+
+// =============================================================================
+// Nat Ryall                                                         08-Jul-2008
+// =============================================================================
+xint CMatchResult::GetInt(const xchar* pKey)
+{
+	return atoi(m_lpPairs[pKey].c_str());
+}
+
+//##############################################################################
+
+//##############################################################################
+//
 //                               MATCH MANAGER
 //
 //##############################################################################
@@ -95,8 +188,15 @@ xstring CMatchQuery::FormatString(xstring sString)
 // =============================================================================
 CMatchManager::CMatchManager() :
 	m_pTCP(NULL),
-	m_pHTTP(NULL)
+	m_pHTTP(NULL),
+	m_iOperation(MatchOperation_None),
+	m_iTimeout(0)
 {
+	m_fpOnListSessionsCompleted = NULL;
+	m_fpOnCreateSessionCompleted = NULL;
+	m_fpOnPingSessionCompleted = NULL;
+	m_fpOnUpdateSessionCompleted = NULL;
+	m_fpOnDestroySessionCompleted = NULL;
 }
 
 // =============================================================================
@@ -105,46 +205,6 @@ CMatchManager::CMatchManager() :
 CMatchManager::~CMatchManager()
 {
 	Deinitialise();
-}
-
-// =============================================================================
-// Nat Ryall                                                         30-Jun-2008
-// =============================================================================
-CSession* CMatchManager::TEMP_QueryServer(xint iSlots)
-{
-	if (!m_pHTTP->IsBusy())
-		m_pHTTP->Post("/match.php?create", "sessid=11819430-18241074-17187362&pass=H82A9ME1PQ");
-
-	while (true)
-	{
-		Packet* pPacket = m_pTCP->Receive();
-
-		if (pPacket)
-		{
-			if (m_pHTTP->ProcessFinalTCPPacket(pPacket))
-			{
-				int iErrorCode = 0;
-				RakNet::RakString xErrorString;
-
-				if (m_pHTTP->HasBadResponse(&iErrorCode, &xErrorString))
-					XLOG("Error: %d, '%s'", iErrorCode, xErrorString.C_String());
-				else
-				{
-					RakNet::RakString xString = m_pHTTP->Read();
-					XLOG("Response: '%s'", xString.C_String());
-				}
-
-				break;
-			}
-
-			m_pTCP->DeallocatePacket(pPacket);
-		}
-
-		m_pHTTP->Update();
-		Sleep(10);
-	}
-
-	return NULL;
 }
 
 // =============================================================================
@@ -177,6 +237,9 @@ void CMatchManager::Deinitialise()
 		delete m_pTCP;
 		m_pTCP = NULL;
 	}
+
+	m_iOperation = MatchOperation_None;
+	m_iTimeout = 0;
 }
 
 // =============================================================================
@@ -184,9 +247,44 @@ void CMatchManager::Deinitialise()
 // =============================================================================
 void CMatchManager::Update()
 {
-	XEN_LIST_FOREACH(t_SessionList, ppSession, m_lpSessions)
+	if (m_iOperation != MatchOperation_None)
 	{
-		//if ((*ppSession)->m_iState != SessionState_Idle)
+		if (m_pHTTP->IsBusy())
+		{
+			if (m_iTimeout == 0)
+				m_iTimeout = _TIMEMS + MATCH_OPERATION_TIMEOUT;
+
+			if (_TIMEMS > m_iTimeout)
+			{
+				// TODO: Restart the TCP server.
+				// TODO: Notify of failure.
+			}
+
+			Packet* pPacket = m_pTCP->Receive();
+
+			if (pPacket)
+			{
+				if (m_pHTTP->ProcessFinalTCPPacket(pPacket))
+				{
+					int iErrorCode = 0;
+					RakNet::RakString xErrorString;
+
+					if (m_pHTTP->HasBadResponse(&iErrorCode, &xErrorString))
+						XLOG("[MatchManager] Error: %d, '%s'", iErrorCode, xErrorString.C_String());
+					else
+					{
+						RakNet::RakString xString = m_pHTTP->Read();
+						XLOG("[MatchManager] Response: '%s'", xString.C_String());
+
+						ProcessResult(&xString);
+					}
+				}
+
+				m_pTCP->DeallocatePacket(pPacket);
+			}
+
+			m_pHTTP->Update();
+		}
 	}
 }
 
@@ -195,11 +293,13 @@ void CMatchManager::Update()
 // =============================================================================
 xbool CMatchManager::ListSessions(t_OnListSessionsCompleted fpCallback)
 {
+	XMASSERT(false, "Operation is not yet implemented.");
+
 	CMatchQuery xQuery;
 
 	xQuery.AddValue("gid", _MATCHGID);
+	xQuery.AddValue("max", 10);
 	xQuery.AddValue("slots", 1);
-	xQuery.AddValue("info", "noradar");
 
 	m_pHTTP->Post("/match.php?list", xQuery.GetQuery());
 
@@ -211,52 +311,35 @@ xbool CMatchManager::ListSessions(t_OnListSessionsCompleted fpCallback)
 // =============================================================================
 CSession* CMatchManager::CreateSession(xint iTotalSlots, t_OnCreateSessionCompleted fpCallback)
 {
-	CMatchQuery xQuery;
+	XMASSERT(m_iOperation == MatchOperation_None, "An operation is already processing.");
 
-	xQuery.AddValue("gid", _MATCHGID);
-	xQuery.AddValue("sid", GenerateSessionID().c_str());
-	xQuery.AddValue("title", "PikPik");
-	xQuery.AddValue("slots", iTotalSlots);
-	xQuery.AddValue("info", "");
-
-	m_pHTTP->Post("/match.php?create", xQuery.GetQuery());
-	
-	while (true)
+	if (m_iOperation == MatchOperation_None)
 	{
-		Packet* pPacket = m_pTCP->Receive();
+		// Create a new session object.
+		CSession* pSession = new CSession();
 
-		if (pPacket)
-		{
-			if (m_pHTTP->ProcessFinalTCPPacket(pPacket))
-			{
-				int iErrorCode = 0;
-				RakNet::RakString xErrorString;
+		pSession->m_iStatus = SessionStatus_Creating;
+		pSession->m_bOwned = true;
+		pSession->m_sSessionID = GenerateSessionID().c_str();
+		pSession->m_iTotalSlots = iTotalSlots;
+		pSession->m_sTitle = "PikPik";
 
-				if (m_pHTTP->HasBadResponse(&iErrorCode, &xErrorString))
-					XLOG("Error: %d, '%s'", iErrorCode, xErrorString.C_String());
-				else
-				{
-					RakNet::RakString xString = m_pHTTP->Read();
-					XLOG("Response: '%s'", xString.C_String());
-				}
+		// Generate and send the operation query.
+		CMatchQuery xQuery;
 
-				break;
-			}
+		xQuery.AddValue("gid", _MATCHGID);
+		xQuery.AddValue("sid", pSession->m_sSessionID);
+		xQuery.AddValue("title", pSession->m_sTitle);
+		xQuery.AddValue("slots", iTotalSlots);
 
-			m_pTCP->DeallocatePacket(pPacket);
-		}
+		m_pHTTP->Post("/match.php?create", xQuery.GetQuery());
 
-		m_pHTTP->Update();
-		Sleep(1);
+		// Start the operation.
+		m_iOperation = MatchOperation_CreateSession;
+		m_fpOnCreateSessionCompleted = fpCallback;
+
+		return pSession;
 	}
-
-	/*m_fpOnCreateSessionCompleted = fpCallback;
-
-	if (m_fpOnCreateSessionCompleted)
-	{
-		m_fpOnCreateSessionCompleted(true, NULL);
-		m_fpOnCreateSessionCompleted = NULL;
-	}*/
 
 	return NULL;
 }
@@ -266,9 +349,10 @@ CSession* CMatchManager::CreateSession(xint iTotalSlots, t_OnCreateSessionComple
 // =============================================================================
 xbool CMatchManager::PingSession(CSession* pSession, t_OnPingSessionCompleted fpCallback)
 {
+	XMASSERT(false, "Operation is not yet implemented.");
+
 	CMatchQuery xQuery;
 
-	xQuery.AddValue("gid", _MATCHGID);
 	xQuery.AddValue("sid", pSession->m_sSessionID.c_str());
 	xQuery.AddValue("pass", pSession->m_sPassword.c_str());
 
@@ -282,15 +366,15 @@ xbool CMatchManager::PingSession(CSession* pSession, t_OnPingSessionCompleted fp
 // =============================================================================
 xbool CMatchManager::UpdateSession(CSession* pSession, t_OnUpdateSessionCompleted fpCallback)
 {
+	XMASSERT(false, "Operation is not yet implemented.");
+
 	CMatchQuery xQuery;
 
-	xQuery.AddValue("gid", _MATCHGID);
 	xQuery.AddValue("sid", pSession->m_sSessionID.c_str());
 	xQuery.AddValue("pass", pSession->m_sPassword.c_str());
-	xQuery.AddValue("state", pSession->m_iState);
-	xQuery.AddValue("title", pSession->m_sTitle.c_str());
+	xQuery.AddValue("state", pSession->m_iStatus);
 	xQuery.AddValue("slots", pSession->m_iTotalSlots);
-	xQuery.AddValue("players", "Krakken,slygamer123,xxRaDiXxx"); // TODO: Change this to use pSession->m_lpPlayers
+	xQuery.AddValue("players", "krakken:slygamer123:xxRaDiXxx"); // TODO: Change this to use pSession->m_lpPlayers
 	xQuery.AddValue("info", pSession->m_sSessionInfo.c_str());
 
 	m_pHTTP->Post("/match.php?update", xQuery.GetQuery());
@@ -303,13 +387,49 @@ xbool CMatchManager::UpdateSession(CSession* pSession, t_OnUpdateSessionComplete
 // =============================================================================
 void CMatchManager::DestroySession(CSession* pSession, t_OnDestroySessionCompleted fpCallback)
 {
+	XMASSERT(false, "Operation is not yet implemented.");
+
 	CMatchQuery xQuery;
 
-	xQuery.AddValue("gid", _MATCHGID);
 	xQuery.AddValue("sid", pSession->m_sSessionID.c_str());
 	xQuery.AddValue("pass", pSession->m_sPassword.c_str());
 
 	m_pHTTP->Post("/match.php?destroy", xQuery.GetQuery());
+}
+
+// =============================================================================
+// Nat Ryall                                                         08-Jul-2008
+// =============================================================================
+void CMatchManager::ProcessResult(RakNet::RakString* pResult)
+{
+	CMatchResult xResult;
+
+	t_MatchResultError iError = xResult.ProcessResult(pResult->C_String());
+	xbool bSuccess = (iError == MatchResultError_Success);
+
+	t_MatchOperation iLastOperation = m_iOperation;
+	m_iOperation = MatchOperation_None;
+
+	switch (iLastOperation)
+	{
+	// Create Session.
+	case MatchOperation_CreateSession:
+		{
+			if (m_fpOnCreateSessionCompleted)
+			{
+				if (bSuccess)
+					m_fpOnCreateSessionCompleted(true, m_pSession);
+				else
+				{
+					delete m_pSession;
+					m_fpOnCreateSessionCompleted(false, NULL);
+				}
+
+				m_fpOnCreateSessionCompleted = NULL;
+			}
+		}
+		break;
+	}
 }
 
 // =============================================================================

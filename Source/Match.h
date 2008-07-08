@@ -29,6 +29,13 @@
 // Singleton accessor.
 #define MatchManager CMatchManager::Get()
 
+// Query & result headers.
+#define MATCH_QUERY_HEADER "match://"
+#define MATCH_RESULT_HEADER "result://"
+
+// The operation timeout in milliseconds.
+#define MATCH_OPERATION_TIMEOUT 10000
+
 //##############################################################################
 
 //##############################################################################
@@ -40,16 +47,42 @@
 // Predeclare.
 class CSession;
 
-// The possible session states.
-enum t_SessionState
+// Match result error codes (linked to the match service).
+enum t_MatchResultError
 {
-	SessionState_Idle,
-	SessionState_Creating,
-	SessionState_Destroying,
+	MatchResultError_Success,
+	MatchResultError_OwnerExists,
+	MatchResultError_SessionExists,
+	MatchResultError_InvalidSession,
+	MatchResultError_InvalidPassword,
+
+	MatchResultError_InvalidHeader,
+};
+
+// The various operations that can occur in the matchmaking service.
+enum t_MatchOperation
+{
+	MatchOperation_None,
+	MatchOperation_ListSessions,
+	MatchOperation_CreateSession,
+	MatchOperation_PingSession,
+	MatchOperation_UpdateSession,
+	MatchOperation_DestroySession,
+};
+
+// The possible session status (linked to the match service).
+enum t_SessionStatus
+{
+	SessionStatus_Unknown,
+	SessionStatus_Creating,
+	SessionStatus_Active,
+	SessionStatus_Started,
+	SessionStatus_Closed,
+	SessionStatus_Timeout,
 };
 
 // Lists.
-typedef xvlist<CSession*> t_SessionList;
+//typedef xvlist<CSession*> t_SessionList;
 
 //##############################################################################
 
@@ -67,10 +100,13 @@ public:
 	// Reset the query to the default string.
 	void Reset();
 
-	// AddValue a key-pair to the query using a string value.
+	// Add a key-pair to the query using a string value.
 	void AddValue(const xchar* pKey, const xchar* pValue);
 
-	// AddValue a key-pair to the query using an integer value.
+	// Add a key-pair to the query using a string value.
+	void AddValue(const xchar* pKey, xstring& sValue);
+
+	// Add a key-pair to the query using an integer value.
 	void AddValue(const xchar* pKey, xint iValue);
 
 	// Get the final query to send to the matchmaking server.
@@ -83,11 +119,38 @@ protected:
 	// Format the string to remove any unsafe characters.
 	xstring FormatString(xstring sString);
 
-	// The query header.
-	const xchar* m_pHeader;
-
 	// The final formatted query to be sent.
 	xstring m_sQuery;
+};
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                MATCH RESULT
+//
+//##############################################################################
+class CMatchResult
+{
+public:
+	// Process the result returned from the web query.
+	t_MatchResultError ProcessResult(const xchar* pResult);
+
+	// Check if a key exists in the result.
+	xbool KeyExists(const xchar* pKey);
+
+	// Get a value for the specified key as a string.
+	const xchar* GetString(const xchar* pKey);
+
+	// Get a value for the specified key as an integer.
+	xint GetInt(const xchar* pKey);
+
+protected:
+	// Types.
+	typedef xhash<xstring, xstring> t_StringHash;
+
+	// The hash table of key-value pairs.
+	t_StringHash m_lpPairs;
 };
 
 //##############################################################################
@@ -106,9 +169,6 @@ public:
 	typedef xfunction(1)<xbool /*Success*/> t_OnPingSessionCompleted;
 	typedef xfunction(2)<xbool /*Success*/, CSession* /*Session*/> t_OnUpdateSessionCompleted;
 	typedef xfunction(1)<xbool /*Success*/> t_OnDestroySessionCompleted;
-
-	// Create a new session with the specified properties.
-	CSession* TEMP_QueryServer(xint iSlots);
 
 	// Singleton instance.
 	static inline CMatchManager& Get() 
@@ -129,13 +189,13 @@ public:
 	// Deinitialise the matchmaking service.
 	void Deinitialise();
 
-	//
+	// Update the service and process any pending operation.
 	void Update();
 
 	// 
 	xbool ListSessions(t_OnListSessionsCompleted fpCallback);
 
-	// 
+	// Create a new session with the specified params.
 	CSession* CreateSession(xint iTotalSlots, t_OnCreateSessionCompleted fpCallback);
 
 	//
@@ -147,7 +207,16 @@ public:
 	//
 	void DestroySession(CSession* pSession, t_OnDestroySessionCompleted fpCallback);
 
+	// Get the currently pending operation.
+	inline t_MatchOperation GetCurrentOperation()
+	{
+		return m_iOperation;
+	}
+
 protected:
+	// Process a query result.
+	void ProcessResult(RakNet::RakString* pString);
+
 	// Generate a unique session ID.
 	xstring GenerateSessionID();
 
@@ -157,8 +226,17 @@ protected:
 	// The HTTP connection to the managing webserver.
 	HTTPConnection* m_pHTTP;
 
+	// The current matchmaking operation.
+	t_MatchOperation m_iOperation;
+
+	// The session being used in the current operation.
+	CSession* m_pSession;
+
+	// The operation timeout counter.
+	xuint m_iTimeout;
+
 	// The internal session list.
-	t_SessionList m_lpSessions;
+	//t_SessionList m_lpSessions;
 
 	// Callbacks.
 	t_OnListSessionsCompleted m_fpOnListSessionsCompleted;
@@ -188,9 +266,9 @@ public:
 	void RemovePlayer(xstring sName);
 
 	//
-	inline t_SessionState GetState()
+	inline t_SessionStatus GetState()
 	{
-		return m_iState;
+		return m_iStatus;
 	}
 
 protected:
@@ -198,7 +276,7 @@ protected:
 	typedef xlist<xstring> t_StringList;
 
 	// The current session state.
-	t_SessionState m_iState;
+	t_SessionStatus m_iStatus;
 
 	// Specifies if the session is owned by the local machine.
 	xbool m_bOwned; 

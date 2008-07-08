@@ -50,9 +50,10 @@
 // FMOD.
 #include <FMOD/fmod.hpp>
 
-// Standard Lib.
+// STL.
 #include <list>
 #include <vector>
+#include <map>
 
 //##############################################################################
 #pragma endregion

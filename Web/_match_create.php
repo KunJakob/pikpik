@@ -99,8 +99,7 @@
 		")"
 	);
 	
-	$result = Result_Init();
-	Result_AddValue($result, "pass", $pass);
-	Result_Print($result);
+	Result_Success();
+	Result_Value("pass", $pass);
 
 ?>
