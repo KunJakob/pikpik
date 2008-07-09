@@ -62,6 +62,8 @@ enum t_LobbyStartMode
 enum t_LobbyState
 {
 	LobbyState_None,
+	LobbyState_Searching,
+	LobbyState_List,
 	LobbyState_Join,
 	LobbyState_Creating,
 	LobbyState_Connecting,
@@ -126,6 +128,9 @@ protected:
 	// Set the internal state.
 	void SetState(t_LobbyState iState);
 
+	// Render the session list.
+	void RenderList();
+
 	// Update the main lobby screen.
 	void UpdateLobby();
 
@@ -185,6 +190,12 @@ protected:
 
 	// The lobby peer font.
 	CFont* m_pPeerFont;
+
+	// The session list count.
+	xint m_iSessionCount;
+
+	// The session list.
+	CSession* m_pSessionList;
 };
 
 //##############################################################################

@@ -3,9 +3,17 @@
 	// ==================================================
 	// Initialise variables for the operation.
 	// ==================================================
-	$gid		= "PP001";
+	$gid		= "PikPik-1";
 	$limit		= 25;
-	$state		= $STATUS_ACTIVE;
+	
+	// ==================================================
+	// Mark all expired sessions as closed.
+	// ==================================================
+	$query = SQL_Query
+	(
+		$mysql_database,
+		"UPDATE sessions SET state = $STATUS_TIMEOUT WHERE state = $STATUS_ACTIVE AND expiry < $current_time"
+	);
 	
 	// ==================================================
 	// Find all relevant sessions.
@@ -16,7 +24,7 @@
 		"SELECT sid, ip, title, tslots, uslots ". 
 		"FROM sessions ".
 		"WHERE gid = '$gid' ".
-		"AND state = $state ".
+		"AND state = $STATUS_ACTIVE ".
 		"AND expiry > $current_time ".
 		"LIMIT $limit"
 	);
@@ -49,5 +57,7 @@
 	}
 	
 	echo "</font>";
+	
+	SQL_FreeQueryResult($query);
 
 ?>

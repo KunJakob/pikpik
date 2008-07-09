@@ -48,6 +48,7 @@ enum t_MenuGroupIndex
 	MenuGroupIndex_Main,
 	MenuGroupIndex_Play,
 	MenuGroupIndex_Online,
+	MenuGroupIndex_Join,
 	/*MAX*/MenuGroupIndex_Max,
 };
 
@@ -203,6 +204,7 @@ protected:
 	void Callback_ShowMainMenu();
 	void Callback_ShowPlayMenu();
 	void Callback_ShowOnlineMenu();
+	void Callback_ShowJoinMenu();
 	void Callback_FindLobby();
 	void Callback_JoinLobby();
 	void Callback_CreateLobby();

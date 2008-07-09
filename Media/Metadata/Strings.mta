@@ -28,14 +28,17 @@
 .Menu_Back
 "Back"
 
-.Menu_OnlineFind
-"Find Game"
-
 .Menu_OnlineJoin
 "Join Game"
 
 .Menu_OnlineCreate
 "Create Game"
+
+.Menu_JoinUnknown
+"Search"
+
+.Menu_JoinKnown
+"Specify IP"
 
 // --------------------------------------------------------------------------------
 // Button
@@ -49,6 +52,9 @@
 // --------------------------------------------------------------------------------
 // Status
 // --------------------------------------------------------------------------------
+.Status_Searching
+"Searching"
+
 .Status_Creating
 "Creating"
 

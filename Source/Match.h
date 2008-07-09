@@ -85,6 +85,7 @@ enum t_SessionStatus
 	SessionStatus_Creating,
 	SessionStatus_Active,
 	SessionStatus_Started,
+	SessionStatus_Closing,
 	SessionStatus_Closed,
 	SessionStatus_Timeout,
 };
@@ -276,6 +277,12 @@ public:
 	// Friends.
 	friend class CMatch;
 
+	// Constructor.
+	CSession();
+
+	// Check to see if the specified player exists in the session.
+	xbool PlayerExists(xstring sName);
+
 	// Add a player to the session by name.
 	xbool AddPlayer(xstring sName);
 
@@ -288,10 +295,6 @@ public:
 		return m_iStatus;
 	}
 
-protected:
-	// Check to see if the specified player exists in the session.
-	xbool PlayerExists(xstring sName);
-	
 	// Types.
 	typedef xlist<xstring> t_StringList;
 

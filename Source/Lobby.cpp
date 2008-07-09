@@ -82,7 +82,6 @@ void CLobbyScreen::Update()
 	QuitCheck();
 	UpdateParent();
 
-
 	switch (m_iState)
 	{
 	case LobbyState_Lobby:
@@ -100,6 +99,10 @@ void CLobbyScreen::Render()
 
 	switch (m_iState)
 	{
+	case LobbyState_List:
+		RenderList();
+		break;
+
 	case LobbyState_Lobby:
 		RenderLobby();
 		break;
@@ -115,7 +118,8 @@ void CLobbyScreen::Start(t_LobbyStartMode iStartMode)
 	{
 	case LobbyStartMode_Find:
 		{
-			SetState(LobbyState_Join);
+			Match.ListSessions(xbind(this, &CLobbyScreen::OnListSessionsCompleted));
+			SetState(LobbyState_Searching);
 		}
 		break;
 
@@ -153,6 +157,13 @@ void CLobbyScreen::SetState(t_LobbyState iState)
 
 	switch (iState)
 	{
+	case LobbyState_Searching:
+		{
+			m_pStatusBox->AttachElements();
+			m_pStatusBox->m_pLabel->SetText(_LOCALE("Status_Searching"));
+		}
+		break;
+
 	case LobbyState_Join:
 		{
 			if (Network.IsRunning())
@@ -210,8 +221,10 @@ void CLobbyScreen::QuitCheck()
 	{
 		switch (m_iState)
 		{
+		case LobbyState_List:
 		case LobbyState_Join:
 			{
+				SetState(LobbyState_None);
 				ScreenManager::Pop();
 			}
 			break;
@@ -234,11 +247,24 @@ void CLobbyScreen::QuitCheck()
 }
 
 // =============================================================================
+// Nat Ryall                                                         09-Jul-2008
+// =============================================================================
+void CLobbyScreen::RenderList()
+{
+	for (xint iA = 0; iA < m_iSessionCount; ++iA)
+	{
+		CSession* pSession = &m_pSessionList[iA];
+
+		_GLOBAL.pGameFont->Render(pSession->m_sSessionID.c_str(), xpoint(10, 10 + (iA * 20)), HGETEXT_LEFT);
+		_GLOBAL.pGameFont->Render(XFORMAT("%d/%d Slots", pSession->m_iUsedSlots, pSession->m_iTotalSlots), xpoint(350, 10 + (iA * 20)), HGETEXT_LEFT);
+	}
+}
+
+// =============================================================================
 // Nat Ryall                                                         17-Jun-2008
 // =============================================================================
 void CLobbyScreen::UpdateLobby()
 {
-	
 }
 
 // =============================================================================
@@ -246,8 +272,6 @@ void CLobbyScreen::UpdateLobby()
 // =============================================================================
 void CLobbyScreen::RenderLobby()
 {
-	//Network.m_pInterface->GetLocalIP(0);
-
 	// Render the peer list.
 	xint iPeerOffset = 0;
 
@@ -263,7 +287,18 @@ void CLobbyScreen::RenderLobby()
 // =============================================================================
 void CLobbyScreen::OnListSessionsCompleted(t_MatchResultError iError, xint iSessionCount, CSession* pSessions)
 {
+	if (iError == MatchResultError_Success)
+	{
+		m_iSessionCount = iSessionCount;
+		m_pSessionList = pSessions;
 
+		SetState(LobbyState_List);
+	}
+	else
+	{
+		SetState(LobbyState_None);
+		ScreenManager::Pop();
+	}
 }
 
 // =============================================================================

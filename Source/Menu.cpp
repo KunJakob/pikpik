@@ -128,10 +128,14 @@ void CMenuScreen::Load()
 		new CMenuLink(MenuGroupIndex_Play,		m_pMenuHighlight,	_LOCALE("Menu_Back"),			xbind(this, &CMenuScreen::Callback_ShowMainMenu)),
 
 		// Online.
-		new CMenuLink(MenuGroupIndex_Online,	m_pMenuDefault,		_LOCALE("Menu_OnlineFind"),		xbind(this, &CMenuScreen::Callback_FindLobby)),
-		new CMenuLink(MenuGroupIndex_Online,	m_pMenuDefault,		_LOCALE("Menu_OnlineJoin"),		xbind(this, &CMenuScreen::Callback_JoinLobby)),
+		new CMenuLink(MenuGroupIndex_Online,	m_pMenuDefault,		_LOCALE("Menu_OnlineJoin"),		xbind(this, &CMenuScreen::Callback_ShowJoinMenu)),
 		new CMenuLink(MenuGroupIndex_Online,	m_pMenuDefault,		_LOCALE("Menu_OnlineCreate"),	xbind(this, &CMenuScreen::Callback_CreateLobby)),
 		new CMenuLink(MenuGroupIndex_Online,	m_pMenuHighlight,	_LOCALE("Menu_Back"),			xbind(this, &CMenuScreen::Callback_ShowMainMenu)),
+
+		// Find.
+		new CMenuLink(MenuGroupIndex_Join,		m_pMenuDefault,		_LOCALE("Menu_JoinUnknown"),	xbind(this, &CMenuScreen::Callback_FindLobby)),
+		new CMenuLink(MenuGroupIndex_Join,		m_pMenuDefault,		_LOCALE("Menu_JoinKnown"),		xbind(this, &CMenuScreen::Callback_JoinLobby)),
+		new CMenuLink(MenuGroupIndex_Join,		m_pMenuHighlight,	_LOCALE("Menu_Back"),			xbind(this, &CMenuScreen::Callback_ShowOnlineMenu)),
 	};
 
 	for (xuint iA = 0; iA < (sizeof(pLinkList) / sizeof(CMenuLink*)); ++iA)
@@ -198,6 +202,10 @@ void CMenuScreen::Update()
 
 		case MenuGroupIndex_Online:
 			SetMenuGroup(MenuGroupIndex_Main);
+			break;
+
+		case MenuGroupIndex_Join:
+			SetMenuGroup(MenuGroupIndex_Online);
 			break;
 		}
 	}
@@ -268,6 +276,14 @@ void CMenuScreen::Callback_ShowPlayMenu()
 void CMenuScreen::Callback_ShowOnlineMenu()
 {
 	SetMenuGroup(MenuGroupIndex_Online);
+}
+
+// =============================================================================
+// Nat Ryall                                                         09-Jul-2008
+// =============================================================================
+void CMenuScreen::Callback_ShowJoinMenu()
+{
+	SetMenuGroup(MenuGroupIndex_Join);
 }
 
 // =============================================================================

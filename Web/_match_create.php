@@ -54,7 +54,7 @@
 	$query = SQL_Query
 	(
 		$mysql_database,
-		"SELECT * FROM sessions WHERE owner = '$owner' AND expiry > $time LIMIT 1"
+		"SELECT * FROM sessions WHERE owner = '$owner' AND expiry > $time AND state = $STATUS_ACTIVE LIMIT 1"
 	);
 	
 	if (SQL_GetNumRows($query))

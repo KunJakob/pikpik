@@ -259,8 +259,6 @@ void CMatch::Update()
 			m_pTCP->Stop();
 			m_pTCP->Start(0, 64);
 
-			m_iTimeout = 0;
-
 			ProcessError(MatchResultError_Timeout);
 
 			return;
@@ -453,7 +451,9 @@ xbool CMatch::CloseSession(CSession* pSession, t_OnCloseSessionCompleted fpCallb
 		m_pHTTP->Post("/match.php?close", xQuery.GetQuery());
 
 		// Start the operation.
+		pSession->m_iStatus = SessionStatus_Closing;
 		m_pSession = pSession;
+
 		m_iOperation = MatchOperation_CloseSession;
 		m_fpOnCloseSessionCompleted = fpCallback;
 		
@@ -477,7 +477,9 @@ void CMatch::ProcessResult(RakNet::RakString* pResult)
 	xbool bSuccess = (iError == MatchResultError_Success);
 
 	t_MatchOperation iLastOperation = m_iOperation;
+
 	m_iOperation = MatchOperation_None;
+	m_iTimeout = 0;
 
 	switch (iLastOperation)
 	{
@@ -593,6 +595,31 @@ xstring CMatch::GenerateSessionID()
 //##############################################################################
 
 // =============================================================================
+// Nat Ryall                                                         09-Jul-2008
+// =============================================================================
+CSession::CSession() :
+	m_iStatus(SessionStatus_Unknown),
+	m_bOwned(false),
+	m_iTotalSlots(0),
+	m_iUsedSlots(0)
+{
+}
+
+// =============================================================================
+// Nat Ryall                                                         09-Jul-2008
+// =============================================================================
+xbool CSession::PlayerExists(xstring sName)
+{
+	XEN_LIST_FOREACH(t_StringList, ppPlayer, m_lpPlayers)
+	{
+		if (*ppPlayer == sName)
+			return true;
+	}
+
+	return false;
+}
+
+// =============================================================================
 // Nat Ryall                                                         02-Jul-2008
 // =============================================================================
 xbool CSession::AddPlayer(xstring sName)
@@ -619,20 +646,6 @@ xbool CSession::RemovePlayer(xstring sName)
 		XEN_LIST_REMOVE(t_StringList, m_lpPlayers, sName);
 
 		return true;
-	}
-
-	return false;
-}
-
-// =============================================================================
-// Nat Ryall                                                         09-Jul-2008
-// =============================================================================
-xbool CSession::PlayerExists(xstring sName)
-{
-	XEN_LIST_FOREACH(t_StringList, ppPlayer, m_lpPlayers)
-	{
-		if (*ppPlayer == sName)
-			return true;
 	}
 
 	return false;

@@ -14,8 +14,9 @@
 	$STATUS_CREATING			= 1;
 	$STATUS_ACTIVE				= 2;
 	$STATUS_STARTED				= 3;
-	$STATUS_CLOSED				= 4;
-	$STATUS_TIMEOUT 			= 5;
+	$STATUS_CLOSING				= 4;
+	$STATUS_CLOSED				= 5;
+	$STATUS_TIMEOUT 			= 6;
 	
 	// Matchmaking.
 	$SESSION_TIMEOUT			= 30;
