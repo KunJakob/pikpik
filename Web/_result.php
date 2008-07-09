@@ -15,13 +15,8 @@
 	// Add a key-value pair to the result text.
 	function Result_Value($key, $value)
 	{
-		echo "&$key=$value";
-	}
-	
-	// Add a section separator.
-	function Result_Separator()
-	{
-		echo "//";
+		if (strlen($key) && strlen($value))
+			echo "&$key=$value";
 	}
 
 ?>

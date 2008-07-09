@@ -53,6 +53,7 @@ class CJoinInterface;
 // The lobby start mode.
 enum t_LobbyStartMode
 {
+	LobbyStartMode_Find,
 	LobbyStartMode_Join,
 	LobbyStartMode_Create,
 };
@@ -131,8 +132,14 @@ protected:
 	// Render the main lobby screen.
 	void RenderLobby();
 
+	// Callback for when the listing of available sessions has completed.
+	void OnListSessionsCompleted(t_MatchResultError iError, xint iSessionCount, CSession* pSessions);
+
 	// Callback for when the session has created.
 	void OnCreateSessionCompleted(t_MatchResultError iError, CSession* pSession);
+
+	// Callback for when the session is closed.
+	void OnCloseSessionCompleted(t_MatchResultError iError, CSession* pSession);
 
 	// Callback for when the join button is clicked in the join interface.
 	void OnJoinClicked(CButtonComponent* pButton, xpoint xOffset);
@@ -166,6 +173,9 @@ protected:
 
 	// The current lobby state.
 	t_LobbyState m_iState;
+
+	// The local active session.
+	CSession* m_pSession;
 
 	// The join interface.
 	CJoinInterface* m_pJoinInterface;

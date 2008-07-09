@@ -91,7 +91,7 @@
 #define ARGBF(A, R, G, B)	ARGB(COLOURF(A), COLOURF(R), COLOURF(G), COLOURF(B))
 
 // Matchmaking options.
-#define _MATCHGID			"PP001"
+#define _GID				"PikPik-1"
 
 //##############################################################################
 #pragma endregion
@@ -116,7 +116,7 @@ class CLobbyScreen;
 enum t_PlayerType
 {
 	PlayerType_Ghost,
-	PlayerType_PacMan,
+	PlayerType_Pacman,
 	/*MAX*/PlayerType_Max,
 };
 

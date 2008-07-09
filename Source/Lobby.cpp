@@ -31,7 +31,8 @@
 // Nat Ryall                                                         22-May-2008
 // =============================================================================
 CLobbyScreen::CLobbyScreen() : CScreen(ScreenIndex_LobbyScreen),
-	m_iState(LobbyState_None)
+	m_iState(LobbyState_None),
+	m_pSession(NULL)
 {
 	_GLOBAL.pLobby = this;
 }
@@ -112,6 +113,12 @@ void CLobbyScreen::Start(t_LobbyStartMode iStartMode)
 {
 	switch (iStartMode)
 	{
+	case LobbyStartMode_Find:
+		{
+			SetState(LobbyState_Join);
+		}
+		break;
+
 	case LobbyStartMode_Join:
 		{
 			SetState(LobbyState_Join);
@@ -120,7 +127,7 @@ void CLobbyScreen::Start(t_LobbyStartMode iStartMode)
 	
 	case LobbyStartMode_Create:
 		{
-			CSession* pSession = Match.CreateSession(4, xbind(this, &CLobbyScreen::OnCreateSessionCompleted));
+			m_pSession = Match.CreateSession(4, xbind(this, &CLobbyScreen::OnCreateSessionCompleted));
 			SetState(LobbyState_Creating);
 		}
 		break;
@@ -212,7 +219,10 @@ void CLobbyScreen::QuitCheck()
 		case LobbyState_Lobby:
 			{
 				if (Network.m_bHosting)
-					ScreenManager::Pop();
+				{
+					Match.CloseSession(m_pSession, xbind(this, &CLobbyScreen::OnCloseSessionCompleted));
+					SetState(LobbyState_Closing);
+				}
 				else
 					SetState(LobbyState_Join);
 
@@ -249,6 +259,14 @@ void CLobbyScreen::RenderLobby()
 }
 
 // =============================================================================
+// Nat Ryall                                                         09-Jul-2008
+// =============================================================================
+void CLobbyScreen::OnListSessionsCompleted(t_MatchResultError iError, xint iSessionCount, CSession* pSessions)
+{
+
+}
+
+// =============================================================================
 // Nat Ryall                                                         08-Jul-2008
 // =============================================================================
 void CLobbyScreen::OnCreateSessionCompleted(t_MatchResultError iError, CSession* pSession)
@@ -271,6 +289,18 @@ void CLobbyScreen::OnCreateSessionCompleted(t_MatchResultError iError, CSession*
 		SetState(LobbyState_None);
 		ScreenManager::Pop();
 	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         09-Jul-2008
+// =============================================================================
+void CLobbyScreen::OnCloseSessionCompleted(t_MatchResultError iError, CSession* pSession)
+{
+	delete m_pSession;
+	m_pSession = NULL;
+
+	SetState(LobbyState_None);
+	ScreenManager::Pop();
 }
 
 // =============================================================================

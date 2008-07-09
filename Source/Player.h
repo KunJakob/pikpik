@@ -96,10 +96,25 @@ public:
 		return m_cName;
 	}
 
+	// Set the player's position using a map block.
+	void SetCurrentBlock(CMapBlock* pBlock);
+
 	// Get the current map block this player is on.
 	inline CMapBlock* GetCurrentBlock()
 	{
 		return m_pCurrentBlock;
+	}
+
+	// Set the player's position using a point.
+	inline void SetPosition(xpoint xPosition)
+	{
+		m_pSprite->SetPosition(xPosition);
+	}
+
+	// Get the player's screen position.
+	inline xpoint GetPosition()
+	{
+		return m_pSprite->GetPosition();
 	}
 
 protected:
@@ -161,11 +176,11 @@ protected:
 //                                   PACMAN
 //
 //##############################################################################
-class CPacMan : public CPlayer
+class CPacman : public CPlayer
 {
 public:
 	// Costructor.
-	CPacMan(CMapBlock* pSpawnBlock);
+	CPacman();
 
 	// Update the object ready for rendering.
 	virtual void Update();
@@ -194,7 +209,7 @@ class CGhost : public CPlayer
 {
 public:
 	// Constructor.
-	CGhost(CMapBlock* pSpawnBlock, xuint iColour);
+	CGhost(xuint iColour);
 
 	// Destructor.
 	~CGhost();

@@ -196,6 +196,17 @@ void CPlayer::Render()
 }
 
 // =============================================================================
+// Nat Ryall                                                         09-Jul-2008
+// =============================================================================
+void CPlayer::SetCurrentBlock(CMapBlock* pBlock)
+{
+	m_pCurrentBlock = pBlock;
+
+	if (m_pCurrentBlock)
+		SetPosition(m_pCurrentBlock->GetScreenPosition());
+}
+
+// =============================================================================
 // Nat Ryall                                                         16-Apr-2008
 // =============================================================================
 void CPlayer::SetState(t_PlayerState iState)
@@ -237,20 +248,15 @@ void CPlayer::OnAnimationEvent(CAnimatedSprite* pSprite, const XCHAR* pEvent)
 // =============================================================================
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
-CPacMan::CPacMan(CMapBlock* pSpawnBlock) : CPlayer(PlayerType_PacMan, "Player-PacMan")
+CPacman::CPacman() : CPlayer(PlayerType_Pacman, "Player-Pacman")
 {
-	m_pCurrentBlock = pSpawnBlock;
-
-	if (m_pCurrentBlock)
-		m_pSprite->SetPosition(m_pCurrentBlock->GetScreenPosition());
-
 	SetState(PlayerState_Idle);
 }
 
 // =============================================================================
 // Nat Ryall                                                         17-Apr-2008
 // =============================================================================
-void CPacMan::Update()
+void CPacman::Update()
 {
 	CPlayer::Update();
 }
@@ -258,7 +264,7 @@ void CPacMan::Update()
 // =============================================================================
 // Nat Ryall                                                         16-Apr-2008
 // =============================================================================
-void CPacMan::SetState(t_PlayerState iState)
+void CPacman::SetState(t_PlayerState iState)
 {
 	switch (iState)
 	{
@@ -296,15 +302,10 @@ void CPacMan::SetState(t_PlayerState iState)
 // =============================================================================
 // Nat Ryall                                                         16-Apr-2008
 // =============================================================================
-CGhost::CGhost(CMapBlock* pSpawnBlock, xuint iColour) : CPlayer(PlayerType_Ghost, "Player-Ghost"),
+CGhost::CGhost(xuint iColour) : CPlayer(PlayerType_Ghost, "Player-Ghost"),
 	m_pEyes(NULL),
 	m_iColour(iColour)
 {
-	m_pCurrentBlock = pSpawnBlock;
-
-	if (m_pCurrentBlock)
-		m_pSprite->SetPosition(m_pCurrentBlock->GetScreenPosition());
-
 	m_pEyes = new CSprite(_SPRITE("Player-Ghost-Eyes"));
 	m_pEyes->SetArea("F1");
 	m_pEyes->SetAnchor(m_pEyes->GetAreaCentre());

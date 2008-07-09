@@ -28,6 +28,9 @@
 .Menu_Back
 "Back"
 
+.Menu_OnlineFind
+"Find Game"
+
 .Menu_OnlineJoin
 "Join Game"
 

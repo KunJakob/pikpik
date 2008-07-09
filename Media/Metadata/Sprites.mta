@@ -31,9 +31,9 @@
 	.File "Surfaces\Menu-Background.png"
 }
 
-.Sprite "Player-PacMan"
+.Sprite "Player-Pacman"
 {
-	.File "Surfaces\Player-PacMan.png"
+	.File "Surfaces\Player-Pacman.png"
 	
 	.Area "F1"				{ .Rect 0  0 46  46 }
 	.Area "F2"				{ .Rect 46 0 92  46 }
@@ -231,4 +231,12 @@
 	.Area "Centre"			{ .Rect 32 0 96  152 }
 	.Area "Right"			{ .Rect 96 0 128 152 }	
 	.Area "Progress"		{ .Rect 32 0 96  152 }
+}
+
+.Sprite "Menu-Session"
+{
+	.File "Surfaces\Menu-Status.png"
+	
+	.HotSpot "Name"			{ .Point 0  0 .Info "Centre" }
+	.HotSpot "Info"			{ .Point 0 40 .Info "Centre" } 
 }

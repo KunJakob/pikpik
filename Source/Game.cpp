@@ -162,7 +162,10 @@ void CGameScreen::Load()
 	_GLOBAL.pActiveMap = new CMap(XFORMAT("M%03d", 5));
 	_GLOBAL.fWorldAlpha = 1.f;
 
-	_GLOBAL.pActivePlayer = _GLOBAL.lpPlayers.front();
+	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, _GLOBAL.lpPlayers)
+		(*ppPlayer)->SetCurrentBlock(_GLOBAL.pActiveMap->GetSpawnBlock((*ppPlayer)->GetType()));
+
+	_GLOBAL.pActivePlayer = _GLOBAL.lpPlayers.back();
 
 	RenderManager::Add(LayerIndex_Background, &m_Background);
 	RenderManager::Add(LayerIndex_Map, _GLOBAL.pActiveMap);

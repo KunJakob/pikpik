@@ -294,7 +294,9 @@ CProgressComponent::~CProgressComponent()
 void CProgressComponent::Render()
 {
 	CRowElement::Render(m_pL->xRect, m_pC->xRect, m_pR->xRect);
-	m_pSprite->RenderTiled(GetPosition() + xpoint(m_xFrameSize.iLeft, 0), xpoint((xint)((xfloat)m_iWidth * m_fProgress), 0), m_pProgress->xRect);
+
+	if (m_fProgress)
+		m_pSprite->RenderTiled(GetPosition() + xpoint(m_xFrameSize.iLeft, 0), xpoint((xint)((xfloat)m_iWidth * m_fProgress), 0), m_pProgress->xRect);
 }
 
 //##############################################################################

@@ -259,7 +259,7 @@ CMap::CMap(const XCHAR* pID) : CRenderable(RenderableType_Map)
 			// Spawn.
 		case '$': 
 			pBlock->iType = TileType_Blank;
-			m_lpSpawnPoints[PlayerType_PacMan].push_back(pBlock); 
+			m_lpSpawnPoints[PlayerType_Pacman].push_back(pBlock); 
 			break;
 
 		case '%': 
@@ -325,16 +325,19 @@ void CMap::Update()
 // =============================================================================
 void CMap::AddVisiblePaths(CMapBlock* pBase, XFLOAT fVisibility)
 {
-	pBase->fVisibility += fVisibility;
-
-	for (XUINT iA = 0; iA < AdjacentDir_Max; ++iA)
+	if (pBase)
 	{
-		CMapBlock* pBlock = pBase;
+		pBase->fVisibility += fVisibility;
 
-		while (pBlock->pAdjacents[iA] && !pBlock->pAdjacents[iA]->IsWall() && !pBlock->pAdjacents[iA]->IsBase())
+		for (XUINT iA = 0; iA < AdjacentDir_Max; ++iA)
 		{
-			pBlock = pBlock->pAdjacents[iA];
-			pBlock->fVisibility += fVisibility;
+			CMapBlock* pBlock = pBase;
+
+			while (pBlock->pAdjacents[iA] && !pBlock->pAdjacents[iA]->IsWall() && !pBlock->pAdjacents[iA]->IsBase())
+			{
+				pBlock = pBlock->pAdjacents[iA];
+				pBlock->fVisibility += fVisibility;
+			}
 		}
 	}
 }

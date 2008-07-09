@@ -196,7 +196,7 @@ CMatch::CMatch() :
 	m_fpOnCreateSessionCompleted = NULL;
 	m_fpOnPingSessionCompleted = NULL;
 	m_fpOnUpdateSessionCompleted = NULL;
-	m_fpOnDestroySessionCompleted = NULL;
+	m_fpOnCloseSessionCompleted = NULL;
 }
 
 // =============================================================================
@@ -234,6 +234,8 @@ void CMatch::Deinitialise()
 
 	if (m_pTCP)
 	{
+		m_pTCP->Stop();
+
 		delete m_pTCP;
 		m_pTCP = NULL;
 	}
@@ -247,44 +249,50 @@ void CMatch::Deinitialise()
 // =============================================================================
 void CMatch::Update()
 {
-	if (m_iOperation != MatchOperation_None)
+	if (IsBusy())
 	{
-		if (m_pHTTP->IsBusy())
+		if (m_iTimeout == 0)
+			m_iTimeout = _TIMEMS + MATCH_OPERATION_TIMEOUT;
+
+		if (_TIMEMS > m_iTimeout)
 		{
-			if (m_iTimeout == 0)
-				m_iTimeout = _TIMEMS + MATCH_OPERATION_TIMEOUT;
+			m_pTCP->Stop();
+			m_pTCP->Start(0, 64);
 
-			if (_TIMEMS > m_iTimeout)
-			{
-				// TODO: Restart the TCP server.
-				// TODO: Notify of failure.
-			}
+			m_iTimeout = 0;
 
-			Packet* pPacket = m_pTCP->Receive();
+			ProcessError(MatchResultError_Timeout);
 
-			if (pPacket)
-			{
-				if (m_pHTTP->ProcessFinalTCPPacket(pPacket))
-				{
-					int iErrorCode = 0;
-					RakNet::RakString xErrorString;
-
-					if (m_pHTTP->HasBadResponse(&iErrorCode, &xErrorString))
-						XLOG("[MatchManager] Error: %d, '%s'", iErrorCode, xErrorString.C_String());
-					else
-					{
-						RakNet::RakString xString = m_pHTTP->Read();
-						XLOG("[MatchManager] Response: '%s'", xString.C_String());
-
-						ProcessResult(&xString);
-					}
-				}
-
-				m_pTCP->DeallocatePacket(pPacket);
-			}
-
-			m_pHTTP->Update();
+			return;
 		}
+
+		Packet* pPacket = m_pTCP->Receive();
+
+		if (pPacket)
+		{
+			if (m_pHTTP->ProcessFinalTCPPacket(pPacket))
+			{
+				int iErrorCode = 0;
+				RakNet::RakString xErrorString;
+
+				if (m_pHTTP->HasBadResponse(&iErrorCode, &xErrorString))
+				{
+					XLOG("[MatchManager] Error: %d, '%s'", iErrorCode, xErrorString.C_String());
+					ProcessError(MatchResultError_BadResponse);
+				}
+				else
+				{
+					RakNet::RakString xString = m_pHTTP->Read();
+
+					XLOG("[MatchManager] Response: '%s'", xString.C_String());
+					ProcessResult(&xString);
+				}
+			}
+
+			m_pTCP->DeallocatePacket(pPacket);
+		}
+
+		m_pHTTP->Update();
 	}
 }
 
@@ -293,15 +301,28 @@ void CMatch::Update()
 // =============================================================================
 xbool CMatch::ListSessions(t_OnListSessionsCompleted fpCallback)
 {
-	XMASSERT(false, "Operation is not yet implemented.");
+	XMASSERT(!IsBusy(), "An operation is already processing.");
+	XMASSERT(fpCallback, "A callback must be specified for this operation.");
 
-	CMatchQuery xQuery;
+	if (!IsBusy() && fpCallback)
+	{
+		// Generate and send the operation query.
+		CMatchQuery xQuery;
 
-	xQuery.AddValue("gid", _MATCHGID);
-	xQuery.AddValue("max", 10);
-	xQuery.AddValue("slots", 1);
+		xQuery.AddValue("gid", _GID);
+		xQuery.AddValue("limit", MATCH_SESSION_LIMIT);
 
-	m_pHTTP->Post("/match.php?list", xQuery.GetQuery());
+		m_pHTTP->Post("/match.php?list", xQuery.GetQuery());
+
+		// Start the operation.
+		m_iOperation = MatchOperation_ListSessions;
+		m_fpOnListSessionsCompleted = fpCallback;
+
+		return true;
+	}
+
+	if (fpCallback)
+		fpCallback(MatchResultError_Busy, 0, NULL);
 
 	return false;
 }
@@ -311,9 +332,9 @@ xbool CMatch::ListSessions(t_OnListSessionsCompleted fpCallback)
 // =============================================================================
 CSession* CMatch::CreateSession(xint iTotalSlots, t_OnCreateSessionCompleted fpCallback)
 {
-	XMASSERT(m_iOperation == MatchOperation_None, "An operation is already processing.");
+	XMASSERT(!IsBusy(), "An operation is already processing.");
 
-	if (m_iOperation == MatchOperation_None)
+	if (!IsBusy())
 	{
 		// Create a new session object.
 		m_pSession = new CSession();
@@ -327,10 +348,12 @@ CSession* CMatch::CreateSession(xint iTotalSlots, t_OnCreateSessionCompleted fpC
 		// Generate and send the operation query.
 		CMatchQuery xQuery;
 
-		xQuery.AddValue("gid", _MATCHGID);
+		xQuery.AddValue("gid", _GID);
 		xQuery.AddValue("sid", m_pSession->m_sSessionID);
 		xQuery.AddValue("title", m_pSession->m_sTitle);
-		xQuery.AddValue("slots", iTotalSlots);
+		xQuery.AddValue("tslots", iTotalSlots);
+		xQuery.AddValue("uslots", 1);
+		xQuery.AddValue("info", m_pSession->m_sInfo);
 
 		m_pHTTP->Post("/match.php?create", xQuery.GetQuery());
 
@@ -341,6 +364,9 @@ CSession* CMatch::CreateSession(xint iTotalSlots, t_OnCreateSessionCompleted fpC
 		return m_pSession;
 	}
 
+	if (fpCallback)
+		fpCallback(MatchResultError_Busy, NULL);
+
 	return NULL;
 }
 
@@ -349,14 +375,28 @@ CSession* CMatch::CreateSession(xint iTotalSlots, t_OnCreateSessionCompleted fpC
 // =============================================================================
 xbool CMatch::PingSession(CSession* pSession, t_OnPingSessionCompleted fpCallback)
 {
-	XMASSERT(false, "Operation is not yet implemented.");
+	XMASSERT(!IsBusy(), "An operation is already processing.");
 
-	CMatchQuery xQuery;
+	if (!IsBusy())
+	{
+		// Generate and send the operation query.
+		CMatchQuery xQuery;
 
-	xQuery.AddValue("sid", pSession->m_sSessionID.c_str());
-	xQuery.AddValue("pass", pSession->m_sPassword.c_str());
+		xQuery.AddValue("sid", pSession->m_sSessionID);
+		xQuery.AddValue("pass", pSession->m_sPassword);
 
-	m_pHTTP->Post("/match.php?ping", xQuery.GetQuery());
+		m_pHTTP->Post("/match.php?ping", xQuery.GetQuery());
+
+		// Start the operation.
+		m_pSession = pSession;
+		m_iOperation = MatchOperation_PingSession;
+		m_fpOnPingSessionCompleted = fpCallback;
+
+		return true;
+	}
+
+	if (fpCallback)
+		fpCallback(MatchResultError_Busy, pSession);
 
 	return false;
 }
@@ -366,18 +406,31 @@ xbool CMatch::PingSession(CSession* pSession, t_OnPingSessionCompleted fpCallbac
 // =============================================================================
 xbool CMatch::UpdateSession(CSession* pSession, t_OnUpdateSessionCompleted fpCallback)
 {
-	XMASSERT(false, "Operation is not yet implemented.");
+	XMASSERT(!IsBusy(), "An operation is already processing.");
 
-	CMatchQuery xQuery;
+	if (!IsBusy())
+	{
+		// Generate and send the operation query.
+		CMatchQuery xQuery;
 
-	xQuery.AddValue("sid", pSession->m_sSessionID.c_str());
-	xQuery.AddValue("pass", pSession->m_sPassword.c_str());
-	xQuery.AddValue("state", pSession->m_iStatus);
-	xQuery.AddValue("slots", pSession->m_iTotalSlots);
-	xQuery.AddValue("players", "krakken:slygamer123:xxRaDiXxx"); // TODO: Change this to use pSession->m_lpPlayers
-	xQuery.AddValue("info", pSession->m_sSessionInfo.c_str());
+		xQuery.AddValue("sid", pSession->m_sSessionID);
+		xQuery.AddValue("pass", pSession->m_sPassword);
+		xQuery.AddValue("state", pSession->m_iStatus);
+		xQuery.AddValue("uslots", pSession->m_iTotalSlots);
+		xQuery.AddValue("info", pSession->m_sInfo);
 
-	m_pHTTP->Post("/match.php?update", xQuery.GetQuery());
+		m_pHTTP->Post("/match.php?update", xQuery.GetQuery());
+
+		// Start the operation.
+		m_pSession = pSession;
+		m_iOperation = MatchOperation_UpdateSession;
+		m_fpOnUpdateSessionCompleted = fpCallback;
+
+		return true;
+	}
+
+	if (fpCallback)
+		fpCallback(MatchResultError_Busy, pSession);
 
 	return false;
 }
@@ -385,16 +438,32 @@ xbool CMatch::UpdateSession(CSession* pSession, t_OnUpdateSessionCompleted fpCal
 // =============================================================================
 // Nat Ryall                                                         02-Jul-2008
 // =============================================================================
-void CMatch::DestroySession(CSession* pSession, t_OnDestroySessionCompleted fpCallback)
+xbool CMatch::CloseSession(CSession* pSession, t_OnCloseSessionCompleted fpCallback)
 {
-	XMASSERT(false, "Operation is not yet implemented.");
+	XMASSERT(!IsBusy(), "An operation is already processing.");
 
-	CMatchQuery xQuery;
+	if (!IsBusy())
+	{
+		// Generate and send the operation query.
+		CMatchQuery xQuery;
 
-	xQuery.AddValue("sid", pSession->m_sSessionID.c_str());
-	xQuery.AddValue("pass", pSession->m_sPassword.c_str());
+		xQuery.AddValue("sid", pSession->m_sSessionID);
+		xQuery.AddValue("pass", pSession->m_sPassword);
 
-	m_pHTTP->Post("/match.php?destroy", xQuery.GetQuery());
+		m_pHTTP->Post("/match.php?close", xQuery.GetQuery());
+
+		// Start the operation.
+		m_pSession = pSession;
+		m_iOperation = MatchOperation_CloseSession;
+		m_fpOnCloseSessionCompleted = fpCallback;
+		
+		return true;
+	}
+
+	if (fpCallback)
+		fpCallback(MatchResultError_Busy, pSession);
+
+	return false;
 }
 
 // =============================================================================
@@ -412,6 +481,34 @@ void CMatch::ProcessResult(RakNet::RakString* pResult)
 
 	switch (iLastOperation)
 	{
+	// List Sessions.
+	case MatchOperation_ListSessions:
+		{
+			static CSession s_xSessions[MATCH_SESSION_LIMIT];
+			xint iSessionCount = 0;
+
+			if (bSuccess)
+			{
+				iSessionCount = xResult.GetInt("results");
+				
+				for (xint iA = 0; iA < iSessionCount; ++iA)
+				{
+					s_xSessions[iA].m_iStatus = SessionStatus_Active;
+					s_xSessions[iA].m_bOwned = false;
+					s_xSessions[iA].m_sSessionID = xResult.GetString(XFORMAT("sid:%d", iA));
+					s_xSessions[iA].m_sIP = xResult.GetString(XFORMAT("ip:%d", iA));
+					s_xSessions[iA].m_sTitle = xResult.GetString(XFORMAT("title:%d", iA));
+					s_xSessions[iA].m_iTotalSlots = xResult.GetInt(XFORMAT("tslots:%d", iA));
+					s_xSessions[iA].m_iUsedSlots = xResult.GetInt(XFORMAT("uslots:%d", iA));
+					s_xSessions[iA].m_sInfo = xResult.GetString(XFORMAT("info:%d", iA));
+				}
+			}
+
+			if (m_fpOnListSessionsCompleted)
+				m_fpOnListSessionsCompleted(iError, iSessionCount, bSuccess ? s_xSessions : NULL);
+		}
+		break;
+
 	// Create Session.
 	case MatchOperation_CreateSession:
 		{
@@ -421,19 +518,48 @@ void CMatch::ProcessResult(RakNet::RakString* pResult)
 				m_pSession->m_sPassword = xResult.GetString("pass");
 			}
 			else
-			{
-				delete m_pSession;
-				m_pSession = NULL;
-			}
+				m_pSession->m_iStatus = SessionStatus_Closed;
 
 			if (m_fpOnCreateSessionCompleted)
-			{
 				m_fpOnCreateSessionCompleted(iError, m_pSession);
-				m_fpOnCreateSessionCompleted = NULL;
-			}
+		}
+		break;
+
+	// Ping Session.
+	case MatchOperation_PingSession:
+		{
+			if (m_fpOnPingSessionCompleted)
+				m_fpOnPingSessionCompleted(iError, m_pSession);
+		}
+		break;
+
+	// Update Session.
+	case MatchOperation_UpdateSession:
+		{
+			if (m_fpOnUpdateSessionCompleted)
+				m_fpOnUpdateSessionCompleted(iError, m_pSession);
+		}
+		break;
+
+	// Close Session.
+	case MatchOperation_CloseSession:
+		{
+			m_pSession->m_iStatus = SessionStatus_Closed;
+
+			if (m_fpOnCloseSessionCompleted)
+				m_fpOnCloseSessionCompleted(iError, m_pSession);
 		}
 		break;
 	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         09-Jul-2008
+// =============================================================================
+void CMatch::ProcessError(t_MatchResultError iError)
+{
+	RakNet::RakString sError = XFORMAT("%serror=%d", MATCH_RESULT_HEADER, iError);
+	ProcessResult(&sError);
 }
 
 // =============================================================================
@@ -469,17 +595,47 @@ xstring CMatch::GenerateSessionID()
 // =============================================================================
 // Nat Ryall                                                         02-Jul-2008
 // =============================================================================
-void CSession::AddPlayer(xstring sName)
+xbool CSession::AddPlayer(xstring sName)
 {
+	if (!PlayerExists(sName) && m_iUsedSlots < m_iTotalSlots)
+	{
+		m_iUsedSlots++;
+		m_lpPlayers.push_back(sName);
 
+		return true;
+	}
+
+	return false;
 }
 
 // =============================================================================
 // Nat Ryall                                                         02-Jul-2008
 // =============================================================================
-void CSession::RemovePlayer(xstring sName)
+xbool CSession::RemovePlayer(xstring sName)
 {
+	if (PlayerExists(sName) && m_iUsedSlots)
+	{
+		m_iUsedSlots--;
+		XEN_LIST_REMOVE(t_StringList, m_lpPlayers, sName);
 
+		return true;
+	}
+
+	return false;
+}
+
+// =============================================================================
+// Nat Ryall                                                         09-Jul-2008
+// =============================================================================
+xbool CSession::PlayerExists(xstring sName)
+{
+	XEN_LIST_FOREACH(t_StringList, ppPlayer, m_lpPlayers)
+	{
+		if (*ppPlayer == sName)
+			return true;
+	}
+
+	return false;
 }
 
 //##############################################################################

@@ -26,10 +26,11 @@
 	$sid		= $stream_values["sid"];
 	$pass		= GeneratePassword();
 	$ip			= $_SERVER["REMOTE_ADDR"];
-	$state		= $STATUS_CREATING;
+	$port		= 0;
+	$state		= $STATUS_ACTIVE;
 	$title		= $stream_values["title"];
-	$tslots		= $stream_values["slots"];
-	$uslots		= 0;
+	$tslots		= $stream_values["tslots"];
+	$uslots		= $stream_values["uslots"];
 	$players	= "";
 	$info		= $stream_values["info"];
 	
@@ -90,6 +91,7 @@
 			"'$sid', ".
 			"'$pass', ".
 			"'$ip', ".
+			"$port, ".
 			"$state, ".
 			"'$title', ".
 			"$tslots, ".
@@ -98,6 +100,9 @@
 			"'$info'".
 		")"
 	);
+	
+	if (!$query)
+		Result_Error($ERROR_QUERY_FAILED);
 	
 	Result_Success();
 	Result_Value("pass", $pass);

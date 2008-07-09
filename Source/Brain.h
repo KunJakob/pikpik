@@ -40,7 +40,7 @@ protected:
 //                                PACMAN BRAIN
 //
 //##############################################################################
-class CPacManBrain : public CBrain
+class CPacmanBrain : public CBrain
 {
 public:
 protected:

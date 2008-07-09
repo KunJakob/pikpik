@@ -191,6 +191,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Source\Brain.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Brain.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\Character.cpp"
 				>
 			</File>
@@ -1423,7 +1431,27 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Web\_match_close.php"
+				>
+			</File>
+			<File
 				RelativePath="..\Web\_match_create.php"
+				>
+			</File>
+			<File
+				RelativePath="..\Web\_match_list.php"
+				>
+			</File>
+			<File
+				RelativePath="..\Web\_match_ping.php"
+				>
+			</File>
+			<File
+				RelativePath="..\Web\_match_public.php"
+				>
+			</File>
+			<File
+				RelativePath="..\Web\_match_update.php"
 				>
 			</File>
 			<File
@@ -1435,7 +1463,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Web\_result.php"
+				>
+			</File>
+			<File
 				RelativePath="..\Web\_stream.php"
+				>
+			</File>
+			<File
+				RelativePath="..\Web\_verify.php"
 				>
 			</File>
 			<File

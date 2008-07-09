@@ -203,6 +203,7 @@ protected:
 	void Callback_ShowMainMenu();
 	void Callback_ShowPlayMenu();
 	void Callback_ShowOnlineMenu();
+	void Callback_FindLobby();
 	void Callback_JoinLobby();
 	void Callback_CreateLobby();
 	void Callback_StartLobby();

@@ -34,7 +34,10 @@
 #define MATCH_RESULT_HEADER "result://"
 
 // The operation timeout in milliseconds.
-#define MATCH_OPERATION_TIMEOUT 10000
+#define MATCH_OPERATION_TIMEOUT 8000
+
+// The number of rows to retrieve when listing sessions.
+#define MATCH_SESSION_LIMIT 8
 
 //##############################################################################
 
@@ -51,11 +54,16 @@ class CSession;
 enum t_MatchResultError
 {
 	MatchResultError_Success,
+	MatchResultError_QueryFailed,
 	MatchResultError_OwnerExists,
 	MatchResultError_SessionExists,
 	MatchResultError_InvalidSession,
 	MatchResultError_InvalidPassword,
+	MatchResultError_NoResults,
 
+	MatchResultError_Busy,
+	MatchResultError_Timeout,
+	MatchResultError_BadResponse,
 	MatchResultError_InvalidHeader,
 };
 
@@ -67,7 +75,7 @@ enum t_MatchOperation
 	MatchOperation_CreateSession,
 	MatchOperation_PingSession,
 	MatchOperation_UpdateSession,
-	MatchOperation_DestroySession,
+	MatchOperation_CloseSession,
 };
 
 // The possible session status (linked to the match service).
@@ -166,9 +174,9 @@ public:
 	// Callbacks.
 	typedef xfunction(3)<t_MatchResultError /*Error*/, xint /*SessionCount*/, CSession* /*Sessions*/> t_OnListSessionsCompleted;
 	typedef xfunction(2)<t_MatchResultError /*Error*/, CSession* /*Session*/> t_OnCreateSessionCompleted;
-	typedef xfunction(1)<t_MatchResultError /*Error*/> t_OnPingSessionCompleted;
+	typedef xfunction(2)<t_MatchResultError /*Error*/, CSession* /*Session*/> t_OnPingSessionCompleted;
 	typedef xfunction(2)<t_MatchResultError /*Error*/, CSession* /*Session*/> t_OnUpdateSessionCompleted;
-	typedef xfunction(1)<t_MatchResultError /*Error*/> t_OnDestroySessionCompleted;
+	typedef xfunction(2)<t_MatchResultError /*Error*/, CSession* /*Session*/> t_OnCloseSessionCompleted;
 
 	// Singleton instance.
 	static inline CMatch& Get() 
@@ -192,20 +200,20 @@ public:
 	// Update the service and process any pending operation.
 	void Update();
 
-	// 
+	// List a selection of available sessions on the server.
 	xbool ListSessions(t_OnListSessionsCompleted fpCallback);
 
 	// Create a new session with the specified params.
 	CSession* CreateSession(xint iTotalSlots, t_OnCreateSessionCompleted fpCallback);
 
-	//
+	// Ping a session to prevent it from timing out.
 	xbool PingSession(CSession* pSession, t_OnPingSessionCompleted fpCallback);
 
-	// 
+	// Update the session details to the matchmaking server.
 	xbool UpdateSession(CSession* pSession, t_OnUpdateSessionCompleted fpCallback);
 
-	//
-	void DestroySession(CSession* pSession, t_OnDestroySessionCompleted fpCallback);
+	// Close a session cleanly.
+	xbool CloseSession(CSession* pSession, t_OnCloseSessionCompleted fpCallback);
 
 	// Get the currently pending operation.
 	inline t_MatchOperation GetCurrentOperation()
@@ -213,9 +221,18 @@ public:
 		return m_iOperation;
 	}
 
+	// Check if the system is currently busy.
+	inline xbool IsBusy()
+	{
+		return m_iOperation != MatchOperation_None;
+	}
+
 protected:
 	// Process a query result.
 	void ProcessResult(RakNet::RakString* pString);
+
+	// Process a local error as a query result.
+	void ProcessError(t_MatchResultError iError);
 
 	// Generate a unique session ID.
 	xstring GenerateSessionID();
@@ -243,7 +260,7 @@ protected:
 	t_OnCreateSessionCompleted m_fpOnCreateSessionCompleted;
 	t_OnPingSessionCompleted m_fpOnPingSessionCompleted;
 	t_OnUpdateSessionCompleted m_fpOnUpdateSessionCompleted;
-	t_OnDestroySessionCompleted m_fpOnDestroySessionCompleted;
+	t_OnCloseSessionCompleted m_fpOnCloseSessionCompleted;
 };
 
 //##############################################################################
@@ -259,19 +276,22 @@ public:
 	// Friends.
 	friend class CMatch;
 
-	//
-	void AddPlayer(xstring sName);
+	// Add a player to the session by name.
+	xbool AddPlayer(xstring sName);
 
-	//
-	void RemovePlayer(xstring sName);
+	// Remove a player from the session by name.
+	xbool RemovePlayer(xstring sName);
 
-	//
-	inline t_SessionStatus GetState()
+	// Get the current session status.
+	inline t_SessionStatus GetStatus()
 	{
 		return m_iStatus;
 	}
 
 protected:
+	// Check to see if the specified player exists in the session.
+	xbool PlayerExists(xstring sName);
+	
 	// Types.
 	typedef xlist<xstring> t_StringList;
 
@@ -287,17 +307,23 @@ protected:
 	// The session password returned when the session is created. This is valid only on the host, NULL otherwise.
 	xstring m_sPassword;
 
-	// The total number of player slots available in the session.
-	xint m_iTotalSlots; 
-
-	// The current players in the session. Used slots is also derived from this list.
-	t_StringList m_lpPlayers;
+	// The IP address of the session.
+	xstring m_sIP;
 
 	// The title of the session.
 	xstring m_sTitle;
 
+	// The total number of player slots available in the session.
+	xint m_iTotalSlots; 
+
+	// The number of currently used slots in the session.
+	xint m_iUsedSlots;
+
+	// The current players in the session.
+	t_StringList m_lpPlayers;
+
 	// The custom session info. Set to NULL or specify extra data to be uploaded.
-	xstring m_sSessionInfo;
+	xstring m_sInfo;
 };
 
 //##############################################################################

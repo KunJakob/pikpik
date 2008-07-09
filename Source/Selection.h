@@ -114,7 +114,7 @@ protected:
 	//CFont* m_pFont[FontType_Max];
 
 	// The pacman & ghost sprites.
-	CPacMan* m_pPacMan;
+	CPacman* m_pPacMan;
 	CGhost* m_pGhost;
 
 	// The selection screen players.
