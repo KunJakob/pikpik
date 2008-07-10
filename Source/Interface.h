@@ -33,7 +33,7 @@
 //##############################################################################
 
 // Shortcuts.
-#define InterfaceManager CInterfaceManager::Get()
+#define Interface CInterface::Get()
 
 //##############################################################################
 
@@ -63,6 +63,7 @@ enum t_ElementType
 	ElementType_Check,
 	ElementType_Radio,
 	ElementType_Scroll,
+	ElementType_TextLink,
 	ElementType_MenuLink,
 	/*MAX*/ElementType_Max,
 };
@@ -77,24 +78,24 @@ typedef XLIST<CInterfaceElement*> t_ElementList;
 //                             INTERFACE MANAGER
 //
 //##############################################################################
-class CInterfaceManager //: public CInterfaceElement
+class CInterface //: public CInterfaceElement
 {
 public:
 	// Friend.
 	friend CInterfaceElement;
 
 	// Singleton instance.
-	static inline CInterfaceManager& Get() 
+	static inline CInterface& Get() 
 	{
-		static CInterfaceManager s_Instance;
+		static CInterface s_Instance;
 		return s_Instance;
 	}
 
 	// Initialise the interface manager.
-	CInterfaceManager();
+	CInterface();
 
 	// Deinitialise the interface manager.
-	~CInterfaceManager();
+	~CInterface();
 
 	// Reset the settings to defaults and clear all elements.
 	void Reset();
@@ -174,6 +175,30 @@ public:
 		m_bDebugRender = bDebug;
 	}
 
+	// Specify is the interface system should be rendered or not.
+	void SetVisible(xbool bVisible)
+	{
+		m_bVisible = bVisible;
+	}
+
+	// Determine if the interface system is currently visible.
+	xbool IsVisible()
+	{
+		return m_bVisible;
+	}
+
+	// Specify is the cursor should be rendered or not.
+	void SetCursorVisible(xbool bVisible)
+	{
+		m_bCursorVisible = bVisible;
+	}
+
+	// Determine if the cursor is currently visible.
+	xbool IsCursorVisible()
+	{
+		return m_bCursorVisible;
+	}
+
 protected:
 	// Register an element with the system. This is done automatically when the element is constructed.
 	inline void RegisterElement(CInterfaceElement* pElement)
@@ -198,6 +223,12 @@ protected:
 
 	// The cursor sprite.
 	CBasicSprite* m_pCursor[ElementType_Max];
+
+	// The interface visibility.
+	xbool m_bVisible;
+
+	// The cursor visibility.
+	xbool m_bCursorVisible;
 
 	// The current mouse position.
 	xpoint m_xMousePos;
@@ -236,7 +267,7 @@ class CInterfaceElement
 {
 public:
 	// Friend.
-	friend CInterfaceManager;
+	friend CInterface;
 
 	// Virtual destructor to ensure proper cleanup of all child classes.
 	virtual ~CInterfaceElement();

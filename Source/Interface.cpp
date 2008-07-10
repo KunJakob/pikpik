@@ -21,8 +21,10 @@
 // =============================================================================
 // Nat Ryall                                                          1-May-2008
 // =============================================================================
-CInterfaceManager::CInterfaceManager() :
+CInterface::CInterface() :
 	m_pScreen(NULL),
+	m_bVisible(true),
+	m_bCursorVisible(true),
 	m_pActiveElement(NULL),
 	m_pFocusedElement(NULL),
 	m_bFoundActive(false),
@@ -35,7 +37,7 @@ CInterfaceManager::CInterfaceManager() :
 // =============================================================================
 // Nat Ryall                                                          1-May-2008
 // =============================================================================
-CInterfaceManager::~CInterfaceManager()
+CInterface::~CInterface()
 {
 	delete m_pScreen;
 
@@ -51,7 +53,7 @@ CInterfaceManager::~CInterfaceManager()
 // =============================================================================
 // Nat Ryall                                                          2-May-2008
 // =============================================================================
-void CInterfaceManager::Reset()
+void CInterface::Reset()
 {
 	m_pActiveElement = NULL;
 	m_pFocusedElement = NULL;
@@ -65,7 +67,7 @@ void CInterfaceManager::Reset()
 // =============================================================================
 // Nat Ryall                                                          1-May-2008
 // =============================================================================
-void CInterfaceManager::Update()
+void CInterface::Update()
 {
 	m_xLastMousePos = m_xMousePos;
 
@@ -116,61 +118,64 @@ void CInterfaceManager::Update()
 // =============================================================================
 // Nat Ryall                                                          1-May-2008
 // =============================================================================
-void CInterfaceManager::Render()
+void CInterface::Render()
 {
-	RenderElement(m_pScreen);
-
-	if (m_bDebugRender)
+	if (m_bVisible)
 	{
-		if (m_pActiveElement)
+		RenderElement(m_pScreen);
+
+		if (m_bDebugRender)
 		{
-			xrect xRect = m_pActiveElement->GetArea();
-			xuint iColour = ARGB(255, 32, 32, 32);
+			if (m_pActiveElement)
+			{
+				xrect xRect = m_pActiveElement->GetArea();
+				xuint iColour = ARGB(255, 32, 32, 32);
 
-			hgeQuad xQuad;
-			memset(&xQuad, 0, sizeof(hgeQuad));
+				hgeQuad xQuad;
+				memset(&xQuad, 0, sizeof(hgeQuad));
 
-			xQuad.v[0].x = (float)xRect.iLeft;
-			xQuad.v[0].y = (float)xRect.iTop;
-			xQuad.v[1].x = (float)xRect.iRight;
-			xQuad.v[1].y = (float)xRect.iTop;
-			xQuad.v[3].x = (float)xRect.iLeft;
-			xQuad.v[3].y = (float)xRect.iBottom;
-			xQuad.v[2].x = (float)xRect.iRight;
-			xQuad.v[2].y = (float)xRect.iBottom;
+				xQuad.v[0].x = (float)xRect.iLeft;
+				xQuad.v[0].y = (float)xRect.iTop;
+				xQuad.v[1].x = (float)xRect.iRight;
+				xQuad.v[1].y = (float)xRect.iTop;
+				xQuad.v[3].x = (float)xRect.iLeft;
+				xQuad.v[3].y = (float)xRect.iBottom;
+				xQuad.v[2].x = (float)xRect.iRight;
+				xQuad.v[2].y = (float)xRect.iBottom;
 
-			xQuad.v[0].col = xQuad.v[1].col = xQuad.v[2].col = xQuad.v[3].col = iColour;
+				xQuad.v[0].col = xQuad.v[1].col = xQuad.v[2].col = xQuad.v[3].col = iColour;
 
-			_HGE->Gfx_RenderQuad(&xQuad);
+				_HGE->Gfx_RenderQuad(&xQuad);
+			}
+
+			if (m_pFocusedElement)
+			{
+				xrect xRect = m_pFocusedElement->GetFocusArea() + xrect(2, 2, -1, -1);
+				xuint iColour = ARGB(255, 255, 0, 0);
+
+				_HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iTop, iColour);
+				_HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iBottom, iColour);
+				_HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iBottom, iColour);
+				_HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iTop, iColour);
+			}
 		}
 
-		if (m_pFocusedElement)
+		if (m_bCursorVisible && _HGE->Input_IsMouseOver() && m_pCursor[ElementType_Unknown])
 		{
-			xrect xRect = m_pFocusedElement->GetFocusArea() + xrect(2, 2, -1, -1);
-			xuint iColour = ARGB(255, 255, 0, 0);
+			CBasicSprite* pCursor = m_pCursor[ElementType_Unknown];
 
-			_HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iTop, iColour);
-			_HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iBottom, iColour);
-			_HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iBottom, iColour);
-			_HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iTop, iColour);
+			if (m_pActiveElement && m_pCursor[m_pActiveElement->GetType()])
+				pCursor = m_pCursor[m_pActiveElement->GetType()];
+
+			pCursor->Render(m_xMousePos);
 		}
-	}
-
-	if (_HGE->Input_IsMouseOver() && m_pCursor[ElementType_Unknown])
-	{
-		CBasicSprite* pCursor = m_pCursor[ElementType_Unknown];
-
-		if (m_pActiveElement && m_pCursor[m_pActiveElement->GetType()])
-			pCursor = m_pCursor[m_pActiveElement->GetType()];
-
-		pCursor->Render(m_xMousePos);
 	}
 }
 
 // =============================================================================
 // Nat Ryall                                                          3-May-2008
 // =============================================================================
-void CInterfaceManager::SetCursor(t_ElementType iType, CSpriteMetadata* pMetadata)
+void CInterface::SetCursor(t_ElementType iType, CSpriteMetadata* pMetadata)
 {
 	if (m_pCursor[iType])
 		delete m_pCursor[iType];
@@ -181,7 +186,7 @@ void CInterfaceManager::SetCursor(t_ElementType iType, CSpriteMetadata* pMetadat
 // =============================================================================
 // Nat Ryall                                                          2-May-2008
 // =============================================================================
-void CInterfaceManager::SetFocus(CInterfaceElement* pElement)
+void CInterface::SetFocus(CInterfaceElement* pElement)
 {
 	if (m_pFocusedElement != pElement)
 	{
@@ -196,7 +201,7 @@ void CInterfaceManager::SetFocus(CInterfaceElement* pElement)
 // =============================================================================
 // Nat Ryall                                                          2-May-2008
 // =============================================================================
-XBOOL CInterfaceManager::IsMouseOver(CInterfaceElement* pElement)
+XBOOL CInterface::IsMouseOver(CInterfaceElement* pElement)
 {
 	return Math::Intersect(m_xMousePos, pElement->GetArea());
 }
@@ -204,7 +209,7 @@ XBOOL CInterfaceManager::IsMouseOver(CInterfaceElement* pElement)
 // =============================================================================
 // Nat Ryall                                                          1-May-2008
 // =============================================================================
-void CInterfaceManager::UpdateElement(CInterfaceElement* pElement)
+void CInterface::UpdateElement(CInterfaceElement* pElement)
 {
 	// Iterate through all children in reverse-render order.
 	XEN_LIST_FOREACH_R(t_ElementList, ppElement, pElement->m_lpChildElements)
@@ -246,7 +251,7 @@ void CInterfaceManager::UpdateElement(CInterfaceElement* pElement)
 // =============================================================================
 // Nat Ryall                                                          1-May-2008
 // =============================================================================
-void CInterfaceManager::RenderElement(CInterfaceElement* pElement)
+void CInterface::RenderElement(CInterfaceElement* pElement)
 {
 	if (pElement->IsVisible())
 	{
@@ -260,7 +265,7 @@ void CInterfaceManager::RenderElement(CInterfaceElement* pElement)
 // =============================================================================
 // Nat Ryall                                                         09-Jun-2008
 // =============================================================================
-void CInterfaceManager::DeregisterElement(CInterfaceElement* pElement)
+void CInterface::DeregisterElement(CInterfaceElement* pElement)
 {
 	if (CInterfaceElement* pParent = pElement->m_pParent)
 		pParent->Detach(pElement);
@@ -286,7 +291,7 @@ CInterfaceElement::CInterfaceElement(t_ElementType iType) :
 	m_bVisible(true),
 	m_bEnabled(true)
 {
-	InterfaceManager.RegisterElement(this);
+	Interface.RegisterElement(this);
 }
 
 // =============================================================================
@@ -294,7 +299,7 @@ CInterfaceElement::CInterfaceElement(t_ElementType iType) :
 // =============================================================================
 CInterfaceElement::~CInterfaceElement()
 {
-	InterfaceManager.DeregisterElement(this);
+	Interface.DeregisterElement(this);
 }
 
 // =============================================================================
@@ -327,11 +332,11 @@ void CInterfaceElement::Detach(CInterfaceElement* pElement)
 
 	XEN_LIST_REMOVE(t_ElementList, m_lpChildElements, pElement);
 
-	if (pElement == InterfaceManager.m_pActiveElement)
-		InterfaceManager.m_pActiveElement = NULL;
+	if (pElement == Interface.m_pActiveElement)
+		Interface.m_pActiveElement = NULL;
 
-	if (pElement == InterfaceManager.m_pFocusedElement)
-		InterfaceManager.m_pFocusedElement = NULL;
+	if (pElement == Interface.m_pFocusedElement)
+		Interface.m_pFocusedElement = NULL;
 }
 
 // =============================================================================

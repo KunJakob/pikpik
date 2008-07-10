@@ -42,6 +42,8 @@ public:
 };
 
 //##############################################################################
+
+//##############################################################################
 //
 //                                   IMAGE
 //
@@ -58,6 +60,8 @@ public:
 	// Render the element.
 	virtual void Render();
 };
+
+//##############################################################################
 
 //##############################################################################
 //
@@ -107,7 +111,7 @@ protected:
 	// Triggered when the mouse enters this element.
 	virtual void OnMouseEnter() 
 	{
-		m_iButtonState = InterfaceManager.IsMouseDown() ? ButtonState_Down : ButtonState_Over;
+		m_iButtonState = Interface.IsMouseDown() ? ButtonState_Down : ButtonState_Over;
 	}
 
 	// Triggered when the mouse leaves this element.
@@ -128,7 +132,7 @@ protected:
 		m_iButtonState = ButtonState_Over;
 
 		if (m_fpOnClickCallback)
-			m_fpOnClickCallback(this, InterfaceManager.GetMousePosition() - GetPosition());
+			m_fpOnClickCallback(this, Interface.GetMousePosition() - GetPosition());
 	}
 
 	// The button states.
@@ -157,6 +161,8 @@ protected:
 	// The callback to execute if the button is clicked.
 	t_OnClickCallback m_fpOnClickCallback;
 };
+
+//##############################################################################
 
 //##############################################################################
 //
@@ -261,6 +267,8 @@ protected:
 };
 
 //##############################################################################
+
+//##############################################################################
 //
 //                                PROGRESS BAR
 //
@@ -305,6 +313,8 @@ protected:
 	// The progress bar progress in the range 0 to 1.
 	xfloat m_fProgress;
 };
+
+//##############################################################################
 
 //##############################################################################
 //
@@ -393,6 +403,8 @@ protected:
 };
 
 //##############################################################################
+
+//##############################################################################
 //
 //                                 GROUP BOX
 //
@@ -441,6 +453,8 @@ protected:
 };
 
 //##############################################################################
+
+//##############################################################################
 //
 //                                  LIST BOX
 //
@@ -448,6 +462,8 @@ protected:
 class CListComponent : public CContainerElement
 {
 };
+
+//##############################################################################
 
 //##############################################################################
 //
@@ -506,7 +522,7 @@ protected:
 	// Triggered when the mouse enters the element.
 	virtual void OnMouseEnter() 
 	{
-		m_iCheckState = InterfaceManager.IsMouseDown() ? CheckState_Down : CheckState_Over;
+		m_iCheckState = Interface.IsMouseDown() ? CheckState_Down : CheckState_Over;
 	}
 
 	// Triggered when the mouse leaves the element.
@@ -551,6 +567,8 @@ protected:
 };
 
 //##############################################################################
+
+//##############################################################################
 //
 //                                RADIO BUTTON
 //
@@ -580,3 +598,54 @@ protected:
 	// The radio component group.
 	xint m_iRadioGroup;
 };
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                  TEXT LINK
+//
+//##############################################################################
+class CTextLink : public CInterfaceElement
+{
+public:
+	// Callbacks.
+	typedef xfunction(0)<> t_fpLinkSelectedCallback;
+
+	// Constructor.
+	CTextLink(CFontMetadata* pFont, const XCHAR* pText, t_fpLinkSelectedCallback fpCallback = NULL);
+
+	// Destructor.
+	virtual ~CTextLink();
+
+	// Render the element.
+	virtual void Render();
+
+	// Get the element width in pixels.
+	virtual xint GetWidth()
+	{
+		return m_pText->GetStringWidth();
+	}
+
+	// Get the element height in pixels.
+	virtual xint GetHeight()
+	{
+		return m_pText->GetFontHeight();
+	}
+
+protected:
+	// Called when the mouse is released when the element is active.
+	virtual void OnMouseUp(xpoint xPosition)
+	{
+		if (m_fpLinkSelectedCallback)
+			m_fpLinkSelectedCallback();
+	}
+
+	// The text to render for the link.
+	CText* m_pText;
+
+	// The link callback.
+	t_fpLinkSelectedCallback m_fpLinkSelectedCallback;
+};
+
+//##############################################################################

@@ -32,6 +32,7 @@
 // =============================================================================
 CLobbyScreen::CLobbyScreen() : CScreen(ScreenIndex_LobbyScreen),
 	m_iState(LobbyState_None),
+	m_bPublic(true),
 	m_pSession(NULL)
 {
 	_GLOBAL.pLobby = this;
@@ -114,25 +115,34 @@ void CLobbyScreen::Render()
 // =============================================================================
 void CLobbyScreen::Start(t_LobbyStartMode iStartMode)
 {
+	m_bPublic = (iStartMode == LobbyStartMode_JoinPublic || iStartMode == LobbyStartMode_CreatePublic);
+	m_pSession = NULL;
+
 	switch (iStartMode)
 	{
-	case LobbyStartMode_Find:
+	case LobbyStartMode_JoinPublic:
 		{
 			Match.ListSessions(xbind(this, &CLobbyScreen::OnListSessionsCompleted));
 			SetState(LobbyState_Searching);
 		}
 		break;
 
-	case LobbyStartMode_Join:
+	case LobbyStartMode_JoinPrivate:
 		{
 			SetState(LobbyState_Join);
 		}
 		break;
 	
-	case LobbyStartMode_Create:
+	case LobbyStartMode_CreatePublic:
 		{
 			m_pSession = Match.CreateSession(4, xbind(this, &CLobbyScreen::OnCreateSessionCompleted));
 			SetState(LobbyState_Creating);
+		}
+		break;
+
+	case LobbyStartMode_CreatePrivate:
+		{
+			CreateLobby();
 		}
 		break;
 	}
@@ -153,7 +163,7 @@ void CLobbyScreen::Stop()
 // =============================================================================
 void CLobbyScreen::SetState(t_LobbyState iState)
 {
-	InterfaceManager.GetScreen()->DetachAll();
+	Interface.GetScreen()->DetachAll();
 
 	switch (iState)
 	{
@@ -231,15 +241,13 @@ void CLobbyScreen::QuitCheck()
 		
 		case LobbyState_Lobby:
 			{
-				if (Network.m_bHosting)
+				if (m_bPublic && Network.m_bHosting)
 				{
 					Match.CloseSession(m_pSession, xbind(this, &CLobbyScreen::OnCloseSessionCompleted));
 					SetState(LobbyState_Closing);
 				}
 				else
-					SetState(LobbyState_Join);
-
-				Network.Stop();
+					CloseLobby();
 			}
 			break;
 		}
@@ -258,6 +266,42 @@ void CLobbyScreen::RenderList()
 		_GLOBAL.pGameFont->Render(pSession->m_sSessionID.c_str(), xpoint(10, 10 + (iA * 20)), HGETEXT_LEFT);
 		_GLOBAL.pGameFont->Render(XFORMAT("%d/%d Slots", pSession->m_iUsedSlots, pSession->m_iTotalSlots), xpoint(350, 10 + (iA * 20)), HGETEXT_LEFT);
 	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         10-Jul-2008
+// =============================================================================
+void CLobbyScreen::CreateLobby()
+{
+	Network.Reset();
+
+	Network.m_xCallbacks.m_fpPeerJoined = xbind(this, &CLobbyScreen::OnPeerJoined);
+	Network.m_xCallbacks.m_fpPeerLeaving = xbind(this, &CLobbyScreen::OnPeerLeaving);
+
+	BindPacketCallbacks();
+
+	Network.StartHost(16, _HOSTPORT);
+
+	SetState(LobbyState_Lobby);
+}
+
+// =============================================================================
+// Nat Ryall                                                         10-Jul-2008
+// =============================================================================
+void CLobbyScreen::JoinLobby(const xchar* pHostAddress)
+{
+	Network.Reset();
+
+	Network.m_xCallbacks.m_fpConnectionCompleted = xbind(this, &CLobbyScreen::OnConnectionCompleted);
+	Network.m_xCallbacks.m_fpConnectionLost = xbind(this, &CLobbyScreen::OnConnectionLost);
+	Network.m_xCallbacks.m_fpPeerJoined = xbind(this, &CLobbyScreen::OnPeerJoined);
+	Network.m_xCallbacks.m_fpPeerLeaving = xbind(this, &CLobbyScreen::OnPeerLeaving);
+
+	Network.StartClient(pHostAddress, _HOSTPORT);
+
+	BindPacketCallbacks();
+
+	SetState(LobbyState_Connecting);
 }
 
 // =============================================================================
@@ -280,6 +324,22 @@ void CLobbyScreen::RenderLobby()
 		m_pPeerFont->Render(XFORMAT("Peer_%02d", (*ppPeer)->m_iID), xpoint(50, 50 + iPeerOffset), HGETEXT_LEFT);
 		iPeerOffset += 40;
 	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         10-Jul-2008
+// =============================================================================
+void CLobbyScreen::CloseLobby()
+{
+	if (m_bPublic || Network.m_bHosting)
+	{
+		SetState(LobbyState_None);
+		ScreenManager::Pop();
+	}
+	else
+		SetState(LobbyState_Join);
+
+	Network.Stop();
 }
 
 // =============================================================================
@@ -307,18 +367,7 @@ void CLobbyScreen::OnListSessionsCompleted(t_MatchResultError iError, xint iSess
 void CLobbyScreen::OnCreateSessionCompleted(t_MatchResultError iError, CSession* pSession)
 {
 	if (iError == MatchResultError_Success)
-	{
-		Network.Reset();
-
-		Network.m_xCallbacks.m_fpPeerJoined = xbind(this, &CLobbyScreen::OnPeerJoined);
-		Network.m_xCallbacks.m_fpPeerLeaving = xbind(this, &CLobbyScreen::OnPeerLeaving);
-
-		BindPacketCallbacks();
-
-		Network.StartHost(16, HOST_INCOMING_PORT);
-
-		SetState(LobbyState_Lobby);
-	}
+		CreateLobby();
 	else
 	{
 		SetState(LobbyState_None);
@@ -334,8 +383,7 @@ void CLobbyScreen::OnCloseSessionCompleted(t_MatchResultError iError, CSession* 
 	delete m_pSession;
 	m_pSession = NULL;
 
-	SetState(LobbyState_None);
-	ScreenManager::Pop();
+	CloseLobby();
 }
 
 // =============================================================================
@@ -343,18 +391,7 @@ void CLobbyScreen::OnCloseSessionCompleted(t_MatchResultError iError, CSession* 
 // =============================================================================
 void CLobbyScreen::OnJoinClicked(CButtonComponent* pButton, xpoint xOffset)
 {
-	Network.Reset();
-
-	Network.m_xCallbacks.m_fpConnectionCompleted = xbind(this, &CLobbyScreen::OnConnectionCompleted);
-	Network.m_xCallbacks.m_fpConnectionLost = xbind(this, &CLobbyScreen::OnConnectionLost);
-	Network.m_xCallbacks.m_fpPeerJoined = xbind(this, &CLobbyScreen::OnPeerJoined);
-	Network.m_xCallbacks.m_fpPeerLeaving = xbind(this, &CLobbyScreen::OnPeerLeaving);
-
-	Network.StartClient(m_pJoinInterface->m_pAddressBox->GetText(), HOST_INCOMING_PORT);
-
-	BindPacketCallbacks();
-
-	SetState(LobbyState_Connecting);
+	JoinLobby(m_pJoinInterface->m_pAddressBox->GetText());
 }
 
 // =============================================================================
@@ -438,12 +475,20 @@ CStatusBox::CStatusBox()
 // =============================================================================
 CStatusBox::~CStatusBox()
 {
-	InterfaceManager.GetScreen()->Detach(m_pStatusBox);
+	Interface.GetScreen()->Detach(m_pStatusBox);
 	delete m_pStatusBox;
 
-	InterfaceManager.GetScreen()->Detach(m_pLabel);
+	Interface.GetScreen()->Detach(m_pLabel);
 	delete m_pLabel;
 }
+
+//##############################################################################
+
+//##############################################################################
+//
+//                             MESSAGE INTERFACE
+//
+//##############################################################################
 
 //##############################################################################
 
@@ -474,10 +519,10 @@ CJoinInterface::CJoinInterface()
 // =============================================================================
 CJoinInterface::~CJoinInterface()
 {
-	InterfaceManager.GetScreen()->Detach(m_pAddressBox);
+	Interface.GetScreen()->Detach(m_pAddressBox);
 	delete m_pAddressBox;
 
-	InterfaceManager.GetScreen()->Detach(m_pJoinButton);
+	Interface.GetScreen()->Detach(m_pJoinButton);
 	delete m_pJoinButton;
 }
 

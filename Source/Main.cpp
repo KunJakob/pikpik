@@ -217,6 +217,8 @@ XBOOL Application::Update()
 
 	Xen::ModuleManager::Update();
 
+	Interface.Update();
+
 	hgeInputEvent hgEvent;
 
 	while (s_pInterface->Input_GetEvent(&hgEvent))
@@ -233,6 +235,8 @@ XBOOL Application::Render()
 	s_pInterface->Gfx_BeginScene();
 
 	Xen::ModuleManager::Render();
+
+	Interface.Render();
 
 	s_pInterface->Gfx_EndScene();
 

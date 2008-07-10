@@ -1,8 +1,17 @@
 - Splash Screens
 - Main Menu
   - Child Menus
+  - Transitions?
 - Join Screen
+- Session Listing
+  - Session Name
+  - Num. Players
+  - Num. Slots
+  - Session Options?
 - Create Screen
+  - Private/Public
+  - Max Players
+  - Session Name
 - Status Screen
 - Lobby
   - Player Listing

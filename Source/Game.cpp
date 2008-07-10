@@ -178,11 +178,12 @@ void CGameScreen::Load()
 
 	m_pFieldMask = new hgeSprite(GenerateFieldMask(48 * 3, 48 * 5), 0, 0, _SWIDTH, _SHEIGHT);
 
-	// Start the game music.
 	_GLOBAL.fMusicEnergy = 0.f;
 
 	_FMOD->createStream("Audio\\Level-Test.mp3", FMOD_SOFTWARE, 0, &m_pMusic);
 	_FMOD->playSound(FMOD_CHANNEL_FREE, m_pMusic, false, &m_pChannel);
+
+	Interface.SetCursorVisible(false);
 }
 
 // =============================================================================
@@ -198,6 +199,8 @@ void CGameScreen::Unload()
 	RenderManager::Reset();
 
 	delete _GLOBAL.pActiveMap;
+
+	Interface.SetCursorVisible(true);
 }
 
 // =============================================================================

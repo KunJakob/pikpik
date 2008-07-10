@@ -86,12 +86,17 @@
 #define _TIMEDELTAF			_HGE->Timer_GetDelta()
 #define _LOCALE(NAME)		_GLOBAL.pLocale->GetProperty(NAME)->GetString()
 
+// Matchmaking.
+#define _GID				"PikPik-1"
+
+// Network.
+#define _HOSTPORT			20557
+#define _MAXNICKLEN			16
+#define _MAXNICKCHARS		15
+
 // Colour manipulations.
 #define COLOURF(COLF)		(xuchar)((COLF) * 255.f)
 #define ARGBF(A, R, G, B)	ARGB(COLOURF(A), COLOURF(R), COLOURF(G), COLOURF(B))
-
-// Matchmaking options.
-#define _GID				"PikPik-1"
 
 //##############################################################################
 #pragma endregion
@@ -163,6 +168,15 @@ enum t_RenderableType
 enum t_NetworkStreamType
 {
 	NetworkStreamType_PlayerInfo,
+};
+
+// The lobby start mode.
+enum t_LobbyStartMode
+{
+	LobbyStartMode_JoinPublic,
+	LobbyStartMode_JoinPrivate,
+	LobbyStartMode_CreatePublic,
+	LobbyStartMode_CreatePrivate,
 };
 
 // Common list types.

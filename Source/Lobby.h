@@ -22,21 +22,7 @@
 #include <Component.h>
 #include <Network.h>
 #include <Match.h>
-
-//##############################################################################
-
-//##############################################################################
-//
-//                                   DEFINES
-//
-//##############################################################################
-
-// The port to host on.
-#define HOST_INCOMING_PORT 20557
-
-// The maximum length allowed for any online nickname in bytes (including NULL).
-#define MAX_NICKNAME_LENGTH 16
-#define MAX_NICKNAME_CHARS 15
+#include <Menu.h>
 
 //##############################################################################
 
@@ -49,14 +35,6 @@
 // Predeclare.
 class CStatusBox;
 class CJoinInterface;
-
-// The lobby start mode.
-enum t_LobbyStartMode
-{
-	LobbyStartMode_Find,
-	LobbyStartMode_Join,
-	LobbyStartMode_Create,
-};
 
 // The lobby state.
 enum t_LobbyState
@@ -73,6 +51,14 @@ enum t_LobbyState
 	LobbyState_Closing,
 };
 
+// The message display mode.
+enum t_MessageDisplayMode
+{
+	MessageDisplayMode_None,
+	MessageDisplayMode_Error,
+	MessageDisplayMode_Confirm,
+};
+
 //##############################################################################
 
 //##############################################################################
@@ -84,7 +70,7 @@ class CNetworkPlayerInfo
 {
 public:
 	// The player's nickname/gamertag with a terminating NULL.
-	char cNickname[MAX_NICKNAME_LENGTH];
+	char cNickname[_MAXNICKLEN];
 };
 
 //##############################################################################
@@ -131,11 +117,20 @@ protected:
 	// Render the session list.
 	void RenderList();
 
+	// Create a new lobby and act as the host.
+	void CreateLobby();
+
+	// Join an existing lobby and act as a client.
+	void JoinLobby(const xchar* pHostAddress);
+
 	// Update the main lobby screen.
 	void UpdateLobby();
 
 	// Render the main lobby screen.
 	void RenderLobby();
+
+	// Close the lobby down and disconnect from the network.
+	void CloseLobby();
 
 	// Callback for when the listing of available sessions has completed.
 	void OnListSessionsCompleted(t_MatchResultError iError, xint iSessionCount, CSession* pSessions);
@@ -179,6 +174,9 @@ protected:
 	// The current lobby state.
 	t_LobbyState m_iState;
 
+	// Specifies if the lobby is public or private.
+	xbool m_bPublic;
+
 	// The local active session.
 	CSession* m_pSession;
 
@@ -220,8 +218,8 @@ public:
 	// Attach all elements to the interface.
 	inline void AttachElements()
 	{
-		InterfaceManager.GetScreen()->Attach(m_pStatusBox);
-		InterfaceManager.GetScreen()->Attach(m_pLabel);
+		Interface.GetScreen()->Attach(m_pStatusBox);
+		Interface.GetScreen()->Attach(m_pLabel);
 	}
 
 protected:
@@ -230,6 +228,46 @@ protected:
 
 	// The status text.
 	CLabelComponent* m_pLabel;
+};
+
+//##############################################################################
+
+//##############################################################################
+//
+//                             MESSAGE INTERFACE
+//
+//##############################################################################
+class CMessageInterface
+{
+public:
+	// Friends.
+	friend class CLobbyScreen;
+
+	// Constructor.
+	CMessageInterface();
+
+	// Destructor.
+	virtual ~CMessageInterface();
+
+	// Attach all elements to the interface.
+	inline void AttachElements()
+	{
+		Interface.GetScreen()->Attach(m_pAcceptLink);
+		Interface.GetScreen()->Attach(m_pCancelLink);
+	}
+
+	// Render the message interface.
+	void Render();
+
+protected:
+	// The display mode.
+	t_MessageDisplayMode m_iMode;
+
+	// The "accept" text link.
+	CTextLink* m_pAcceptLink;
+
+	// The "cancel" text link.
+	CTextLink* m_pCancelLink;
 };
 
 //##############################################################################
@@ -254,8 +292,8 @@ public:
 	// Attach all elements to the interface.
 	inline void AttachElements()
 	{
-		InterfaceManager.GetScreen()->Attach(m_pAddressBox);
-		InterfaceManager.GetScreen()->Attach(m_pJoinButton);
+		Interface.GetScreen()->Attach(m_pAddressBox);
+		Interface.GetScreen()->Attach(m_pJoinButton);
 	}
 
 protected:

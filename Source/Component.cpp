@@ -11,6 +11,8 @@
 #include <Component.h>
 
 //##############################################################################
+
+//##############################################################################
 //
 //                                   LABEL
 //
@@ -39,6 +41,8 @@ void CLabelComponent::Render()
 }
 
 //##############################################################################
+
+//##############################################################################
 //
 //                                 IMAGE BOX
 //
@@ -65,6 +69,8 @@ void CImageComponent::Render()
 {
 	CImageElement::Render();
 }
+
+//##############################################################################
 
 //##############################################################################
 //
@@ -115,6 +121,8 @@ void CButtonComponent::Render()
 	if (m_pFont)
 		m_pFont->Render(m_xText.c_str(), xrect(0, 0, GetSize()) + GetPosition(), HGETEXT_CENTER | HGETEXT_MIDDLE);
 }
+
+//##############################################################################
 
 //##############################################################################
 //
@@ -177,7 +185,7 @@ void CInputComponent::Render()
 	m_pFont->Render(xRenderText.c_str(), GetPosition() + xTextOffset, HGETEXT_LEFT);
 
 	// Render the cursor if we're focused.
-	if (InterfaceManager.IsFocusedElement(this) && m_iFlashTimer < 500)
+	if (Interface.IsFocusedElement(this) && m_iFlashTimer < 500)
 	{
 		xRenderText = xRenderText.substr(0, m_iCharOffset);
 
@@ -261,6 +269,8 @@ void CInputComponent::OnKeyChar(xchar cChar)
 }
 
 //##############################################################################
+
+//##############################################################################
 //
 //                                PROGRESS BAR
 //
@@ -298,6 +308,8 @@ void CProgressComponent::Render()
 	if (m_fProgress)
 		m_pSprite->RenderTiled(GetPosition() + xpoint(m_xFrameSize.iLeft, 0), xpoint((xint)((xfloat)m_iWidth * m_fProgress), 0), m_pProgress->xRect);
 }
+
+//##############################################################################
 
 //##############################################################################
 //
@@ -358,6 +370,8 @@ void CWindowComponent::Render()
 }
 
 //##############################################################################
+
+//##############################################################################
 //
 //                                 GROUP BOX
 //
@@ -380,12 +394,12 @@ CGroupComponent::CGroupComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pM
 	m_pBR = pMetaSprite->FindArea("BottomRight");
 
 	m_xFrameSize = xrect
-		(
+	(
 		m_pML->xRect.Width(),
 		m_pTC->xRect.Height(),
 		m_pMR->xRect.Width(),
 		m_pBC->xRect.Height()
-		);
+	);
 
 	if (pMetaFont)
 		m_pFont = new CFont(pMetaFont);
@@ -422,9 +436,13 @@ void CGroupComponent::Render()
 }
 
 //##############################################################################
+
+//##############################################################################
 //
 //                                  LIST BOX
 //
+//##############################################################################
+
 //##############################################################################
 
 //##############################################################################
@@ -491,6 +509,8 @@ void CCheckComponent::OnMouseUp(xpoint xPosition)
 }
 
 //##############################################################################
+
+//##############################################################################
 //
 //                                RADIO BUTTON
 //
@@ -531,7 +551,7 @@ void CRadioComponent::OnMouseUp(xpoint xPosition)
 // =============================================================================
 CRadioComponent* CRadioComponent::GetChecked(xint iRadioGroup)
 {
-	XEN_LIST_FOREACH(t_ElementList, ppElement, InterfaceManager.GetElementList())
+	XEN_LIST_FOREACH(t_ElementList, ppElement, Interface.GetElementList())
 	{
 		if ((*ppElement)->GetType() == ElementType_Radio)
 		{
@@ -543,6 +563,43 @@ CRadioComponent* CRadioComponent::GetChecked(xint iRadioGroup)
 	}
 
 	return NULL;
+}
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                  TEXT LINK
+//
+//##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                         10-Jul-2008
+// =============================================================================
+CTextLink::CTextLink(CFontMetadata* pFont, const XCHAR* pText, t_fpLinkSelectedCallback fpCallback) : CInterfaceElement(ElementType_MenuLink),
+	m_pText(NULL),
+	m_fpLinkSelectedCallback(fpCallback)
+{
+	m_pText = new CText(pFont);
+	m_pText->SetString(pText);
+	m_pText->SetAlignment(HGETEXT_LEFT);
+}
+
+// =============================================================================
+// Nat Ryall                                                         10-Jul-2008
+// =============================================================================
+CTextLink::~CTextLink()
+{
+	delete m_pText;
+}
+
+// =============================================================================
+// Nat Ryall                                                         10-Jul-2008
+// =============================================================================
+void CTextLink::Render()
+{
+	m_pText->SetPosition(GetPosition());
+	m_pText->Render();
 }
 
 //##############################################################################

@@ -34,11 +34,17 @@
 .Menu_OnlineCreate
 "Create Game"
 
-.Menu_JoinUnknown
+.Menu_JoinPublic
 "Search"
 
-.Menu_JoinKnown
+.Menu_JoinPrivate
 "Specify IP"
+
+.Menu_CreatePublic
+"Public"
+
+.Menu_CreatePrivate
+"Private"
 
 // --------------------------------------------------------------------------------
 // Button
