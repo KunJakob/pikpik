@@ -25,11 +25,12 @@
 //##############################################################################
 
 // The player types.
-enum t_PlayerBrainType
+enum t_PlayerLogicType
 {
-	PlayerBrainType_Local,
-	PlayerBrainType_AI,
-	PlayerBrainType_Remote,
+	PlayerLogicType_None,
+	PlayerLogicType_Local,
+	PlayerLogicType_AI,
+	PlayerLogicType_Remote,
 };
 
 // The possible player states.
@@ -40,6 +41,16 @@ enum t_PlayerState
 	PlayerState_Move,
 	PlayerState_Warp,
 	PlayerState_Die,
+};
+
+// The direction to move in.
+enum t_MoveDirection
+{
+	MoveDirection_Left = AdjacentDir_Left,
+	MoveDirection_Up,
+	MoveDirection_Right,
+	MoveDirection_Down,
+	/*MAX*/MoveDirection_Max,
 };
 
 //##############################################################################
@@ -117,12 +128,39 @@ public:
 		return m_pSprite->GetPosition();
 	}
 
+	// Set the player logic type.
+	inline void SetLogicType(t_PlayerLogicType _Value) 
+	{ 
+		m_iLogicType = _Value; 
+	}
+
+	// Get the player logic type.
+	inline t_PlayerLogicType GetLogicType() 
+	{ 
+		return m_iLogicType; 
+	}
+
 protected:
 	// Constuctor.
 	CPlayer(t_PlayerType iType, const XCHAR* pSpriteName);
 
 	// Called to change the state of the player object.
 	virtual void SetState(t_PlayerState iState);
+
+	// The player logic update where decisions are made regarding state changes.
+	virtual void Logic();
+
+	// The logic for a local human player.
+	virtual void LogicLocal();
+
+	// The logic for computer controlled players (artificial intelligence).
+	virtual void LogicAI();
+
+	// The logic for networked human or computer controlled players.
+	virtual void LogicRemote();
+
+	// Execute a move action for the player.
+	void Move(t_MoveDirection iDirection);
 
 	// Check if the specified block is passable.
 	virtual XBOOL IsPassable(CMapBlock* pBlock)
@@ -135,6 +173,9 @@ protected:
 
 	// The type of the derived class.
 	t_PlayerType m_iType;
+
+	// The player logic type.
+	t_PlayerLogicType m_iLogicType;
 
 	// The state of the player.
 	t_PlayerState m_iState;
@@ -160,8 +201,11 @@ protected:
 	// Determines if the player is leaving or entering the map.
 	XBOOL m_bLeaving;
 
+	// The movement direction.
+	t_MoveDirection m_iMoveDir;
+
 	// The transition direction.
-	t_AdjacentDir m_iTransitionDir;
+	t_MoveDirection m_iTransitionDir;
 
 	// The player name.
 	XCHAR m_cName[_MAXNAMELEN + 1];

@@ -159,13 +159,17 @@ void CalculateMusicEnergy(FMOD::Channel* pChannel)
 // =============================================================================
 void CGameScreen::Load()
 {
-	_GLOBAL.pActiveMap = new CMap(XFORMAT("M%03d", 5));
+	_GLOBAL.pActiveMap = new CMap(XFORMAT("M%03d", 6));
 	_GLOBAL.fWorldAlpha = 1.f;
 
 	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, _GLOBAL.lpPlayers)
+	{
 		(*ppPlayer)->SetCurrentBlock(_GLOBAL.pActiveMap->GetSpawnBlock((*ppPlayer)->GetType()));
+		(*ppPlayer)->SetLogicType(PlayerLogicType_AI);
+	}
 
-	_GLOBAL.pActivePlayer = _GLOBAL.lpPlayers.back();
+	_GLOBAL.pActivePlayer = _GLOBAL.lpPlayers.front();
+	_GLOBAL.pActivePlayer->SetLogicType(PlayerLogicType_Local);
 
 	RenderManager::Add(LayerIndex_Background, &m_Background);
 	RenderManager::Add(LayerIndex_Map, _GLOBAL.pActiveMap);
@@ -220,6 +224,8 @@ void CGameScreen::Update()
 	{
 		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, _GLOBAL.lpPlayers)
 		{
+			//_GLOBAL.pActivePlayer->SetLogicType(PlayerLogicType_AI);
+
 			if (_GLOBAL.pActivePlayer == *ppPlayer)
 			{
 				if (*ppPlayer == _GLOBAL.lpPlayers.back())
@@ -231,6 +237,8 @@ void CGameScreen::Update()
 					_GLOBAL.pActivePlayer = *ppPlayer;
 					_GLOBAL.fWorldAlpha = 1.f;
 				}
+
+				//_GLOBAL.pActivePlayer->SetLogicType(PlayerLogicType_Local); 
 			}
 		}
 	}
