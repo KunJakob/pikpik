@@ -96,3 +96,23 @@
 		.Offset 2 2
 	}
 }
+
+.Font "Menu-Session-Title"
+{
+	.File "Font\ShowcardGothic_36.fnt"
+	.Scale 0.67
+	.Colour 228 217 191
+	
+	.Shadow 
+	{ 
+		.Colour 71 59 33
+		.Offset 2 2
+	}
+}
+
+.Font "Menu-Session-Info"
+{
+	.File "Font\ShowcardGothic_36.fnt"
+	.Scale 0.36
+	.Colour 71 59 33
+}

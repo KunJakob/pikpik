@@ -65,6 +65,7 @@ enum t_ElementType
 	ElementType_Scroll,
 	ElementType_TextLink,
 	ElementType_MenuLink,
+	ElementType_SessionBox,
 	/*MAX*/ElementType_Max,
 };
 

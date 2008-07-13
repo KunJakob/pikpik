@@ -35,6 +35,7 @@
 // Predeclare.
 class CStatusBox;
 class CJoinInterface;
+class CSessionBox;
 
 // The lobby state.
 enum t_LobbyState
@@ -70,7 +71,7 @@ class CNetworkPlayerInfo
 {
 public:
 	// The player's nickname/gamertag with a terminating NULL.
-	char cNickname[_MAXNICKLEN];
+	char cNickname[_MAXNAMELEN];
 };
 
 //##############################################################################
@@ -83,6 +84,9 @@ public:
 class CLobbyScreen : public CScreen
 {
 public:
+	// Friends.
+	friend class CSessionBox;
+
 	// Initialise.
 	CLobbyScreen();
 
@@ -111,23 +115,23 @@ public:
 	void QuitCheck();
 
 protected:
-	// Set the internal state.
-	void SetState(t_LobbyState iState);
+	// Update the main lobby screen.
+	void UpdateLobby();
 
 	// Render the session list.
 	void RenderList();
+
+	// Render the main lobby screen.
+	void RenderLobby();
+
+	// Set the internal state.
+	void SetState(t_LobbyState iState);
 
 	// Create a new lobby and act as the host.
 	void CreateLobby();
 
 	// Join an existing lobby and act as a client.
 	void JoinLobby(const xchar* pHostAddress);
-
-	// Update the main lobby screen.
-	void UpdateLobby();
-
-	// Render the main lobby screen.
-	void RenderLobby();
 
 	// Close the lobby down and disconnect from the network.
 	void CloseLobby();
@@ -168,6 +172,9 @@ protected:
 	// Callback for when a lobby packet is received.
 	void OnReceivePlayerInfo(CNetworkPeer* pFrom, BitStream* pStream);
 
+	// Delete any session box instances we have.
+	void DeleteSessionBoxes();
+
 	// The lobby startup mode.
 	t_LobbyStartMode m_iStartMode;
 
@@ -186,6 +193,9 @@ protected:
 	// The status box.
 	CStatusBox* m_pStatusBox;
 
+	// The session list object.
+	CSessionBox* m_pSessionBoxes[MATCH_SESSION_LIMIT];
+
 	// The lobby peer font.
 	CFont* m_pPeerFont;
 
@@ -194,6 +204,9 @@ protected:
 
 	// The session list.
 	CSession* m_pSessionList;
+
+	// The ping timer.
+	Tools::CTimer m_xPingTimer;
 };
 
 //##############################################################################
@@ -302,6 +315,45 @@ protected:
 
 	// The join screen join button.
 	CButtonComponent* m_pJoinButton;
+};
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                 SESSION BOX
+//
+//##############################################################################
+class CSessionBox : CImageComponent
+{
+public:
+	// Friends.
+	friend class CLobbyScreen;
+
+	// Constructor.
+	CSessionBox(xint iIndex, CSession* pSession);
+
+	// Destructor.
+	virtual ~CSessionBox();
+
+	// Render the element.
+	virtual void Render();
+
+protected:
+	// Triggered when the left mouse-button is released within the element area.
+	virtual void OnMouseUp(xpoint xPosition);
+
+	// The title font.
+	CFont* m_pTitleFont;
+
+	// The info font.
+	CFont* m_pInfoFont;
+
+	// The index of the session box.
+	xint m_iIndex;
+		
+	// The session bound to this box.
+	CSession* m_pSession;
 };
 
 //##############################################################################

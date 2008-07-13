@@ -39,6 +39,9 @@
 // The number of rows to retrieve when listing sessions.
 #define MATCH_SESSION_LIMIT 8
 
+// The interval to ping the session at to keep it alive.
+#define MATCH_PING_INTERVAL 15000
+
 //##############################################################################
 
 //##############################################################################

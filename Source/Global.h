@@ -73,8 +73,11 @@
 #define _SRECT				xrect(0, 0, _SWIDTH, _SHEIGHT)
 
 // Game options.
+#define _GID				"PikPik-1"
+#define _HOSTPORT			20557
 #define _MAXPLAYERS			5
 #define _MAXNAMELEN			15
+#define _MAXNAMECHARS		16
 
 // Shortcuts.
 #define _GLOBAL				CGlobal::Get()
@@ -85,14 +88,6 @@
 #define _TIMEDELTA			Application::GetTimeDelta()
 #define _TIMEDELTAF			_HGE->Timer_GetDelta()
 #define _LOCALE(NAME)		_GLOBAL.pLocale->GetProperty(NAME)->GetString()
-
-// Matchmaking.
-#define _GID				"PikPik-1"
-
-// Network.
-#define _HOSTPORT			20557
-#define _MAXNICKLEN			16
-#define _MAXNICKCHARS		15
 
 // Colour manipulations.
 #define COLOURF(COLF)		(xuchar)((COLF) * 255.f)

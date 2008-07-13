@@ -83,6 +83,7 @@ void CMenuScreen::Load()
 	Interface.SetCursor(ElementType_Button, _SPRITE("Cursor-Click"));
 	Interface.SetCursor(ElementType_Input, _SPRITE("Cursor-Write"));
 	Interface.SetCursor(ElementType_MenuLink, _SPRITE("Cursor-Click"));
+	Interface.SetCursor(ElementType_SessionBox, _SPRITE("Cursor-Click"));
 
 	// Initialise the menu links.
 	CMenuLink* pLinkList[] = 
@@ -116,7 +117,7 @@ void CMenuScreen::Load()
 
 	for (xuint iGroup = 0; iGroup < MenuGroupIndex_Max; ++iGroup)
 	{
-		xuint iElementCount = m_lpMenuLinks[iGroup].size();
+		xuint iElementCount = (xuint)m_lpMenuLinks[iGroup].size();
 		xuint iElement = 0;
 
 		XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[iGroup])

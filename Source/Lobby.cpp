@@ -62,6 +62,10 @@ void CLobbyScreen::Load()
 
 	// Initialise components.
 	m_pJoinInterface->m_pAddressBox->SetText("127.0.0.1");
+
+	// Session list.
+	for (xint iA = 0; iA < MATCH_SESSION_LIMIT; ++iA)
+		m_pSessionBoxes[iA] = NULL;
 }
 
 // =============================================================================
@@ -73,6 +77,40 @@ void CLobbyScreen::Unload()
 	delete m_pStatusBox;
 
 	delete m_pPeerFont;
+
+	DeleteSessionBoxes();
+}
+
+// =============================================================================
+// Nat Ryall                                                         17-Jun-2008
+// =============================================================================
+void CLobbyScreen::QuitCheck()
+{
+	if (_HGE->Input_KeyUp(HGEK_ESCAPE))
+	{
+		switch (m_iState)
+		{
+		case LobbyState_List:
+		case LobbyState_Join:
+			{
+				SetState(LobbyState_None);
+				ScreenManager::Pop();
+			}
+			break;
+
+		case LobbyState_Lobby:
+			{
+				if (m_bPublic && Network.m_bHosting)
+				{
+					Match.CloseSession(m_pSession, xbind(this, &CLobbyScreen::OnCloseSessionCompleted));
+					SetState(LobbyState_Closing);
+				}
+				else
+					CloseLobby();
+			}
+			break;
+		}
+	}
 }
 
 // =============================================================================
@@ -88,6 +126,24 @@ void CLobbyScreen::Update()
 	case LobbyState_Lobby:
 		UpdateLobby();
 		break;
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         17-Jun-2008
+// =============================================================================
+void CLobbyScreen::UpdateLobby()
+{
+	if (!Match.IsBusy())
+	{
+		if (Network.m_bHosting)
+		{
+			if (m_xPingTimer.IsExpired())
+			{
+				Match.PingSession(m_pSession, NULL);
+				m_xPingTimer.ExpireAfter(MATCH_PING_INTERVAL);
+			}
+		}
 	}
 }
 
@@ -111,10 +167,33 @@ void CLobbyScreen::Render()
 }
 
 // =============================================================================
+// Nat Ryall                                                         09-Jul-2008
+// =============================================================================
+void CLobbyScreen::RenderList()
+{	
+}
+
+// =============================================================================
+// Nat Ryall                                                         17-Jun-2008
+// =============================================================================
+void CLobbyScreen::RenderLobby()
+{
+	xint iPeerOffset = 0;
+
+	XEN_LIST_FOREACH(t_NetworkPeerList, ppPeer, Network.m_lpPeers)
+	{
+		m_pPeerFont->Render(XFORMAT("Peer #%d", (*ppPeer)->m_iID), xpoint(50, 50 + iPeerOffset), HGETEXT_LEFT);
+		iPeerOffset += 40;
+	}
+}
+
+// =============================================================================
 // Nat Ryall                                                         09-Jun-2008
 // =============================================================================
 void CLobbyScreen::Start(t_LobbyStartMode iStartMode)
 {
+	m_xPingTimer.Reset();
+	
 	m_bPublic = (iStartMode == LobbyStartMode_JoinPublic || iStartMode == LobbyStartMode_CreatePublic);
 	m_pSession = NULL;
 
@@ -167,6 +246,13 @@ void CLobbyScreen::SetState(t_LobbyState iState)
 
 	switch (iState)
 	{
+	case LobbyState_List:
+		{
+			for (int iA = 0; iA < m_iSessionCount; ++iA)
+				Interface.GetScreen()->Attach(m_pSessionBoxes[iA]);
+		}
+		break;
+
 	case LobbyState_Searching:
 		{
 			m_pStatusBox->AttachElements();
@@ -223,52 +309,6 @@ void CLobbyScreen::SetState(t_LobbyState iState)
 }
 
 // =============================================================================
-// Nat Ryall                                                         17-Jun-2008
-// =============================================================================
-void CLobbyScreen::QuitCheck()
-{
-	if (_HGE->Input_KeyUp(HGEK_ESCAPE))
-	{
-		switch (m_iState)
-		{
-		case LobbyState_List:
-		case LobbyState_Join:
-			{
-				SetState(LobbyState_None);
-				ScreenManager::Pop();
-			}
-			break;
-		
-		case LobbyState_Lobby:
-			{
-				if (m_bPublic && Network.m_bHosting)
-				{
-					Match.CloseSession(m_pSession, xbind(this, &CLobbyScreen::OnCloseSessionCompleted));
-					SetState(LobbyState_Closing);
-				}
-				else
-					CloseLobby();
-			}
-			break;
-		}
-	}
-}
-
-// =============================================================================
-// Nat Ryall                                                         09-Jul-2008
-// =============================================================================
-void CLobbyScreen::RenderList()
-{
-	for (xint iA = 0; iA < m_iSessionCount; ++iA)
-	{
-		CSession* pSession = &m_pSessionList[iA];
-
-		_GLOBAL.pGameFont->Render(pSession->m_sSessionID.c_str(), xpoint(10, 10 + (iA * 20)), HGETEXT_LEFT);
-		_GLOBAL.pGameFont->Render(XFORMAT("%d/%d Slots", pSession->m_iUsedSlots, pSession->m_iTotalSlots), xpoint(350, 10 + (iA * 20)), HGETEXT_LEFT);
-	}
-}
-
-// =============================================================================
 // Nat Ryall                                                         10-Jul-2008
 // =============================================================================
 void CLobbyScreen::CreateLobby()
@@ -305,28 +345,6 @@ void CLobbyScreen::JoinLobby(const xchar* pHostAddress)
 }
 
 // =============================================================================
-// Nat Ryall                                                         17-Jun-2008
-// =============================================================================
-void CLobbyScreen::UpdateLobby()
-{
-}
-
-// =============================================================================
-// Nat Ryall                                                         17-Jun-2008
-// =============================================================================
-void CLobbyScreen::RenderLobby()
-{
-	// Render the peer list.
-	xint iPeerOffset = 0;
-
-	XEN_LIST_FOREACH(t_NetworkPeerList, ppPeer, Network.m_lpPeers)
-	{
-		m_pPeerFont->Render(XFORMAT("Peer_%02d", (*ppPeer)->m_iID), xpoint(50, 50 + iPeerOffset), HGETEXT_LEFT);
-		iPeerOffset += 40;
-	}
-}
-
-// =============================================================================
 // Nat Ryall                                                         10-Jul-2008
 // =============================================================================
 void CLobbyScreen::CloseLobby()
@@ -349,8 +367,13 @@ void CLobbyScreen::OnListSessionsCompleted(t_MatchResultError iError, xint iSess
 {
 	if (iError == MatchResultError_Success)
 	{
+		DeleteSessionBoxes();
+
 		m_iSessionCount = iSessionCount;
 		m_pSessionList = pSessions;
+
+		for (xint iA = 0; iA < iSessionCount; ++iA)
+			m_pSessionBoxes[iA] = new CSessionBox(iA, &m_pSessionList[iA]);
 
 		SetState(LobbyState_List);
 	}
@@ -445,6 +468,21 @@ void CLobbyScreen::OnReceivePlayerInfo(CNetworkPeer* pFrom, BitStream* pStream)
 	XLOG("[LobbyScreen] Received player info from peer #%d.", pFrom->m_iID);
 }
 
+// =============================================================================
+// Nat Ryall                                                         13-Jul-2008
+// =============================================================================
+void CLobbyScreen::DeleteSessionBoxes()
+{
+	for (xint iA = 0; iA < MATCH_SESSION_LIMIT; ++iA)
+	{
+		if (m_pSessionBoxes[iA])
+		{
+			delete m_pSessionBoxes[iA];
+			m_pSessionBoxes[iA] = NULL;
+		}
+	}
+}
+
 //##############################################################################
 
 //##############################################################################
@@ -524,6 +562,69 @@ CJoinInterface::~CJoinInterface()
 
 	Interface.GetScreen()->Detach(m_pJoinButton);
 	delete m_pJoinButton;
+}
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                 SESSION BOX
+//
+//##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                         13-Jul-2008
+// =============================================================================
+CSessionBox::CSessionBox(xint iIndex, CSession* pSession) : CImageComponent(_SPRITE("Menu-Session")),
+	m_iIndex(iIndex),
+	m_pSession(pSession)
+{
+	m_iType = ElementType_SessionBox;
+
+	m_pTitleFont = new CFont(_FONT("Menu-Session-Title"));
+	m_pInfoFont = new CFont(_FONT("Menu-Session-Info"));
+
+	xpoint xSize = m_pSprite->GetImageSize();
+	SetPosition(xpoint(_HSWIDTH - (xSize.iX / 2), 40 + (m_iIndex * (xSize.iY + 10))));
+}
+
+// =============================================================================
+// Nat Ryall                                                         13-Jul-2008
+// =============================================================================
+CSessionBox::~CSessionBox()
+{
+	delete m_pTitleFont;
+	delete m_pInfoFont;
+}
+
+// =============================================================================
+// Nat Ryall                                                         13-Jul-2008
+// =============================================================================
+void CSessionBox::Render()
+{
+	CImageComponent::Render();
+
+	m_pTitleFont->Render
+	(
+		m_pSession->m_sTitle.c_str(), 
+		m_pSprite->GetMetadata()->FindArea("Title")->xRect + GetPosition(), 
+		HGETEXT_CENTER | HGETEXT_MIDDLE
+	);
+
+	m_pInfoFont->Render
+	(
+		XFORMAT("%d Playing", m_pSession->m_iUsedSlots), 
+		m_pSprite->GetMetadata()->FindArea("Info")->xRect + GetPosition(), 
+		HGETEXT_CENTER | HGETEXT_MIDDLE
+	);
+}
+
+// =============================================================================
+// Nat Ryall                                                         13-Jul-2008
+// =============================================================================
+void CSessionBox::OnMouseUp(xpoint xPosition)
+{
+	_GLOBAL.pLobby->JoinLobby(m_pSession->m_sIP.c_str());
 }
 
 //##############################################################################

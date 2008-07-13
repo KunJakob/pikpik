@@ -235,8 +235,8 @@
 
 .Sprite "Menu-Session"
 {
-	.File "Surfaces\Menu-Status.png"
+	.File "Surfaces\Menu-Session.png"
 	
-	.HotSpot "Name"			{ .Point 0  0 .Info "Centre" }
-	.HotSpot "Info"			{ .Point 0 40 .Info "Centre" } 
+	.Area "Title"			{ .Rect 20  7 490 35 }
+	.Area "Info"			{ .Rect 20 45 490 61 }
 }

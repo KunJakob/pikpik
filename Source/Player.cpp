@@ -255,16 +255,23 @@ void CPlayer::LogicAI()
 		iRealDirection[iA] = (t_MoveDirection)((m_iMoveDir + iA + 3) % MoveDirection_Max);
 		pMoveDirection[iA] = _GLOBAL.pActiveMap->GetAdjacentBlock((t_AdjacentDir)iRealDirection[iA], m_pCurrentBlock);
 
-		if (!pMoveDirection[iA]->IsWall())
+		if (IsPassable(pMoveDirection[iA]))
 			iDirectionCount++;
 		else
 			pMoveDirection[iA] = NULL;		
 	}
 
-	// Reverse if we're at a dead end.
+	// If we have no choice, 
 	if (iDirectionCount == 1)
 	{
-		Move((t_MoveDirection)((m_iMoveDir + 2) % MoveDirection_Max));
+		for (xint iA = 0; iA < MoveDirection_Max; ++iA)
+		{
+			if (pMoveDirection[iA])
+			{
+				Move(iRealDirection[iA]);
+				break;
+			}
+		}
 	}
 	// Otherwise pick a random path to move down.
 	else
@@ -429,7 +436,7 @@ void CGhost::Render()
 	CPlayer::Render();
 
 	m_pEyes->SetPosition(m_pSprite->GetPosition());
-	m_pEyes->SetAlpha(m_pSprite->GetAlpha());
+	m_pEyes->SetAlpha(Math::Clamp((m_pSprite->GetAlpha() * 3.f - 1.f), 0.f, 1.f));
 	m_pEyes->Render();
 }
 

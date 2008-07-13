@@ -289,6 +289,14 @@ public:
 	}
 
 	/**
+	* Get the width and height of the image.
+	*/
+	XPOINT GetImageSize()
+	{
+		return XPOINT(GetImageWidth(), GetImageHeight());
+	}
+
+	/**
 	* Get the rect of the entire sprite image.
 	*/
 	XRECT GetImageRect()

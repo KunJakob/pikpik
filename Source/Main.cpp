@@ -162,8 +162,8 @@ void Application::Initialise()
 
 	// Create all the available players.
 	_GLOBAL.lpPlayers.push_back(new CPacman());
-	_GLOBAL.lpPlayers.push_back(new CGhost(0xFF40F0F0));
-	_GLOBAL.lpPlayers.push_back(new CGhost(0xFFF0F040));
+	//_GLOBAL.lpPlayers.push_back(new CGhost(0xFF40F0F0));
+	//_GLOBAL.lpPlayers.push_back(new CGhost(0xFFF0F040));
 	_GLOBAL.lpPlayers.push_back(new CGhost(0xFFF040F0));
 
 	// Initialise the matchmaking system.

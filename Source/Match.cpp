@@ -111,7 +111,7 @@ t_MatchResultError CMatchResult::ProcessResult(const xchar* pResult)
 
 		// Copy the result string into internal memory so that we can manipulate it.
 		xchar* pLocalResult = NULL;
-		xint iResultLen = strlen(pResult);
+		xint iResultLen = (xint)strlen(pResult);
 
 		if (iResultLen)
 		{
@@ -570,7 +570,7 @@ void CMatch::ProcessError(t_MatchResultError iError)
 xstring CMatch::GenerateSessionID()
 {
 	static const xchar* s_pChars = "0123456789ABCDEF";
-	static const xint s_iNumChars = strlen(s_pChars);
+	static const xint s_iNumChars = (xint)strlen(s_pChars);
 
 	xstring sSessionID = "";
 

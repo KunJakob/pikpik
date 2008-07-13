@@ -168,8 +168,8 @@ void CGameScreen::Load()
 		(*ppPlayer)->SetLogicType(PlayerLogicType_AI);
 	}
 
-	_GLOBAL.pActivePlayer = _GLOBAL.lpPlayers.front();
-	_GLOBAL.pActivePlayer->SetLogicType(PlayerLogicType_Local);
+	_GLOBAL.pActivePlayer = _GLOBAL.lpPlayers.back();
+	_GLOBAL.pActivePlayer->SetLogicType(PlayerLogicType_AI);
 
 	RenderManager::Add(LayerIndex_Background, &m_Background);
 	RenderManager::Add(LayerIndex_Map, _GLOBAL.pActiveMap);
