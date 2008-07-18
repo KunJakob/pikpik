@@ -126,6 +126,7 @@ void CMenuScreen::Load()
 
 	// Initialise transition variables.
 	m_iState = MenuState_None;
+	m_iMenuGroup = MenuGroupIndex_None;
 	m_iPendingMenuGroup = MenuGroupIndex_None;
 	m_iLastMenuGroup = MenuGroupIndex_Main;
 	m_iNextScreen = ScreenIndex_Invalid;
@@ -241,6 +242,16 @@ void CMenuScreen::ShowNextScreen()
 		}
 
 		m_iNextScreen = ScreenIndex_Invalid;
+
+		return;
+	}
+
+	if (m_iPendingMenuGroup != MenuGroupIndex_None)
+	{
+		AttachMenuGroup(m_iPendingMenuGroup);
+
+		m_iState = MenuState_TransitionIn;
+		m_iPendingMenuGroup = MenuGroupIndex_None;
 	}
 }
 
@@ -268,15 +279,6 @@ void CMenuScreen::SetMenuGroup(t_MenuGroupIndex iMenuGroup)
 	}
 
 	m_iPendingMenuGroup = iMenuGroup;*/
-
-	// On TransitionOut
-	/*if (m_iPendingMenuGroup != MenuGroupIndex_None)
-	{
-		AttachMenuGroup(m_iPendingMenuGroup);
-
-		m_iState = MenuState_TransitionIn;
-		m_iPendingMenuGroup = MenuGroupIndex_None;
-	}*/
 }
 
 // =============================================================================

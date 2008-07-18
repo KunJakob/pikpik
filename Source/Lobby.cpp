@@ -100,7 +100,7 @@ void CLobbyScreen::QuitCheck()
 
 		case LobbyState_Lobby:
 			{
-				if (m_bPublic && Network.m_bHosting)
+				if (m_bPublic && Network.IsHosting())
 				{
 					Match.CloseSession(m_pSession, xbind(this, &CLobbyScreen::OnCloseSessionCompleted));
 					SetState(LobbyState_Closing);
@@ -136,7 +136,7 @@ void CLobbyScreen::UpdateLobby()
 {
 	if (m_pSession && !Match.IsBusy())
 	{
-		if (Network.m_bHosting)
+		if (Network.IsHosting())
 		{
 			if (m_xPingTimer.IsExpired())
 			{
@@ -180,11 +180,13 @@ void CLobbyScreen::RenderLobby()
 {
 	xint iPeerOffset = 0;
 
-	XEN_LIST_FOREACH(t_NetworkPeerList, ppPeer, Network.m_lpPeers)
+	XEN_LIST_FOREACH(t_NetworkPeerList, ppPeer, Network.GetPeers())
 	{
 		m_pPeerFont->Render(XFORMAT("Peer #%d", (*ppPeer)->m_iID), xpoint(50, 50 + iPeerOffset), HGETEXT_LEFT);
 		iPeerOffset += 40;
 	}
+
+	_GLOBAL.pGameFont->Render(XFORMAT("Ping:  %d", Network.GetLastPing()), xpoint(_SWIDTH - 100, 50), HGETEXT_LEFT);
 }
 
 // =============================================================================
@@ -349,7 +351,7 @@ void CLobbyScreen::JoinLobby(const xchar* pHostAddress)
 // =============================================================================
 void CLobbyScreen::CloseLobby()
 {
-	if (m_bPublic || Network.m_bHosting)
+	if (m_bPublic || Network.IsHosting())
 	{
 		SetState(LobbyState_None);
 		ScreenManager::Pop();

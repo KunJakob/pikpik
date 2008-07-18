@@ -351,6 +351,17 @@ void CNetwork::DisconnectPeer(CNetworkPeer* pPeer)
 }
 
 // =============================================================================
+// Nat Ryall                                                         18-Jul-2008
+// =============================================================================
+xint CNetwork::GetLastPing()
+{
+	if (m_bHosting || !m_pHostPeer)
+		return -1;
+	else
+		return m_pInterface->GetLastPing(m_pHostPeer->m_xAddress);
+}
+
+// =============================================================================
 // Nat Ryall                                                         09-Jun-2008
 // =============================================================================
 CNetworkPeer* CNetwork::CreatePeer()
@@ -512,6 +523,8 @@ void CNetwork::ProcessClientNotifications(xchar cIdentifier, Packet* pPacket, xu
 	// Client successfully/unsuccessfully connected to the host.
 	case ID_CONNECTION_REQUEST_ACCEPTED:
 		{
+			m_bConnected = true;
+
 			m_pHostPeer = CreatePeer();
 
 			m_pHostPeer->m_bHost = true;
@@ -529,6 +542,8 @@ void CNetwork::ProcessClientNotifications(xchar cIdentifier, Packet* pPacket, xu
 
 	case ID_CONNECTION_ATTEMPT_FAILED:
 		{
+			m_bConnected = false;
+
 			if (m_xCallbacks.m_fpConnectionCompleted)
 				m_xCallbacks.m_fpConnectionCompleted(false);
 		}
@@ -539,6 +554,8 @@ void CNetwork::ProcessClientNotifications(xchar cIdentifier, Packet* pPacket, xu
 	case ID_CONNECTION_LOST:
 		{
 			// Destroy all existing peers.
+
+			m_bConnected = false;
 
 			if (m_xCallbacks.m_fpConnectionLost)
 				m_xCallbacks.m_fpConnectionLost();

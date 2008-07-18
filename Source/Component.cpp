@@ -221,9 +221,9 @@ void CInputComponent::OnMouseDown(xpoint xPosition)
 		}
 
 		if (iWidth > iTarget && iTarget - iLastWidth < iWidth - iTarget)
-			m_iCharOffset = xCheckString.length() - 1;
+			m_iCharOffset = (xint)xCheckString.length() - 1;
 		else
-			m_iCharOffset = xCheckString.length();
+			m_iCharOffset = (xint)xCheckString.length();
 	}
 }
 

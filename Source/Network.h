@@ -135,26 +135,47 @@ public:
 	// Forcefully disconnect a peer from the local machine. Valid only on the host.
 	void DisconnectPeer(CNetworkPeer* pPeer);
 
-	// The local interface.
-	RakPeerInterface* m_pInterface;
+	// Get the last ping time to the host or -1 if we are the host or disconnected.
+	xint GetLastPing();
+
+	// Get a pointer to the internal raknet interface.
+	inline RakPeerInterface* GetInterface() 
+	{ 
+		return m_pInterface; 
+	}
+
+	// Get the current peer list.
+	inline t_NetworkPeerList& GetPeers() 
+	{ 
+		return m_lpPeers; 
+	}
+
+	// Get the local peer or NULL if there is no local peer.
+	inline CNetworkPeer* GetLocalPeer() 
+	{ 
+		return m_pLocalPeer; 
+	}
+
+	// Get the current host peer or NULL if not known.
+	inline CNetworkPeer* GetHostPeer() 
+	{ 
+		return m_pHostPeer; 
+	}
+
+	// Determine if the local machine is the host.
+	inline xbool IsHosting() 
+	{ 
+		return m_bHosting; 
+	}
+
+	// Determine if the local machine is connected to a host.
+	inline xbool IsConnected() 
+	{ 
+		return m_bConnected; 
+	}
 
 	// The network callbacks.
 	CNetworkCallbacks m_xCallbacks;
-
-	// The network peer list.
-	t_NetworkPeerList m_lpPeers;
-
-	// The local peer.
-	CNetworkPeer* m_pLocalPeer;
-
-	// The host peer.
-	CNetworkPeer* m_pHostPeer;
-
-	// Determines if the local machine is the host.
-	xbool m_bHosting;
-
-	// Determines if we are connected to a remote machine.
-	xbool m_bConnected;
 
 protected:
 	// Relay a data packet from the host machine to all other peers on behalf of the sending peer.
@@ -186,6 +207,24 @@ protected:
 
 	// Find an exisiting peer by peer ID.
 	CNetworkPeer* FindPeer(xint iPeerID);
+
+	// The local interface.
+	RakPeerInterface* m_pInterface;
+
+	// The network peer list.
+	t_NetworkPeerList m_lpPeers;
+
+	// The local peer.
+	CNetworkPeer* m_pLocalPeer;
+
+	// The host peer.
+	CNetworkPeer* m_pHostPeer;
+
+	// Determines if the local machine is the host.
+	xbool m_bHosting;
+
+	// Determines if we are connected to a remote machine.
+	xbool m_bConnected;
 
 	// The array of callback type bindings.
 	t_fpStreamReceived m_fpReceiveCallbacks[256];
