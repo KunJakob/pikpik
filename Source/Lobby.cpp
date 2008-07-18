@@ -134,7 +134,7 @@ void CLobbyScreen::Update()
 // =============================================================================
 void CLobbyScreen::UpdateLobby()
 {
-	if (!Match.IsBusy())
+	if (m_pSession && !Match.IsBusy())
 	{
 		if (Network.m_bHosting)
 		{

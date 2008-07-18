@@ -52,13 +52,13 @@ enum t_MenuGroupIndex
 	/*MAX*/MenuGroupIndex_Max,
 };
 
-// The different transition states.
-enum t_MenuElementState
+// The menu states.
+enum t_MenuState
 {
-	MenuElementState_None = -1,
-	MenuElementState_In,
-	MenuElementState_Normal,
-	MenuElementState_Out,
+	MenuState_None = -1,
+	MenuState_TransitionIn,
+	MenuState_Idle,
+	MenuState_TransitionOut,
 };
 
 // Lists.
@@ -125,16 +125,22 @@ public:
 	// Called each frame to update the screen when active.
 	virtual void Update();
 
+	// Show any pending screens.
+	void ShowNextScreen();
+
 	// Called each frame to render the screen when active.
 	virtual void Render();
 
 	// Called when a game-specific event is executed when active.
 	virtual void Notify(XIN xuint iEventType, XIN void* pEventInfo) {}
 
-	// Set the menu group to render.
+	// Set the menu group to use.
 	void SetMenuGroup(t_MenuGroupIndex iMenuGroup);
 
 protected:
+	// Detach all links and add specific elements corresponding to the specified menu group.
+	void AttachMenuGroup(t_MenuGroupIndex iMenuGroup);
+
 	// Menu link actions.
 	void Callback_ShowMainMenu();
 	void Callback_ShowOnlineMenu();
@@ -146,6 +152,9 @@ protected:
 	void Callback_CreatePrivate();
 	void Callback_StartGame();
 	void Callback_QuitGame();
+
+	// The current menu state.
+	t_MenuState m_iState;
 
 	// The font metadata to render the links with.
 	CFontMetadata* m_pMenuDefault;
@@ -164,6 +173,9 @@ protected:
 
 	// The currently active menu group.
 	t_MenuGroupIndex m_iMenuGroup;
+
+	// The pending menu group for transitions.
+	t_MenuGroupIndex m_iPendingMenuGroup;
 
 	// The last active menu group.
 	t_MenuGroupIndex m_iLastMenuGroup;

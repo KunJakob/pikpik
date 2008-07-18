@@ -125,8 +125,9 @@ void CMenuScreen::Load()
 	}
 
 	// Initialise transition variables.
+	m_iState = MenuState_None;
+	m_iPendingMenuGroup = MenuGroupIndex_None;
 	m_iLastMenuGroup = MenuGroupIndex_Main;
-
 	m_iNextScreen = ScreenIndex_Invalid;
 	m_iLobbyMode = LobbyStartMode_CreatePrivate;
 }
@@ -158,6 +159,7 @@ void CMenuScreen::Wake()
 void CMenuScreen::Sleep()
 {
 	m_iLastMenuGroup = m_iMenuGroup;
+
 	SetMenuGroup(MenuGroupIndex_None);
 }
 
@@ -187,18 +189,28 @@ void CMenuScreen::Update()
 	}
 
 	// Transition or update this screen.
-	if (m_iNextScreen != ScreenIndex_Invalid)
+	switch (m_iState)
 	{
-		ScreenManager::Push(m_iNextScreen);
-
-		switch (m_iNextScreen)
+	case MenuState_None:
 		{
-		case ScreenIndex_LobbyScreen:
-			_GLOBAL.pLobby->Start(m_iLobbyMode);
-			break;
+			ShowNextScreen();
 		}
+		break;
 
-		m_iNextScreen = ScreenIndex_Invalid;
+	case MenuState_TransitionIn:
+		{
+		}
+		break;
+
+	case MenuState_Idle:
+		{
+		}
+		break;
+
+	case MenuState_TransitionOut:
+		{
+		}
+		break;
 	}
 
 	m_pBackground->Update();
@@ -213,9 +225,64 @@ void CMenuScreen::Render()
 }
 
 // =============================================================================
+// Nat Ryall                                                         17-Jul-2008
+// =============================================================================
+void CMenuScreen::ShowNextScreen()
+{
+	if (m_iNextScreen != ScreenIndex_Invalid)
+	{
+		ScreenManager::Push(m_iNextScreen);
+
+		switch (m_iNextScreen)
+		{
+		case ScreenIndex_LobbyScreen:
+			_GLOBAL.pLobby->Start(m_iLobbyMode);
+			break;
+		}
+
+		m_iNextScreen = ScreenIndex_Invalid;
+	}
+}
+
+// =============================================================================
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
 void CMenuScreen::SetMenuGroup(t_MenuGroupIndex iMenuGroup)
+{
+	AttachMenuGroup(iMenuGroup);
+
+	/*if (iMenuGroup != MenuGroupIndex_None)
+	{
+		if (m_iMenuGroup == MenuGroupIndex_None)
+		{
+			AttachMenuGroup(iMenuGroup);
+			m_iState = MenuState_TransitionIn;
+		}
+		else
+			m_iState = MenuState_TransitionOut;
+	}
+	else
+	{
+		if (m_iMenuGroup != MenuGroupIndex_None)
+			m_iState = MenuState_TransitionOut;
+	}
+
+	m_iPendingMenuGroup = iMenuGroup;*/
+
+	// On TransitionOut
+	/*if (m_iPendingMenuGroup != MenuGroupIndex_None)
+	{
+		AttachMenuGroup(m_iPendingMenuGroup);
+
+		m_iState = MenuState_TransitionIn;
+		m_iPendingMenuGroup = MenuGroupIndex_None;
+	}*/
+}
+
+// =============================================================================
+// Nat Ryall                                                         17-Jul-2008
+// =============================================================================
+void CMenuScreen::AttachMenuGroup(t_MenuGroupIndex iMenuGroup)
 {
 	Interface.GetScreen()->DetachAll();
 
