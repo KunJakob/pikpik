@@ -62,7 +62,7 @@ enum t_MenuElementState
 };
 
 // Lists.
-typedef XLIST<CMenuLink*> t_MenuLinkList;
+typedef xlist<CMenuLink*> t_MenuLinkList;
 
 //##############################################################################
 #pragma endregion
@@ -82,7 +82,7 @@ public:
 	friend CMenuScreen;
 
 	// Constructor.
-	CMenuLink(XUINT iGroupIndex, CFontMetadata* pFont, const XCHAR* pText, t_fpLinkSelectedCallback fpCallback = NULL);
+	CMenuLink(xuint iGroupIndex, CFontMetadata* pFont, const xchar* pText, t_fpLinkSelectedCallback fpCallback = NULL);
 
 	// Destructor.
 	virtual ~CMenuLink() {}

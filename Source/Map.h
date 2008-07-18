@@ -51,18 +51,18 @@ enum t_TileType
 };
 
 // Adjacent direction.
-enum t_AdjacentDir
+enum t_AdjacentDirection
 {
-	AdjacentDir_None = -1,
-	AdjacentDir_Left,
-	AdjacentDir_Up,
-	AdjacentDir_Right,
-	AdjacentDir_Down,
-	/*MAX*/AdjacentDir_Max,
+	AdjacentDirection_None = -1,
+	AdjacentDirection_Left,
+	AdjacentDirection_Up,
+	AdjacentDirection_Right,
+	AdjacentDirection_Down,
+	/*MAX*/AdjacentDirection_Max,
 };
 
 // Lists.
-typedef XVLIST<CMapBlock*> t_MapBlockList;
+typedef xvlist<CMapBlock*> t_MapBlockList;
 
 //##############################################################################
 #pragma endregion
@@ -83,13 +83,13 @@ public:
 	void Update();
 
 	// Check if the block is a wall tile.
-	XBOOL IsWall()
+	xbool IsWall()
 	{
 		return cChar == '#';
 	}
 
 	// Check if the block is part of a ghost base.
-	XBOOL IsBase()
+	xbool IsBase()
 	{
 		return iType == TileType_Entrance || iType == TileType_Base;
 	}
@@ -101,10 +101,10 @@ public:
 	}
 
 	// Check if the specified player can see this block.
-	XBOOL IsVisible(CPlayer* pPlayer);
+	xbool IsVisible(CPlayer* pPlayer);
 
 	// Get the screen position of a block.
-	XPOINT GetScreenPosition()
+	xpoint GetScreenPosition()
 	{
 		return xPosition * 48;
 	}
@@ -113,28 +113,28 @@ public:
 	void Eat();
 
 	// The block index for the parent map.
-	XUINT iIndex;
+	xuint iIndex;
 
 	// The original map char.
-	XCHAR cChar;
+	xchar cChar;
 
 	// The processed tile type.
 	t_TileType iType;
 
 	// The map rotation angle.
-	XFLOAT fAngle;
+	xfloat fAngle;
 
 	// The map block position.
-	XPOINT xPosition;
+	xpoint xPosition;
 
 	// The block "eaten" status.
-	XBOOL bEaten;
+	xbool bEaten;
 
 	// The "eaten" and "respawn" timer.
 	Tools::CTimer xTimer;
 
 	// The block visibility.
-	XFLOAT fVisibility;
+	xfloat fVisibility;
 
 	// The trap (if any) that is bound to this block.
 	CTrap* m_pTrap;
@@ -143,15 +143,15 @@ public:
 	CPower* m_pPower;
 
 	// The block adjacents.
-	CMapBlock* pAdjacents[AdjacentDir_Max];
+	CMapBlock* pAdjacents[AdjacentDirection_Max];
 
 protected:
 	/**
 	* Get the bit-index for the adjacent.
 	*/
-	XUINT GetBit(t_AdjacentDir iAdjacentDir)
+	xuint GetBit(t_AdjacentDirection iAdjacentDir)
 	{
-		return 1 << (XUINT)iAdjacentDir;
+		return 1 << (xuint)iAdjacentDir;
 	}
 };
 
@@ -173,7 +173,7 @@ public:
 	/**
 	* Create a new map from metadata.
 	*/
-	CMap(const XCHAR* pID);
+	CMap(const xchar* pID);
 
 	/**
 	* Clean up the map data on destruction.
@@ -193,7 +193,7 @@ public:
 	/**
 	* Get the name of the map as specified in the metadata.
 	*/
-	const XCHAR* GetName()
+	const xchar* GetName()
 	{
 		return m_pName;
 	}
@@ -201,7 +201,7 @@ public:
 	/**
 	* Get the block width of the map as specified in the metadata.
 	*/
-	XUINT GetWidth()
+	xuint GetWidth()
 	{
 		return m_iWidth;
 	}
@@ -209,7 +209,7 @@ public:
 	/**
 	* Get the block height of the map as specified in the metadata.
 	*/
-	XUINT GetHeight()
+	xuint GetHeight()
 	{
 		return m_iHeight;
 	}
@@ -217,7 +217,7 @@ public:
 	/**
 	* Set the map offset in pixels to begin the map render.
 	*/
-	void SetOffset(XPOINT xOffset)
+	void SetOffset(xpoint xOffset)
 	{
 		m_xOffset = xOffset;
 	}
@@ -225,7 +225,7 @@ public:
 	/**
 	* Get the current offset.
 	*/
-	XPOINT GetOffset()
+	xpoint GetOffset()
 	{
 		return m_xOffset;
 	}
@@ -233,7 +233,7 @@ public:
 	/**
 	* Get a map block by index.
 	*/
-	CMapBlock* GetBlock(XUINT iBlockIndex)
+	CMapBlock* GetBlock(xuint iBlockIndex)
 	{
 		XMASSERT(iBlockIndex < (m_iWidth * m_iHeight), "Block index requested is out of bounds.");
 		return &m_xBlocks[iBlockIndex];
@@ -242,7 +242,7 @@ public:
 	/**
 	* Get a map block by block position.
 	*/
-	CMapBlock* GetBlock(XPOINT xBlockPos)
+	CMapBlock* GetBlock(xpoint xBlockPos)
 	{
 		return GetBlock(xBlockPos.iX + (xBlockPos.iY * m_iWidth));
 	}
@@ -255,23 +255,23 @@ public:
 	/**
 	* Get a block in the adjacent direction to the specified block. This will wrap around the map if on the edge.
 	*/
-	CMapBlock* GetAdjacentBlock(t_AdjacentDir iAdjacentDir, CMapBlock* pBlock);
+	CMapBlock* GetAdjacentBlock(t_AdjacentDirection iAdjacentDir, CMapBlock* pBlock);
 
 protected:
 	/**
 	* Add the specified visibility to all valid paths from the specified block.
 	*/
-	void AddVisiblePaths(CMapBlock* pStartingBlock, XFLOAT fVisibility);
+	void AddVisiblePaths(CMapBlock* pStartingBlock, xfloat fVisibility);
 
 	// The map name.
-	const XCHAR* m_pName;
+	const xchar* m_pName;
 
 	// The map dimensions in blocks.
-	XUINT m_iWidth;
-	XUINT m_iHeight;
+	xuint m_iWidth;
+	xuint m_iHeight;
 
 	// The total number of blocks in the map.
-	XUINT m_iBlockCount;
+	xuint m_iBlockCount;
 
 	// The total number of pellets eaten.
 	xuint m_iPelletsEaten;
@@ -283,7 +283,7 @@ protected:
 	t_MapBlockList m_lpSpawnPoints[PlayerType_Max];	
 
 	// The current map offset in pixels.
-	XPOINT m_xOffset;
+	xpoint m_xOffset;
 
 	// The map colourisation.
 	xfloat m_fColours[3];

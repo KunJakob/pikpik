@@ -21,7 +21,7 @@
 // =============================================================================
 // Nat Ryall                                                         24-Apr-2008
 // =============================================================================
-CFontFile::CFontFile(const XCHAR* pFile) : CResourceFile(ResourceType_Font, pFile)
+CFontFile::CFontFile(const xchar* pFile) : CResourceFile(ResourceType_Font, pFile)
 {
 	pResource = new hgeFont(pFile);
 }
@@ -55,7 +55,7 @@ CFontMetadata::CFontMetadata(CDataset* pDataset) : CResourceMetadata(ResourceTyp
 	iColour = 0xFFFFFFFF;
 	fSpacing = 1.f;
 	fTracking = 0.f;
-	xShadowOffset = XPOINT();
+	xShadowOffset = xpoint();
 	iShadowColour = 0xFF000000;
 
 	if (_PROPERTY_EXISTS(pDataset, "Scale"))
@@ -111,11 +111,11 @@ void CFont::Render(const xchar* pString, xpoint xPosition, xuint iAlign, xfloat 
 	{
 		xpoint xShadowPosition = xPosition + m_pMetadata->xShadowOffset;
 
-		pFont->SetColor(SETA(m_pMetadata->iShadowColour, (XCHAR)(fAlpha * 255.f)));
+		pFont->SetColor(SETA(m_pMetadata->iShadowColour, (xchar)(fAlpha * 255.f)));
 		pFont->Render((xfloat)xShadowPosition.iX, (xfloat)xShadowPosition.iY, iAlign, pString);
 	}
 
-	pFont->SetColor(SETA(m_pMetadata->iColour, (XCHAR)(fAlpha * 255.f)));
+	pFont->SetColor(SETA(m_pMetadata->iColour, (xchar)(fAlpha * 255.f)));
 	pFont->Render((xfloat)xPosition.iX, (xfloat)xPosition.iY, iAlign, pString);
 }
 
@@ -134,11 +134,11 @@ void CFont::Render(const xchar* pString, xrect xRect, xuint iAlign, xfloat fAlph
 	{
 		xrect xShadowRect = xRect + m_pMetadata->xShadowOffset;
 
-		pFont->SetColor(SETA(m_pMetadata->iShadowColour, (XCHAR)(fAlpha * 255.f)));
+		pFont->SetColor(SETA(m_pMetadata->iShadowColour, (xchar)(fAlpha * 255.f)));
 		pFont->printfb((xfloat)xShadowRect.iLeft, (xfloat)xShadowRect.iTop, (xfloat)xShadowRect.Width(), (xfloat)xShadowRect.Height(), iAlign, pString);
 	}
 
-	pFont->SetColor(SETA(m_pMetadata->iColour, (XCHAR)(fAlpha * 255.f)));
+	pFont->SetColor(SETA(m_pMetadata->iColour, (xchar)(fAlpha * 255.f)));
 	pFont->printfb((xfloat)xRect.iLeft, (xfloat)xRect.iTop, (xfloat)xRect.Width(), (xfloat)xRect.Height(), iAlign, pString);
 }
 

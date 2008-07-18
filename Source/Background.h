@@ -45,7 +45,7 @@ public:
 	}
 
 	// The background colour.
-	XUINT iBackgroundColour;
+	xuint iBackgroundColour;
 };
 
 //##############################################################################
@@ -63,7 +63,7 @@ public:
 	/**
 	* Constructor.
 	*/
-	CBackgroundImage(const XCHAR* pSpriteName);
+	CBackgroundImage(const xchar* pSpriteName);
 
 	/**
 	* Destructor.
@@ -81,23 +81,23 @@ public:
 	virtual void Render();
 
 	// The interval to scroll at.
-	XUINT iScrollInterval;
+	xuint iScrollInterval;
 
 	// The background scrolling speed.
-	XPOINT xScrollVector;
+	xpoint xScrollVector;
 
 protected:
 	// The background sprite.
 	CBasicSprite* m_pSprite;
 
 	// The background sprite image area.
-	XRECT m_xArea;
+	xrect m_xArea;
 
 	// The internal timer used to scroll the background.
-	XUINT m_iTimer;
+	xuint m_iTimer;
 
 	// The menu scrolling offset.
-	XPOINT m_xOffset;
+	xpoint m_xOffset;
 };
 
 //##############################################################################

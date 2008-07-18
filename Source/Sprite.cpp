@@ -21,7 +21,7 @@
 // =============================================================================
 // Nat Ryall                                                         22-Apr-2008
 // =============================================================================
-CSpriteFile::CSpriteFile(const XCHAR* pFile) : CResourceFile(ResourceType_Sprite, pFile)
+CSpriteFile::CSpriteFile(const xchar* pFile) : CResourceFile(ResourceType_Sprite, pFile)
 {
 	HTEXTURE hTexture = _HGE->Texture_Load(pFile);
 	pResource = new hgeSprite(hTexture, 0.0f, 0.0f, (float)_HGE->Texture_GetWidth(hTexture), (float)_HGE->Texture_GetHeight(hTexture));
@@ -63,9 +63,9 @@ CSpriteMetadata::CSpriteMetadata(CDataset* pDataset) : CResourceMetadata(Resourc
 		if (_PROPERTY_EXISTS(pAreaDataset, "Rect"))
 			pArea->xRect = _PROPERTY->GetRect();
 		else if (_PROPERTY_EXISTS(pAreaDataset, "Size"))
-			pArea->xRect = XRECT(_PROPERTY->GetPoint(0), _PROPERTY->GetPoint(0) + _PROPERTY->GetPoint(1));
+			pArea->xRect = xrect(_PROPERTY->GetPoint(0), _PROPERTY->GetPoint(0) + _PROPERTY->GetPoint(1));
 		else if (_PROPERTY_EXISTS(pAreaDataset, "Tile"))
-			pArea->xRect = XRECT(_PROPERTY->GetInt(0) * _PROPERTY->GetInt(1), 0, (_PROPERTY->GetInt(0) + 1) * _PROPERTY->GetInt(1), _PROPERTY->GetInt(2));
+			pArea->xRect = xrect(_PROPERTY->GetInt(0) * _PROPERTY->GetInt(1), 0, (_PROPERTY->GetInt(0) + 1) * _PROPERTY->GetInt(1), _PROPERTY->GetInt(2));
 	}
 
 	// Animations.
@@ -77,7 +77,7 @@ CSpriteMetadata::CSpriteMetadata(CDataset* pDataset) : CResourceMetadata(Resourc
 		pAnimation->pName = pAnimationDataset->GetName();
 		pAnimation->iAnimationTime = 0;
 
-		XUINT iAnimationDelay = 0;
+		xuint iAnimationDelay = 0;
 
 		if (_PROPERTY_EXISTS(pAnimationDataset, "Delay"))
 			iAnimationDelay = _PROPERTY->GetInt();
@@ -101,7 +101,7 @@ CSpriteMetadata::CSpriteMetadata(CDataset* pDataset) : CResourceMetadata(Resourc
 			pFrame->pArea = FindArea(pFrameDataset->GetProperty("Area")->GetString());
 
 			if (_PROPERTY_EXISTS(pAnimationDataset, "Delay"))
-				pFrame->iDelay = (XUINT)_PROPERTY->GetInt();
+				pFrame->iDelay = (xuint)_PROPERTY->GetInt();
 
 			if (_PROPERTY_EXISTS(pFrameDataset, "Event"))
 				pFrame->pEvent = _PROPERTY->GetString();
@@ -141,7 +141,7 @@ CSpriteMetadata::~CSpriteMetadata()
 // =============================================================================
 // Nat Ryall                                                         23-Apr-2008
 // =============================================================================
-CSpriteMetadata::CArea* CSpriteMetadata::FindArea(const XCHAR* pName)
+CSpriteMetadata::CArea* CSpriteMetadata::FindArea(const xchar* pName)
 {
 	XEN_LIST_FOREACH(t_AreaList, ppArea, lpAreas)
 	{
@@ -155,7 +155,7 @@ CSpriteMetadata::CArea* CSpriteMetadata::FindArea(const XCHAR* pName)
 // =============================================================================
 // Nat Ryall                                                         23-Apr-2008
 // =============================================================================
-CSpriteMetadata::CFrame* CSpriteMetadata::FindFrame(CAnimation* pAnimation, const XCHAR* pName)
+CSpriteMetadata::CFrame* CSpriteMetadata::FindFrame(CAnimation* pAnimation, const xchar* pName)
 {
 	XEN_LIST_FOREACH(t_FrameList, ppFrame, pAnimation->lpFrames)
 	{
@@ -169,7 +169,7 @@ CSpriteMetadata::CFrame* CSpriteMetadata::FindFrame(CAnimation* pAnimation, cons
 // =============================================================================
 // Nat Ryall                                                         23-Apr-2008
 // =============================================================================
-CSpriteMetadata::CAnimation* CSpriteMetadata::FindAnimation(const XCHAR* pName)
+CSpriteMetadata::CAnimation* CSpriteMetadata::FindAnimation(const xchar* pName)
 {
 	XEN_LIST_FOREACH(t_AnimationList, ppAnimation, lpAnimations)
 	{
@@ -191,12 +191,12 @@ CSpriteMetadata::CAnimation* CSpriteMetadata::FindAnimation(const XCHAR* pName)
 // =============================================================================
 // Nat Ryall                                                         23-Apr-2008
 // =============================================================================
-void CBasicSprite::Render(XPOINT xPosition, XPOINT xAnchor, XRECT xArea, XFLOAT fAlpha, XFLOAT fAngle)
+void CBasicSprite::Render(xpoint xPosition, xpoint xAnchor, xrect xArea, xfloat fAlpha, xfloat fAngle)
 {
 	hgeSprite* pSprite = m_pMetadata->GetSprite();
 
 	pSprite->SetHotSpot((float)xAnchor.iX, (float)xAnchor.iY);
-	pSprite->SetColor(SETA(pSprite->GetColor(), (XCHAR)(fAlpha * 255.f)));
+	pSprite->SetColor(SETA(pSprite->GetColor(), (xchar)(fAlpha * 255.f)));
 	pSprite->SetTextureRect((float)xArea.iLeft, (float)xArea.iTop, (float)xArea.Width(), (float)xArea.Height());
 
 	if (fAngle)
@@ -208,7 +208,7 @@ void CBasicSprite::Render(XPOINT xPosition, XPOINT xAnchor, XRECT xArea, XFLOAT 
 // =============================================================================
 // Nat Ryall                                                         21-May-2008
 // =============================================================================
-void CBasicSprite::RenderTiled(XPOINT xPosition, XPOINT xSize, XPOINT xAnchor, XRECT xArea, XFLOAT fAlpha)
+void CBasicSprite::RenderTiled(xpoint xPosition, xpoint xSize, xpoint xAnchor, xrect xArea, xfloat fAlpha)
 {
 	xpoint xOffset;
 	xpoint xTile;
@@ -333,7 +333,7 @@ void CAnimatedSprite::SetFrame(CSpriteMetadata::CFrame* pFrame)
 // =============================================================================
 // Nat Ryall                                                         16-Apr-2008
 // =============================================================================
-void CAnimatedSprite::SetAnimation(CSpriteMetadata::CAnimation* pAnimation, XBOOL bPlay)
+void CAnimatedSprite::SetAnimation(CSpriteMetadata::CAnimation* pAnimation, xbool bPlay)
 {
 	m_bPlaying = bPlay;
 	m_iFrameTimer = 0;

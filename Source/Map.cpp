@@ -57,7 +57,7 @@ static const t_TileType s_iTileIndexLookup[] =
 };
 
 // The rotation angle lookup table.
-static const XFLOAT s_fRotationAngleLookup[] =
+static const xfloat s_fRotationAngleLookup[] =
 {
 	0.0f,
 	90.0f,
@@ -158,7 +158,7 @@ void CMapBlock::Update()
 // =============================================================================
 // Nat Ryall                                                         17-Apr-2008
 // =============================================================================
-XBOOL CMapBlock::IsVisible(CPlayer* pPlayer)
+xbool CMapBlock::IsVisible(CPlayer* pPlayer)
 {
 	return true;
 }
@@ -190,7 +190,7 @@ void CMapBlock::Eat()
 // =============================================================================
 // Nat Ryall                                                         10-Apr-2008
 // =============================================================================
-CMap::CMap(const XCHAR* pID) : CRenderable(RenderableType_Map)
+CMap::CMap(const xchar* pID) : CRenderable(RenderableType_Map)
 {
 	CDataset* pDataset = s_pMetadata->GetDataset("Map", pID);
 
@@ -207,29 +207,29 @@ CMap::CMap(const XCHAR* pID) : CRenderable(RenderableType_Map)
 	// Process the map blocks.
 	CProperty* pProperty = pDataset->GetProperty("Data");
 
-	for (XUINT iY = 0; iY < m_iHeight; ++iY)
+	for (xuint iY = 0; iY < m_iHeight; ++iY)
 	{
-		for (XUINT iX = 0; iX < m_iWidth; ++iX)
+		for (xuint iX = 0; iX < m_iWidth; ++iX)
 		{
-			XUINT iIndex = iX + (iY * m_iWidth); 
+			xuint iIndex = iX + (iY * m_iWidth); 
 			CMapBlock* pBlock = &m_xBlocks[iIndex];
 
 			pBlock->iIndex = iIndex;
 			pBlock->cChar = pProperty->GetChar(iIndex);
 			pBlock->iType = TileType_Blank;
 			pBlock->fAngle = 0.f;
-			pBlock->xPosition = XPOINT(iX, iY);
+			pBlock->xPosition = xpoint(iX, iY);
 			pBlock->fVisibility = 0.f;
 			pBlock->bEaten = false;
 
-			pBlock->pAdjacents[AdjacentDir_Left]		= (iIndex % m_iWidth > 0) ? &m_xBlocks[iIndex - 1] : NULL;
-			pBlock->pAdjacents[AdjacentDir_Up]			= (iIndex >= m_iWidth) ? &m_xBlocks[iIndex - m_iWidth] : NULL;
-			pBlock->pAdjacents[AdjacentDir_Right]		= (iIndex % m_iWidth < m_iWidth - 1) ? &m_xBlocks[iIndex + 1] : NULL;
-			pBlock->pAdjacents[AdjacentDir_Down]		= (iIndex < m_iBlockCount - m_iWidth) ? &m_xBlocks[iIndex + m_iWidth] : NULL;
+			pBlock->pAdjacents[AdjacentDirection_Left]		= (iIndex % m_iWidth > 0) ? &m_xBlocks[iIndex - 1] : NULL;
+			pBlock->pAdjacents[AdjacentDirection_Up]		= (iIndex >= m_iWidth) ? &m_xBlocks[iIndex - m_iWidth] : NULL;
+			pBlock->pAdjacents[AdjacentDirection_Right]		= (iIndex % m_iWidth < m_iWidth - 1) ? &m_xBlocks[iIndex + 1] : NULL;
+			pBlock->pAdjacents[AdjacentDirection_Down]		= (iIndex < m_iBlockCount - m_iWidth) ? &m_xBlocks[iIndex + m_iWidth] : NULL;
 		}
 	}
 
-	for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
+	for (xuint iA = 0; iA < m_iBlockCount; ++iA)
 	{
 		CMapBlock* pBlock = &m_xBlocks[iA];
 
@@ -243,12 +243,12 @@ CMap::CMap(const XCHAR* pID) : CRenderable(RenderableType_Map)
 			// Wall.
 		case '#':
 			{
-				XUINT iMask = 0;
+				xuint iMask = 0;
 
-				for (XUINT iB = 0; iB < AdjacentDir_Max; ++iB)
+				for (xuint iB = 0; iB < AdjacentDirection_Max; ++iB)
 				{
 					if (pBlock->pAdjacents[iB] && pBlock->pAdjacents[iB]->cChar == '#')
-						iMask |= pBlock->GetBit((t_AdjacentDir)iB);
+						iMask |= pBlock->GetBit((t_AdjacentDirection)iB);
 				}
 
 				pBlock->iType = s_iTileIndexLookup[iMask];
@@ -295,7 +295,7 @@ void CMap::Update()
 {
 	if (_GLOBAL.pActivePlayer->m_iType == PlayerType_Ghost)
 	{
-		for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
+		for (xuint iA = 0; iA < m_iBlockCount; ++iA)
 			m_xBlocks[iA].fVisibility = 0.f;
 
 		if (_GLOBAL.pActivePlayer->m_iState != PlayerState_Warp)
@@ -304,7 +304,7 @@ void CMap::Update()
 			AddVisiblePaths(_GLOBAL.pActivePlayer->m_pTargetBlock, _GLOBAL.pActivePlayer->m_fTransition);
 		}
 
-		for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
+		for (xuint iA = 0; iA < m_iBlockCount; ++iA)
 		{
 			if (m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsBase())
 				m_xBlocks[iA].fVisibility = 1.f;
@@ -312,24 +312,24 @@ void CMap::Update()
 	}
 	else
 	{
-		for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
+		for (xuint iA = 0; iA < m_iBlockCount; ++iA)
 			m_xBlocks[iA].fVisibility = 1.f;
 	}
 
-	for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
+	for (xuint iA = 0; iA < m_iBlockCount; ++iA)
 		m_xBlocks[iA].Update();
 }
 
 // =============================================================================
 // Nat Ryall                                                         16-Apr-2008
 // =============================================================================
-void CMap::AddVisiblePaths(CMapBlock* pBase, XFLOAT fVisibility)
+void CMap::AddVisiblePaths(CMapBlock* pBase, xfloat fVisibility)
 {
 	if (pBase)
 	{
 		pBase->fVisibility += fVisibility;
 
-		for (XUINT iA = 0; iA < AdjacentDir_Max; ++iA)
+		for (xuint iA = 0; iA < AdjacentDirection_Max; ++iA)
 		{
 			CMapBlock* pBlock = pBase;
 
@@ -370,9 +370,9 @@ void CMap::Render()
 	}
 
 	// Draw the map.
-	for (XUINT iA = 0; iA < m_iBlockCount; ++iA)
+	for (xuint iA = 0; iA < m_iBlockCount; ++iA)
 	{
-		static XPOINT s_xCentrePoint = XPOINT(24, 24);
+		static xpoint s_xCentrePoint = xpoint(24, 24);
 
 		if (m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsBase())
 			s_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, m_fColours[0], m_fColours[1], m_fColours[2]));
@@ -396,7 +396,7 @@ void CMap::Render()
 // =============================================================================
 // Nat Ryall                                                          3-Jun-2008
 // =============================================================================
-CMapBlock* CMap::GetAdjacentBlock(t_AdjacentDir iAdjacentDir, CMapBlock* pBlock)
+CMapBlock* CMap::GetAdjacentBlock(t_AdjacentDirection iAdjacentDir, CMapBlock* pBlock)
 {
 	if (pBlock->pAdjacents[iAdjacentDir])
 		return pBlock->pAdjacents[iAdjacentDir];
@@ -406,12 +406,12 @@ CMapBlock* CMap::GetAdjacentBlock(t_AdjacentDir iAdjacentDir, CMapBlock* pBlock)
 
 		switch (iAdjacentDir)
 		{
-		case AdjacentDir_Left:		return &m_xBlocks[iIndex + m_iWidth - 1];
-		case AdjacentDir_Up:		return &m_xBlocks[m_iBlockCount - m_iWidth + iIndex];
-		case AdjacentDir_Right:		return &m_xBlocks[iIndex - m_iWidth + 1];
-		case AdjacentDir_Down:		return &m_xBlocks[iIndex % m_iWidth];
+		case AdjacentDirection_Left:	return &m_xBlocks[iIndex + m_iWidth - 1];
+		case AdjacentDirection_Up:		return &m_xBlocks[m_iBlockCount - m_iWidth + iIndex];
+		case AdjacentDirection_Right:	return &m_xBlocks[iIndex - m_iWidth + 1];
+		case AdjacentDirection_Down:	return &m_xBlocks[iIndex % m_iWidth];
 
-		default:					return NULL;
+		default:						return NULL;
 		}
 	}
 }

@@ -70,7 +70,7 @@ enum t_ElementType
 };
 
 // Lists.
-typedef XLIST<CInterfaceElement*> t_ElementList;
+typedef xlist<CInterfaceElement*> t_ElementList;
 
 //##############################################################################
 

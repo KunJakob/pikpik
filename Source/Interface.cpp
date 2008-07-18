@@ -201,7 +201,7 @@ void CInterface::SetFocus(CInterfaceElement* pElement)
 // =============================================================================
 // Nat Ryall                                                          2-May-2008
 // =============================================================================
-XBOOL CInterface::IsMouseOver(CInterfaceElement* pElement)
+xbool CInterface::IsMouseOver(CInterfaceElement* pElement)
 {
 	return Math::Intersect(m_xMousePos, pElement->GetArea());
 }

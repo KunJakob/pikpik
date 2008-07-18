@@ -33,7 +33,7 @@
 //##############################################################################
 
 // Lists.
-typedef XLIST<CScreen*> t_ScreenList;
+typedef xlist<CScreen*> t_ScreenList;
 
 //##############################################################################
 #pragma endregion
@@ -52,10 +52,10 @@ static HGE* s_pInterface = NULL;
 static FMOD::System* s_pSoundSystem = NULL;
 
 // Flow Control.
-static XBOOL s_bTerminate = false;
+static xbool s_bTerminate = false;
 
 // Timer.
-static XUINT s_iTimeDelta = 0;
+static xuint s_iTimeDelta = 0;
 
 // Screen List.
 static t_ScreenList s_lpScreens;
@@ -162,8 +162,8 @@ void Application::Initialise()
 
 	// Create all the available players.
 	_GLOBAL.lpPlayers.push_back(new CPacman());
-	//_GLOBAL.lpPlayers.push_back(new CGhost(0xFF40F0F0));
-	//_GLOBAL.lpPlayers.push_back(new CGhost(0xFFF0F040));
+	_GLOBAL.lpPlayers.push_back(new CGhost(0xFF40F0F0));
+	_GLOBAL.lpPlayers.push_back(new CGhost(0xFFF0F040));
 	_GLOBAL.lpPlayers.push_back(new CGhost(0xFFF040F0));
 
 	// Initialise the matchmaking system.
@@ -200,7 +200,7 @@ void Application::Deinitialise()
 // =============================================================================
 // Nat Ryall                                                         23-Mar-2008
 // =============================================================================
-XBOOL Application::Update()
+xbool Application::Update()
 {
 	if (_GLOBAL.iNextScreen != ScreenIndex_Invalid)
 	{
@@ -208,7 +208,7 @@ XBOOL Application::Update()
 		_GLOBAL.iNextScreen = ScreenIndex_Invalid;
 	}
 
-	s_iTimeDelta = (XUINT)(_TIMEDELTAF * 1000.f);
+	s_iTimeDelta = (xuint)(_TIMEDELTAF * 1000.f);
 
 	Network.Update();
 	Match.Update();
@@ -230,7 +230,7 @@ XBOOL Application::Update()
 // =============================================================================
 // Nat Ryall                                                         23-Mar-2008
 // =============================================================================
-XBOOL Application::Render()
+xbool Application::Render()
 {
 	s_pInterface->Gfx_BeginScene();
 
@@ -262,7 +262,7 @@ HGE* Application::GetInterface()
 // =============================================================================
 // Nat Ryall                                                          8-Apr-2008
 // =============================================================================
-XUINT Application::GetTimeDelta()
+xuint Application::GetTimeDelta()
 {
 	return s_iTimeDelta;
 }

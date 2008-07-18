@@ -576,7 +576,7 @@ CRadioComponent* CRadioComponent::GetChecked(xint iRadioGroup)
 // =============================================================================
 // Nat Ryall                                                         10-Jul-2008
 // =============================================================================
-CTextLink::CTextLink(CFontMetadata* pFont, const XCHAR* pText, t_fpLinkSelectedCallback fpCallback) : CInterfaceElement(ElementType_MenuLink),
+CTextLink::CTextLink(CFontMetadata* pFont, const xchar* pText, t_fpLinkSelectedCallback fpCallback) : CInterfaceElement(ElementType_MenuLink),
 	m_pText(NULL),
 	m_fpLinkSelectedCallback(fpCallback)
 {

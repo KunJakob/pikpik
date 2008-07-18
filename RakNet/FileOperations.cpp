@@ -51,7 +51,7 @@ bool WriteFileWithDirectories( const char *path, char *data, unsigned dataLength
 		{
 			pathCopy[ index ] = 0;
 #ifdef _WIN32
-#pragma warning( disable : 4966 ) // mkdir declared depreciated by Microsoft in order to make it harder to be cross platform.  I don't agree it's depreciated.
+#pragma warning( disable : 4996 ) // mkdir declared depreciated by Microsoft in order to make it harder to be cross platform.  I don't agree it's depreciated.
 			mkdir( pathCopy );
 #else
 

@@ -33,7 +33,7 @@ void CLogoScreen::Load()
 	m_pImage = new CSprite(_SPRITE("Logo-SAPIAN"));
 
 	m_pImage->SetAnchor(m_pImage->GetAreaCentre());
-	m_pImage->SetPosition(XPOINT(_HSWIDTH, _HSHEIGHT));
+	m_pImage->SetPosition(xpoint(_HSWIDTH, _HSHEIGHT));
 }
 
 // =============================================================================

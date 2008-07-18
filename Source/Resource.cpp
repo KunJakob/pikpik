@@ -25,8 +25,8 @@
 //##############################################################################
 
 // Lists.
-typedef XLIST<CResourceFile*> t_ResourceFileList;
-typedef XLIST<CResourceMetadata*> t_ResourceMetadataList;
+typedef xlist<CResourceFile*> t_ResourceFileList;
+typedef xlist<CResourceMetadata*> t_ResourceMetadataList;
 
 //##############################################################################
 
@@ -51,7 +51,7 @@ static t_ResourceMetadataList s_lpResourceMetadata[ResourceType_Max];
 // =============================================================================
 // Nat Ryall                                                         22-Apr-2008
 // =============================================================================
-CResourceFile::CResourceFile(t_ResourceType iResourceType, const XCHAR* pResourceFile) :
+CResourceFile::CResourceFile(t_ResourceType iResourceType, const xchar* pResourceFile) :
 	iType(iResourceType),
 	pResource(NULL),
 	pFile(pResourceFile),
@@ -89,7 +89,7 @@ CResourceMetadata::CResourceMetadata(t_ResourceType iResourceType, CDataset* pDa
 // =============================================================================
 void ResourceManager::Reset()
 {
-	for (XUINT iA = 0; iA < ResourceType_Max; ++iA)
+	for (xuint iA = 0; iA < ResourceType_Max; ++iA)
 	{
 		XEN_LIST_ERASE_ALL(s_lpResourceMetadata[iA]);
 	}
@@ -110,7 +110,7 @@ void ResourceManager::RegisterMetadata(CMetadata* pMetadata)
 // =============================================================================
 // Nat Ryall                                                         22-Apr-2008
 // =============================================================================
-CResourceFile* ResourceManager::AllocResourceFile(t_ResourceType iType, const XCHAR* pFile)
+CResourceFile* ResourceManager::AllocResourceFile(t_ResourceType iType, const xchar* pFile)
 {
 	XEN_LIST_FOREACH(t_ResourceFileList, ppResourceFile, s_lpResourceFiles[iType])
 	{
@@ -158,7 +158,7 @@ void ResourceManager::ReleaseResourceFile(CResourceFile* pFile)
 // =============================================================================
 // Nat Ryall                                                         22-Apr-2008
 // =============================================================================
-CResourceMetadata* ResourceManager::FindResource(t_ResourceType iType, const XCHAR* pName)
+CResourceMetadata* ResourceManager::FindResource(t_ResourceType iType, const xchar* pName)
 {
 	XEN_LIST_FOREACH(t_ResourceMetadataList, ppResource, s_lpResourceMetadata[iType])
 	{

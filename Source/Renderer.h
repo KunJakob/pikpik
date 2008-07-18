@@ -44,10 +44,10 @@
 class CRenderable;
 
 // Callbacks.
-typedef void (*t_fpRenderCallback)(CRenderable* /*Renderable*/);
+typedef xfunction(1)<CRenderable* /*Renderable*/> t_RenderCallback;
 
 // Lists.
-typedef XLIST<CRenderable*> t_RenderableList;
+typedef xlist<CRenderable*> t_RenderableList;
 
 //##############################################################################
 #pragma endregion
@@ -64,7 +64,7 @@ public:
 	/**
 	* Constructor.
 	*/
-	CRenderable(XUINT iRenderableType) : m_iRenderableType(iRenderableType) {}
+	CRenderable(xuint iRenderableType) : m_iRenderableType(iRenderableType) {}
 
 	/**
 	* Destructor.
@@ -84,14 +84,14 @@ public:
 	/**
 	* Get the renderable type assigned to this renderable.
 	*/
-	XUINT GetRenderableType()
+	xuint GetRenderableType()
 	{
 		return m_iRenderableType;
 	}
 
 protected:
 	// The renderable type used for identification of renderables.
-	XUINT m_iRenderableType;
+	xuint m_iRenderableType;
 };
 
 //##############################################################################
@@ -107,13 +107,13 @@ class CRenderLayer
 {
 public:
 	// The layer index.
-	XUINT iLayer;
+	xuint iLayer;
 
 	// The enabled/disabled status of this layer.
-	XBOOL bEnabled;
+	xbool bEnabled;
 
 	// The render override callback.
-	t_fpRenderCallback fpRenderCallback;
+	t_RenderCallback fpRenderCallback;
 
 	// The renderable list for this layer.
 	t_RenderableList lpRenderables;
@@ -139,7 +139,7 @@ namespace RenderManager
 	* Add a renderable to the system on the specified layer (0 to RENDERER_MAXLAYERS-1).
 	* @note Lower layers are obscured by higher layers.
 	*/
-	void Add(XUINT iLayer, CRenderable* pRenderable);
+	void Add(xuint iLayer, CRenderable* pRenderable);
 
 	/**
 	* Find and remove a renderable from the system.
@@ -149,23 +149,23 @@ namespace RenderManager
 	/**
 	* Enable a layer and allow update/rendering. Layers are enabled by default.
 	*/
-	void EnableLayer(XUINT iLayer);
+	void EnableLayer(xuint iLayer);
 
 	/**
 	* Disable a layer and stop update/rendering. Layers are enabled by default.
 	*/
-	void DisableLayer(XUINT iLayer);
+	void DisableLayer(xuint iLayer);
 
 	/**
 	* Check if a specific layer is enabled.
 	*/
-	XBOOL IsLayerEnabled(XUINT iLayer);
+	xbool IsLayerEnabled(xuint iLayer);
 
 	/**
 	* Specify a function to override the render process for each renderable on a specific layer.
 	* @note Renderables must have Render() called within the override for the object to appear.
 	*/
-	void SetRenderCallback(XUINT iLayer, t_fpRenderCallback fpCallback);
+	void SetRenderCallback(xuint iLayer, t_RenderCallback fpCallback);
 }
 
 //##############################################################################

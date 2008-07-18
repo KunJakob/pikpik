@@ -40,19 +40,34 @@ public:
 	CGameScreen() : CScreen(ScreenIndex_GameScreen) {}
 
 	virtual void Load();
+
+	virtual void Unload();
+
 	virtual void Wake() {}
 
+	virtual void Sleep() {}
+
 	virtual void Update();
+
 	virtual void Render();
 
 	virtual void Notify(xuint iEventType, void* pEventInfo) {}
 
-	virtual void Sleep() {}
-	virtual void Unload();
-
 protected:
+	void LoadMap(xint iIndex);
+
+	void LoadMusic();
+
+	void InitialisePlayers();
+
+	void WorldTransform(CRenderable* pRenderable);
+
+	HTEXTURE GenerateFieldMask(xint iInnerRadius, xint iOuterRadius);
+
+	void CalculateMusicEnergy(FMOD::Channel* pChannel);
+
 	// The map background.
-	CBackground m_Background;
+	CBackground m_xBackground;
 
 	// The field mask.
 	hgeSprite* m_pFieldMask;
@@ -60,6 +75,9 @@ protected:
 	// The background music.
 	FMOD::Sound* m_pMusic;
 	FMOD::Channel* m_pChannel;
+
+	// The world transform offset.
+	xpoint m_xOffset;
 };
 
 //##############################################################################

@@ -24,7 +24,7 @@
 // =============================================================================
 // Nat Ryall                                                         10-Apr-2008
 // =============================================================================
-XCHAR CProperty::GetChar(XUINT iIndex)
+xchar CProperty::GetChar(xuint iIndex)
 {
 	return m_lpValues[iIndex][0];
 }
@@ -32,7 +32,7 @@ XCHAR CProperty::GetChar(XUINT iIndex)
 // =============================================================================
 // Author: Nat Ryall                                           Date: 30-Jan-2008
 // =============================================================================
-XINT CProperty::GetInt(XUINT iIndex)
+xint CProperty::GetInt(xuint iIndex)
 {
 	return atoi(m_lpValues[iIndex]);
 }
@@ -40,7 +40,7 @@ XINT CProperty::GetInt(XUINT iIndex)
 // =============================================================================
 // Author: Nat Ryall                                           Date: 30-Jan-2008
 // =============================================================================
-XFLOAT CProperty::GetFloat(XUINT iIndex)
+xfloat CProperty::GetFloat(xuint iIndex)
 {
 	return (float)atof(m_lpValues[iIndex]);
 }
@@ -48,7 +48,7 @@ XFLOAT CProperty::GetFloat(XUINT iIndex)
 // =============================================================================
 // Author: Nat Ryall                                           Date: 30-Jan-2008
 // =============================================================================
-XBOOL CProperty::GetBool(XUINT iIndex)
+xbool CProperty::GetBool(xuint iIndex)
 {
 	return (strcmp(GetString(iIndex), "false") == 0 || strcmp(GetString(iIndex), "0")) ? false : true;
 }
@@ -56,9 +56,9 @@ XBOOL CProperty::GetBool(XUINT iIndex)
 // =============================================================================
 // Author: Nat Ryall                                           Date: 30-Jan-2008
 // =============================================================================
-const XCHAR* CProperty::GetString(XUINT iIndex)
+const xchar* CProperty::GetString(xuint iIndex)
 {
-	return (const XCHAR*)m_lpValues[iIndex];
+	return (const xchar*)m_lpValues[iIndex];
 }
 
 //##############################################################################

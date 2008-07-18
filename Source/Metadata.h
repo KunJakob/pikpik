@@ -96,14 +96,14 @@ public:
 	* Constructor.
 	* @param bExecute Specify true to execute the metadata synchronously in the constructor.
 	*/
-	CMetadata(const XCHAR* pFilePath, XBOOL bExecute = true);
+	CMetadata(const xchar* pFilePath, xbool bExecute = true);
 
 	/**
 	* Update the metadata processing. This should be called every frame and will run up to iMaxTime milliseconds. Check IsCompleted to see if the metadata is ready to be used.
 	* @param iMaxTime The maximum time, in milliseconds, allowed for the update. This keeps the metadata asychronous and fast.
 	* @param iChunkSize The number of bytes to read each cycle. This number of bytes will be read in chunks until iMaxTime.
 	*/
-	void Update(XUINT iMaxTime = 20, XUINT iChunkSize = 64);
+	void Update(xuint iMaxTime = 20, xuint iChunkSize = 64);
 
 	/**
 	* Get the current task being executed by the metadata.
@@ -116,20 +116,20 @@ public:
 	/**
 	* Get the progress of the current task as a percentage (0 to 100).
 	*/
-	XUINT GetProgress();
+	xuint GetProgress();
 
 	/**
 	* Get the global/averaged progress of the metadata processing.
 	*/
-	XUINT GetGlobalProgress()
+	xuint GetGlobalProgress()
 	{
-		return (((XUINT)GetCurrentTask() * 100) + GetProgress()) / 3;
+		return (((xuint)GetCurrentTask() * 100) + GetProgress()) / 3;
 	}
 
 	/**
 	* Check if the metadata has finished processing all data and is ready to be used.
 	*/
-	XBOOL IsCompleted()
+	xbool IsCompleted()
 	{
 		return m_iTask == ST_Completed || m_iTask == ST_Error;
 	}
@@ -137,19 +137,19 @@ public:
 	/**
 	* Get a demetadataion of the last error that occured. Valid when GetCurrentTask() == ST_Error.
 	*/
-	const XCHAR* GetError()
+	const xchar* GetError()
 	{
 		return m_pError;
 	}
 
 protected:
 	// Lists.
-	typedef XVLIST<XCHAR*> t_lpString;
+	typedef xvlist<xchar*> t_lpString;
 
 	/**
 	* Internal update for the metadata tasks.
 	*/
-	void UpdateLoad(XUINT iChunkSize);
+	void UpdateLoad(xuint iChunkSize);
 	void UpdateTokenise();
 	void UpdateParse();
 
@@ -161,7 +161,7 @@ protected:
 	/**
 	* Set the error internally to report back to the user.
 	*/
-	void SetError(const XCHAR* pError);
+	void SetError(const xchar* pError);
 
 	/**
 	* System.
@@ -171,36 +171,36 @@ protected:
 	t_MetadataTask m_iTask;
 
 	// The completion status of the current metadata task (0-100).
-	XUINT m_iPercent;
+	xuint m_iPercent;
 
 	// The error string. Valid when m_iTask == ST_Error.
-	XCHAR* m_pError;
+	xchar* m_pError;
 
 	/**
 	* File.
 	*/
 
 	// The file name of the metadata.
-	XCHAR* m_pFile;
+	xchar* m_pFile;
 
 	// The handle to the file being loaded.
 	HANDLE m_hFile;
 
 	// The size of the file being loaded.
-	XUINT m_iFileSize;
+	xuint m_iFileSize;
 
 	// The number of bytes read in so far.
-	XUINT m_iBytesRead;
+	xuint m_iBytesRead;
 
 	// The metadata data.
-	XCHAR* m_pData;
+	xchar* m_pData;
 
 	/**
 	* Tokenise.
 	*/
 
 	// The current offset.
-	XUINT m_iTokenOffset;
+	xuint m_iTokenOffset;
 
 	// A list of metadata tokens.
 	t_lpString m_lpTokens;
@@ -210,7 +210,7 @@ protected:
 	*/
 
 	// The current token offset.
-	XUINT m_iTokenIndex;
+	xuint m_iTokenIndex;
 
 	// The current dataset that we're working with.
 	CDataset* m_pDataset;

@@ -24,7 +24,7 @@
 // =============================================================================
 // Author: Nat Ryall                                           Date: 29-Jan-2008
 // =============================================================================
-CMetadata::CMetadata(const XCHAR* pFilePath, XBOOL bExecute) : CDataset(NULL, "Metadata", NULL),
+CMetadata::CMetadata(const xchar* pFilePath, xbool bExecute) : CDataset(NULL, "Metadata", NULL),
 	m_iTask(ST_LoadFile), 
 	m_iPercent(0),
 	m_pError(NULL),
@@ -38,7 +38,7 @@ CMetadata::CMetadata(const XCHAR* pFilePath, XBOOL bExecute) : CDataset(NULL, "M
 	m_pDataset(NULL),
 	m_pProperty(NULL)
 {
-	m_pFile = (XCHAR*)pFilePath;
+	m_pFile = (xchar*)pFilePath;
 	m_pDataset = this;
 
 	if (bExecute)
@@ -51,9 +51,9 @@ CMetadata::CMetadata(const XCHAR* pFilePath, XBOOL bExecute) : CDataset(NULL, "M
 // =============================================================================
 // Author: Nat Ryall                                           Date: 29-Jan-2008
 // =============================================================================
-void CMetadata::Update(XUINT iMaxTime, XUINT iChunkSize)
+void CMetadata::Update(xuint iMaxTime, xuint iChunkSize)
 {
-	XUINT32 iTimeout = GetTickCount() + iMaxTime;
+	xuint32 iTimeout = GetTickCount() + iMaxTime;
 
 	while (GetTickCount() < iTimeout)
 	{
@@ -80,7 +80,7 @@ void CMetadata::Update(XUINT iMaxTime, XUINT iChunkSize)
 // =============================================================================
 // Author: Nat Ryall                                           Date: 29-Jan-2008
 // =============================================================================
-XUINT CMetadata::GetProgress()
+xuint CMetadata::GetProgress()
 {
 	switch (m_iTask)
 	{
@@ -100,7 +100,7 @@ XUINT CMetadata::GetProgress()
 // =============================================================================
 // Author: Nat Ryall                                           Date: 29-Jan-2008
 // =============================================================================
-void CMetadata::UpdateLoad(XUINT iChunkSize)
+void CMetadata::UpdateLoad(xuint iChunkSize)
 {
 	// Initialise the file.
 	if (m_hFile == INVALID_HANDLE_VALUE)
@@ -121,7 +121,7 @@ void CMetadata::UpdateLoad(XUINT iChunkSize)
 			return;
 		}
 
-		m_pData = new XCHAR[m_iFileSize + 1];
+		m_pData = new xchar[m_iFileSize + 1];
 		m_pData[m_iFileSize] = NULL;
 
 		if (!m_pData)
@@ -171,8 +171,8 @@ void CMetadata::UpdateTokenise()
 	}
 
 	// Find the next token.
-	XUINT iTokenStart = m_iTokenOffset;
-	XBOOL bQuotes = false;
+	xuint iTokenStart = m_iTokenOffset;
+	xbool bQuotes = false;
 
 	while (m_pData[m_iTokenOffset] != NULL && (bQuotes || !iswspace(m_pData[m_iTokenOffset])))
 	{
@@ -190,7 +190,7 @@ void CMetadata::UpdateTokenise()
 		m_iTokenOffset++;
 	}
 
-	XUINT iTokenLen = m_iTokenOffset - iTokenStart;
+	xuint iTokenLen = m_iTokenOffset - iTokenStart;
 
 	if (iTokenLen)
 	{
@@ -210,7 +210,7 @@ void CMetadata::UpdateTokenise()
 // =============================================================================
 void CMetadata::UpdateParse()
 {
-	XCHAR* pToken = m_lpTokens[m_iTokenIndex];
+	xchar* pToken = m_lpTokens[m_iTokenIndex];
 
 	if (!pToken)
 		return;
@@ -257,12 +257,12 @@ void CMetadata::UpdateParse()
 // =============================================================================
 // Author: Nat Ryall                                           Date: 29-Jan-2008
 // =============================================================================
-void CMetadata::SetError(const XCHAR* pError)
+void CMetadata::SetError(const xchar* pError)
 {
 	Cleanup();
 
 	m_iTask = ST_Error;
-	m_pError = (XCHAR*)pError;
+	m_pError = (xchar*)pError;
 
 	XEXCEPTION(pError);
 }

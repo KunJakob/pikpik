@@ -40,7 +40,7 @@
 // =============================================================================
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
-CMenuLink::CMenuLink(XUINT iGroupIndex, CFontMetadata* pFont, const XCHAR* pText, t_fpLinkSelectedCallback fpCallback) : CTextLink(pFont, pText, fpCallback),
+CMenuLink::CMenuLink(xuint iGroupIndex, CFontMetadata* pFont, const xchar* pText, t_fpLinkSelectedCallback fpCallback) : CTextLink(pFont, pText, fpCallback),
 	m_iGroupIndex(iGroupIndex)
 {
 	m_iType = ElementType_MenuLink;
@@ -49,9 +49,9 @@ CMenuLink::CMenuLink(XUINT iGroupIndex, CFontMetadata* pFont, const XCHAR* pText
 // =============================================================================
 // Nat Ryall                                                         18-Apr-2008
 // =============================================================================
-void CMenuLink::RePosition(XUINT iElementIndex, XUINT iNumElements)
+void CMenuLink::RePosition(xuint iElementIndex, xuint iNumElements)
 {
-	XPOINT xPosition = XPOINT(_HSWIDTH - (GetWidth() / 2), _HSHEIGHT - (iNumElements * (GetHeight() / 2)) + iElementIndex * (GetHeight() + 5));
+	xpoint xPosition = xpoint(_HSWIDTH - (GetWidth() / 2), _HSHEIGHT - (iNumElements * (GetHeight() / 2)) + iElementIndex * (GetHeight() + 5));
 	SetPosition(xPosition);
 }
 

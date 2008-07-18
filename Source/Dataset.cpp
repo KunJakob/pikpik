@@ -33,13 +33,13 @@ CDataset::~CDataset()
 // =============================================================================
 // Author: Nat Ryall                                            Date: 1-Feb-2008
 // =============================================================================
-XUINT CDataset::GetDatasetCount(const XCHAR* pType)
+xuint CDataset::GetDatasetCount(const xchar* pType)
 {
 	if (!pType)
-		return (XUINT)m_lpDatasets.size();
+		return (xuint)m_lpDatasets.size();
 	else
 	{
-		XUINT iCount = 0;
+		xuint iCount = 0;
 
 		XEN_LIST_FOREACH(t_DatasetList, ppDataset, m_lpDatasets)
 		{
@@ -54,7 +54,7 @@ XUINT CDataset::GetDatasetCount(const XCHAR* pType)
 // =============================================================================
 // Author: Nat Ryall                                            Date: 1-Feb-2008
 // =============================================================================
-CDataset* CDataset::GetDataset(CDataset* pPrev, const XCHAR* pType, const XCHAR* pName)
+CDataset* CDataset::GetDataset(CDataset* pPrev, const xchar* pType, const xchar* pName)
 {
 	t_DatasetList::iterator ppDataset = m_lpDatasets.begin();
 
@@ -85,13 +85,13 @@ CDataset* CDataset::GetDataset(CDataset* pPrev, const XCHAR* pType, const XCHAR*
 // =============================================================================
 // Author: Nat Ryall                                            Date: 1-Feb-2008
 // =============================================================================
-XUINT CDataset::GetPropertyCount(const XCHAR* pType)
+xuint CDataset::GetPropertyCount(const xchar* pType)
 {
 	if (!pType)
-		return (XUINT)m_lpProperties.size();
+		return (xuint)m_lpProperties.size();
 	else
 	{
-		XUINT iCount = 0;
+		xuint iCount = 0;
 
 		XEN_LIST_FOREACH(t_PropertyList, ppProperty, m_lpProperties)
 		{
@@ -106,7 +106,7 @@ XUINT CDataset::GetPropertyCount(const XCHAR* pType)
 // =============================================================================
 // Author: Nat Ryall                                            Date: 1-Feb-2008
 // =============================================================================
-CProperty* CDataset::GetProperty(CProperty* pPrev, const XCHAR* pType)
+CProperty* CDataset::GetProperty(CProperty* pPrev, const xchar* pType)
 {
 	t_PropertyList::iterator ppProperty = m_lpProperties.begin();
 

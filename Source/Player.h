@@ -44,13 +44,13 @@ enum t_PlayerState
 };
 
 // The direction to move in.
-enum t_MoveDirection
+enum t_PlayerDirection
 {
-	MoveDirection_Left = AdjacentDir_Left,
-	MoveDirection_Up,
-	MoveDirection_Right,
-	MoveDirection_Down,
-	/*MAX*/MoveDirection_Max,
+	PlayerDirection_Left = AdjacentDirection_Left,
+	PlayerDirection_Up,
+	PlayerDirection_Right,
+	PlayerDirection_Down,
+	/*MAX*/PlayerDirection_Max,
 };
 
 //##############################################################################
@@ -70,6 +70,9 @@ public:
 
 	// Destructor.
 	virtual ~CPlayer();
+
+	// Reset the player.
+	virtual void Reset();
 
 	// Update the object ready for rendering.
 	virtual void Update();
@@ -95,14 +98,26 @@ public:
 		return m_pSprite;
 	}
 
+	// Set the player logic type.
+	inline void SetLogicType(t_PlayerLogicType _Value) 
+	{ 
+		m_iLogicType = _Value; 
+	}
+
+	// Get the player logic type.
+	inline t_PlayerLogicType GetLogicType() 
+	{ 
+		return m_iLogicType; 
+	}
+
 	// Set the player's name.
-	void SetName(const XCHAR* pName)
+	void SetName(const xchar* pName)
 	{
 		strcpy_s(m_cName, _MAXNAMELEN + 1, pName);
 	}
 
 	// Get the player's name.
-	const XCHAR* GetName()
+	const xchar* GetName()
 	{
 		return m_cName;
 	}
@@ -128,24 +143,15 @@ public:
 		return m_pSprite->GetPosition();
 	}
 
-	// Set the player logic type.
-	inline void SetLogicType(t_PlayerLogicType _Value) 
-	{ 
-		m_iLogicType = _Value; 
-	}
-
-	// Get the player logic type.
-	inline t_PlayerLogicType GetLogicType() 
-	{ 
-		return m_iLogicType; 
-	}
-
 protected:
 	// Constuctor.
-	CPlayer(t_PlayerType iType, const XCHAR* pSpriteName);
+	CPlayer(t_PlayerType iType, const xchar* pSpriteName);
 
 	// Called to change the state of the player object.
 	virtual void SetState(t_PlayerState iState);
+
+	// Execute a move action for the player.
+	void Move(t_PlayerDirection iDirection);
 
 	// The player logic update where decisions are made regarding state changes.
 	virtual void Logic();
@@ -159,17 +165,17 @@ protected:
 	// The logic for networked human or computer controlled players.
 	virtual void LogicRemote();
 
-	// Execute a move action for the player.
-	void Move(t_MoveDirection iDirection);
+	// A logic behaviour to let the player wander aimlessly.
+	void BehaviourWander();
 
 	// Check if the specified block is passable.
-	virtual XBOOL IsPassable(CMapBlock* pBlock)
+	virtual xbool IsPassable(CMapBlock* pBlock)
 	{
 		return !pBlock->IsWall();
 	}
 
 	// Called when an animation event occurs.
-	void OnAnimationEvent(CAnimatedSprite* pSprite, const XCHAR* pEvent);
+	void OnAnimationEvent(CAnimatedSprite* pSprite, const xchar* pEvent);
 
 	// The type of the derived class.
 	t_PlayerType m_iType;
@@ -190,25 +196,25 @@ protected:
 	CMapBlock* m_pTargetBlock;
 
 	// The current time set for the operation.
-	XUINT m_iTime;
+	xuint m_iTime;
 
 	// The total time set for the move.
-	XUINT m_iMoveTime;
+	xuint m_iMoveTime;
 
 	// The transition distance between two blocks clamped to the range 0.0 to 1.0.
-	XFLOAT m_fTransition;
+	xfloat m_fTransition;
 
 	// Determines if the player is leaving or entering the map.
-	XBOOL m_bLeaving;
+	xbool m_bLeaving;
 
 	// The movement direction.
-	t_MoveDirection m_iMoveDir;
+	t_PlayerDirection m_iMoveDir;
 
 	// The transition direction.
-	t_MoveDirection m_iTransitionDir;
+	t_PlayerDirection m_iTransitionDir;
 
 	// The player name.
-	XCHAR m_cName[_MAXNAMELEN + 1];
+	xchar m_cName[_MAXNAMELEN + 1];
 };
 
 //##############################################################################
@@ -231,7 +237,7 @@ public:
 
 protected:
 	// Check if the specified block is passable.
-	virtual XBOOL IsPassable(CMapBlock* pBlock)
+	virtual xbool IsPassable(CMapBlock* pBlock)
 	{
 		return CPlayer::IsPassable(pBlock) && pBlock->cChar != '=';
 	}

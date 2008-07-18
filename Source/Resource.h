@@ -71,16 +71,16 @@ public:
 	void* pResource;
 
 	// The resource file name.
-	const XCHAR* pFile;
+	const xchar* pFile;
 
 	// The resource reference count.
-	XUINT iReferenceCount;
+	xuint iReferenceCount;
 
 protected:
 	/**
 	* Constructor: Initialise the file.
 	*/
-	CResourceFile(t_ResourceType iResourceType, const XCHAR* pResourceFile);
+	CResourceFile(t_ResourceType iResourceType, const xchar* pResourceFile);
 };
 
 //##############################################################################
@@ -106,7 +106,7 @@ public:
 	t_ResourceType iType;
 
 	// The resource name.
-	const XCHAR* pName;
+	const xchar* pName;
 
 protected:
 	/**
@@ -138,7 +138,7 @@ namespace ResourceManager
 	/**
 	* Allocate a new or existing resource file with the specified type and file.
 	*/
-	CResourceFile* AllocResourceFile(t_ResourceType iType, const XCHAR* pFile);
+	CResourceFile* AllocResourceFile(t_ResourceType iType, const xchar* pFile);
 
 	/**
 	* Release a resource file and destroy it if there are no remaining references.
@@ -149,7 +149,7 @@ namespace ResourceManager
 	* Find the metadata for a managed resource with the specified type and name.
 	* @return The resource metadata or NULL if not found.
 	*/
-	CResourceMetadata* FindResource(t_ResourceType iType, const XCHAR* pName);
+	CResourceMetadata* FindResource(t_ResourceType iType, const xchar* pName);
 }
 
 //##############################################################################

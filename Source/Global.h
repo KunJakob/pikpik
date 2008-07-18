@@ -175,9 +175,9 @@ enum t_LobbyStartMode
 };
 
 // Common list types.
-typedef XLIST<CMetadata*> t_MetadataList;
-typedef XLIST<CSprite*> t_SpriteList;
-typedef XLIST<CPlayer*> t_PlayerList;
+typedef xlist<CMetadata*> t_MetadataList;
+typedef xlist<CSprite*> t_SpriteList;
+typedef xlist<CPlayer*> t_PlayerList;
 
 //##############################################################################
 #pragma endregion

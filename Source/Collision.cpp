@@ -22,7 +22,7 @@
 //##############################################################################
 
 // Lists.
-typedef XLIST<CCollidable*> t_CollidableList;
+typedef xlist<CCollidable*> t_CollidableList;
 
 //##############################################################################
 #pragma endregion

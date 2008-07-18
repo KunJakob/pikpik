@@ -61,12 +61,12 @@ public:
 	* @note This can be used for optimisation and disabling collision per-object.
 	* @important Both objects must remain valid for the duration of the call.
 	*/
-	virtual XBOOL IsCollidable(CCollidable* pWith) = 0;
+	virtual xbool IsCollidable(CCollidable* pWith) = 0;
 
 	/**
 	* Get the collision rect to test against another collision rect.
 	*/
-	virtual XRECT GetCollisionRect() = 0;
+	virtual xrect GetCollisionRect() = 0;
 
 	/**
 	* Callback that is executed when a valid collision occurs.

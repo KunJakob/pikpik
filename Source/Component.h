@@ -613,7 +613,7 @@ public:
 	typedef xfunction(0)<> t_fpLinkSelectedCallback;
 
 	// Constructor.
-	CTextLink(CFontMetadata* pFont, const XCHAR* pText, t_fpLinkSelectedCallback fpCallback = NULL);
+	CTextLink(CFontMetadata* pFont, const xchar* pText, t_fpLinkSelectedCallback fpCallback = NULL);
 
 	// Destructor.
 	virtual ~CTextLink();

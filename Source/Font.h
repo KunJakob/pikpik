@@ -41,7 +41,7 @@ public:
 	/**
 	* Constructor: Initialise the file.
 	*/
-	CFontFile(const XCHAR* pFile);
+	CFontFile(const xchar* pFile);
 
 	/**
 	* Destructor: Clean up the file memory.
@@ -88,12 +88,12 @@ public:
 public:
 	CFontFile* pFile;			// The font file used for rendering.
 
-	XFLOAT fScale;				// The font scale.
-	XUINT iColour;				// The font colour.
-	XFLOAT fSpacing;			// The spacing between lines.
-	XFLOAT fTracking;			// The spacing between letters.
-	XPOINT xShadowOffset;		// The font shadow offset.
-	XUINT iShadowColour;		// The font shadow colour.
+	xfloat fScale;				// The font scale.
+	xuint iColour;				// The font colour.
+	xfloat fSpacing;			// The spacing between lines.
+	xfloat fTracking;			// The spacing between letters.
+	xpoint xShadowOffset;		// The font shadow offset.
+	xuint iShadowColour;		// The font shadow colour.
 };
 
 //##############################################################################
@@ -167,7 +167,7 @@ public:
 	/**
 	* Get the width of a string of characters using the specified font.
 	*/
-	xint GetStringWidth(const XCHAR* pString)
+	xint GetStringWidth(const xchar* pString)
 	{
 		return (xint)m_pMetadata->GetFont()->GetStringWidth(pString);
 	}
@@ -208,7 +208,7 @@ public:
 	/**
 	* Set the text string to render.
 	*/
-	void SetString(const XCHAR* pString)
+	void SetString(const xchar* pString)
 	{
 		m_xString = pString;
 	}
@@ -216,7 +216,7 @@ public:
 	/**
 	* Get the text string to be rendered.
 	*/
-	const XCHAR* GetString()
+	const xchar* GetString()
 	{
 		return m_xString.c_str();
 	}
@@ -224,7 +224,7 @@ public:
 	/**
 	* Set the screen position to render from.
 	*/
-	void SetPosition(XPOINT xPosition)
+	void SetPosition(xpoint xPosition)
 	{
 		m_xPosition = xPosition;
 	}
@@ -232,7 +232,7 @@ public:
 	/**
 	* Get the screen position to render from.
 	*/
-	XPOINT GetPosition()
+	xpoint GetPosition()
 	{
 		return m_xPosition;
 	}
@@ -240,7 +240,7 @@ public:
 	/**
 	* Set the text alignment. Use HGETEXT_*.
 	*/
-	void SetAlignment(XUINT iAlignment)
+	void SetAlignment(xuint iAlignment)
 	{
 		m_iAlignment = iAlignment;
 	}
@@ -248,7 +248,7 @@ public:
 	/**
 	* Get the text alignment.
 	*/
-	XUINT GetAlignment()
+	xuint GetAlignment()
 	{
 		return m_iAlignment;
 	}
@@ -256,20 +256,20 @@ public:
 	/**
 	* Get the width of the current text string using the specified font.
 	*/
-	XUINT GetStringWidth()
+	xuint GetStringWidth()
 	{
 		return CFont::GetStringWidth(GetString());
 	}
 
 protected:
 	// The text string to render.
-	XSTRING m_xString;
+	xstring m_xString;
 
 	// The screen position to render at.
-	XPOINT m_xPosition;
+	xpoint m_xPosition;
 
 	// The text alignment relative to the position.
-	XUINT m_iAlignment;
+	xuint m_iAlignment;
 };
 
 //##############################################################################

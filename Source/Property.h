@@ -50,7 +50,7 @@ public:
 	/**
 	* Constructor. 
 	*/
-	CProperty(CDataset* pParent, XCHAR* pType) : m_pParent(pParent), m_pType(pType) {}
+	CProperty(CDataset* pParent, xchar* pType) : m_pParent(pParent), m_pType(pType) {}
 
 	/**
 	* Get the dataset this property belongs to.
@@ -63,76 +63,76 @@ public:
 	/**
 	* Get the type of the property.
 	*/
-	const XCHAR* GetType()
+	const xchar* GetType()
 	{
-		return (const XCHAR*)m_pType;
+		return (const xchar*)m_pType;
 	}
 
 	/**
 	* Get the number of values in the property. 
 	*/
-	XUINT GetValueCount()
+	xuint GetValueCount()
 	{
-		return (XUINT)m_lpValues.size();
+		return (xuint)m_lpValues.size();
 	}
 
 	/**
 	* Get the property value as a char.
 	* @param iIndex Specify the index offset of the value to retrieve.
 	*/
-	XCHAR GetChar(XUINT iIndex = 0);
+	xchar GetChar(xuint iIndex = 0);
 
 	/**
 	* Get the property value as an integer.
 	* @param iIndex Specify the index offset of the value to retrieve.
 	*/
-	XINT GetInt(XUINT iIndex = 0);
+	xint GetInt(xuint iIndex = 0);
 
 	/**
 	* Get the property value as a float.
 	* @param iIndex Specify the index offset of the value to retrieve.
 	*/
-	XFLOAT GetFloat(XUINT iIndex = 0);
+	xfloat GetFloat(xuint iIndex = 0);
 
 	/**
 	* Get the property value as a boolean.
 	* @param iIndex Specify the index offset of the value to retrieve.
 	*/
-	XBOOL GetBool(XUINT iIndex = 0);
+	xbool GetBool(xuint iIndex = 0);
 
 	/**
 	* Get the property value as a string.
 	* @param iIndex Specify the index offset of the value to retrieve.
 	*/
-	const XCHAR* GetString(XUINT iIndex = 0);
+	const xchar* GetString(xuint iIndex = 0);
 
 	/**
 	* Get the property value as a point.
 	*/
-	XPOINT GetPoint(XUINT iIndex = 0)
+	xpoint GetPoint(xuint iIndex = 0)
 	{
-		XUINT iOffset = iIndex * 2;
-		return XPOINT(GetInt(iOffset + 0), GetInt(iOffset + 1));
+		xuint iOffset = iIndex * 2;
+		return xpoint(GetInt(iOffset + 0), GetInt(iOffset + 1));
 	}
 
 	/**
 	* Get the property value as a rect.
 	*/
-	XRECT GetRect(XUINT iIndex = 0)
+	xrect GetRect(xuint iIndex = 0)
 	{
-		XUINT iOffset = iIndex * 4;
-		return XRECT(GetInt(iOffset + 0), GetInt(iOffset + 1), GetInt(iOffset + 2), GetInt(iOffset + 3));
+		xuint iOffset = iIndex * 4;
+		return xrect(GetInt(iOffset + 0), GetInt(iOffset + 1), GetInt(iOffset + 2), GetInt(iOffset + 3));
 	}
 
 protected:
 	// Lists.
-	typedef std::vector<XCHAR*> t_ValueList;
+	typedef std::vector<xchar*> t_ValueList;
 
 	// The parent dataset.
 	CDataset* m_pParent;
 
 	// The type of the property.
-	XCHAR* m_pType;
+	xchar* m_pType;
 
 	// List of values held within the property.
 	t_ValueList m_lpValues;

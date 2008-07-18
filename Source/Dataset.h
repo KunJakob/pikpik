@@ -52,7 +52,7 @@ public:
 	/**
 	* Constructor. 
 	*/
-	CDataset(CDataset* pParent, const XCHAR* pType, const XCHAR* pName) : m_pParent(pParent), m_pType(pType), m_pName(pName) {}
+	CDataset(CDataset* pParent, const xchar* pType, const xchar* pName) : m_pParent(pParent), m_pType(pType), m_pName(pName) {}
 
 	/**
 	* Destructor.
@@ -70,7 +70,7 @@ public:
 	/**
 	* Get the type of the dataset.
 	*/
-	const XCHAR* GetType()
+	const xchar* GetType()
 	{
 		return m_pType;
 	}
@@ -78,7 +78,7 @@ public:
 	/**
 	* Get the name of the dataset. Returns NULL if no name was specified.
 	*/
-	const XCHAR* GetName()
+	const xchar* GetName()
 	{
 		return m_pName;
 	}
@@ -87,13 +87,13 @@ public:
 	* Get the total number of subsets available with the specified type.
 	* @param pType The type of the dataset to count instances of. Specify NULL to count all subsets in the current scope.
 	*/
-	XUINT GetDatasetCount(const XCHAR* pType = NULL);
+	xuint GetDatasetCount(const xchar* pType = NULL);
 
 	/**
 	* Get a child dataset by type. Type must be specified but name can be set to NULL if no name is specified in metadata.
 	* @return A valid dataset object or NULL if no dataset is found.
 	*/
-	CDataset* GetDataset(const XCHAR* pType, const XCHAR* pName = NULL)
+	CDataset* GetDataset(const xchar* pType, const xchar* pName = NULL)
 	{
 		return GetDataset(NULL, pType, pName);
 	}
@@ -103,13 +103,13 @@ public:
 	* @param pPrev The dataset to start searching from. This dataset is used for locational purposes only and is not included in the search.
 	* @return A valid dataset object or NULL if no dataset is found.
 	*/
-	CDataset* GetDataset(CDataset* pPrev, const XCHAR* pType, const XCHAR* pName = NULL);
+	CDataset* GetDataset(CDataset* pPrev, const xchar* pType, const xchar* pName = NULL);
 
 	/**
 	* Get a child dataset by index.
 	* @return A valid dataset object or NULL if the index is out of bounds.
 	*/
-	CDataset* GetDataset(XUINT iIndex)
+	CDataset* GetDataset(xuint iIndex)
 	{
 		return (iIndex < m_lpDatasets.size()) ? m_lpDatasets[iIndex] : NULL;
 	}
@@ -118,13 +118,13 @@ public:
 	* Get the total number of properties available with the specified name.
 	* @param pType The type name of the property to count instances of. Specify NULL to count all properties in the current scope.
 	*/
-	XUINT GetPropertyCount(const XCHAR* pType = NULL);
+	xuint GetPropertyCount(const xchar* pType = NULL);
 
 	/**
 	* Get a property by type name.
 	* @return A valid property object or NULL if no property is found.
 	*/
-	CProperty* GetProperty(const XCHAR* pType)
+	CProperty* GetProperty(const xchar* pType)
 	{
 		return GetProperty(NULL, pType);
 	}
@@ -134,30 +134,30 @@ public:
 	* @param pPrev The property to start searching from. This property is used for locational purposes only and is not included in the search.
 	* @return A valid property object or NULL if no property is found.
 	*/
-	CProperty* GetProperty(CProperty* pPrev, const XCHAR* pType);
+	CProperty* GetProperty(CProperty* pPrev, const xchar* pType);
 
 	/**
 	* Get a child property by index.
 	* @return A valid property object or NULL if the index is out of bounds.
 	*/
-	CProperty* GetProperty(XUINT iIndex)
+	CProperty* GetProperty(xuint iIndex)
 	{
 		return (iIndex < m_lpProperties.size()) ? m_lpProperties[iIndex] : NULL;
 	}
 
 protected:
 	// Lists.
-	typedef XVLIST<CDataset*> t_DatasetList;
-	typedef XVLIST<CProperty*> t_PropertyList;
+	typedef xvlist<CDataset*> t_DatasetList;
+	typedef xvlist<CProperty*> t_PropertyList;
 
 	// The parent dataset.
 	CDataset* m_pParent;
 
 	// The local dataset type.
-	const XCHAR* m_pType;
+	const xchar* m_pType;
 
 	// The local dataset name.
-	const XCHAR* m_pName;
+	const xchar* m_pName;
 
 	// A list of all child subsets.
 	t_DatasetList m_lpDatasets;

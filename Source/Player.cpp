@@ -39,26 +39,17 @@
 // =============================================================================
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
-CPlayer::CPlayer(t_PlayerType iType, const XCHAR* pSpriteName) : CRenderable(RenderableType_Player), 
+CPlayer::CPlayer(t_PlayerType iType, const xchar* pSpriteName) : CRenderable(RenderableType_Player), 
 	m_iType(iType),
-	m_iLogicType(PlayerLogicType_None),
-	m_iState(PlayerState_None),
-	m_pSprite(NULL),
-	m_pCurrentBlock(NULL),
-	m_pTargetBlock(NULL),
-	m_iTime(0),
-	m_iMoveTime(0),
-	m_fTransition(0.f),
-	m_bLeaving(false),
-	m_iTransitionDir(MoveDirection_Left),
-	m_iMoveDir(MoveDirection_Left)
+	m_pSprite(NULL)
 {
 	m_pSprite = new CAnimatedSprite(_SPRITE(pSpriteName));
-	m_pSprite->SetAnimation("Idle", true);
+	m_pSprite->SetAnimation("Idle");
 	m_pSprite->SetAnchor(m_pSprite->GetAreaCentre());
 	m_pSprite->SetEventCallback(xbind(this, &CPlayer::OnAnimationEvent));
 
 	SetName("Unknown");
+	Reset();
 }
 
 // =============================================================================
@@ -67,6 +58,25 @@ CPlayer::CPlayer(t_PlayerType iType, const XCHAR* pSpriteName) : CRenderable(Ren
 CPlayer::~CPlayer()
 {
 	delete m_pSprite;
+}
+
+// =============================================================================
+// Nat Ryall                                                         15-Jul-2008
+// =============================================================================
+void CPlayer::Reset()
+{
+	m_iState = PlayerState_None;
+	m_iLogicType = PlayerLogicType_None;
+	m_pCurrentBlock = NULL;
+	m_pTargetBlock = NULL;
+	m_iTime = 0;
+	m_iMoveTime = 0;
+	m_fTransition = 0.f;
+	m_bLeaving = false;
+	m_iTransitionDir = PlayerDirection_Left;
+	m_iMoveDir = PlayerDirection_Left;
+
+	SetState(PlayerState_Idle);
 }
 
 // =============================================================================
@@ -91,8 +101,8 @@ void CPlayer::Update()
 	case PlayerState_Move:
 		{
 			// Move the player along their path.
-			m_iTime = Math::Clamp<XUINT>(m_iTime + _TIMEDELTA, 0, m_iMoveTime);
-			m_fTransition = Math::Clamp((XFLOAT)m_iTime / (XFLOAT)m_iMoveTime, 0.f, 1.f);
+			m_iTime = Math::Clamp<xuint>(m_iTime + _TIMEDELTA, 0, m_iMoveTime);
+			m_fTransition = Math::Clamp((xfloat)m_iTime / (xfloat)m_iMoveTime, 0.f, 1.f);
 
 			m_pSprite->SetPosition(m_pCurrentBlock->GetScreenPosition() + (((m_pTargetBlock->GetScreenPosition() - m_pCurrentBlock->GetScreenPosition()) * m_iTime) / m_iMoveTime));
 			
@@ -109,7 +119,7 @@ void CPlayer::Update()
 
 	case PlayerState_Warp:
 		{
-			const static xfloat s_fMoveDir[MoveDirection_Max] = {-1.f, -1.f, 1.f, 1.f};
+			const static xfloat s_fMoveDir[PlayerDirection_Max] = {-1.f, -1.f, 1.f, 1.f};
 			static xfloat s_fBlockSize = 48.f;
 
 			xfloat fChange = _TIMEDELTAF * m_iMoveTime;
@@ -121,8 +131,8 @@ void CPlayer::Update()
 				if (m_fTransition > s_fBlockSize)
 				{
 					m_fTransition = s_fBlockSize;
-					m_pCurrentBlock = _GLOBAL.pActiveMap->GetAdjacentBlock((t_AdjacentDir)m_iTransitionDir, m_pCurrentBlock);
-					m_iTransitionDir = (t_MoveDirection)((m_iTransitionDir + 2) % MoveDirection_Max);
+					m_pCurrentBlock = _GLOBAL.pActiveMap->GetAdjacentBlock((t_AdjacentDirection)m_iTransitionDir, m_pCurrentBlock);
+					m_iTransitionDir = (t_PlayerDirection)((m_iTransitionDir + 2) % PlayerDirection_Max);
 					m_bLeaving = false;
 				}
 			}
@@ -145,7 +155,7 @@ void CPlayer::Update()
 				xOffset.iX = (xint)(m_fTransition * s_fMoveDir[m_iTransitionDir]);
 
 			m_pSprite->SetPosition(m_pCurrentBlock->GetScreenPosition() + xOffset);
-			fAlpha = 1.f - (m_fTransition / s_fBlockSize);
+			fAlpha *= 1.f - (m_fTransition / s_fBlockSize);
 
 			if (_GLOBAL.pActivePlayer == this)
 				_GLOBAL.fWorldAlpha = Math::Clamp(1.f - (m_fTransition / s_fBlockSize), 0.f, 1.f);
@@ -207,6 +217,26 @@ void CPlayer::SetState(t_PlayerState iState)
 // =============================================================================
 // Nat Ryall                                                         11-Jul-2008
 // =============================================================================
+void CPlayer::Move(t_PlayerDirection iDirection)
+{
+	m_pTargetBlock = m_pCurrentBlock->pAdjacents[iDirection];
+	m_iMoveDir = iDirection;
+	m_iTransitionDir = iDirection;
+	m_iTime = 0;
+	m_fTransition = 0.f;
+
+	if (m_pCurrentBlock->pAdjacents[iDirection])
+		SetState(PlayerState_Move);
+	else
+	{
+		m_bLeaving = true;
+		SetState(PlayerState_Warp);
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         11-Jul-2008
+// =============================================================================
 void CPlayer::Logic()
 {
 	switch (m_iLogicType)
@@ -227,13 +257,13 @@ void CPlayer::LogicLocal()
 		return;
 
 	// Check player input for all directions.
-	for (XUINT iA = 0; iA < MoveDirection_Max; ++iA)
+	for (xuint iA = 0; iA < PlayerDirection_Max; ++iA)
 	{
 		if (_HGE->Input_GetKeyState(HGEK_LEFT + iA))
 		{
 			// If we can move, begin the transition to the next block.
 			if (!m_pCurrentBlock->pAdjacents[iA] || IsPassable(m_pCurrentBlock->pAdjacents[iA]))
-				Move((t_MoveDirection)iA);
+				Move((t_PlayerDirection)iA);
 		}
 	}
 }
@@ -244,16 +274,30 @@ void CPlayer::LogicLocal()
 void CPlayer::LogicAI()
 {
 	// Check for a retreat mode/chase mode... otherwise...
+	BehaviourWander();
+}
 
-	// Wander logic.
-	CMapBlock* pMoveDirection[MoveDirection_Max];
-	t_MoveDirection iRealDirection[MoveDirection_Max];
+// =============================================================================
+// Nat Ryall                                                         11-Jul-2008
+// =============================================================================
+void CPlayer::LogicRemote()
+{
+	// Here we need to process incoming commands maybe.
+}
+
+// =============================================================================
+// Nat Ryall                                                         15-Jul-2008
+// =============================================================================
+void CPlayer::BehaviourWander()
+{
+	CMapBlock* pMoveDirection[PlayerDirection_Max];
+	t_PlayerDirection iRealDirection[PlayerDirection_Max];
 	xint iDirectionCount = 0;
 
-	for (xint iA = 0; iA < MoveDirection_Max; ++iA)
+	for (xint iA = 0; iA < PlayerDirection_Max; ++iA)
 	{
-		iRealDirection[iA] = (t_MoveDirection)((m_iMoveDir + iA + 3) % MoveDirection_Max);
-		pMoveDirection[iA] = _GLOBAL.pActiveMap->GetAdjacentBlock((t_AdjacentDir)iRealDirection[iA], m_pCurrentBlock);
+		iRealDirection[iA] = (t_PlayerDirection)((m_iMoveDir + iA + 3) % PlayerDirection_Max);
+		pMoveDirection[iA] = _GLOBAL.pActiveMap->GetAdjacentBlock((t_AdjacentDirection)iRealDirection[iA], m_pCurrentBlock);
 
 		if (IsPassable(pMoveDirection[iA]))
 			iDirectionCount++;
@@ -264,7 +308,7 @@ void CPlayer::LogicAI()
 	// If we have no choice, 
 	if (iDirectionCount == 1)
 	{
-		for (xint iA = 0; iA < MoveDirection_Max; ++iA)
+		for (xint iA = 0; iA < PlayerDirection_Max; ++iA)
 		{
 			if (pMoveDirection[iA])
 			{
@@ -278,7 +322,7 @@ void CPlayer::LogicAI()
 	{
 		xint iRandomDir = rand() % (iDirectionCount - 1);
 
-		for (xint iA = 0; iA < MoveDirection_Max; ++iA)
+		for (xint iA = 0; iA < PlayerDirection_Max; ++iA)
 		{
 			if (pMoveDirection[iA])
 				iRandomDir--;
@@ -293,37 +337,9 @@ void CPlayer::LogicAI()
 }
 
 // =============================================================================
-// Nat Ryall                                                         11-Jul-2008
-// =============================================================================
-void CPlayer::LogicRemote()
-{
-	// Here we need to process incoming commands maybe.
-}
-
-// =============================================================================
-// Nat Ryall                                                         11-Jul-2008
-// =============================================================================
-void CPlayer::Move(t_MoveDirection iDirection)
-{
-	m_pTargetBlock = m_pCurrentBlock->pAdjacents[iDirection];
-	m_iMoveDir = iDirection;
-	m_iTransitionDir = iDirection;
-	m_iTime = 0;
-	m_fTransition = 0.f;
-
-	if (m_pCurrentBlock->pAdjacents[iDirection])
-		SetState(PlayerState_Move);
-	else
-	{
-		m_bLeaving = true;
-		SetState(PlayerState_Warp);
-	}
-}
-
-// =============================================================================
 // Nat Ryall                                                         16-Apr-2008
 // =============================================================================
-void CPlayer::OnAnimationEvent(CAnimatedSprite* pSprite, const XCHAR* pEvent)
+void CPlayer::OnAnimationEvent(CAnimatedSprite* pSprite, const xchar* pEvent)
 {
 	if (strcmp(pEvent, "Eat") == 0)
 	{
@@ -376,7 +392,7 @@ void CPacman::SetState(t_PlayerState iState)
 	case PlayerState_Warp:
 		{
 			m_pSprite->Play("Move");
-			m_pSprite->SetAngle((XFLOAT)m_iTransitionDir * 90.f, true);
+			m_pSprite->SetAngle((xfloat)m_iTransitionDir * 90.f, true);
 
 			m_iMoveTime = m_pSprite->GetAnimation()->iAnimationTime;
 		}

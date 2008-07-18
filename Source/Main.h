@@ -21,10 +21,15 @@
 //                                   TYPES
 //
 //##############################################################################
+
+// Predeclare
 namespace FMOD
 {
 	class System;
 }
+
+// Namespace.
+using namespace Xen;
 
 //##############################################################################
 
@@ -49,12 +54,12 @@ namespace Application
 	/**
 	* The game update callback.
 	*/
-	XBOOL Update();
+	xbool Update();
 
 	/**
 	* The game render callback.
 	*/
-	XBOOL Render();
+	xbool Render();
 
 	/**
 	* Call to terminate the application.
@@ -69,7 +74,7 @@ namespace Application
 	/**
 	* Get the current time delta in milliseconds.
 	*/
-	XUINT GetTimeDelta();
+	xuint GetTimeDelta();
 
 	/**
 	* Get the sound interface.
