@@ -37,8 +37,8 @@
 //##############################################################################
 
 // The menu transition values.
-#define MENU_TRANSITION_DELAY 100
-#define MENU_TRANSITION_TIME 250
+#define MENU_TRANSITION_DELAY 0
+#define MENU_TRANSITION_TIME 200
 #define MENU_TRANSITION_DISTANCE _SWIDTH
 
 //##############################################################################
