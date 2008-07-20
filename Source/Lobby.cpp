@@ -102,8 +102,11 @@ void CLobbyScreen::QuitCheck()
 			{
 				if (m_bPublic && Network.IsHosting())
 				{
-					Match.CloseSession(m_pSession, xbind(this, &CLobbyScreen::OnCloseSessionCompleted));
-					SetState(LobbyState_Closing);
+					if (!Match.IsBusy())
+					{
+						Match.CloseSession(m_pSession, xbind(this, &CLobbyScreen::OnCloseSessionCompleted));
+						SetState(LobbyState_Closing);
+					}
 				}
 				else
 					CloseLobby();
@@ -244,14 +247,14 @@ void CLobbyScreen::Stop()
 // =============================================================================
 void CLobbyScreen::SetState(t_LobbyState iState)
 {
-	Interface.GetScreen()->DetachAll();
+	InterfaceRoot->DetachAll();
 
 	switch (iState)
 	{
 	case LobbyState_List:
 		{
 			for (int iA = 0; iA < m_iSessionCount; ++iA)
-				Interface.GetScreen()->Attach(m_pSessionBoxes[iA]);
+				InterfaceRoot->Attach(m_pSessionBoxes[iA]);
 		}
 		break;
 
@@ -427,7 +430,10 @@ void CLobbyScreen::OnConnectionCompleted(xbool bSuccess)
 	if (bSuccess)
 		SetState(LobbyState_Lobby);
 	else
+	{
 		SetState(LobbyState_Join);
+		Network.RequestStop();
+	}
 }
 
 // =============================================================================
@@ -515,10 +521,10 @@ CStatusBox::CStatusBox()
 // =============================================================================
 CStatusBox::~CStatusBox()
 {
-	Interface.GetScreen()->Detach(m_pStatusBox);
+	InterfaceRoot->Detach(m_pStatusBox);
 	delete m_pStatusBox;
 
-	Interface.GetScreen()->Detach(m_pLabel);
+	InterfaceRoot->Detach(m_pLabel);
 	delete m_pLabel;
 }
 
@@ -559,10 +565,10 @@ CJoinInterface::CJoinInterface()
 // =============================================================================
 CJoinInterface::~CJoinInterface()
 {
-	Interface.GetScreen()->Detach(m_pAddressBox);
+	InterfaceRoot->Detach(m_pAddressBox);
 	delete m_pAddressBox;
 
-	Interface.GetScreen()->Detach(m_pJoinButton);
+	InterfaceRoot->Detach(m_pJoinButton);
 	delete m_pJoinButton;
 }
 

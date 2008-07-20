@@ -231,8 +231,8 @@ public:
 	// Attach all elements to the interface.
 	inline void AttachElements()
 	{
-		Interface.GetScreen()->Attach(m_pStatusBox);
-		Interface.GetScreen()->Attach(m_pLabel);
+		InterfaceRoot->Attach(m_pStatusBox);
+		InterfaceRoot->Attach(m_pLabel);
 	}
 
 protected:
@@ -265,8 +265,8 @@ public:
 	// Attach all elements to the interface.
 	inline void AttachElements()
 	{
-		Interface.GetScreen()->Attach(m_pAcceptLink);
-		Interface.GetScreen()->Attach(m_pCancelLink);
+		InterfaceRoot->Attach(m_pAcceptLink);
+		InterfaceRoot->Attach(m_pCancelLink);
 	}
 
 	// Render the message interface.
@@ -305,8 +305,8 @@ public:
 	// Attach all elements to the interface.
 	inline void AttachElements()
 	{
-		Interface.GetScreen()->Attach(m_pAddressBox);
-		Interface.GetScreen()->Attach(m_pJoinButton);
+		InterfaceRoot->Attach(m_pAddressBox);
+		InterfaceRoot->Attach(m_pJoinButton);
 	}
 
 protected:

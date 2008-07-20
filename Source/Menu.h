@@ -42,14 +42,14 @@ class CMenuScreen;
 class CMenuLink;
 
 // The different group types.
-enum t_MenuGroupIndex
+enum t_MenuGroup
 {
-	MenuGroupIndex_None = -1,
-	MenuGroupIndex_Main,
-	MenuGroupIndex_Online,
-	MenuGroupIndex_Join,
-	MenuGroupIndex_Create,
-	/*MAX*/MenuGroupIndex_Max,
+	MenuGroup_None = -1,
+	MenuGroup_Main,
+	MenuGroup_Online,
+	MenuGroup_Join,
+	MenuGroup_Create,
+	/*MAX*/MenuGroup_Max,
 };
 
 // The menu states.
@@ -86,6 +86,21 @@ public:
 
 	// Destructor.
 	virtual ~CMenuLink() {}
+
+	// The element index specifying the on screen order of the link.
+	xuint m_iElementIndex;
+
+	// Determines if the element is transitioning in from the right.
+	xbool m_bTransitionRight;
+
+	// The element transition tracker.
+	xuint m_iTransitionTime;
+
+	// The offset timer for the transition to start.
+	Tools::CTimer m_xStartTimer;
+
+	// The final link position on screen.
+	xpoint m_xLinkPosition;
 
 protected:
 	// Re-position the menu link in relation to other links.
@@ -125,6 +140,9 @@ public:
 	// Called each frame to update the screen when active.
 	virtual void Update();
 
+	// Update the transition in/out state.
+	void UpdateTransition(xbool bTransitionIn);
+
 	// Show any pending screens.
 	void ShowNextScreen();
 
@@ -135,11 +153,20 @@ public:
 	virtual void Notify(XIN xuint iEventType, XIN void* pEventInfo) {}
 
 	// Set the menu group to use.
-	void SetMenuGroup(t_MenuGroupIndex iMenuGroup);
+	void SetMenuGroup(t_MenuGroup iMenuGroup);
 
 protected:
+	// Set the menu state.
+	void SetState(t_MenuState iState);
+
+	// Set the next screen to show once the transition out has completed.
+	void SetNextScreen(t_ScreenIndex iScreenIndex);
+
 	// Detach all links and add specific elements corresponding to the specified menu group.
-	void AttachMenuGroup(t_MenuGroupIndex iMenuGroup);
+	void AttachMenuGroup(t_MenuGroup iMenuGroup);
+
+	// Initialise the transition.
+	void InitTransition(xbool bTransitionIn);
 
 	// Menu link actions.
 	void Callback_ShowMainMenu();
@@ -163,7 +190,7 @@ protected:
 	CFontMetadata* m_pMenuHighlight;
 
 	// A list of all the menu elements.
-	t_MenuLinkList m_lpMenuLinks[MenuGroupIndex_Max];
+	t_MenuLinkList m_lpMenuLinks[MenuGroup_Max];
 
 	// The background image to scroll.
 	CBackgroundImage* m_pBackground;
@@ -172,13 +199,13 @@ protected:
 	CBasicSprite* m_pCursor;
 
 	// The currently active menu group.
-	t_MenuGroupIndex m_iMenuGroup;
+	t_MenuGroup m_iMenuGroup;
 
 	// The pending menu group for transitions.
-	t_MenuGroupIndex m_iPendingMenuGroup;
+	t_MenuGroup m_iPendingMenuGroup;
 
 	// The last active menu group.
-	t_MenuGroupIndex m_iLastMenuGroup;
+	t_MenuGroup m_iLastMenuGroup;
 
 	// The next screen to process.
 	t_ScreenIndex m_iNextScreen;

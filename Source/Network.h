@@ -196,17 +196,17 @@ protected:
 	// Geterate a new peer ID. Valid only on the host.
 	xint GetUniquePeerID();
 
-	// Destroy an existing peer if it exists by system address.
-	void DestroyPeer(SystemAddress* pAddress);
-
-	// Destroy a peer if it exists by peer ID.
-	void DestroyPeer(xint iPeerID);
+	// Destroy an existing peer.
+	void DestroyPeer(CNetworkPeer* pPeer);
 
 	// Find an existing peer by system address.
 	CNetworkPeer* FindPeer(SystemAddress* pAddress);
 
 	// Find an exisiting peer by peer ID.
 	CNetworkPeer* FindPeer(xint iPeerID);
+
+	// Free all existing peers in the system and fire any leaving notifications.
+	void FreePeers();
 
 	// The local interface.
 	RakPeerInterface* m_pInterface;

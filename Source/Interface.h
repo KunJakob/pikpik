@@ -34,6 +34,7 @@
 
 // Shortcuts.
 #define Interface CInterface::Get()
+#define InterfaceRoot CInterface::Get().GetRootElement()
 
 //##############################################################################
 
@@ -107,10 +108,13 @@ public:
 	// Called to render elements.
 	virtual void Render();
 
+	// Render a box border to the specified dimensions and colour.
+	void RenderBox(xrect xRect, xuint iColour);
+
 	// Get the base screen element that all other elements should attach to.
-	CScreenElement* GetScreen()
+	CScreenElement* GetRootElement()
 	{
-		return m_pScreen;
+		return m_pRoot;
 	}
 
 	// Get a list of all existing elements.
@@ -220,7 +224,7 @@ protected:
 	void RenderElement(CInterfaceElement* pElement);
 
 	// The base container object.
-	CScreenElement* m_pScreen;
+	CScreenElement* m_pRoot;
 
 	// The cursor sprite.
 	CBasicSprite* m_pCursor[ElementType_Max];

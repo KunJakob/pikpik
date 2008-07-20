@@ -30,6 +30,19 @@
 //##############################################################################
 #pragma endregion
 
+//##############################################################################
+//
+//                                   MACROS
+//
+//##############################################################################
+
+// The menu transition values.
+#define MENU_TRANSITION_DELAY 100
+#define MENU_TRANSITION_TIME 250
+#define MENU_TRANSITION_DISTANCE _SWIDTH
+
+//##############################################################################
+
 #pragma region Elements
 //##############################################################################
 //
@@ -41,7 +54,8 @@
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
 CMenuLink::CMenuLink(xuint iGroupIndex, CFontMetadata* pFont, const xchar* pText, t_fpLinkSelectedCallback fpCallback) : CTextLink(pFont, pText, fpCallback),
-	m_iGroupIndex(iGroupIndex)
+	m_iGroupIndex(iGroupIndex),
+	m_iElementIndex(0)
 {
 	m_iType = ElementType_MenuLink;
 }
@@ -51,8 +65,10 @@ CMenuLink::CMenuLink(xuint iGroupIndex, CFontMetadata* pFont, const xchar* pText
 // =============================================================================
 void CMenuLink::RePosition(xuint iElementIndex, xuint iNumElements)
 {
-	xpoint xPosition = xpoint(_HSWIDTH - (GetWidth() / 2), _HSHEIGHT - (iNumElements * (GetHeight() / 2)) + iElementIndex * (GetHeight() + 5));
-	SetPosition(xPosition);
+	m_iElementIndex = iElementIndex;
+	m_xLinkPosition = xpoint(_HSWIDTH - (GetWidth() / 2), _HSHEIGHT - (iNumElements * (GetHeight() / 2)) + iElementIndex * (GetHeight() + 5));
+
+	SetPosition(m_xLinkPosition);
 }
 
 //##############################################################################
@@ -89,33 +105,33 @@ void CMenuScreen::Load()
 	CMenuLink* pLinkList[] = 
 	{
 		// Main.
-		new CMenuLink(MenuGroupIndex_Main,		m_pMenuHighlight,	_LOCALE("Menu_Online"),			xbind(this, &CMenuScreen::Callback_ShowOnlineMenu)),
-		new CMenuLink(MenuGroupIndex_Main,		m_pMenuDefault,		_LOCALE("Menu_Offline"),		xbind(this, &CMenuScreen::Callback_StartGame)),
-		new CMenuLink(MenuGroupIndex_Main,		m_pMenuDefault,		_LOCALE("Menu_Tutorial"),		NULL),
-		new CMenuLink(MenuGroupIndex_Main,		m_pMenuDefault,		_LOCALE("Menu_Options"),		NULL),
-		new CMenuLink(MenuGroupIndex_Main,		m_pMenuDefault,		_LOCALE("Menu_Credits"),		NULL),
-		new CMenuLink(MenuGroupIndex_Main,		m_pMenuDefault,		_LOCALE("Menu_Exit"),			xbind(this, &CMenuScreen::Callback_QuitGame)),
+		new CMenuLink(MenuGroup_Main,		m_pMenuHighlight,	_LOCALE("Menu_Online"),			xbind(this, &CMenuScreen::Callback_ShowOnlineMenu)),
+		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Offline"),		xbind(this, &CMenuScreen::Callback_StartGame)),
+		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Tutorial"),		NULL),
+		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Options"),		NULL),
+		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Credits"),		NULL),
+		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Exit"),			xbind(this, &CMenuScreen::Callback_QuitGame)),
 
 		// Online.
-		new CMenuLink(MenuGroupIndex_Online,	m_pMenuDefault,		_LOCALE("Menu_OnlineJoin"),		xbind(this, &CMenuScreen::Callback_ShowJoinMenu)),
-		new CMenuLink(MenuGroupIndex_Online,	m_pMenuDefault,		_LOCALE("Menu_OnlineCreate"),	xbind(this, &CMenuScreen::Callback_ShowCreateMenu)),
-		new CMenuLink(MenuGroupIndex_Online,	m_pMenuHighlight,	_LOCALE("Menu_Back"),			xbind(this, &CMenuScreen::Callback_ShowMainMenu)),
+		new CMenuLink(MenuGroup_Online,		m_pMenuDefault,		_LOCALE("Menu_OnlineJoin"),		xbind(this, &CMenuScreen::Callback_ShowJoinMenu)),
+		new CMenuLink(MenuGroup_Online,		m_pMenuDefault,		_LOCALE("Menu_OnlineCreate"),	xbind(this, &CMenuScreen::Callback_ShowCreateMenu)),
+		new CMenuLink(MenuGroup_Online,		m_pMenuHighlight,	_LOCALE("Menu_Back"),			xbind(this, &CMenuScreen::Callback_ShowMainMenu)),
 
 		// Find.
-		new CMenuLink(MenuGroupIndex_Join,		m_pMenuDefault,		_LOCALE("Menu_JoinPublic"),		xbind(this, &CMenuScreen::Callback_JoinPublic)),
-		new CMenuLink(MenuGroupIndex_Join,		m_pMenuDefault,		_LOCALE("Menu_JoinPrivate"),	xbind(this, &CMenuScreen::Callback_JoinPrivate)),
-		new CMenuLink(MenuGroupIndex_Join,		m_pMenuHighlight,	_LOCALE("Menu_Back"),			xbind(this, &CMenuScreen::Callback_ShowOnlineMenu)),
+		new CMenuLink(MenuGroup_Join,		m_pMenuDefault,		_LOCALE("Menu_JoinPublic"),		xbind(this, &CMenuScreen::Callback_JoinPublic)),
+		new CMenuLink(MenuGroup_Join,		m_pMenuDefault,		_LOCALE("Menu_JoinPrivate"),	xbind(this, &CMenuScreen::Callback_JoinPrivate)),
+		new CMenuLink(MenuGroup_Join,		m_pMenuHighlight,	_LOCALE("Menu_Back"),			xbind(this, &CMenuScreen::Callback_ShowOnlineMenu)),
 
 		// Create.
-		new CMenuLink(MenuGroupIndex_Create,	m_pMenuDefault,		_LOCALE("Menu_CreatePublic"),	xbind(this, &CMenuScreen::Callback_CreatePublic)),
-		new CMenuLink(MenuGroupIndex_Create,	m_pMenuDefault,		_LOCALE("Menu_CreatePrivate"),	xbind(this, &CMenuScreen::Callback_CreatePrivate)),
-		new CMenuLink(MenuGroupIndex_Create,	m_pMenuHighlight,	_LOCALE("Menu_Back"),			xbind(this, &CMenuScreen::Callback_ShowOnlineMenu)),
+		new CMenuLink(MenuGroup_Create,		m_pMenuDefault,		_LOCALE("Menu_CreatePublic"),	xbind(this, &CMenuScreen::Callback_CreatePublic)),
+		new CMenuLink(MenuGroup_Create,		m_pMenuDefault,		_LOCALE("Menu_CreatePrivate"),	xbind(this, &CMenuScreen::Callback_CreatePrivate)),
+		new CMenuLink(MenuGroup_Create,		m_pMenuHighlight,	_LOCALE("Menu_Back"),			xbind(this, &CMenuScreen::Callback_ShowOnlineMenu)),
 	};
 
 	for (xuint iA = 0; iA < (sizeof(pLinkList) / sizeof(CMenuLink*)); ++iA)
 		m_lpMenuLinks[pLinkList[iA]->m_iGroupIndex].push_back(pLinkList[iA]);
 
-	for (xuint iGroup = 0; iGroup < MenuGroupIndex_Max; ++iGroup)
+	for (xuint iGroup = 0; iGroup < MenuGroup_Max; ++iGroup)
 	{
 		xuint iElementCount = (xuint)m_lpMenuLinks[iGroup].size();
 		xuint iElement = 0;
@@ -126,9 +142,9 @@ void CMenuScreen::Load()
 
 	// Initialise transition variables.
 	m_iState = MenuState_None;
-	m_iMenuGroup = MenuGroupIndex_None;
-	m_iPendingMenuGroup = MenuGroupIndex_None;
-	m_iLastMenuGroup = MenuGroupIndex_Main;
+	m_iMenuGroup = MenuGroup_None;
+	m_iPendingMenuGroup = MenuGroup_None;
+	m_iLastMenuGroup = MenuGroup_Main;
 	m_iNextScreen = ScreenIndex_Invalid;
 	m_iLobbyMode = LobbyStartMode_CreatePrivate;
 }
@@ -159,9 +175,7 @@ void CMenuScreen::Wake()
 // =============================================================================
 void CMenuScreen::Sleep()
 {
-	m_iLastMenuGroup = m_iMenuGroup;
-
-	SetMenuGroup(MenuGroupIndex_None);
+	//SetMenuGroup(MenuGroup_None);
 }
 
 // =============================================================================
@@ -170,46 +184,37 @@ void CMenuScreen::Sleep()
 void CMenuScreen::Update()
 {
 	// Allow "ESC" to exit the game.
-	if (_HGE->Input_KeyUp(HGEK_ESCAPE))
+	if (m_iState == MenuState_Idle && _HGE->Input_KeyUp(HGEK_ESCAPE))
 	{
 		switch (m_iMenuGroup)
 		{
-		case MenuGroupIndex_Main:
+		case MenuGroup_Main:
 			_TERMINATE;
 			return;
 
-		case MenuGroupIndex_Online:
-			SetMenuGroup(MenuGroupIndex_Main);
+		case MenuGroup_Online:
+			SetMenuGroup(MenuGroup_Main);
 			break;
 
-		case MenuGroupIndex_Join:
-		case MenuGroupIndex_Create:
-			SetMenuGroup(MenuGroupIndex_Online);
+		case MenuGroup_Join:
+		case MenuGroup_Create:
+			SetMenuGroup(MenuGroup_Online);
 			break;
 		}
 	}
 
-	// Transition or update this screen.
+	// Update based on the state.
 	switch (m_iState)
 	{
-	case MenuState_None:
-		{
-			ShowNextScreen();
-		}
-		break;
-
 	case MenuState_TransitionIn:
 		{
-		}
-		break;
-
-	case MenuState_Idle:
-		{
+			UpdateTransition(true);
 		}
 		break;
 
 	case MenuState_TransitionOut:
 		{
+			UpdateTransition(false);
 		}
 		break;
 	}
@@ -218,11 +223,88 @@ void CMenuScreen::Update()
 }
 
 // =============================================================================
+// Nat Ryall                                                         20-Jul-2008
+// =============================================================================
+void CMenuScreen::UpdateTransition(xbool bTransitionIn)
+{
+	XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[m_iMenuGroup])
+	{
+		CMenuLink* pMenuLink = *ppMenuLink;
+
+		if (pMenuLink->m_xStartTimer.IsExpired())
+		{
+			// Perform the transition in for each link as it expires.
+			xint iOffset = XINTPERCENT(pMenuLink->m_iTransitionTime, MENU_TRANSITION_DISTANCE, MENU_TRANSITION_TIME);
+			xint iDirectionalOffset = bTransitionIn ? MENU_TRANSITION_DISTANCE - iOffset : iOffset;
+
+			pMenuLink->m_iTransitionTime = Math::Clamp<xuint>(pMenuLink->m_iTransitionTime + _TIMEDELTA, 0, MENU_TRANSITION_TIME);
+			pMenuLink->SetPosition(pMenuLink->m_xLinkPosition + xpoint(pMenuLink->m_bTransitionRight ? iDirectionalOffset : -iDirectionalOffset, 0));
+
+			// If we're the last one to finish the transition, go to 'idle'.
+			if (pMenuLink->m_iElementIndex == ((xint)m_lpMenuLinks[m_iMenuGroup].size() - 1) && iOffset == MENU_TRANSITION_DISTANCE)
+			{
+				SetState(bTransitionIn ? MenuState_Idle : MenuState_None);
+				return;
+			}
+		}
+	}
+}
+
+// =============================================================================
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
 void CMenuScreen::Render()
 {
 	m_pBackground->Render();
+}
+
+// =============================================================================
+// Nat Ryall                                                         20-Jul-2008
+// =============================================================================
+void CMenuScreen::SetState(t_MenuState iState)
+{
+	m_iState = iState;
+
+	switch (iState)
+	{
+	case MenuState_None:
+		{
+			m_iLastMenuGroup = m_iMenuGroup;
+			m_iMenuGroup = MenuGroup_None;
+
+			ShowNextScreen();
+		}
+		break;
+
+	case MenuState_TransitionIn:
+		{
+			InterfaceRoot->SetEnabled(false);
+			InitTransition(true);
+		}
+		break;
+
+	case MenuState_Idle:
+		{
+			InterfaceRoot->SetEnabled(true);
+		}
+		break;
+
+	case MenuState_TransitionOut:
+		{
+			InterfaceRoot->SetEnabled(false);
+			InitTransition(false);
+		}
+		break;
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         20-Jul-2008
+// =============================================================================
+void CMenuScreen::SetNextScreen(t_ScreenIndex iScreenIndex)
+{
+	m_iNextScreen = iScreenIndex;
+	SetState(MenuState_TransitionOut);
 }
 
 // =============================================================================
@@ -246,55 +328,72 @@ void CMenuScreen::ShowNextScreen()
 		return;
 	}
 
-	if (m_iPendingMenuGroup != MenuGroupIndex_None)
+	if (m_iPendingMenuGroup != MenuGroup_None)
 	{
-		AttachMenuGroup(m_iPendingMenuGroup);
-
-		m_iState = MenuState_TransitionIn;
-		m_iPendingMenuGroup = MenuGroupIndex_None;
+		SetMenuGroup(m_iPendingMenuGroup);
+		m_iPendingMenuGroup = MenuGroup_None;
 	}
 }
 
 // =============================================================================
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
-void CMenuScreen::SetMenuGroup(t_MenuGroupIndex iMenuGroup)
+void CMenuScreen::SetMenuGroup(t_MenuGroup iMenuGroup)
 {
-	AttachMenuGroup(iMenuGroup);
-
-	/*if (iMenuGroup != MenuGroupIndex_None)
+	if (iMenuGroup != MenuGroup_None)
 	{
-		if (m_iMenuGroup == MenuGroupIndex_None)
+		if (m_iMenuGroup == MenuGroup_None)
 		{
 			AttachMenuGroup(iMenuGroup);
-			m_iState = MenuState_TransitionIn;
+			SetState(MenuState_TransitionIn);
 		}
 		else
-			m_iState = MenuState_TransitionOut;
+		{
+			m_iPendingMenuGroup = iMenuGroup;
+			SetState(MenuState_TransitionOut);
+		}
 	}
 	else
 	{
-		if (m_iMenuGroup != MenuGroupIndex_None)
-			m_iState = MenuState_TransitionOut;
+		if (m_iMenuGroup != MenuGroup_None)
+			SetState(MenuState_TransitionOut);
 	}
-
-	m_iPendingMenuGroup = iMenuGroup;*/
 }
 
 // =============================================================================
 // Nat Ryall                                                         17-Jul-2008
 // =============================================================================
-void CMenuScreen::AttachMenuGroup(t_MenuGroupIndex iMenuGroup)
+void CMenuScreen::AttachMenuGroup(t_MenuGroup iMenuGroup)
 {
-	Interface.GetScreen()->DetachAll();
+	m_iMenuGroup = iMenuGroup;
 
-	if (iMenuGroup != MenuGroupIndex_None)
+	InterfaceRoot->DetachAll();
+
+	if (iMenuGroup != MenuGroup_None)
 	{
 		XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[iMenuGroup])
-			Interface.GetScreen()->Attach(*ppMenuLink);
+			InterfaceRoot->Attach(*ppMenuLink);
 	}
+}
 
-	m_iMenuGroup = iMenuGroup;
+// =============================================================================
+// Nat Ryall                                                         20-Jul-2008
+// =============================================================================
+void CMenuScreen::InitTransition(xbool bTransitionIn)
+{
+	XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[m_iMenuGroup])
+	{
+		CMenuLink* pMenuLink = *ppMenuLink;
+
+		pMenuLink->m_bTransitionRight = (pMenuLink->m_iElementIndex % 2 == 0);
+		pMenuLink->m_iTransitionTime = 0;
+		pMenuLink->m_xStartTimer.ExpireAfter(MENU_TRANSITION_DELAY * pMenuLink->m_iElementIndex);
+
+		if (bTransitionIn)
+			pMenuLink->SetPosition(xpoint(pMenuLink->m_xLinkPosition.iX, -pMenuLink->GetHeight()));
+		else
+			pMenuLink->m_bTransitionRight = !pMenuLink->m_bTransitionRight;
+	}
 }
 
 // =============================================================================
@@ -302,7 +401,7 @@ void CMenuScreen::AttachMenuGroup(t_MenuGroupIndex iMenuGroup)
 // =============================================================================
 void CMenuScreen::Callback_ShowMainMenu()
 {
-	SetMenuGroup(MenuGroupIndex_Main);
+	SetMenuGroup(MenuGroup_Main);
 }
 
 // =============================================================================
@@ -310,7 +409,7 @@ void CMenuScreen::Callback_ShowMainMenu()
 // =============================================================================
 void CMenuScreen::Callback_ShowOnlineMenu()
 {
-	SetMenuGroup(MenuGroupIndex_Online);
+	SetMenuGroup(MenuGroup_Online);
 }
 
 // =============================================================================
@@ -318,7 +417,7 @@ void CMenuScreen::Callback_ShowOnlineMenu()
 // =============================================================================
 void CMenuScreen::Callback_ShowJoinMenu()
 {
-	SetMenuGroup(MenuGroupIndex_Join);
+	SetMenuGroup(MenuGroup_Join);
 }
 
 // =============================================================================
@@ -326,7 +425,7 @@ void CMenuScreen::Callback_ShowJoinMenu()
 // =============================================================================
 void CMenuScreen::Callback_ShowCreateMenu()
 {
-	SetMenuGroup(MenuGroupIndex_Create);
+	SetMenuGroup(MenuGroup_Create);
 }
 
 // =============================================================================
@@ -334,7 +433,7 @@ void CMenuScreen::Callback_ShowCreateMenu()
 // =============================================================================
 void CMenuScreen::Callback_JoinPublic()
 {
-	m_iNextScreen = ScreenIndex_LobbyScreen;
+	SetNextScreen(ScreenIndex_LobbyScreen);
 	m_iLobbyMode = LobbyStartMode_JoinPublic;
 }
 
@@ -343,7 +442,7 @@ void CMenuScreen::Callback_JoinPublic()
 // =============================================================================
 void CMenuScreen::Callback_JoinPrivate()
 {
-	m_iNextScreen = ScreenIndex_LobbyScreen;
+	SetNextScreen(ScreenIndex_LobbyScreen);
 	m_iLobbyMode = LobbyStartMode_JoinPrivate;
 }
 
@@ -352,7 +451,7 @@ void CMenuScreen::Callback_JoinPrivate()
 // =============================================================================
 void CMenuScreen::Callback_CreatePublic()
 {
-	m_iNextScreen = ScreenIndex_LobbyScreen;
+	SetNextScreen(ScreenIndex_LobbyScreen);
 	m_iLobbyMode = LobbyStartMode_CreatePublic;
 }
 
@@ -361,7 +460,7 @@ void CMenuScreen::Callback_CreatePublic()
 // =============================================================================
 void CMenuScreen::Callback_CreatePrivate()
 {
-	m_iNextScreen = ScreenIndex_LobbyScreen;
+	SetNextScreen(ScreenIndex_LobbyScreen);
 	m_iLobbyMode = LobbyStartMode_CreatePrivate;
 }
 
@@ -370,7 +469,7 @@ void CMenuScreen::Callback_CreatePrivate()
 // =============================================================================
 void CMenuScreen::Callback_StartGame()
 {
-	m_iNextScreen = ScreenIndex_GameScreen;
+	SetNextScreen(ScreenIndex_GameScreen);
 }
 
 // =============================================================================

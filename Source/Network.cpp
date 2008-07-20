@@ -330,6 +330,9 @@ void CNetwork::Stop()
 	{
 		XLOG("[Network] Stopping network.");
 
+		if (m_bHosting)
+			FreePeers();
+
 		if (m_xCallbacks.m_fpNetworkStopped)
 			m_xCallbacks.m_fpNetworkStopped();
 
@@ -390,23 +393,10 @@ xint CNetwork::GetUniquePeerID()
 }
 
 // =============================================================================
-// Nat Ryall                                                         09-Jun-2008
+// Nat Ryall                                                         19-Jul-2008
 // =============================================================================
-void CNetwork::DestroyPeer(SystemAddress* pAddress)
+void CNetwork::DestroyPeer(CNetworkPeer* pPeer)
 {
-	CNetworkPeer* pPeer = FindPeer(pAddress);
-
-	if (pPeer)
-		XEN_LIST_ERASE(t_NetworkPeerList, m_lpPeers, pPeer);
-}
-
-// =============================================================================
-// Nat Ryall                                                         09-Jun-2008
-// =============================================================================
-void CNetwork::DestroyPeer(xint iPeerID)
-{
-	CNetworkPeer* pPeer = FindPeer(iPeerID);
-
 	if (pPeer)
 		XEN_LIST_ERASE(t_NetworkPeerList, m_lpPeers, pPeer);
 }
@@ -440,6 +430,27 @@ CNetworkPeer* CNetwork::FindPeer(xint iPeerID)
 }
 
 // =============================================================================
+// Nat Ryall                                                         19-Jul-2008
+// =============================================================================
+void CNetwork::FreePeers()
+{
+	// Notify that all peers are leaving if we have a callback.
+	if (m_xCallbacks.m_fpPeerLeaving)
+	{
+		while (m_lpPeers.size()) 
+		{ 
+			m_xCallbacks.m_fpPeerLeaving(m_lpPeers.back());
+
+			delete *m_lpPeers.rbegin(); 
+			m_lpPeers.pop_back(); 
+		}	
+	}
+	// Otherwise just erase them from memory.
+	else
+		XEN_LIST_ERASE_ALL(m_lpPeers);
+}
+
+// =============================================================================
 // Nat Ryall                                                         09-Jun-2008
 // =============================================================================
 void CNetwork::ProcessHostNotifications(xchar cIdentifier, Packet* pPacket, xuchar* pData, xint iDataSize)
@@ -448,11 +459,13 @@ void CNetwork::ProcessHostNotifications(xchar cIdentifier, Packet* pPacket, xuch
 
 	switch (cIdentifier)
 	{
+	// A new client connection was established to this machine.
 	case ID_NEW_INCOMING_CONNECTION:
 		{
 			CNetworkPeer* pJoiningPeer = CreatePeer();
 			pJoiningPeer->m_xAddress = pPacket->systemAddress;
 
+			// Notify all of out client-peers of the new peer.
 			XEN_LIST_FOREACH_R(t_NetworkPeerList, ppPeer, m_lpPeers)
 			{
 				if (!(*ppPeer)->m_bLocal)
@@ -467,6 +480,7 @@ void CNetwork::ProcessHostNotifications(xchar cIdentifier, Packet* pPacket, xuch
 				}
 			}
 
+			// Assign an ID to the new client and notify them.
 			BitStream xOutStream;
 
 			xOutStream.Write((xuint8)ID_PEER_JOINED);
@@ -475,14 +489,17 @@ void CNetwork::ProcessHostNotifications(xchar cIdentifier, Packet* pPacket, xuch
 
 			m_pInterface->Send(&xOutStream, HIGH_PRIORITY, RELIABLE, 1, pPacket->systemAddress, true);
 
+			// Fire the join notification.
 			if (m_xCallbacks.m_fpPeerJoined)
 				m_xCallbacks.m_fpPeerJoined(pJoiningPeer);
 		}
 		break;
 
+	// A client has lost connection to us.
 	case ID_DISCONNECTION_NOTIFICATION:
 	case ID_CONNECTION_LOST:
 		{
+			// If we have a record of them, notify all other clients of their disconnection.
 			CNetworkPeer* pLeavingPeer = FindPeer(&pPacket->systemAddress);
 			
 			if (pLeavingPeer)
@@ -495,10 +512,11 @@ void CNetwork::ProcessHostNotifications(xchar cIdentifier, Packet* pPacket, xuch
 				m_pInterface->Send(&xOutStream, HIGH_PRIORITY, RELIABLE, 1, UNASSIGNED_SYSTEM_ADDRESS, true);
 			}
 
+			// Fire the leaving notification.
 			if (m_xCallbacks.m_fpPeerLeaving)
 				m_xCallbacks.m_fpPeerLeaving(pLeavingPeer);
 
-			DestroyPeer(pLeavingPeer->m_iID);
+			DestroyPeer(pLeavingPeer);
 		}
 		break;
 
@@ -553,8 +571,9 @@ void CNetwork::ProcessClientNotifications(xchar cIdentifier, Packet* pPacket, xu
 	case ID_DISCONNECTION_NOTIFICATION:
 	case ID_CONNECTION_LOST:
 		{
-			// Destroy all existing peers.
+			FreePeers();
 
+			// We're no longer connected so notify and shutdown.
 			m_bConnected = false;
 
 			if (m_xCallbacks.m_fpConnectionLost)
@@ -598,7 +617,7 @@ void CNetwork::ProcessClientNotifications(xchar cIdentifier, Packet* pPacket, xu
 			if (pPeer && m_xCallbacks.m_fpPeerLeaving)
 				m_xCallbacks.m_fpPeerLeaving(pPeer);
 
-			DestroyPeer(iID);
+			DestroyPeer(pPeer);
 		}
 		break;
 

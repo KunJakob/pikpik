@@ -22,7 +22,7 @@
 // Nat Ryall                                                          1-May-2008
 // =============================================================================
 CInterface::CInterface() :
-	m_pScreen(NULL),
+	m_pRoot(NULL),
 	m_bVisible(true),
 	m_bCursorVisible(true),
 	m_pActiveElement(NULL),
@@ -30,7 +30,7 @@ CInterface::CInterface() :
 	m_bFoundActive(false),
 	m_bDebugRender(false)
 {
-	m_pScreen = new CScreenElement();
+	m_pRoot = new CScreenElement();
 	Reset();
 }
 
@@ -39,15 +39,13 @@ CInterface::CInterface() :
 // =============================================================================
 CInterface::~CInterface()
 {
-	delete m_pScreen;
+	delete m_pRoot;
 
 	for (xint iA = 0; iA < ElementType_Max; ++iA)
 	{
 		if (m_pCursor[iA])
 			delete m_pCursor[iA];
 	}
-
-	XEN_LIST_ERASE_ALL(m_lpElements);
 }
 
 // =============================================================================
@@ -58,7 +56,7 @@ void CInterface::Reset()
 	m_pActiveElement = NULL;
 	m_pFocusedElement = NULL;
 
-	m_pScreen->DetachAll();
+	m_pRoot->DetachAll();
 
 	for (xint iA = 0; iA < ElementType_Max; ++iA)
 		m_pCursor[iA] = NULL;
@@ -82,7 +80,7 @@ void CInterface::Update()
 
 	m_bFoundActive = false;
 
-	UpdateElement(m_pScreen);
+	UpdateElement(m_pRoot);
 
 	if (m_pFocusedElement)
 	{
@@ -122,8 +120,9 @@ void CInterface::Render()
 {
 	if (m_bVisible)
 	{
-		RenderElement(m_pScreen);
+		RenderElement(m_pRoot);
 
+		// Render debug boxes over the interface to show the active and focused elements.
 		if (m_bDebugRender)
 		{
 			if (m_pActiveElement)
@@ -131,21 +130,7 @@ void CInterface::Render()
 				xrect xRect = m_pActiveElement->GetArea();
 				xuint iColour = ARGB(255, 32, 32, 32);
 
-				hgeQuad xQuad;
-				memset(&xQuad, 0, sizeof(hgeQuad));
-
-				xQuad.v[0].x = (float)xRect.iLeft;
-				xQuad.v[0].y = (float)xRect.iTop;
-				xQuad.v[1].x = (float)xRect.iRight;
-				xQuad.v[1].y = (float)xRect.iTop;
-				xQuad.v[3].x = (float)xRect.iLeft;
-				xQuad.v[3].y = (float)xRect.iBottom;
-				xQuad.v[2].x = (float)xRect.iRight;
-				xQuad.v[2].y = (float)xRect.iBottom;
-
-				xQuad.v[0].col = xQuad.v[1].col = xQuad.v[2].col = xQuad.v[3].col = iColour;
-
-				_HGE->Gfx_RenderQuad(&xQuad);
+				RenderBox(xRect, iColour);
 			}
 
 			if (m_pFocusedElement)
@@ -153,23 +138,53 @@ void CInterface::Render()
 				xrect xRect = m_pFocusedElement->GetFocusArea() + xrect(2, 2, -1, -1);
 				xuint iColour = ARGB(255, 255, 0, 0);
 
-				_HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iTop, iColour);
-				_HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iBottom, iColour);
-				_HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iBottom, iColour);
-				_HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iTop, iColour);
+				RenderBox(xRect, iColour);
 			}
 		}
 
+		// Render the cursor.
 		if (m_bCursorVisible && _HGE->Input_IsMouseOver() && m_pCursor[ElementType_Unknown])
 		{
 			CBasicSprite* pCursor = m_pCursor[ElementType_Unknown];
 
+			// If we have an active element and an custom cursor exists.
 			if (m_pActiveElement && m_pCursor[m_pActiveElement->GetType()])
-				pCursor = m_pCursor[m_pActiveElement->GetType()];
+			{
+				CInterfaceElement* pElement = m_pActiveElement;
+
+				while (pElement->IsEnabled() && pElement != m_pRoot)
+					pElement = pElement->GetParent();
+
+				// Check that the there is nothing disabled and so blocking the custom cursor.
+				if (pElement->IsEnabled())
+					pCursor = m_pCursor[m_pActiveElement->GetType()];
+			}
 
 			pCursor->Render(m_xMousePos);
 		}
 	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         20-Jul-2008
+// =============================================================================
+void CInterface::RenderBox(xrect xRect, xuint iColour)
+{
+	hgeQuad xQuad;
+	memset(&xQuad, 0, sizeof(hgeQuad));
+
+	xQuad.v[0].x = (float)xRect.iLeft;
+	xQuad.v[0].y = (float)xRect.iTop;
+	xQuad.v[1].x = (float)xRect.iRight;
+	xQuad.v[1].y = (float)xRect.iTop;
+	xQuad.v[3].x = (float)xRect.iLeft;
+	xQuad.v[3].y = (float)xRect.iBottom;
+	xQuad.v[2].x = (float)xRect.iRight;
+	xQuad.v[2].y = (float)xRect.iBottom;
+
+	xQuad.v[0].col = xQuad.v[1].col = xQuad.v[2].col = xQuad.v[3].col = iColour;
+
+	_HGE->Gfx_RenderQuad(&xQuad);
 }
 
 // =============================================================================
