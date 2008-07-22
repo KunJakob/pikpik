@@ -154,10 +154,8 @@ void CMenuScreen::Load()
 // =============================================================================
 void CMenuScreen::Unload()
 {
-	//delete m_pMenuDefault;
-	//delete m_pMenuHighlight; 
-
-	// TODO: Fix the above.
+	delete m_pMenuDefault;
+	delete m_pMenuHighlight; 
 
 	delete m_pBackground;
 }
@@ -175,7 +173,6 @@ void CMenuScreen::Wake()
 // =============================================================================
 void CMenuScreen::Sleep()
 {
-	//SetMenuGroup(MenuGroup_None);
 }
 
 // =============================================================================
