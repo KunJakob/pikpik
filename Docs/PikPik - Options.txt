@@ -1,0 +1,5 @@
+Options
+ - Radar Transparency: 0.25 - 1.0
+
+Online Options
+ - Nickname: 16 Chars Max
