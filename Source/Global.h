@@ -157,6 +157,7 @@ enum t_RenderableType
 	RenderableType_Player,
 	RenderableType_Text,
 	RenderableType_Dialog,
+	RenderableType_Minimap,
 };
 
 // Network packet types.

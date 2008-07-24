@@ -239,7 +239,7 @@ protected:
 	// Check if the specified block is passable.
 	virtual xbool IsPassable(CMapBlock* pBlock)
 	{
-		return CPlayer::IsPassable(pBlock) && pBlock->cChar != '=';
+		return CPlayer::IsPassable(pBlock) && pBlock->m_cChar != '=';
 	}
 
 	// Called to change the state of the player object.
@@ -272,6 +272,12 @@ public:
 
 	// Called to change the state of the player object.
 	virtual void SetState(t_PlayerState iState);
+
+	// Get the ghost's colour.
+	inline xuint GetColour() 
+	{ 
+		return m_iColour; 
+	}
 
 protected:
 	// The ghost's eyes.

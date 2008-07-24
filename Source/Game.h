@@ -24,6 +24,7 @@
 #include <Player.h>
 #include <Background.h>
 #include <Interface.h>
+#include <Minimap.h>
 
 //##############################################################################
 #pragma endregion
@@ -78,6 +79,9 @@ protected:
 
 	// The world transform offset.
 	xpoint m_xOffset;
+
+	//
+	CMinimap* m_pMinimap;
 };
 
 //##############################################################################

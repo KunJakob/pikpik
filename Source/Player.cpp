@@ -171,7 +171,7 @@ void CPlayer::Update()
 	}
 
 	if (this != _GLOBAL.pActivePlayer)
-		m_pSprite->SetAlpha(m_pCurrentBlock->fVisibility * fAlpha);
+		m_pSprite->SetAlpha(m_pCurrentBlock->m_fVisibility * fAlpha);
 	else
 		m_pSprite->SetAlpha(fAlpha);
 
@@ -219,13 +219,13 @@ void CPlayer::SetState(t_PlayerState iState)
 // =============================================================================
 void CPlayer::Move(t_PlayerDirection iDirection)
 {
-	m_pTargetBlock = m_pCurrentBlock->pAdjacents[iDirection];
+	m_pTargetBlock = m_pCurrentBlock->m_pAdjacents[iDirection];
 	m_iMoveDir = iDirection;
 	m_iTransitionDir = iDirection;
 	m_iTime = 0;
 	m_fTransition = 0.f;
 
-	if (m_pCurrentBlock->pAdjacents[iDirection])
+	if (m_pCurrentBlock->m_pAdjacents[iDirection])
 		SetState(PlayerState_Move);
 	else
 	{
@@ -262,7 +262,7 @@ void CPlayer::LogicLocal()
 		if (_HGE->Input_GetKeyState(HGEK_LEFT + iA))
 		{
 			// If we can move, begin the transition to the next block.
-			if (!m_pCurrentBlock->pAdjacents[iA] || IsPassable(m_pCurrentBlock->pAdjacents[iA]))
+			if (!m_pCurrentBlock->m_pAdjacents[iA] || IsPassable(m_pCurrentBlock->m_pAdjacents[iA]))
 				Move((t_PlayerDirection)iA);
 		}
 	}
@@ -476,7 +476,7 @@ void CGhost::SetState(t_PlayerState iState)
 			m_pEyes->SetArea(XFORMAT("F%d", m_iTransitionDir + 1));
 			m_iMoveTime = m_pSprite->GetAnimation()->iAnimationTime;
 
-			if (m_pCurrentBlock->iType == TileType_Entrance || (m_pTargetBlock && m_pTargetBlock->iType == TileType_Entrance))
+			if (m_pCurrentBlock->m_iTileType == TileType_Entrance || (m_pTargetBlock && m_pTargetBlock->m_iTileType == TileType_Entrance))
 				m_iMoveTime *= 4;
 		}
 		break;

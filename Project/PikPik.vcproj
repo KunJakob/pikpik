@@ -327,6 +327,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Source\Minimap.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Minimap.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\Network.cpp"
 				>
 			</File>

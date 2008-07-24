@@ -19,6 +19,9 @@
 // Local.
 #include <Game.h>
 
+// Other.
+#include <Minimap.h>
+
 //##############################################################################
 
 //##############################################################################
@@ -42,9 +45,14 @@ void CGameScreen::Load()
 	RenderManager::SetRenderCallback(LayerIndex_Map, xbind(this, &CGameScreen::WorldTransform));
 	RenderManager::SetRenderCallback(LayerIndex_Player, xbind(this, &CGameScreen::WorldTransform));
 
-	m_pFieldMask = new hgeSprite(GenerateFieldMask(48 * 3, 48 * 5), 0, 0, _SWIDTH, _SHEIGHT);
+	//m_pFieldMask = new hgeSprite(GenerateFieldMask(48 * 3, 48 * 5), 0, 0, 512, 512);
 
 	Interface.SetCursorVisible(false);
+
+	m_pMinimap = new CMinimap(_GLOBAL.pActiveMap);
+	m_pMinimap->Generate(MinimapElement_Walls | MinimapElement_GhostBase | MinimapElement_Pellets | MinimapElement_Floor);
+
+	RenderManager::Add(LayerIndex_Radar, m_pMinimap);
 }
 
 // =============================================================================
@@ -97,10 +105,12 @@ void CGameScreen::Unload()
 
 	RenderManager::Reset();
 
-	_HGE->Texture_Free(m_pFieldMask->GetTexture());
-	delete m_pFieldMask;
+	//_HGE->Texture_Free(m_pFieldMask->GetTexture());
+	//delete m_pFieldMask;
 
 	Interface.SetCursorVisible(true);
+
+	delete m_pMinimap;
 }
 
 // =============================================================================
@@ -120,7 +130,7 @@ void CGameScreen::Update()
 	{
 		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, _GLOBAL.lpPlayers)
 		{
-			//_GLOBAL.pActivePlayer->SetLogicType(PlayerLogicType_AI);
+			_GLOBAL.pActivePlayer->SetLogicType(PlayerLogicType_AI);
 
 			if (_GLOBAL.pActivePlayer == *ppPlayer)
 			{
@@ -134,7 +144,7 @@ void CGameScreen::Update()
 					_GLOBAL.fWorldAlpha = 1.f;
 				}
 
-				//_GLOBAL.pActivePlayer->SetLogicType(PlayerLogicType_Local); 
+				_GLOBAL.pActivePlayer->SetLogicType(PlayerLogicType_Local); 
 			}
 		}
 	}
@@ -144,6 +154,8 @@ void CGameScreen::Update()
 
 	// Calculate the music energy using spectrum analysis.
 	CalculateMusicEnergy(m_pChannel);
+
+	m_pMinimap->Generate(MinimapElement_Walls | MinimapElement_GhostBase /*| MinimapElement_Pellets*/ | MinimapElement_Ghost);
 }
 
 // =============================================================================
@@ -151,8 +163,8 @@ void CGameScreen::Update()
 // =============================================================================
 void CGameScreen::Render()
 {
-	if (_GLOBAL.pActivePlayer->GetType() == PlayerType_Ghost)
-		m_pFieldMask->Render(0, 0);
+	//if (_GLOBAL.pActivePlayer->GetType() == PlayerType_Ghost)
+	//	m_pFieldMask->Render(_HSWIDTH - 256, _HSHEIGHT - 256);
 
 	const char* pMusicTitle = "Unknown";
 
@@ -162,7 +174,7 @@ void CGameScreen::Render()
 	if (m_pMusic->getTag("ARTIST", 0, &fmArtist) == FMOD_OK && m_pMusic->getTag("TITLE", 0, &fmTitle) == FMOD_OK && fmArtist.data && fmTitle.data)
 		pMusicTitle = XFORMAT("%s - %s", fmArtist.data, fmTitle.data);
 
-	_GLOBAL.pGameFont->Render(pMusicTitle, xpoint(10, 10), HGETEXT_LEFT);
+	//_GLOBAL.pGameFont->Render(pMusicTitle, xpoint(10, 10), HGETEXT_LEFT);
 }
 
 // =============================================================================
@@ -208,7 +220,7 @@ HTEXTURE CGameScreen::GenerateFieldMask(xint iInnerRadius, xint iOuterRadius)
 	static xint s_iHeight = _SHEIGHT;
 	static xpoint s_xCentre = xpoint(_HSWIDTH, _HSHEIGHT);
 
-	HTEXTURE hFieldMask = _HGE->Texture_Create(s_iWidth, s_iHeight);
+	HTEXTURE hFieldMask = _HGE->Texture_Create(512, 512); // Fix this.
 
 	DWORD* pTexMem = _HGE->Texture_Lock(hFieldMask, false);
 	{

@@ -50,6 +50,15 @@ enum t_TileType
 	/*MAX*/TileType_Max,
 };
 
+// A generic block type.
+enum t_BlockType
+{
+	BlockType_Floor,
+	BlockType_Pellet,
+	BlockType_Wall,
+	BlockType_Base,
+};
+
 // Adjacent direction.
 enum t_AdjacentDirection
 {
@@ -85,19 +94,19 @@ public:
 	// Check if the block is a wall tile.
 	xbool IsWall()
 	{
-		return cChar == '#';
+		return m_iBlockType == BlockType_Wall;
 	}
 
 	// Check if the block is part of a ghost base.
 	xbool IsBase()
 	{
-		return iType == TileType_Entrance || iType == TileType_Base;
+		return m_iBlockType == BlockType_Base;
 	}
 
 	// Check if the block is edible.
 	xbool IsEdible()
 	{
-		return !bEaten && (iType == TileType_Pellet || iType == TileType_Power);
+		return !m_bEaten && m_iBlockType == BlockType_Pellet;
 	}
 
 	// Check if the specified player can see this block.
@@ -106,35 +115,38 @@ public:
 	// Get the screen position of a block.
 	xpoint GetScreenPosition()
 	{
-		return xPosition * 48;
+		return m_xPosition * 48;
 	}
 
 	// Eat this block.
 	void Eat();
 
 	// The block index for the parent map.
-	xuint iIndex;
+	xuint m_iIndex;
 
 	// The original map char.
-	xchar cChar;
+	xchar m_cChar;
 
 	// The processed tile type.
-	t_TileType iType;
+	t_TileType m_iTileType;
+
+	// The generic block type (group).
+	t_BlockType m_iBlockType;
 
 	// The map rotation angle.
-	xfloat fAngle;
+	xfloat m_fAngle;
 
 	// The map block position.
-	xpoint xPosition;
+	xpoint m_xPosition;
 
 	// The block "eaten" status.
-	xbool bEaten;
+	xbool m_bEaten;
 
 	// The "eaten" and "respawn" timer.
-	Tools::CTimer xTimer;
+	Tools::CTimer m_xRespawnTimer;
 
 	// The block visibility.
-	xfloat fVisibility;
+	xfloat m_fVisibility;
 
 	// The trap (if any) that is bound to this block.
 	CTrap* m_pTrap;
@@ -143,7 +155,7 @@ public:
 	CPower* m_pPower;
 
 	// The block adjacents.
-	CMapBlock* pAdjacents[AdjacentDirection_Max];
+	CMapBlock* m_pAdjacents[AdjacentDirection_Max];
 
 protected:
 	/**

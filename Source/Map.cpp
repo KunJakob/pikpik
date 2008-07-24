@@ -77,6 +77,23 @@ static const xfloat s_fRotationAngleLookup[] =
 	0.0f,
 };
 
+// The block type lookup table.
+static const t_BlockType s_iBlockTypeLookup[TileType_Max] =
+{
+	BlockType_Floor,
+	BlockType_Pellet,
+	BlockType_Pellet,
+	BlockType_Floor,
+	BlockType_Wall,
+	BlockType_Wall,
+	BlockType_Wall,
+	BlockType_Wall,
+	BlockType_Wall,
+	BlockType_Wall,
+	BlockType_Base,
+	BlockType_Base,
+};
+
 //##############################################################################
 #pragma endregion
 
@@ -151,8 +168,8 @@ s_Module;
 // =============================================================================
 void CMapBlock::Update()
 {
-	//if (bEaten && xTimer.IsExpired())
-	//	bEaten = false;
+	//if (m_bEaten && xTimer.IsExpired())
+	//	m_bEaten = false;
 }
 
 // =============================================================================
@@ -168,9 +185,9 @@ xbool CMapBlock::IsVisible(CPlayer* pPlayer)
 // =============================================================================
 void CMapBlock::Eat()
 {
-	if (!bEaten)
+	if (!m_bEaten)
 	{
-		bEaten = true;
+		m_bEaten = true;
 		//xTimer.ExpireAfter(60000);
 
 		_GLOBAL.pActiveMap->m_iPelletsEaten++;
@@ -214,18 +231,18 @@ CMap::CMap(const xchar* pID) : CRenderable(RenderableType_Map)
 			xuint iIndex = iX + (iY * m_iWidth); 
 			CMapBlock* pBlock = &m_xBlocks[iIndex];
 
-			pBlock->iIndex = iIndex;
-			pBlock->cChar = pProperty->GetChar(iIndex);
-			pBlock->iType = TileType_Blank;
-			pBlock->fAngle = 0.f;
-			pBlock->xPosition = xpoint(iX, iY);
-			pBlock->fVisibility = 0.f;
-			pBlock->bEaten = false;
+			pBlock->m_iIndex = iIndex;
+			pBlock->m_cChar = pProperty->GetChar(iIndex);
+			pBlock->m_iTileType = TileType_Blank;
+			pBlock->m_fAngle = 0.f;
+			pBlock->m_xPosition = xpoint(iX, iY);
+			pBlock->m_fVisibility = 0.f;
+			pBlock->m_bEaten = false;
 
-			pBlock->pAdjacents[AdjacentDirection_Left]		= (iIndex % m_iWidth > 0) ? &m_xBlocks[iIndex - 1] : NULL;
-			pBlock->pAdjacents[AdjacentDirection_Up]		= (iIndex >= m_iWidth) ? &m_xBlocks[iIndex - m_iWidth] : NULL;
-			pBlock->pAdjacents[AdjacentDirection_Right]		= (iIndex % m_iWidth < m_iWidth - 1) ? &m_xBlocks[iIndex + 1] : NULL;
-			pBlock->pAdjacents[AdjacentDirection_Down]		= (iIndex < m_iBlockCount - m_iWidth) ? &m_xBlocks[iIndex + m_iWidth] : NULL;
+			pBlock->m_pAdjacents[AdjacentDirection_Left]	= (iIndex % m_iWidth > 0) ? &m_xBlocks[iIndex - 1] : NULL;
+			pBlock->m_pAdjacents[AdjacentDirection_Up]		= (iIndex >= m_iWidth) ? &m_xBlocks[iIndex - m_iWidth] : NULL;
+			pBlock->m_pAdjacents[AdjacentDirection_Right]	= (iIndex % m_iWidth < m_iWidth - 1) ? &m_xBlocks[iIndex + 1] : NULL;
+			pBlock->m_pAdjacents[AdjacentDirection_Down]	= (iIndex < m_iBlockCount - m_iWidth) ? &m_xBlocks[iIndex + m_iWidth] : NULL;
 		}
 	}
 
@@ -233,40 +250,43 @@ CMap::CMap(const xchar* pID) : CRenderable(RenderableType_Map)
 	{
 		CMapBlock* pBlock = &m_xBlocks[iA];
 
-		switch (pBlock->cChar)
+		switch (pBlock->m_cChar)
 		{
-			// Special.
-		case '*': pBlock->iType = TileType_Pellet;		break;
-		case '@': pBlock->iType = TileType_Power;		break;
-		case '=': pBlock->iType = TileType_Entrance;	break;
+		// Special.
+		case '*': pBlock->m_iTileType = TileType_Pellet;	break;
+		case '@': pBlock->m_iTileType = TileType_Power;		break;
+		case '=': pBlock->m_iTileType = TileType_Entrance;	break;
 
-			// Wall.
+		// Wall.
 		case '#':
 			{
 				xuint iMask = 0;
 
 				for (xuint iB = 0; iB < AdjacentDirection_Max; ++iB)
 				{
-					if (pBlock->pAdjacents[iB] && pBlock->pAdjacents[iB]->cChar == '#')
+					if (pBlock->m_pAdjacents[iB] && pBlock->m_pAdjacents[iB]->m_cChar == '#')
 						iMask |= pBlock->GetBit((t_AdjacentDirection)iB);
 				}
 
-				pBlock->iType = s_iTileIndexLookup[iMask];
-				pBlock->fAngle = s_fRotationAngleLookup[iMask];
+				pBlock->m_iTileType = s_iTileIndexLookup[iMask];
+				pBlock->m_fAngle = s_fRotationAngleLookup[iMask];
 			}
 			break;
 
-			// Spawn.
+		// Spawn.
 		case '$': 
-			pBlock->iType = TileType_Blank;
+			pBlock->m_iTileType = TileType_Blank;
 			m_lpSpawnPoints[PlayerType_Pacman].push_back(pBlock); 
 			break;
 
 		case '%': 
-			pBlock->iType = TileType_Base;
+			pBlock->m_iTileType = TileType_Base;
 			m_lpSpawnPoints[PlayerType_Ghost].push_back(pBlock);
 			break;
 		}
+
+		// Determine the block type.
+		pBlock->m_iBlockType = s_iBlockTypeLookup[pBlock->m_iTileType];
 	}
 
 	// Initialise the colourisation.
@@ -296,7 +316,7 @@ void CMap::Update()
 	if (_GLOBAL.pActivePlayer->m_iType == PlayerType_Ghost)
 	{
 		for (xuint iA = 0; iA < m_iBlockCount; ++iA)
-			m_xBlocks[iA].fVisibility = 0.f;
+			m_xBlocks[iA].m_fVisibility = 0.f;
 
 		if (_GLOBAL.pActivePlayer->m_iState != PlayerState_Warp)
 		{
@@ -307,13 +327,13 @@ void CMap::Update()
 		for (xuint iA = 0; iA < m_iBlockCount; ++iA)
 		{
 			if (m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsBase())
-				m_xBlocks[iA].fVisibility = 1.f;
+				m_xBlocks[iA].m_fVisibility = 1.f;
 		}
 	}
 	else
 	{
 		for (xuint iA = 0; iA < m_iBlockCount; ++iA)
-			m_xBlocks[iA].fVisibility = 1.f;
+			m_xBlocks[iA].m_fVisibility = 1.f;
 	}
 
 	for (xuint iA = 0; iA < m_iBlockCount; ++iA)
@@ -327,16 +347,16 @@ void CMap::AddVisiblePaths(CMapBlock* pBase, xfloat fVisibility)
 {
 	if (pBase)
 	{
-		pBase->fVisibility += fVisibility;
+		pBase->m_fVisibility += fVisibility;
 
 		for (xuint iA = 0; iA < AdjacentDirection_Max; ++iA)
 		{
 			CMapBlock* pBlock = pBase;
 
-			while (pBlock->pAdjacents[iA] && !pBlock->pAdjacents[iA]->IsWall() && !pBlock->pAdjacents[iA]->IsBase())
+			while (pBlock->m_pAdjacents[iA] && !pBlock->m_pAdjacents[iA]->IsWall() && !pBlock->m_pAdjacents[iA]->IsBase())
 			{
-				pBlock = pBlock->pAdjacents[iA];
-				pBlock->fVisibility += fVisibility;
+				pBlock = pBlock->m_pAdjacents[iA];
+				pBlock->m_fVisibility += fVisibility;
 			}
 		}
 	}
@@ -377,18 +397,17 @@ void CMap::Render()
 		if (m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsBase())
 			s_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, m_fColours[0], m_fColours[1], m_fColours[2]));
 		else
-			//s_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, 1.f - m_fColours[0], 1.f - m_fColours[1], 1.f - m_fColours[2]));
 			s_pTiles->GetMetadata()->GetSprite()->SetColor(0xFFFFFFFF);
 
-		t_TileType iTileType = m_xBlocks[iA].bEaten ? TileType_Eaten : m_xBlocks[iA].iType;
+		t_TileType iTileType = m_xBlocks[iA].m_bEaten ? TileType_Eaten : m_xBlocks[iA].m_iTileType;
 
 		s_pTiles->Render
 		(
 			m_xBlocks[iA].GetScreenPosition() - m_xOffset, 
 			s_xCentrePoint, 
 			s_pTileAreas[iTileType]->xRect,
-			m_xBlocks[iA].fVisibility * _GLOBAL.fWorldAlpha, 
-			(m_xBlocks[iA].fAngle / 180.0f) * M_PI
+			m_xBlocks[iA].m_fVisibility * _GLOBAL.fWorldAlpha, 
+			(m_xBlocks[iA].m_fAngle / 180.0f) * M_PI
 		);
 	}
 }
@@ -398,11 +417,11 @@ void CMap::Render()
 // =============================================================================
 CMapBlock* CMap::GetAdjacentBlock(t_AdjacentDirection iAdjacentDir, CMapBlock* pBlock)
 {
-	if (pBlock->pAdjacents[iAdjacentDir])
-		return pBlock->pAdjacents[iAdjacentDir];
+	if (pBlock->m_pAdjacents[iAdjacentDir])
+		return pBlock->m_pAdjacents[iAdjacentDir];
 	else
 	{
-		xuint iIndex = pBlock->iIndex;
+		xuint iIndex = pBlock->m_iIndex;
 
 		switch (iAdjacentDir)
 		{
