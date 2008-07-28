@@ -446,6 +446,10 @@
 				Name="Xen"
 				>
 				<File
+					RelativePath="..\Xen\Circle.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Xen\Common.h"
 					>
 				</File>
@@ -475,6 +479,10 @@
 				</File>
 				<File
 					RelativePath="..\Xen\Macros.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Xen\Math.cpp"
 					>
 				</File>
 				<File

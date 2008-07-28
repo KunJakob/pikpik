@@ -1,4 +1,3 @@
-#pragma region Include
 //##############################################################################
 //
 //                                   INCLUDE
@@ -17,9 +16,7 @@
 #include <Player.h>
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Static
 //##############################################################################
 //
 //                                   STATIC
@@ -90,73 +87,53 @@ static const t_BlockType s_iBlockTypeLookup[TileType_Max] =
 	BlockType_Wall,
 	BlockType_Wall,
 	BlockType_Wall,
-	BlockType_Base,
-	BlockType_Base,
+	BlockType_GhostWall,
+	BlockType_GhostBase,
 };
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Module
 //##############################################################################
 //
 //                                   MODULE
 //
 //##############################################################################
-static class CMapModule : public Xen::CModule
+
+// =============================================================================
+// Nat Ryall                                                         28-Jul-2008
+// =============================================================================
+void CMapModule::Initialise()
 {
-public:
-	// Constructor.
-	CMapModule()
-	{
-		XMODULE(this);
-	}
+	s_pMetadata = new CMetadata(".\\Metadata\\Maps.mta");
+	s_pTiles = new CBasicSprite(_SPRITE("Map-Tiles"));
 
-	// Initialise.
-	virtual void Initialise()
-	{
-		s_pMetadata = new CMetadata(".\\Metadata\\Maps.mta");
-		s_pTiles = new CBasicSprite(_SPRITE("Map-Tiles"));
+	s_pTileAreas[TileType_Blank]			= s_pTiles->GetMetadata()->FindArea("Blank");
+	s_pTileAreas[TileType_Pellet]			= s_pTiles->GetMetadata()->FindArea("Pellet");
+	s_pTileAreas[TileType_Power]			= s_pTiles->GetMetadata()->FindArea("Power");
+	s_pTileAreas[TileType_Eaten]			= s_pTiles->GetMetadata()->FindArea("Eaten");
+	s_pTileAreas[TileType_Solo]				= s_pTiles->GetMetadata()->FindArea("Solo");
+	s_pTileAreas[TileType_Tunnel]			= s_pTiles->GetMetadata()->FindArea("Tunnel");
+	s_pTileAreas[TileType_Cap]				= s_pTiles->GetMetadata()->FindArea("Cap");
+	s_pTileAreas[TileType_Corner]			= s_pTiles->GetMetadata()->FindArea("Corner");
+	s_pTileAreas[TileType_Junction]			= s_pTiles->GetMetadata()->FindArea("Junction");
+	s_pTileAreas[TileType_Intersection]		= s_pTiles->GetMetadata()->FindArea("Intersection");
+	s_pTileAreas[TileType_Entrance]			= s_pTiles->GetMetadata()->FindArea("Entrance");
+	s_pTileAreas[TileType_Base]				= s_pTiles->GetMetadata()->FindArea("Base");
 
-		s_pTileAreas[TileType_Blank]			= s_pTiles->GetMetadata()->FindArea("Blank");
-		s_pTileAreas[TileType_Pellet]			= s_pTiles->GetMetadata()->FindArea("Pellet");
-		s_pTileAreas[TileType_Power]			= s_pTiles->GetMetadata()->FindArea("Power");
-		s_pTileAreas[TileType_Eaten]			= s_pTiles->GetMetadata()->FindArea("Eaten");
-		s_pTileAreas[TileType_Solo]				= s_pTiles->GetMetadata()->FindArea("Solo");
-		s_pTileAreas[TileType_Tunnel]			= s_pTiles->GetMetadata()->FindArea("Tunnel");
-		s_pTileAreas[TileType_Cap]				= s_pTiles->GetMetadata()->FindArea("Cap");
-		s_pTileAreas[TileType_Corner]			= s_pTiles->GetMetadata()->FindArea("Corner");
-		s_pTileAreas[TileType_Junction]			= s_pTiles->GetMetadata()->FindArea("Junction");
-		s_pTileAreas[TileType_Intersection]		= s_pTiles->GetMetadata()->FindArea("Intersection");
-		s_pTileAreas[TileType_Entrance]			= s_pTiles->GetMetadata()->FindArea("Entrance");
-		s_pTileAreas[TileType_Base]				= s_pTiles->GetMetadata()->FindArea("Base");
+	s_pTiles->GetMetadata()->GetSprite()->SetBlendMode(BLEND_COLORMUL | BLEND_ALPHABLEND);
+}
 
-		s_pTiles->GetMetadata()->GetSprite()->SetBlendMode(BLEND_COLORMUL | BLEND_ALPHABLEND);
-	}
-
-	// Update.
-	virtual void Update()
-	{
-	}
-
-	// Render.
-	virtual void Render()
-	{
-	}
-
-	// Deinitialise.
-	virtual void Deinitialise()
-	{
-		delete s_pTiles;
-		delete s_pMetadata;
-	}
-} 
-s_Module;
+// =============================================================================
+// Nat Ryall                                                         28-Jul-2008
+// =============================================================================
+void CMapModule::Deinitialise()
+{
+	delete s_pTiles;
+	delete s_pMetadata;
+}
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Block
 //##############################################################################
 //
 //                                   BLOCK
@@ -195,9 +172,7 @@ void CMapBlock::Eat()
 }
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Map
 //##############################################################################
 //
 //                                     MAP
@@ -237,6 +212,7 @@ CMap::CMap(const xchar* pID) : CRenderable(RenderableType_Map)
 			pBlock->m_fAngle = 0.f;
 			pBlock->m_xPosition = xpoint(iX, iY);
 			pBlock->m_fVisibility = 0.f;
+			pBlock->m_fPlayerVisibility = 0.f;
 			pBlock->m_bEaten = false;
 
 			pBlock->m_pAdjacents[AdjacentDirection_Left]	= (iIndex % m_iWidth > 0) ? &m_xBlocks[iIndex - 1] : NULL;
@@ -326,14 +302,19 @@ void CMap::Update()
 
 		for (xuint iA = 0; iA < m_iBlockCount; ++iA)
 		{
-			if (m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsBase())
+			m_xBlocks[iA].m_fPlayerVisibility = m_xBlocks[iA].m_fVisibility;
+
+			if (m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsGhostWall())
 				m_xBlocks[iA].m_fVisibility = 1.f;
 		}
 	}
 	else
 	{
 		for (xuint iA = 0; iA < m_iBlockCount; ++iA)
+		{
 			m_xBlocks[iA].m_fVisibility = 1.f;
+			m_xBlocks[iA].m_fPlayerVisibility = 1.f;
+		}
 	}
 
 	for (xuint iA = 0; iA < m_iBlockCount; ++iA)
@@ -353,10 +334,13 @@ void CMap::AddVisiblePaths(CMapBlock* pBase, xfloat fVisibility)
 		{
 			CMapBlock* pBlock = pBase;
 
-			while (pBlock->m_pAdjacents[iA] && !pBlock->m_pAdjacents[iA]->IsWall() && !pBlock->m_pAdjacents[iA]->IsBase())
+			while (pBlock->m_pAdjacents[iA] && !pBlock->m_pAdjacents[iA]->IsWall() && !pBlock->m_pAdjacents[iA]->IsGhostWall())
 			{
 				pBlock = pBlock->m_pAdjacents[iA];
 				pBlock->m_fVisibility += fVisibility;
+
+				//if (pBlock->IsWall() || pBlock->IsGhostWall())
+				//	break;
 			}
 		}
 	}
@@ -394,7 +378,7 @@ void CMap::Render()
 	{
 		static xpoint s_xCentrePoint = xpoint(24, 24);
 
-		if (m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsBase())
+		if (m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsGhostWall())
 			s_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, m_fColours[0], m_fColours[1], m_fColours[2]));
 		else
 			s_pTiles->GetMetadata()->GetSprite()->SetColor(0xFFFFFFFF);
@@ -458,4 +442,3 @@ CMapBlock* CMap::GetSpawnBlock(t_PlayerType iPlayerType)
 }
 
 //##############################################################################
-#pragma endregion

@@ -1,4 +1,3 @@
-#pragma region Include
 //##############################################################################
 //
 //                                   INCLUDE
@@ -12,9 +11,7 @@
 #include <Renderer.h>
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Static
 //##############################################################################
 //
 //                                   STATIC
@@ -25,72 +22,58 @@
 static CRenderLayer s_xLayers[RENDERER_MAXLAYERS];
 
 //##############################################################################
-#pragma endregion
 
-#pragma region ModuleManager
 //##############################################################################
 //
 //                                   MODULE
 //
 //##############################################################################
-static class CRenderModule : public Xen::CModule
+
+// =============================================================================
+// Nat Ryall                                                         28-Jul-2008
+// =============================================================================
+void CRenderModule::Initialise()
 {
-public:
-	// Constructor.
-	CRenderModule()
-	{
-		XMODULE(this);
-	}
+	RenderManager::Reset();
+}
 
-	// Initialise.
-	virtual void Initialise()
+// =============================================================================
+// Nat Ryall                                                         28-Jul-2008
+// =============================================================================
+void CRenderModule::Update()
+{
+	for (xuint iA = 0; iA < RENDERER_MAXLAYERS; ++iA)
 	{
-		RenderManager::Reset();
-	}
+		if (!s_xLayers[iA].bEnabled)
+			continue;
 
-	// Update.
-	virtual void Update()
+		XEN_LIST_FOREACH(t_RenderableList, ppRenderable, s_xLayers[iA].lpRenderables)
+			(*ppRenderable)->Update();
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         28-Jul-2008
+// =============================================================================
+void CRenderModule::Render()
+{
+	for (xuint iA = 0; iA < RENDERER_MAXLAYERS; ++iA)
 	{
-		for (xuint iA = 0; iA < RENDERER_MAXLAYERS; ++iA)
+		if (!s_xLayers[iA].bEnabled)
+			continue;
+
+		XEN_LIST_FOREACH(t_RenderableList, ppRenderable, s_xLayers[iA].lpRenderables)
 		{
-			if (!s_xLayers[iA].bEnabled)
-				continue;
-
-			XEN_LIST_FOREACH(t_RenderableList, ppRenderable, s_xLayers[iA].lpRenderables)
-				(*ppRenderable)->Update();
+			if (s_xLayers[iA].fpRenderCallback)
+				s_xLayers[iA].fpRenderCallback(*ppRenderable);
+			else
+				(*ppRenderable)->Render();
 		}
 	}
-
-	// Render.
-	virtual void Render()
-	{
-		for (xuint iA = 0; iA < RENDERER_MAXLAYERS; ++iA)
-		{
-			if (!s_xLayers[iA].bEnabled)
-				continue;
-
-			XEN_LIST_FOREACH(t_RenderableList, ppRenderable, s_xLayers[iA].lpRenderables)
-			{
-				if (s_xLayers[iA].fpRenderCallback)
-					s_xLayers[iA].fpRenderCallback(*ppRenderable);
-				else
-					(*ppRenderable)->Render();
-			}
-		}
-	}
-
-	// Deinitialise.
-	virtual void Deinitialise()
-	{
-		RenderManager::Reset();
-	}
-} 
-s_Module;
+}
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Definition
 //##############################################################################
 //
 //                                 DEFINITION
@@ -166,4 +149,3 @@ void RenderManager::SetRenderCallback(xuint iLayer, t_RenderCallback fpCallback)
 }
 
 //##############################################################################
-#pragma endregion

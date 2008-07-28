@@ -35,7 +35,12 @@
 // =============================================================================
 void CGameScreen::Load()
 {
-	LoadMap(6);
+#if defined(_DEBUG)
+	//RenderManager::SetRenderCallback(LayerIndex_Player, xbind(this, &CGameScreen::_RenderCollidables));
+	//Need AddRenderCallback();
+#endif
+
+	LoadMap(5);
 	LoadMusic();
 
 	InitialisePlayers();
@@ -44,8 +49,6 @@ void CGameScreen::Load()
 	
 	RenderManager::SetRenderCallback(LayerIndex_Map, xbind(this, &CGameScreen::WorldTransform));
 	RenderManager::SetRenderCallback(LayerIndex_Player, xbind(this, &CGameScreen::WorldTransform));
-
-	//m_pFieldMask = new hgeSprite(GenerateFieldMask(48 * 3, 48 * 5), 0, 0, 512, 512);
 
 	Interface.SetCursorVisible(false);
 
@@ -105,9 +108,6 @@ void CGameScreen::Unload()
 
 	RenderManager::Reset();
 
-	//_HGE->Texture_Free(m_pFieldMask->GetTexture());
-	//delete m_pFieldMask;
-
 	Interface.SetCursorVisible(true);
 
 	delete m_pMinimap;
@@ -126,12 +126,10 @@ void CGameScreen::Update()
 	}
 
 	// Switch between players.
-	if (_HGE->Input_KeyDown(HGEK_SPACE))
+	if (_HGE->Input_KeyDown(HGEK_P))
 	{
 		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, _GLOBAL.lpPlayers)
 		{
-			_GLOBAL.pActivePlayer->SetLogicType(PlayerLogicType_AI);
-
 			if (_GLOBAL.pActivePlayer == *ppPlayer)
 			{
 				if (*ppPlayer == _GLOBAL.lpPlayers.back())
@@ -142,11 +140,22 @@ void CGameScreen::Update()
 
 					_GLOBAL.pActivePlayer = *ppPlayer;
 					_GLOBAL.fWorldAlpha = 1.f;
-				}
-
-				_GLOBAL.pActivePlayer->SetLogicType(PlayerLogicType_Local); 
+				} 
 			}
 		}
+	}
+
+	// Switch between logic types.
+	if (_HGE->Input_KeyDown(HGEK_L))
+	{
+		t_PlayerLogicType iLogicType = _GLOBAL.pActivePlayer->GetLogicType();
+
+		if (iLogicType == PlayerLogicType_Local)
+			iLogicType = PlayerLogicType_AI;
+		else
+			iLogicType = PlayerLogicType_Local;
+
+		_GLOBAL.pActivePlayer->SetLogicType(iLogicType);
 	}
 
 	// Calculate the map offset.
@@ -155,7 +164,7 @@ void CGameScreen::Update()
 	// Calculate the music energy using spectrum analysis.
 	CalculateMusicEnergy(m_pChannel);
 
-	m_pMinimap->Generate(MinimapElement_Walls | MinimapElement_GhostBase /*| MinimapElement_Pellets*/ | MinimapElement_Ghost);
+	m_pMinimap->Generate(MinimapElement_Walls | MinimapElement_GhostBase | MinimapElement_Pellets | MinimapElement_Ghost);
 }
 
 // =============================================================================
@@ -163,18 +172,43 @@ void CGameScreen::Update()
 // =============================================================================
 void CGameScreen::Render()
 {
-	//if (_GLOBAL.pActivePlayer->GetType() == PlayerType_Ghost)
-	//	m_pFieldMask->Render(_HSWIDTH - 256, _HSHEIGHT - 256);
+	//const char* pMusicTitle = "Unknown";
 
-	const char* pMusicTitle = "Unknown";
+	//FMOD_TAG fmArtist;
+	//FMOD_TAG fmTitle;
 
-	FMOD_TAG fmArtist;
-	FMOD_TAG fmTitle;
-
-	if (m_pMusic->getTag("ARTIST", 0, &fmArtist) == FMOD_OK && m_pMusic->getTag("TITLE", 0, &fmTitle) == FMOD_OK && fmArtist.data && fmTitle.data)
-		pMusicTitle = XFORMAT("%s - %s", fmArtist.data, fmTitle.data);
+	//if (m_pMusic->getTag("ARTIST", 0, &fmArtist) == FMOD_OK && m_pMusic->getTag("TITLE", 0, &fmTitle) == FMOD_OK && fmArtist.data && fmTitle.data)
+	//	pMusicTitle = XFORMAT("%s - %s", fmArtist.data, fmTitle.data);
 
 	//_GLOBAL.pGameFont->Render(pMusicTitle, xpoint(10, 10), HGETEXT_LEFT);
+}
+
+// =============================================================================
+// Nat Ryall                                                          3-Jun-2008
+// =============================================================================
+void CGameScreen::CalculateMusicEnergy(FMOD::Channel* pChannel)
+{
+	const static xint s_iIterations = 2048;
+	const static xint s_iSearch = 8;
+
+	xfloat fSpectrum[2][s_iIterations];
+
+	pChannel->getSpectrum(fSpectrum[0], s_iIterations, 0, FMOD_DSP_FFT_WINDOW_HANNING);
+	pChannel->getSpectrum(fSpectrum[1], s_iIterations, 1, FMOD_DSP_FFT_WINDOW_HANNING);
+
+	xfloat fStrength[s_iSearch];
+
+	for (xint iA = 0; iA < s_iSearch; ++iA)
+		fStrength[iA] = fSpectrum[0][iA] + fSpectrum[1][iA];
+
+	xfloat fAverageStrength = 0.f;
+
+	for (xint iA = 4; iA < s_iSearch; ++iA)
+		fAverageStrength += fStrength[iA];
+
+	fAverageStrength /= 4.f;
+
+	_GLOBAL.fMusicEnergy = fAverageStrength * 0.1f;
 }
 
 // =============================================================================
@@ -210,72 +244,10 @@ void CGameScreen::WorldTransform(CRenderable* pRenderable)
 }
 
 // =============================================================================
-// Nat Ryall                                                         29-Apr-2008
+// Nat Ryall                                                         28-Jul-2008
 // =============================================================================
-HTEXTURE CGameScreen::GenerateFieldMask(xint iInnerRadius, xint iOuterRadius)
+void CGameScreen::_RenderCollidables(CRenderable* pRenderable)
 {
-	xint iRadiusDifference = iOuterRadius - iInnerRadius;
-
-	static xint s_iWidth = _SWIDTH;
-	static xint s_iHeight = _SHEIGHT;
-	static xpoint s_xCentre = xpoint(_HSWIDTH, _HSHEIGHT);
-
-	HTEXTURE hFieldMask = _HGE->Texture_Create(512, 512); // Fix this.
-
-	DWORD* pTexMem = _HGE->Texture_Lock(hFieldMask, false);
-	{
-		for (xint iY = 0; iY < s_iHeight; ++iY)
-		{
-			for (xint iX = 0; iX < s_iWidth; ++iX)
-			{
-				DWORD* pPixel = &pTexMem[iX + (iY * s_iWidth)];
-				xint iAlpha = 255;
-
-				xpoint xDistance = xpoint(abs(iX - s_xCentre.iX), abs(iY - s_xCentre.iY));
-				xDistance *= xDistance;
-
-				xint iDistance = (xint)sqrt((xfloat)xDistance.iX + (xfloat)xDistance.iY);
-
-				if (iDistance < iInnerRadius)
-					iAlpha = 0;
-				else if (iDistance < iOuterRadius)
-					iAlpha = ((iDistance - iInnerRadius) * 255) / iRadiusDifference;
-
-				*pPixel = ARGB(Math::Clamp<xint>(iAlpha, 0, 255), 0, 0, 0);
-			}
-		}
-	}
-	_HGE->Texture_Unlock(hFieldMask);
-
-	return hFieldMask;
-}
-
-// =============================================================================
-// Nat Ryall                                                          3-Jun-2008
-// =============================================================================
-void CGameScreen::CalculateMusicEnergy(FMOD::Channel* pChannel)
-{
-	const static xint s_iIterations = 2048;
-	const static xint s_iSearch = 8;
-
-	xfloat fSpectrum[2][s_iIterations];
-
-	pChannel->getSpectrum(fSpectrum[0], s_iIterations, 0, FMOD_DSP_FFT_WINDOW_HANNING);
-	pChannel->getSpectrum(fSpectrum[1], s_iIterations, 1, FMOD_DSP_FFT_WINDOW_HANNING);
-
-	xfloat fStrength[s_iSearch];
-
-	for (xint iA = 0; iA < s_iSearch; ++iA)
-		fStrength[iA] = fSpectrum[0][iA] + fSpectrum[1][iA];
-
-	xfloat fAverageStrength = 0.f;
-
-	for (xint iA = 4; iA < s_iSearch; ++iA)
-		fAverageStrength += fStrength[iA];
-
-	fAverageStrength /= 4.f;
-
-	_GLOBAL.fMusicEnergy = fAverageStrength * 0.1f;
 }
 
 //##############################################################################

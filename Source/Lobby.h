@@ -23,6 +23,18 @@
 #include <Network.h>
 #include <Match.h>
 #include <Menu.h>
+#include <Player.h>
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                   MACROS
+//
+//##############################################################################
+
+// Get the peer info from a peer structure.
+#define GetPeerInfo(PEERCLASS) ((CNetworkPeerInfo*)(PEERCLASS)->m_pData)
 
 //##############################################################################
 
@@ -64,14 +76,27 @@ enum t_MessageDisplayMode
 
 //##############################################################################
 //
-//                             NETWORK PLAYER INFO
+//                              NETWORK PEER INFO
 //
 //##############################################################################
-class CNetworkPlayerInfo
+class CNetworkPeerInfo
 {
 public:
-	// The player's nickname/gamertag with a terminating NULL.
-	char cNickname[_MAXNAMELEN];
+	// The peer's nickname/gamertag with a terminating NULL.
+	char m_cNickname[_MAXNAMELEN];
+
+	// The player character assigned to the peer.
+	union 
+	{
+		// Base.
+		CPlayer* m_pPlayer;
+
+		// Pacman.
+		CPacman* m_pPacman;
+
+		// Ghost.
+		CGhost* m_pGhost;
+	};
 };
 
 //##############################################################################

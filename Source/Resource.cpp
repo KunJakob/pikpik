@@ -110,7 +110,7 @@ void ResourceManager::RegisterMetadata(CMetadata* pMetadata)
 // =============================================================================
 // Nat Ryall                                                         22-Apr-2008
 // =============================================================================
-CResourceFile* ResourceManager::AllocResourceFile(t_ResourceType iType, const xchar* pFile)
+CResourceFile* ResourceManager::CreateResourceFile(t_ResourceType iType, const xchar* pFile)
 {
 	XEN_LIST_FOREACH(t_ResourceFileList, ppResourceFile, s_lpResourceFiles[iType])
 	{

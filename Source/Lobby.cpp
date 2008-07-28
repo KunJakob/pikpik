@@ -185,8 +185,13 @@ void CLobbyScreen::RenderLobby()
 
 	XEN_LIST_FOREACH(t_NetworkPeerList, ppPeer, Network.GetPeers())
 	{
-		m_pPeerFont->Render(XFORMAT("Peer #%d", (*ppPeer)->m_iID), xpoint(50, 50 + iPeerOffset), HGETEXT_LEFT);
-		iPeerOffset += 40;
+		CNetworkPeerInfo* pInfo = GetPeerInfo(*ppPeer);
+
+		if (pInfo)
+		{
+			m_pPeerFont->Render(pInfo->m_cNickname, xpoint(50, 50 + iPeerOffset), HGETEXT_LEFT);
+			iPeerOffset += 40;
+		}
 	}
 
 	_GLOBAL.pGameFont->Render(XFORMAT("Ping:  %d", Network.GetLastPing()), xpoint(_SWIDTH - 100, 50), HGETEXT_LEFT);
@@ -450,6 +455,13 @@ void CLobbyScreen::OnConnectionLost()
 void CLobbyScreen::OnPeerJoined(CNetworkPeer* pPeer)
 {
 	XLOG("[LobbyScreen] Peer #%d joined the game.", pPeer->m_iID);
+
+	CNetworkPeerInfo* pInfo = new CNetworkPeerInfo;
+
+	strcpy_s(pInfo->m_cNickname, _MAXNAMELEN, XFORMAT("Peer #%d", pPeer->m_iID));
+	pInfo->m_pPlayer = NULL;
+
+	pPeer->m_pData = pInfo;
 }
 
 // =============================================================================
@@ -458,6 +470,9 @@ void CLobbyScreen::OnPeerJoined(CNetworkPeer* pPeer)
 void CLobbyScreen::OnPeerLeaving(CNetworkPeer* pPeer)
 {
 	XLOG("[LobbyScreen] Peer #%d is about to leave the game.", pPeer->m_iID);
+
+	if (CNetworkPeerInfo* pInfo = GetPeerInfo(pPeer))
+		delete pInfo;
 }
 
 // =============================================================================

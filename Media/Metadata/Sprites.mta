@@ -46,7 +46,7 @@
 	
 	.Animation "Move"
 	{
-		.Delay 60
+		.Delay 50
 		
 		.Frame { .Area "F2" }
 		.Frame { .Area "F3" }
@@ -64,7 +64,7 @@
 	
 	.Animation "Idle"
 	{
-		.Delay 120
+		.Delay 100
 	
 		.Frame { .Area "F1" }
 		.Frame { .Area "F2" .Loop }

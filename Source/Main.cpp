@@ -1,4 +1,3 @@
-#pragma region Include
 //##############################################################################
 //
 //                                   INCLUDE
@@ -21,11 +20,10 @@
 #include <Network.h>
 #include <Character.h>
 #include <Match.h>
+#include <Collision.h>
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Types
 //##############################################################################
 //
 //                                   TYPES
@@ -36,9 +34,7 @@
 typedef xlist<CScreen*> t_ScreenList;
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Static
 //##############################################################################
 //
 //                                   STATIC
@@ -61,9 +57,7 @@ static xuint s_iTimeDelta = 0;
 static t_ScreenList s_lpScreens;
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Main
 //##############################################################################
 //
 //                                    MAIN
@@ -121,9 +115,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 }
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Declaration
 //##############################################################################
 //
 //                                 DECLARATION
@@ -146,6 +138,14 @@ void Application::Initialise()
 
 	// Initialise the game font.
 	_GLOBAL.pGameFont = new CFont(_FONT("Default"));
+
+	// Add all required modules to the game.
+	_MODULE(CRenderModule);
+	_MODULE(CMapModule);
+
+	XMODULE(&CollisionManager);
+
+	_MODULE(CScreenModule);
 
 	// Initialise all modules.
 	Xen::ModuleManager::Initialise();
@@ -276,6 +276,5 @@ FMOD::System* Application::GetSoundSystem()
 }
 
 //##############################################################################
-#pragma endregion
 
 

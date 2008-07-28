@@ -1,6 +1,5 @@
 #pragma once
 
-#pragma region Include
 //##############################################################################
 //
 //                                   INCLUDE
@@ -15,9 +14,7 @@
 #include <Map.h>
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Types
 //##############################################################################
 //
 //                                   TYPES
@@ -54,9 +51,7 @@ enum t_PlayerDirection
 };
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Base
 //##############################################################################
 //
 //                                    BASE
@@ -196,10 +191,10 @@ protected:
 	CMapBlock* m_pTargetBlock;
 
 	// The current time set for the operation.
-	xuint m_iTime;
+	xint m_iTime;
 
 	// The total time set for the move.
-	xuint m_iMoveTime;
+	xint m_iMoveTime;
 
 	// The transition distance between two blocks clamped to the range 0.0 to 1.0.
 	xfloat m_fTransition;
@@ -218,9 +213,7 @@ protected:
 };
 
 //##############################################################################
-#pragma endregion
 
-#pragma region PacMan
 //##############################################################################
 //
 //                                   PACMAN
@@ -247,9 +240,7 @@ protected:
 };
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Ghost
 //##############################################################################
 //
 //                                   GHOST
@@ -288,4 +279,3 @@ protected:
 };
 
 //##############################################################################
-#pragma endregion

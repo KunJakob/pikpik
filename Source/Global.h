@@ -8,7 +8,6 @@
 * Copyright © SAPIAN
 */
 
-#pragma region Include
 //##############################################################################
 //
 //                                   INCLUDE
@@ -56,9 +55,7 @@
 #include <map>
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Macros
 //##############################################################################
 //
 //                                   MACROS
@@ -94,9 +91,7 @@
 #define ARGBF(A, R, G, B)	ARGB(COLOURF(A), COLOURF(R), COLOURF(G), COLOURF(B))
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Types
 //##############################################################################
 //
 //                                   TYPES
@@ -175,15 +170,21 @@ enum t_LobbyStartMode
 	LobbyStartMode_CreatePrivate,
 };
 
+// The collision groups in the game.
+enum t_CollisionGroup
+{
+	CollisionGroup_Player,
+	CollisionGroup_Trap,
+	CollisionGroup_Power,
+};
+
 // Common list types.
 typedef xlist<CMetadata*> t_MetadataList;
 typedef xlist<CSprite*> t_SpriteList;
 typedef xlist<CPlayer*> t_PlayerList;
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Namespace
 //##############################################################################
 //
 //                                 NAMESPACE
@@ -193,9 +194,7 @@ using namespace Xen;
 using namespace fastdelegate;
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Global
 //##############################################################################
 //
 //                                   GLOBAL
@@ -243,4 +242,3 @@ public:
 };
 
 //##############################################################################
-#pragma endregion

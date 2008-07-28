@@ -136,9 +136,9 @@ namespace ResourceManager
 	void RegisterMetadata(CMetadata* pMetadata);
 
 	/**
-	* Allocate a new or existing resource file with the specified type and file.
+	* Create a resource file with the specified type and file.
 	*/
-	CResourceFile* AllocResourceFile(t_ResourceType iType, const xchar* pFile);
+	CResourceFile* CreateResourceFile(t_ResourceType iType, const xchar* pFile);
 
 	/**
 	* Release a resource file and destroy it if there are no remaining references.

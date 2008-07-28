@@ -121,8 +121,16 @@ HTEXTURE CMinimap::Generate(xuint iElementMask)
 						}
 						break;
 
-						// Base.
-					case BlockType_Base:
+						// Ghost Wall.
+					case BlockType_GhostWall:
+						{
+							if (XFLAGISSET(iElementMask, MinimapElement_GhostBase))
+								*pPixel = 0xFF804040;
+						}
+						break;
+
+						// Ghost Base.
+					case BlockType_GhostBase:
 						{
 							if (XFLAGISSET(iElementMask, MinimapElement_GhostBase))
 								*pPixel = 0xFFFF8080;

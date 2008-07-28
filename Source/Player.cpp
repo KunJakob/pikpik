@@ -1,4 +1,3 @@
-#pragma region Include
 //##############################################################################
 //
 //                                   INCLUDE
@@ -16,20 +15,16 @@
 #include <Sprite.h>
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Macros
 //##############################################################################
 //
 //                                   MACROS
 //
 //##############################################################################
-#define PLAYER_MOVETIME 200
+#define _MOVETIME 200
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Base
 //##############################################################################
 //
 //                                    BASE
@@ -44,7 +39,7 @@ CPlayer::CPlayer(t_PlayerType iType, const xchar* pSpriteName) : CRenderable(Ren
 	m_pSprite(NULL)
 {
 	m_pSprite = new CAnimatedSprite(_SPRITE(pSpriteName));
-	m_pSprite->SetAnimation("Idle");
+	m_pSprite->Play("Idle");
 	m_pSprite->SetAnchor(m_pSprite->GetAreaCentre());
 	m_pSprite->SetEventCallback(xbind(this, &CPlayer::OnAnimationEvent));
 
@@ -84,6 +79,9 @@ void CPlayer::Reset()
 // =============================================================================
 void CPlayer::Update()
 {
+	const static xfloat s_fMoveDir[PlayerDirection_Max] = {-1.f, -1.f, 1.f, 1.f};
+	static xfloat s_fBlockSize = 48.f;
+
 	xfloat fAlpha = 1.f;
 
 	switch (m_iState)
@@ -101,7 +99,7 @@ void CPlayer::Update()
 	case PlayerState_Move:
 		{
 			// Move the player along their path.
-			m_iTime = Math::Clamp<xuint>(m_iTime + _TIMEDELTA, 0, m_iMoveTime);
+			m_iTime = Math::Clamp<xint>(m_iTime + _TIMEDELTA, 0, m_iMoveTime);
 			m_fTransition = Math::Clamp((xfloat)m_iTime / (xfloat)m_iMoveTime, 0.f, 1.f);
 
 			m_pSprite->SetPosition(m_pCurrentBlock->GetScreenPosition() + (((m_pTargetBlock->GetScreenPosition() - m_pCurrentBlock->GetScreenPosition()) * m_iTime) / m_iMoveTime));
@@ -119,18 +117,14 @@ void CPlayer::Update()
 
 	case PlayerState_Warp:
 		{
-			const static xfloat s_fMoveDir[PlayerDirection_Max] = {-1.f, -1.f, 1.f, 1.f};
-			static xfloat s_fBlockSize = 48.f;
-
-			xfloat fChange = _TIMEDELTAF * m_iMoveTime;
-
 			if (m_bLeaving)
 			{
-				m_fTransition += fChange;
+				m_iTime = Math::Clamp<xint>(m_iTime + _TIMEDELTA, 0, m_iMoveTime);
+				m_fTransition = Math::Clamp((xfloat)m_iTime / (xfloat)m_iMoveTime, 0.f, 1.f);
 
-				if (m_fTransition > s_fBlockSize)
+				if (m_iTime == m_iMoveTime)
 				{
-					m_fTransition = s_fBlockSize;
+					m_fTransition = 1.f;
 					m_pCurrentBlock = _GLOBAL.pActiveMap->GetAdjacentBlock((t_AdjacentDirection)m_iTransitionDir, m_pCurrentBlock);
 					m_iTransitionDir = (t_PlayerDirection)((m_iTransitionDir + 2) % PlayerDirection_Max);
 					m_bLeaving = false;
@@ -138,9 +132,10 @@ void CPlayer::Update()
 			}
 			else
 			{
-				m_fTransition -= fChange;
+				m_iTime = Math::Clamp<xint>(m_iTime - _TIMEDELTA, 0, m_iMoveTime);
+				m_fTransition = Math::Clamp((xfloat)m_iTime / (xfloat)m_iMoveTime, 0.f, 1.f);
 
-				if (m_fTransition < 0.f)
+				if (m_iTime == 0)
 				{
 					m_fTransition = 0.f;
 					SetState(PlayerState_Idle);
@@ -150,15 +145,14 @@ void CPlayer::Update()
 			xpoint xOffset;
 			
 			if (m_iTransitionDir % 2)
-				xOffset.iY = (xint)(m_fTransition * s_fMoveDir[m_iTransitionDir]);
+				xOffset.iY = (xint)(m_fTransition * s_fBlockSize * s_fMoveDir[m_iTransitionDir]);
 			else
-				xOffset.iX = (xint)(m_fTransition * s_fMoveDir[m_iTransitionDir]);
+				xOffset.iX = (xint)(m_fTransition * s_fBlockSize * s_fMoveDir[m_iTransitionDir]);
 
 			m_pSprite->SetPosition(m_pCurrentBlock->GetScreenPosition() + xOffset);
-			fAlpha *= 1.f - (m_fTransition / s_fBlockSize);
 
 			if (_GLOBAL.pActivePlayer == this)
-				_GLOBAL.fWorldAlpha = Math::Clamp(1.f - (m_fTransition / s_fBlockSize), 0.f, 1.f);
+				_GLOBAL.fWorldAlpha = Math::Clamp(1.f - m_fTransition, 0.f, 1.f);
 		}
 		break;
 
@@ -171,7 +165,14 @@ void CPlayer::Update()
 	}
 
 	if (this != _GLOBAL.pActivePlayer)
-		m_pSprite->SetAlpha(m_pCurrentBlock->m_fVisibility * fAlpha);
+	{
+		xfloat fVisibility = (m_pCurrentBlock->m_fPlayerVisibility * (1.f - m_fTransition));
+
+		if (m_pTargetBlock)
+			fVisibility += m_pTargetBlock->m_fPlayerVisibility * m_fTransition;
+
+		m_pSprite->SetAlpha(fVisibility * fAlpha);
+	}
 	else
 		m_pSprite->SetAlpha(fAlpha);
 
@@ -349,9 +350,7 @@ void CPlayer::OnAnimationEvent(CAnimatedSprite* pSprite, const xchar* pEvent)
 }
 
 //##############################################################################
-#pragma endregion
 
-#pragma region PacMan
 //##############################################################################
 //
 //                                   PACMAN
@@ -394,7 +393,7 @@ void CPacman::SetState(t_PlayerState iState)
 			m_pSprite->Play("Move");
 			m_pSprite->SetAngle((xfloat)m_iTransitionDir * 90.f, true);
 
-			m_iMoveTime = m_pSprite->GetAnimation()->iAnimationTime;
+			m_iMoveTime = _MOVETIME;
 		}
 		break;
 	}
@@ -403,9 +402,7 @@ void CPacman::SetState(t_PlayerState iState)
 }
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Ghost
 //##############################################################################
 //
 //                                   GHOST
@@ -452,7 +449,12 @@ void CGhost::Render()
 	CPlayer::Render();
 
 	m_pEyes->SetPosition(m_pSprite->GetPosition());
-	m_pEyes->SetAlpha(Math::Clamp((m_pSprite->GetAlpha() * 3.f - 1.f), 0.f, 1.f));
+
+	if (_GLOBAL.pActivePlayer->GetType() == PlayerType_Pacman || _GLOBAL.pActivePlayer == this)
+		m_pEyes->SetAlpha(m_pSprite->GetAlpha());
+	else
+		m_pEyes->SetAlpha(1.f);
+	
 	m_pEyes->Render();
 }
 
@@ -487,4 +489,3 @@ void CGhost::SetState(t_PlayerState iState)
 
 
 //##############################################################################
-#pragma endregion

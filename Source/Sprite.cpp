@@ -50,7 +50,7 @@ CSpriteFile::~CSpriteFile()
 CSpriteMetadata::CSpriteMetadata(CDataset* pDataset) : CResourceMetadata(ResourceType_Sprite, pDataset)
 {
 	// File.
-	pFile = (CSpriteFile*)ResourceManager::AllocResourceFile(ResourceType_Sprite, pDataset->GetProperty("File")->GetString());
+	pFile = (CSpriteFile*)ResourceManager::CreateResourceFile(ResourceType_Sprite, pDataset->GetProperty("File")->GetString());
 
 	// Areas.
 	_DATASET_FOREACH(pAreaDataset, pDataset, "Area", NULL)

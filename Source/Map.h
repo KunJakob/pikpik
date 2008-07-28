@@ -1,6 +1,5 @@
 #pragma once
 
-#pragma region Include
 //##############################################################################
 //
 //                                   INCLUDE
@@ -18,9 +17,7 @@
 #include <Power.h>
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Types
 //##############################################################################
 //
 //                                   TYPES
@@ -56,7 +53,8 @@ enum t_BlockType
 	BlockType_Floor,
 	BlockType_Pellet,
 	BlockType_Wall,
-	BlockType_Base,
+	BlockType_GhostWall,
+	BlockType_GhostBase,
 };
 
 // Adjacent direction.
@@ -74,9 +72,24 @@ enum t_AdjacentDirection
 typedef xvlist<CMapBlock*> t_MapBlockList;
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Block
+//##############################################################################
+//
+//                                   MODULE
+//
+//##############################################################################
+class CMapModule : public CModule
+{
+public:
+	// Initialise.
+	virtual void Initialise();
+
+	// Deinitialise.
+	virtual void Deinitialise();
+};
+
+//##############################################################################
+
 //##############################################################################
 //
 //                                   BLOCK
@@ -98,9 +111,15 @@ public:
 	}
 
 	// Check if the block is part of a ghost base.
-	xbool IsBase()
+	xbool IsGhostBase()
 	{
-		return m_iBlockType == BlockType_Base;
+		return m_iBlockType == BlockType_GhostBase;
+	}
+
+	// Check if the block is a ghost wall.
+	xbool IsGhostWall()
+	{
+		return m_iBlockType == BlockType_GhostWall;
 	}
 
 	// Check if the block is edible.
@@ -148,6 +167,9 @@ public:
 	// The block visibility.
 	xfloat m_fVisibility;
 
+	// The player visibility.
+	xfloat m_fPlayerVisibility;
+
 	// The trap (if any) that is bound to this block.
 	CTrap* m_pTrap;
 	
@@ -168,9 +190,7 @@ protected:
 };
 
 //##############################################################################
-#pragma endregion
 
-#pragma region Map
 //##############################################################################
 //
 //                                     MAP
@@ -303,4 +323,3 @@ protected:
 };
 
 //##############################################################################
-#pragma endregion
