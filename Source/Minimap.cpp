@@ -66,7 +66,7 @@ void CMinimap::Render()
 {
 	_HGE->System_SetState(HGE_TEXTUREFILTER, false);
 		
-	m_pSprite->RenderEx(10.f, 10.f, 0.f, 8.f, 0.f);
+	m_pSprite->RenderEx(10.f, 10.f, 0.f, 4.f, 0.f);
 	
 	_HGE->System_SetState(HGE_TEXTUREFILTER, true);
 }
@@ -97,7 +97,7 @@ HTEXTURE CMinimap::Generate(xuint iElementMask)
 
 					switch (pBlock->m_iBlockType)
 					{
-						// Floor.
+					// Floor.
 					case BlockType_Floor:
 						{
 							if (XFLAGISSET(iElementMask, MinimapElement_Floor))
@@ -105,7 +105,7 @@ HTEXTURE CMinimap::Generate(xuint iElementMask)
 						}
 						break;
 
-						// Pellet
+					// Pellet
 					case BlockType_Pellet:
 						{
 							if (XFLAGISSET(iElementMask, MinimapElement_Pellets) && !pBlock->m_bEaten)
@@ -113,7 +113,7 @@ HTEXTURE CMinimap::Generate(xuint iElementMask)
 						}
 						break;
 
-						// Wall.
+					// Wall.
 					case BlockType_Wall:
 						{
 							if (XFLAGISSET(iElementMask, MinimapElement_Walls))
@@ -121,19 +121,19 @@ HTEXTURE CMinimap::Generate(xuint iElementMask)
 						}
 						break;
 
-						// Ghost Wall.
+					// Ghost Wall.
 					case BlockType_GhostWall:
 						{
-							if (XFLAGISSET(iElementMask, MinimapElement_GhostBase))
-								*pPixel = 0xFF804040;
+							if (XFLAGISSET(iElementMask, MinimapElement_GhostWalls))
+								*pPixel = 0xFFC0C0FF;
 						}
 						break;
 
-						// Ghost Base.
+					// Ghost Base.
 					case BlockType_GhostBase:
 						{
 							if (XFLAGISSET(iElementMask, MinimapElement_GhostBase))
-								*pPixel = 0xFFFF8080;
+								*pPixel = 0xFF4040FF;
 						}
 						break;
 					}
@@ -141,8 +141,8 @@ HTEXTURE CMinimap::Generate(xuint iElementMask)
 			}
 		}
 
-		// Ghosts.
-		if (XFLAGISSET(iElementMask, MinimapElement_Pacman) || XFLAGISSET(iElementMask, MinimapElement_Ghost))
+		// Players.
+		//if (XFLAGISSET(iElementMask, MinimapElement_Pacman) || XFLAGISSET(iElementMask, MinimapElement_Ghost))
 		{
 			XEN_LIST_FOREACH(t_PlayerList, ppPlayer, _GLOBAL.lpPlayers)
 			{
@@ -152,10 +152,23 @@ HTEXTURE CMinimap::Generate(xuint iElementMask)
 				{
 					DWORD* pPixel = &pMinimap[pBlock->m_xPosition.iX + (pBlock->m_xPosition.iY * m_iTextureWidth)];
 
-					if (pPlayer->GetType() == PlayerType_Ghost && XFLAGISSET(iElementMask, MinimapElement_Ghost))
+					switch (pPlayer->GetType())
 					{
-						CGhost* pGhost = (CGhost*)pPlayer;
-						*pPixel = pGhost->GetColour();
+					// Ghost.
+					case PlayerType_Ghost:
+						{
+							if (XFLAGISSET(iElementMask, MinimapElement_Ghost))
+								*pPixel = 0xFFFF8000;
+						}
+						break;
+
+					// Pacman.
+					case PlayerType_Pacman:
+						{
+							if (XFLAGISSET(iElementMask, MinimapElement_Pacman))
+								*pPixel = 0xFFFFFF80;
+						}
+						break;
 					}
 				}
 			}
@@ -163,7 +176,7 @@ HTEXTURE CMinimap::Generate(xuint iElementMask)
 	}
 	_HGE->Texture_Unlock(m_hMinimap);
 
-	m_pSprite->SetTexture(m_hMinimap);
+	//m_pSprite->SetTexture(m_hMinimap);
 
 	return m_hMinimap;
 }

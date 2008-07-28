@@ -338,9 +338,6 @@ void CMap::AddVisiblePaths(CMapBlock* pBase, xfloat fVisibility)
 			{
 				pBlock = pBlock->m_pAdjacents[iA];
 				pBlock->m_fVisibility += fVisibility;
-
-				//if (pBlock->IsWall() || pBlock->IsGhostWall())
-				//	break;
 			}
 		}
 	}

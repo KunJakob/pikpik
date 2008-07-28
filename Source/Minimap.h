@@ -35,14 +35,15 @@ enum t_MinimapElement
 {
 	MinimapElement_Floor		= XBIT(0),
 	MinimapElement_Walls		= XBIT(1),
-	MinimapElement_GhostBase	= XBIT(2),
-	MinimapElement_Pellets		= XBIT(3),
-	MinimapElement_Powers		= XBIT(4),
-	MinimapElement_Traps		= XBIT(5),
-	MinimapElement_Pacman		= XBIT(6),
-	MinimapElement_Ghost		= XBIT(7),
-	MinimapElement_PacmanSpawn	= XBIT(8),
-	MinimapElement_Scanline		= XBIT(9),
+	MinimapElement_GhostWalls	= XBIT(2),
+	MinimapElement_GhostBase	= XBIT(3),
+	MinimapElement_Pellets		= XBIT(4),
+	MinimapElement_Powers		= XBIT(5),
+	MinimapElement_Traps		= XBIT(6),
+	MinimapElement_Pacman		= XBIT(7),
+	MinimapElement_Ghost		= XBIT(8),
+	MinimapElement_PacmanSpawn	= XBIT(9),
+	MinimapElement_Scanline		= XBIT(10),
 };
 
 //##############################################################################

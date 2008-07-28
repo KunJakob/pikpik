@@ -479,7 +479,7 @@ void CGhost::SetState(t_PlayerState iState)
 			m_iMoveTime = m_pSprite->GetAnimation()->iAnimationTime;
 
 			if (m_pCurrentBlock->m_iTileType == TileType_Entrance || (m_pTargetBlock && m_pTargetBlock->m_iTileType == TileType_Entrance))
-				m_iMoveTime *= 4;
+				m_iMoveTime *= 3;
 		}
 		break;
 	}

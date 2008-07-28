@@ -40,7 +40,7 @@ void CGameScreen::Load()
 	//Need AddRenderCallback();
 #endif
 
-	LoadMap(5);
+	LoadMap(1);
 	LoadMusic();
 
 	InitialisePlayers();
@@ -53,8 +53,6 @@ void CGameScreen::Load()
 	Interface.SetCursorVisible(false);
 
 	m_pMinimap = new CMinimap(_GLOBAL.pActiveMap);
-	m_pMinimap->Generate(MinimapElement_Walls | MinimapElement_GhostBase | MinimapElement_Pellets | MinimapElement_Floor);
-
 	RenderManager::Add(LayerIndex_Radar, m_pMinimap);
 }
 
@@ -126,7 +124,7 @@ void CGameScreen::Update()
 	}
 
 	// Switch between players.
-	if (_HGE->Input_KeyDown(HGEK_P))
+	if (_HGE->Input_KeyDown(HGEK_SPACE))
 	{
 		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, _GLOBAL.lpPlayers)
 		{
@@ -146,7 +144,7 @@ void CGameScreen::Update()
 	}
 
 	// Switch between logic types.
-	if (_HGE->Input_KeyDown(HGEK_L))
+	if (_HGE->Input_KeyDown(HGEK_SHIFT))
 	{
 		t_PlayerLogicType iLogicType = _GLOBAL.pActivePlayer->GetLogicType();
 
@@ -164,7 +162,7 @@ void CGameScreen::Update()
 	// Calculate the music energy using spectrum analysis.
 	CalculateMusicEnergy(m_pChannel);
 
-	m_pMinimap->Generate(MinimapElement_Walls | MinimapElement_GhostBase | MinimapElement_Pellets | MinimapElement_Ghost);
+	m_pMinimap->Generate(MinimapElement_Walls | MinimapElement_GhostWalls | MinimapElement_GhostBase | MinimapElement_Ghost | MinimapElement_Pacman);
 }
 
 // =============================================================================

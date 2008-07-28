@@ -135,6 +135,9 @@ void CMenuScreen::Load()
 			(*ppMenuLink)->RePosition(iElement++, iElementCount);
 	}
 
+	// Create a list of maps.
+
+
 	// Initialise transition variables.
 	m_iState = MenuState_None;
 	m_iMenuGroup = MenuGroup_None;
