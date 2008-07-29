@@ -40,7 +40,7 @@ void CGameScreen::Load()
 	//Need AddRenderCallback();
 #endif
 
-	LoadMap(1);
+	LoadMap();
 	LoadMusic();
 
 	InitialisePlayers();
@@ -59,9 +59,9 @@ void CGameScreen::Load()
 // =============================================================================
 // Nat Ryall                                                         15-Jul-2008
 // =============================================================================
-void CGameScreen::LoadMap(xint iIndex)
+void CGameScreen::LoadMap()
 {
-	_GLOBAL.pActiveMap = new CMap(XFORMAT("M%03d", iIndex));
+	_GLOBAL.pActiveMap->Load();
 	_GLOBAL.fWorldAlpha = 1.f;
 
 	RenderManager::Add(LayerIndex_Map, _GLOBAL.pActiveMap);
@@ -101,7 +101,8 @@ void CGameScreen::InitialisePlayers()
 // =============================================================================
 void CGameScreen::Unload()
 {
-	delete _GLOBAL.pActiveMap;
+	_GLOBAL.pActiveMap->Unload();
+
 	m_pMusic->release();
 
 	RenderManager::Reset();
@@ -119,7 +120,7 @@ void CGameScreen::Update()
 	// Exit the game.
 	if (_HGE->Input_KeyUp(HGEK_ESCAPE))
 	{
-		ScreenManager::Pop();
+		ScreenManager.Pop();
 		return;
 	}
 
@@ -214,12 +215,14 @@ void CGameScreen::CalculateMusicEnergy(FMOD::Channel* pChannel)
 // =============================================================================
 void CGameScreen::WorldTransform(CRenderable* pRenderable)
 {
+	xpoint xOffset = _GLOBAL.pActivePlayer->GetSprite()->GetPosition() - xpoint(_HSWIDTH, _HSHEIGHT);
+
 	switch (pRenderable->GetRenderableType())
 	{
 	case RenderableType_Map:
 		{
 			CMap* pMap = (CMap*)pRenderable;
-			pMap->SetOffset(m_xOffset);
+			pMap->SetOffset(xOffset);
 			pMap->Render();
 		}
 		break;
@@ -230,7 +233,7 @@ void CGameScreen::WorldTransform(CRenderable* pRenderable)
 
 			xpoint xPosition = pPlayer->GetSprite()->GetPosition();
 
-			pPlayer->GetSprite()->SetPosition(xPosition - m_xOffset);
+			pPlayer->GetSprite()->SetPosition(xPosition - xOffset);
 			pPlayer->Render();
 			pPlayer->GetSprite()->SetPosition(xPosition);
 		}

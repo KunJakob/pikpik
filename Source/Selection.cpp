@@ -51,7 +51,7 @@ void CSelectionScreen::Update()
 {
 	if (_HGE->Input_KeyDown(HGEK_ESCAPE))
 	{
-		ScreenManager::Pop();
+		ScreenManager.Pop();
 		return;
 	}
 }

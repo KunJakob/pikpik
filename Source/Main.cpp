@@ -54,7 +54,7 @@ static xbool s_bTerminate = false;
 static xuint s_iTimeDelta = 0;
 
 // Screen List.
-static t_ScreenList s_lpScreens;
+::t_ScreenList s_lpScreens;
 
 //##############################################################################
 
@@ -140,12 +140,11 @@ void Application::Initialise()
 	_GLOBAL.pGameFont = new CFont(_FONT("Default"));
 
 	// Add all required modules to the game.
-	_MODULE(CRenderModule);
-	_MODULE(CMapModule);
-
 	XMODULE(&CollisionManager);
+	XMODULE(&ScreenManager);
+	XMODULE(&MapManager);
 
-	_MODULE(CScreenModule);
+	_MODULE(CRenderModule);
 
 	// Initialise all modules.
 	Xen::ModuleManager::Initialise();
@@ -158,7 +157,7 @@ void Application::Initialise()
 	s_lpScreens.push_back(new CLobbyScreen);
 	s_lpScreens.push_back(new CCharacterScreen);
 
-	ScreenManager::Set(ScreenIndex_LogoScreen);
+	ScreenManager.Set(ScreenIndex_LogoScreen);
 
 	// Create all the available players.
 	_GLOBAL.lpPlayers.push_back(new CPacman());
@@ -204,7 +203,7 @@ xbool Application::Update()
 {
 	if (_GLOBAL.iNextScreen != ScreenIndex_Invalid)
 	{
-		Xen::ScreenManager::Set(_GLOBAL.iNextScreen);
+		ScreenManager.Set(_GLOBAL.iNextScreen);
 		_GLOBAL.iNextScreen = ScreenIndex_Invalid;
 	}
 
@@ -222,7 +221,7 @@ xbool Application::Update()
 	hgeInputEvent hgEvent;
 
 	while (s_pInterface->Input_GetEvent(&hgEvent))
-		Xen::ScreenManager::Event(hgEvent.type, &hgEvent);
+		ScreenManager.Event(hgEvent.type, &hgEvent);
 
 	return s_bTerminate;
 }

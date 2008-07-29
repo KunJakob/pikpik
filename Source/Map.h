@@ -20,6 +20,17 @@
 
 //##############################################################################
 //
+//                                   MACROS
+//
+//##############################################################################
+
+// Shortcuts.
+#define MapManager CMapManager::Get()
+
+//##############################################################################
+
+//##############################################################################
+//
 //                                   TYPES
 //
 //##############################################################################
@@ -70,23 +81,7 @@ enum t_AdjacentDirection
 
 // Lists.
 typedef xvlist<CMapBlock*> t_MapBlockList;
-
-//##############################################################################
-
-//##############################################################################
-//
-//                                   MODULE
-//
-//##############################################################################
-class CMapModule : public CModule
-{
-public:
-	// Initialise.
-	virtual void Initialise();
-
-	// Deinitialise.
-	virtual void Deinitialise();
-};
+typedef xvlist<CMap*> t_MapList;
 
 //##############################################################################
 
@@ -162,7 +157,7 @@ public:
 	xbool m_bEaten;
 
 	// The "eaten" and "respawn" timer.
-	Tools::CTimer m_xRespawnTimer;
+	CTimer m_xRespawnTimer;
 
 	// The block visibility.
 	xfloat m_fVisibility;
@@ -180,9 +175,7 @@ public:
 	CMapBlock* m_pAdjacents[AdjacentDirection_Max];
 
 protected:
-	/**
-	* Get the bit-index for the adjacent.
-	*/
+	// Get the bit-index for the adjacent.
 	xuint GetBit(t_AdjacentDirection iAdjacentDir)
 	{
 		return 1 << (xuint)iAdjacentDir;
@@ -202,111 +195,118 @@ public:
 	// Friends.
 	friend class CMapBlock;
 
-	/**
-	* Create a new map from metadata.
-	*/
-	CMap(const xchar* pID);
+	// Create a new map from metadata.
+	CMap(CDataset* pDataset);
 
-	/**
-	* Clean up the map data on destruction.
-	*/
+	// Clean up the map data on destruction.
 	virtual ~CMap();
 
-	/**
-	* Update the map.
-	*/
+	// Load the map into memory so that it's playable.
+	void Load();
+
+	// Unload the map from memory.
+	void Unload();
+
+	// Update the map.
 	virtual void Update();
 
-	/**
-	* Render the map.
-	*/
+	// Render the map.
 	virtual void Render();
 
-	/**
-	* Get the name of the map as specified in the metadata.
-	*/
-	const xchar* GetName()
+	// Determine if the map instance is currently loaded into memory.
+	inline xbool IsLoaded()
+	{
+		return m_bLoaded;
+	}
+
+	// Get the map ID.
+	inline const xchar* GetID()
+	{
+		return m_pID;
+	}
+
+	// Get the name of the map as specified in the metadata.
+	inline const xchar* GetName()
 	{
 		return m_pName;
 	}
 
-	/**
-	* Get the block width of the map as specified in the metadata.
-	*/
-	xuint GetWidth()
+	// Get the block width of the map as specified in the metadata.
+	inline xint GetWidth()
 	{
 		return m_iWidth;
 	}
 
-	/**
-	* Get the block height of the map as specified in the metadata.
-	*/
-	xuint GetHeight()
+	// Get the block height of the map as specified in the metadata.
+	inline xint GetHeight()
 	{
 		return m_iHeight;
 	}
 
-	/**
-	* Set the map offset in pixels to begin the map render.
-	*/
-	void SetOffset(xpoint xOffset)
+	// Set the map offset in pixels to begin the map render.
+	inline void SetOffset(xpoint xOffset)
 	{
 		m_xOffset = xOffset;
 	}
 
-	/**
-	* Get the current offset.
-	*/
-	xpoint GetOffset()
+	// Get the current offset.
+	inline xpoint GetOffset()
 	{
 		return m_xOffset;
 	}
 
-	/**
-	* Get a map block by index.
-	*/
-	CMapBlock* GetBlock(xuint iBlockIndex)
+	// Get a map block by index.
+	inline CMapBlock* GetBlock(xint iBlockIndex)
 	{
-		XMASSERT(iBlockIndex < (m_iWidth * m_iHeight), "Block index requested is out of bounds.");
+		XMASSERT(iBlockIndex < (GetWidth() * GetHeight()), "Block index requested is out of bounds.");
 		return &m_xBlocks[iBlockIndex];
 	}
 
-	/**
-	* Get a map block by block position.
-	*/
-	CMapBlock* GetBlock(xpoint xBlockPos)
+	// Get a map block by block position.
+	inline CMapBlock* GetBlock(xpoint xBlockPos)
 	{
-		return GetBlock(xBlockPos.iX + (xBlockPos.iY * m_iWidth));
+		return GetBlock(xBlockPos.iX + (xBlockPos.iY * GetWidth()));
 	}
 
-	/**
-	* Get a random player spawn block.
-	*/
+	// Get a random player spawn block.
 	CMapBlock* GetSpawnBlock(t_PlayerType iPlayerType);
 
-	/**
-	* Get a block in the adjacent direction to the specified block. This will wrap around the map if on the edge.
-	*/
+	// Get a block in the adjacent direction to the specified block. This will wrap around the map if on the edge.
 	CMapBlock* GetAdjacentBlock(t_AdjacentDirection iAdjacentDir, CMapBlock* pBlock);
 
 protected:
-	/**
-	* Add the specified visibility to all valid paths from the specified block.
-	*/
+	// Add the specified visibility to all valid paths from the specified block.
 	void AddVisiblePaths(CMapBlock* pStartingBlock, xfloat fVisibility);
 
-	// The map name.
+	// The map dataset.
+	CDataset* m_pDataset;
+
+	// Determines if the map is currently loaded into memory.
+	xbool m_bLoaded;
+
+	// The map identifier.
+	const xchar* m_pID;
+
+	// The title of the map.
 	const xchar* m_pName;
 
-	// The map dimensions in blocks.
-	xuint m_iWidth;
-	xuint m_iHeight;
+	// The number of "pacman" players allowed on the map.
+	xint m_iPacmanCount;
+
+	// The number of "ghost" players allowed on the map.
+	xint m_iGhostCount;
+
+	// The map width.
+	xint m_iWidth;
+
+	// The map height.
+	xint m_iHeight;
 
 	// The total number of blocks in the map.
-	xuint m_iBlockCount;
+	xint m_iBlockCount;
 
 	// The total number of pellets eaten.
-	xuint m_iPelletsEaten;
+	xint m_iPelletsEaten;
 
 	// The processed map data.
 	CMapBlock* m_xBlocks;
@@ -317,9 +317,63 @@ protected:
 	// The current map offset in pixels.
 	xpoint m_xOffset;
 
-	// The map colourisation.
-	xfloat m_fColours[3];
-	xbool m_bUp[3];
+	// The map current map colourisation channels.
+	xfloat m_fChannels[3];
+
+	// The current colour transition direction.
+	xbool m_bColouriseDir[3];
+};
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                 MAP MANAGER
+//
+//##############################################################################
+class CMapManager : public CModule
+{
+public:
+	// Friends.
+	friend class CMap;
+
+	// Singleton instance.
+	static inline CMapManager& Get() 
+	{
+		static CMapManager s_Instance;
+		return s_Instance;
+	}
+
+	// (Module) Load all map resources and determine available maps.
+	virtual void Initialise();
+
+	// (Module) Free all map resources and any loaded maps.
+	virtual void Deinitialise();
+
+	// Get a specific map by index.
+	CMap* GetMap(xint iIndex);
+
+	// Get a specific map by ID.
+	CMap* GetMap(const xchar* pID);
+
+	// Get the number of known maps.
+	inline xint GetMapCount()
+	{
+		return (xint)m_lpMaps.size();
+	}
+
+protected:
+	// The map metadata.
+	CMetadata* m_pMetadata;
+
+	// The tiles used for rendering the map.
+	CBasicSprite* m_pTiles;
+
+	// The areas of each map tile.
+	CSpriteMetadata::CArea* m_pTileAreas[TileType_Max];
+
+	// The list of map descriptions.
+	t_MapList m_lpMaps;
 };
 
 //##############################################################################

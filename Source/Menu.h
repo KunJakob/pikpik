@@ -46,6 +46,7 @@ enum t_MenuGroup
 	MenuGroup_Online,
 	MenuGroup_Join,
 	MenuGroup_Create,
+	MenuGroup_Levels,
 	/*MAX*/MenuGroup_Max,
 };
 
@@ -92,7 +93,7 @@ public:
 	xuint m_iTransitionTime;
 
 	// The offset timer for the transition to start.
-	Tools::CTimer m_xStartTimer;
+	CTimer m_xStartTimer;
 
 	// The final link position on screen.
 	xpoint m_xLinkPosition;
@@ -170,6 +171,7 @@ protected:
 	void Callback_JoinPrivate();
 	void Callback_CreatePublic();
 	void Callback_CreatePrivate();
+	void Callback_ShowLevelsMenu();
 	void Callback_StartGame();
 	void Callback_QuitGame();
 

@@ -57,8 +57,8 @@ public:
 	virtual void Render();
 
 protected:
-	// Load the map with the specified index from metadata.
-	void LoadMap(xint iIndex);
+	// Load the currently active map.
+	void LoadMap();
 
 	// Load the game music track.
 	void LoadMusic();

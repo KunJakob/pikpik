@@ -231,7 +231,7 @@ protected:
 	CSession* m_pSessionList;
 
 	// The ping timer.
-	Tools::CTimer m_xPingTimer;
+	CTimer m_xPingTimer;
 };
 
 //##############################################################################

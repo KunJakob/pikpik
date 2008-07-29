@@ -23,15 +23,6 @@
 //
 //##############################################################################
 
-// The map metadata.
-static CMetadata* s_pMetadata = NULL;
-
-// The tiles used for rendering the map.
-static CBasicSprite* s_pTiles = NULL;
-
-// The areas of each map tile.
-static CSpriteMetadata::CArea* s_pTileAreas[TileType_Max];
-
 // The tile index lookup table.
 static const t_TileType s_iTileIndexLookup[] = 
 {
@@ -95,47 +86,6 @@ static const t_BlockType s_iBlockTypeLookup[TileType_Max] =
 
 //##############################################################################
 //
-//                                   MODULE
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         28-Jul-2008
-// =============================================================================
-void CMapModule::Initialise()
-{
-	s_pMetadata = new CMetadata(".\\Metadata\\Maps.mta");
-	s_pTiles = new CBasicSprite(_SPRITE("Map-Tiles"));
-
-	s_pTileAreas[TileType_Blank]			= s_pTiles->GetMetadata()->FindArea("Blank");
-	s_pTileAreas[TileType_Pellet]			= s_pTiles->GetMetadata()->FindArea("Pellet");
-	s_pTileAreas[TileType_Power]			= s_pTiles->GetMetadata()->FindArea("Power");
-	s_pTileAreas[TileType_Eaten]			= s_pTiles->GetMetadata()->FindArea("Eaten");
-	s_pTileAreas[TileType_Solo]				= s_pTiles->GetMetadata()->FindArea("Solo");
-	s_pTileAreas[TileType_Tunnel]			= s_pTiles->GetMetadata()->FindArea("Tunnel");
-	s_pTileAreas[TileType_Cap]				= s_pTiles->GetMetadata()->FindArea("Cap");
-	s_pTileAreas[TileType_Corner]			= s_pTiles->GetMetadata()->FindArea("Corner");
-	s_pTileAreas[TileType_Junction]			= s_pTiles->GetMetadata()->FindArea("Junction");
-	s_pTileAreas[TileType_Intersection]		= s_pTiles->GetMetadata()->FindArea("Intersection");
-	s_pTileAreas[TileType_Entrance]			= s_pTiles->GetMetadata()->FindArea("Entrance");
-	s_pTileAreas[TileType_Base]				= s_pTiles->GetMetadata()->FindArea("Base");
-
-	s_pTiles->GetMetadata()->GetSprite()->SetBlendMode(BLEND_COLORMUL | BLEND_ALPHABLEND);
-}
-
-// =============================================================================
-// Nat Ryall                                                         28-Jul-2008
-// =============================================================================
-void CMapModule::Deinitialise()
-{
-	delete s_pTiles;
-	delete s_pMetadata;
-}
-
-//##############################################################################
-
-//##############################################################################
-//
 //                                   BLOCK
 //
 //##############################################################################
@@ -182,98 +132,22 @@ void CMapBlock::Eat()
 // =============================================================================
 // Nat Ryall                                                         10-Apr-2008
 // =============================================================================
-CMap::CMap(const xchar* pID) : CRenderable(RenderableType_Map)
+CMap::CMap(CDataset* pDataset) : CRenderable(RenderableType_Map),
+	m_pDataset(pDataset),
+	m_bLoaded(false),
+	m_iPelletsEaten(0),
+	m_xBlocks(NULL)
 {
-	CDataset* pDataset = s_pMetadata->GetDataset("Map", pID);
-
-	// Get the map properties.
+	m_pID = pDataset->GetName();
 	m_pName = pDataset->GetProperty("Name")->GetString();
+
+	m_iPacmanCount = pDataset->GetProperty("Gobblers")->GetInt();
+	m_iGhostCount = pDataset->GetProperty("Chasers")->GetInt();
 
 	m_iWidth = pDataset->GetProperty("Size")->GetInt(0);
 	m_iHeight = pDataset->GetProperty("Size")->GetInt(1);
 
-	// Allocate the map block memory.
-	m_iBlockCount = m_iHeight * m_iWidth;
-	m_xBlocks = new CMapBlock[m_iBlockCount];
-
-	// Process the map blocks.
-	CProperty* pProperty = pDataset->GetProperty("Data");
-
-	for (xuint iY = 0; iY < m_iHeight; ++iY)
-	{
-		for (xuint iX = 0; iX < m_iWidth; ++iX)
-		{
-			xuint iIndex = iX + (iY * m_iWidth); 
-			CMapBlock* pBlock = &m_xBlocks[iIndex];
-
-			pBlock->m_iIndex = iIndex;
-			pBlock->m_cChar = pProperty->GetChar(iIndex);
-			pBlock->m_iTileType = TileType_Blank;
-			pBlock->m_fAngle = 0.f;
-			pBlock->m_xPosition = xpoint(iX, iY);
-			pBlock->m_fVisibility = 0.f;
-			pBlock->m_fPlayerVisibility = 0.f;
-			pBlock->m_bEaten = false;
-
-			pBlock->m_pAdjacents[AdjacentDirection_Left]	= (iIndex % m_iWidth > 0) ? &m_xBlocks[iIndex - 1] : NULL;
-			pBlock->m_pAdjacents[AdjacentDirection_Up]		= (iIndex >= m_iWidth) ? &m_xBlocks[iIndex - m_iWidth] : NULL;
-			pBlock->m_pAdjacents[AdjacentDirection_Right]	= (iIndex % m_iWidth < m_iWidth - 1) ? &m_xBlocks[iIndex + 1] : NULL;
-			pBlock->m_pAdjacents[AdjacentDirection_Down]	= (iIndex < m_iBlockCount - m_iWidth) ? &m_xBlocks[iIndex + m_iWidth] : NULL;
-		}
-	}
-
-	for (xuint iA = 0; iA < m_iBlockCount; ++iA)
-	{
-		CMapBlock* pBlock = &m_xBlocks[iA];
-
-		switch (pBlock->m_cChar)
-		{
-		// Special.
-		case '*': pBlock->m_iTileType = TileType_Pellet;	break;
-		case '@': pBlock->m_iTileType = TileType_Power;		break;
-		case '=': pBlock->m_iTileType = TileType_Entrance;	break;
-
-		// Wall.
-		case '#':
-			{
-				xuint iMask = 0;
-
-				for (xuint iB = 0; iB < AdjacentDirection_Max; ++iB)
-				{
-					if (pBlock->m_pAdjacents[iB] && pBlock->m_pAdjacents[iB]->m_cChar == '#')
-						iMask |= pBlock->GetBit((t_AdjacentDirection)iB);
-				}
-
-				pBlock->m_iTileType = s_iTileIndexLookup[iMask];
-				pBlock->m_fAngle = s_fRotationAngleLookup[iMask];
-			}
-			break;
-
-		// Spawn.
-		case '$': 
-			pBlock->m_iTileType = TileType_Blank;
-			m_lpSpawnPoints[PlayerType_Pacman].push_back(pBlock); 
-			break;
-
-		case '%': 
-			pBlock->m_iTileType = TileType_Base;
-			m_lpSpawnPoints[PlayerType_Ghost].push_back(pBlock);
-			break;
-		}
-
-		// Determine the block type.
-		pBlock->m_iBlockType = s_iBlockTypeLookup[pBlock->m_iTileType];
-	}
-
-	// Initialise the colourisation.
-	for (xint iA = 0; iA < 3; ++iA)
-	{
-		m_fColours[iA] = .5f;
-		m_bUp[iA] = (rand() % 2 == 0);
-	}
-
-	// Initialise the map properties.
-	m_iPelletsEaten = 0;
+	m_iBlockCount = m_iWidth * m_iHeight;
 }
 
 // =============================================================================
@@ -281,7 +155,116 @@ CMap::CMap(const xchar* pID) : CRenderable(RenderableType_Map)
 // =============================================================================
 CMap::~CMap()
 {
-	delete[] m_xBlocks;
+}
+
+// =============================================================================
+// Nat Ryall                                                         29-Jul-2008
+// =============================================================================
+void CMap::Load()
+{
+	if (!m_bLoaded)
+	{
+		// Allocate the map block memory.
+		m_xBlocks = new CMapBlock[m_iBlockCount];
+
+		// Process the map blocks.
+		CProperty* pProperty = m_pDataset->GetProperty("Data");
+
+		for (xint iY = 0; iY < m_iHeight; ++iY)
+		{
+			for (xint iX = 0; iX < m_iWidth; ++iX)
+			{
+				xint iIndex = iX + (iY * m_iWidth); 
+				CMapBlock* pBlock = &m_xBlocks[iIndex];
+
+				pBlock->m_iIndex = iIndex;
+				pBlock->m_cChar = pProperty->GetChar(iIndex);
+				pBlock->m_iTileType = TileType_Blank;
+				pBlock->m_fAngle = 0.f;
+				pBlock->m_xPosition = xpoint(iX, iY);
+				pBlock->m_fVisibility = 0.f;
+				pBlock->m_fPlayerVisibility = 0.f;
+				pBlock->m_bEaten = false;
+
+				pBlock->m_pAdjacents[AdjacentDirection_Left]	= (iIndex % m_iWidth > 0) ? &m_xBlocks[iIndex - 1] : NULL;
+				pBlock->m_pAdjacents[AdjacentDirection_Up]		= (iIndex >= m_iWidth) ? &m_xBlocks[iIndex - m_iWidth] : NULL;
+				pBlock->m_pAdjacents[AdjacentDirection_Right]	= (iIndex % m_iWidth < m_iWidth - 1) ? &m_xBlocks[iIndex + 1] : NULL;
+				pBlock->m_pAdjacents[AdjacentDirection_Down]	= (iIndex < m_iBlockCount - m_iWidth) ? &m_xBlocks[iIndex + m_iWidth] : NULL;
+			}
+		}
+
+		for (xint iA = 0; iA < m_iBlockCount; ++iA)
+		{
+			CMapBlock* pBlock = &m_xBlocks[iA];
+
+			switch (pBlock->m_cChar)
+			{
+			// Special.
+			case '*': pBlock->m_iTileType = TileType_Pellet;	break;
+			case '@': pBlock->m_iTileType = TileType_Power;		break;
+			case '=': pBlock->m_iTileType = TileType_Entrance;	break;
+
+			// Wall.
+			case '#':
+				{
+					xuint iMask = 0;
+
+					for (xuint iB = 0; iB < AdjacentDirection_Max; ++iB)
+					{
+						if (pBlock->m_pAdjacents[iB] && pBlock->m_pAdjacents[iB]->m_cChar == '#')
+							iMask |= pBlock->GetBit((t_AdjacentDirection)iB);
+					}
+
+					pBlock->m_iTileType = s_iTileIndexLookup[iMask];
+					pBlock->m_fAngle = s_fRotationAngleLookup[iMask];
+				}
+				break;
+
+			// Spawn.
+			case '$': 
+				pBlock->m_iTileType = TileType_Blank;
+				m_lpSpawnPoints[PlayerType_Pacman].push_back(pBlock); 
+				break;
+
+			case '%': 
+				pBlock->m_iTileType = TileType_Base;
+				m_lpSpawnPoints[PlayerType_Ghost].push_back(pBlock);
+				break;
+			}
+
+			// Determine the block type.
+			pBlock->m_iBlockType = s_iBlockTypeLookup[pBlock->m_iTileType];
+		}
+
+		// Initialise the colourisation.
+		for (xint iA = 0; iA < 3; ++iA)
+		{
+			m_fChannels[iA] = .5f;
+			m_bColouriseDir[iA] = (rand() % 2 == 0);
+		}
+
+		// Initialise the map properties.
+		m_iPelletsEaten = 0;
+	}
+
+	m_bLoaded = true;
+}
+
+// =============================================================================
+// Nat Ryall                                                         29-Jul-2008
+// =============================================================================
+void CMap::Unload()
+{
+	if (m_bLoaded)
+	{
+		delete[] m_xBlocks;
+		m_xBlocks = NULL;
+
+		for (xint iA = 0; iA < PlayerType_Max; ++iA)
+			m_lpSpawnPoints[iA].clear();
+	}
+
+	m_bLoaded = false;
 }
 
 // =============================================================================
@@ -291,16 +274,13 @@ void CMap::Update()
 {
 	if (_GLOBAL.pActivePlayer->m_iType == PlayerType_Ghost)
 	{
-		for (xuint iA = 0; iA < m_iBlockCount; ++iA)
+		for (xint iA = 0; iA < m_iBlockCount; ++iA)
 			m_xBlocks[iA].m_fVisibility = 0.f;
 
-		if (_GLOBAL.pActivePlayer->m_iState != PlayerState_Warp)
-		{
-			AddVisiblePaths(_GLOBAL.pActivePlayer->m_pCurrentBlock, 1.0f - _GLOBAL.pActivePlayer->m_fTransition);
-			AddVisiblePaths(_GLOBAL.pActivePlayer->m_pTargetBlock, _GLOBAL.pActivePlayer->m_fTransition);
-		}
+		AddVisiblePaths(_GLOBAL.pActivePlayer->m_pCurrentBlock, 1.0f - _GLOBAL.pActivePlayer->m_fTransition);
+		AddVisiblePaths(_GLOBAL.pActivePlayer->m_pTargetBlock, _GLOBAL.pActivePlayer->m_fTransition);
 
-		for (xuint iA = 0; iA < m_iBlockCount; ++iA)
+		for (xint iA = 0; iA < m_iBlockCount; ++iA)
 		{
 			m_xBlocks[iA].m_fPlayerVisibility = m_xBlocks[iA].m_fVisibility;
 
@@ -310,15 +290,15 @@ void CMap::Update()
 	}
 	else
 	{
-		for (xuint iA = 0; iA < m_iBlockCount; ++iA)
+		for (xint iA = 0; iA < m_iBlockCount; ++iA)
 		{
 			m_xBlocks[iA].m_fVisibility = 1.f;
 			m_xBlocks[iA].m_fPlayerVisibility = 1.f;
 		}
 	}
 
-	for (xuint iA = 0; iA < m_iBlockCount; ++iA)
-		m_xBlocks[iA].Update();
+	//for (xint iA = 0; iA < m_iBlockCount; ++iA)
+	//	m_xBlocks[iA].Update();
 }
 
 // =============================================================================
@@ -356,37 +336,37 @@ void CMap::Render()
 	{
 		xfloat fChannelEnergy = _GLOBAL.fMusicEnergy * (iA + 1);
 
-		if (m_bUp[iA])
+		if (m_bColouriseDir[iA])
 		{
-			m_fColours[iA] += fChannelEnergy;
-			m_bUp[iA] = !(m_fColours[iA] > s_fMaxColour);
+			m_fChannels[iA] += fChannelEnergy;
+			m_bColouriseDir[iA] = !(m_fChannels[iA] > s_fMaxColour);
 		}
 		else
 		{
-			m_fColours[iA] -= fChannelEnergy;
-			m_bUp[iA] = (m_fColours[iA] < s_fMinColour);
+			m_fChannels[iA] -= fChannelEnergy;
+			m_bColouriseDir[iA] = (m_fChannels[iA] < s_fMinColour);
 		}
 
-		m_fColours[iA] = Math::Clamp(m_fColours[iA], s_fMinColour, s_fMaxColour);
+		m_fChannels[iA] = Math::Clamp(m_fChannels[iA], s_fMinColour, s_fMaxColour);
 	}
 
 	// Draw the map.
-	for (xuint iA = 0; iA < m_iBlockCount; ++iA)
+	for (xint iA = 0; iA < m_iBlockCount; ++iA)
 	{
 		static xpoint s_xCentrePoint = xpoint(24, 24);
 
 		if (m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsGhostWall())
-			s_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, m_fColours[0], m_fColours[1], m_fColours[2]));
+			MapManager.m_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, m_fChannels[0], m_fChannels[1], m_fChannels[2]));
 		else
-			s_pTiles->GetMetadata()->GetSprite()->SetColor(0xFFFFFFFF);
+			MapManager.m_pTiles->GetMetadata()->GetSprite()->SetColor(0xFFFFFFFF);
 
 		t_TileType iTileType = m_xBlocks[iA].m_bEaten ? TileType_Eaten : m_xBlocks[iA].m_iTileType;
 
-		s_pTiles->Render
+		MapManager.m_pTiles->Render
 		(
 			m_xBlocks[iA].GetScreenPosition() - m_xOffset, 
 			s_xCentrePoint, 
-			s_pTileAreas[iTileType]->xRect,
+			MapManager.m_pTileAreas[iTileType]->xRect,
 			m_xBlocks[iA].m_fVisibility * _GLOBAL.fWorldAlpha, 
 			(m_xBlocks[iA].m_fAngle / 180.0f) * M_PI
 		);
@@ -407,7 +387,7 @@ CMapBlock* CMap::GetAdjacentBlock(t_AdjacentDirection iAdjacentDir, CMapBlock* p
 		switch (iAdjacentDir)
 		{
 		case AdjacentDirection_Left:	return &m_xBlocks[iIndex + m_iWidth - 1];
-		case AdjacentDirection_Up:		return &m_xBlocks[m_iBlockCount - m_iWidth + iIndex];
+		case AdjacentDirection_Up:		return &m_xBlocks[iIndex + m_iBlockCount - m_iWidth];
 		case AdjacentDirection_Right:	return &m_xBlocks[iIndex - m_iWidth + 1];
 		case AdjacentDirection_Down:	return &m_xBlocks[iIndex % m_iWidth];
 
@@ -436,6 +416,84 @@ CMapBlock* CMap::GetSpawnBlock(t_PlayerType iPlayerType)
 	while (!pBlock);
 
 	return pBlock;
+}
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                 MAP MANAGER
+//
+//##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                         28-Jul-2008
+// =============================================================================
+void CMapManager::Initialise()
+{
+	m_pMetadata = new CMetadata(".\\Metadata\\Maps.mta");
+
+	// Load and initialise all resources.
+	m_pTiles = new CBasicSprite(_SPRITE("Map-Tiles"));
+
+	m_pTileAreas[TileType_Blank]			= m_pTiles->GetMetadata()->FindArea("Blank");
+	m_pTileAreas[TileType_Pellet]			= m_pTiles->GetMetadata()->FindArea("Pellet");
+	m_pTileAreas[TileType_Power]			= m_pTiles->GetMetadata()->FindArea("Power");
+	m_pTileAreas[TileType_Eaten]			= m_pTiles->GetMetadata()->FindArea("Eaten");
+	m_pTileAreas[TileType_Solo]				= m_pTiles->GetMetadata()->FindArea("Solo");
+	m_pTileAreas[TileType_Tunnel]			= m_pTiles->GetMetadata()->FindArea("Tunnel");
+	m_pTileAreas[TileType_Cap]				= m_pTiles->GetMetadata()->FindArea("Cap");
+	m_pTileAreas[TileType_Corner]			= m_pTiles->GetMetadata()->FindArea("Corner");
+	m_pTileAreas[TileType_Junction]			= m_pTiles->GetMetadata()->FindArea("Junction");
+	m_pTileAreas[TileType_Intersection]		= m_pTiles->GetMetadata()->FindArea("Intersection");
+	m_pTileAreas[TileType_Entrance]			= m_pTiles->GetMetadata()->FindArea("Entrance");
+	m_pTileAreas[TileType_Base]				= m_pTiles->GetMetadata()->FindArea("Base");
+
+	m_pTiles->GetMetadata()->GetSprite()->SetBlendMode(BLEND_COLORMUL | BLEND_ALPHABLEND);
+
+	// Create a map instance for each map in metadata.
+	_DATASET_FOREACH(pDataset, m_pMetadata, "Map", NULL)
+		m_lpMaps.push_back(new CMap(pDataset));
+}
+
+// =============================================================================
+// Nat Ryall                                                         28-Jul-2008
+// =============================================================================
+void CMapManager::Deinitialise()
+{
+	delete m_pMetadata;
+	delete m_pTiles;
+
+	XEN_LIST_ERASE_ALL(m_lpMaps);
+}
+
+// =============================================================================
+// Nat Ryall                                                         29-Jul-2008
+// =============================================================================
+CMap* CMapManager::GetMap(xint iIndex)
+{
+	XASSERT(iIndex < GetMapCount());
+
+	if (iIndex < GetMapCount())
+		return m_lpMaps[iIndex];
+
+	return NULL;
+}
+
+// =============================================================================
+// Nat Ryall                                                         29-Jul-2008
+// =============================================================================
+CMap* CMapManager::GetMap(const xchar* pID)
+{
+	XASSERT(pID);
+
+	XEN_LIST_FOREACH(t_MapList, ppMap, m_lpMaps)
+	{
+		if (strcmp(pID, (*ppMap)->GetID()) == 0)
+			return *ppMap;
+	}
+
+	return NULL;
 }
 
 //##############################################################################

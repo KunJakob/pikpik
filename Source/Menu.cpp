@@ -101,7 +101,7 @@ void CMenuScreen::Load()
 	{
 		// Main.
 		new CMenuLink(MenuGroup_Main,		m_pMenuHighlight,	_LOCALE("Menu_Online"),			xbind(this, &CMenuScreen::Callback_ShowOnlineMenu)),
-		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Offline"),		xbind(this, &CMenuScreen::Callback_StartGame)),
+		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Offline"),		xbind(this, &CMenuScreen::Callback_ShowLevelsMenu)),
 		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Tutorial"),		NULL),
 		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Options"),		NULL),
 		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Credits"),		NULL),
@@ -128,15 +128,26 @@ void CMenuScreen::Load()
 
 	for (xuint iGroup = 0; iGroup < MenuGroup_Max; ++iGroup)
 	{
-		xuint iElementCount = (xuint)m_lpMenuLinks[iGroup].size();
 		xuint iElement = 0;
 
 		XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[iGroup])
-			(*ppMenuLink)->RePosition(iElement++, iElementCount);
+			(*ppMenuLink)->RePosition(iElement++, (xuint)m_lpMenuLinks[iGroup].size());
 	}
 
 	// Create a list of maps.
+	for (int iA = 0; iA < MapManager.GetMapCount(); ++iA)
+	{
+		CMap* pMap = MapManager.GetMap(iA);
+		CMenuLink* pMenuLink = new CMenuLink(MenuGroup_Levels, m_pMenuDefault, pMap->GetName(), xbind(this, &CMenuScreen::Callback_StartGame));
+		
+		pMenuLink->RePosition(iA, MapManager.GetMapCount() + 1);
+		m_lpMenuLinks[MenuGroup_Levels].push_back(pMenuLink);
+	}
 
+	CMenuLink* pMenuLink = new CMenuLink(MenuGroup_Levels, m_pMenuHighlight, _LOCALE("Menu_Back"), xbind(this, &CMenuScreen::Callback_ShowMainMenu));
+
+	pMenuLink->RePosition(MapManager.GetMapCount(), MapManager.GetMapCount() + 1);
+	m_lpMenuLinks[MenuGroup_Levels].push_back(pMenuLink);
 
 	// Initialise transition variables.
 	m_iState = MenuState_None;
@@ -187,6 +198,7 @@ void CMenuScreen::Update()
 			_TERMINATE;
 			return;
 
+		case MenuGroup_Levels:
 		case MenuGroup_Online:
 			SetMenuGroup(MenuGroup_Main);
 			break;
@@ -309,7 +321,7 @@ void CMenuScreen::ShowNextScreen()
 {
 	if (m_iNextScreen != ScreenIndex_Invalid)
 	{
-		ScreenManager::Push(m_iNextScreen);
+		ScreenManager.Push(m_iNextScreen);
 
 		switch (m_iNextScreen)
 		{
@@ -424,6 +436,14 @@ void CMenuScreen::Callback_ShowCreateMenu()
 }
 
 // =============================================================================
+// Nat Ryall                                                         29-Jul-2008
+// =============================================================================
+void CMenuScreen::Callback_ShowLevelsMenu()
+{
+	SetMenuGroup(MenuGroup_Levels);
+}
+
+// =============================================================================
 // Nat Ryall                                                         09-Jul-2008
 // =============================================================================
 void CMenuScreen::Callback_JoinPublic()
@@ -464,6 +484,9 @@ void CMenuScreen::Callback_CreatePrivate()
 // =============================================================================
 void CMenuScreen::Callback_StartGame()
 {
+	CMenuLink* pLink = (CMenuLink*)Interface.GetActiveElement();
+
+	_GLOBAL.pActiveMap = MapManager.GetMap(pLink->m_iElementIndex);
 	SetNextScreen(ScreenIndex_GameScreen);
 }
 

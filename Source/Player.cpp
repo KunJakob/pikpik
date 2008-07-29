@@ -38,12 +38,13 @@ CPlayer::CPlayer(t_PlayerType iType, const xchar* pSpriteName) : CRenderable(Ren
 	m_iType(iType),
 	m_pSprite(NULL)
 {
+	SetName("Unknown"); // Probably shouldn't have that here, it's more of an online thing.
+
 	m_pSprite = new CAnimatedSprite(_SPRITE(pSpriteName));
-	m_pSprite->Play("Idle");
+	m_pSprite->SetAnimation("Idle");
 	m_pSprite->SetAnchor(m_pSprite->GetAreaCentre());
 	m_pSprite->SetEventCallback(xbind(this, &CPlayer::OnAnimationEvent));
 
-	SetName("Unknown");
 	Reset();
 }
 
@@ -70,6 +71,9 @@ void CPlayer::Reset()
 	m_bLeaving = false;
 	m_iTransitionDir = PlayerDirection_Left;
 	m_iMoveDir = PlayerDirection_Left;
+
+	m_pSprite->Play("Idle");
+	m_pSprite->SetAlpha(1.f);
 
 	SetState(PlayerState_Idle);
 }

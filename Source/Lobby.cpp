@@ -94,7 +94,7 @@ void CLobbyScreen::QuitCheck()
 		case LobbyState_Join:
 			{
 				SetState(LobbyState_None);
-				ScreenManager::Pop();
+				ScreenManager.Pop();
 			}
 			break;
 
@@ -362,7 +362,7 @@ void CLobbyScreen::CloseLobby()
 	if (m_bPublic || Network.IsHosting())
 	{
 		SetState(LobbyState_None);
-		ScreenManager::Pop();
+		ScreenManager.Pop();
 	}
 	else
 		SetState(LobbyState_Join);
@@ -390,7 +390,7 @@ void CLobbyScreen::OnListSessionsCompleted(t_MatchResultError iError, xint iSess
 	else
 	{
 		SetState(LobbyState_None);
-		ScreenManager::Pop();
+		ScreenManager.Pop();
 	}
 }
 
@@ -404,7 +404,7 @@ void CLobbyScreen::OnCreateSessionCompleted(t_MatchResultError iError, CSession*
 	else
 	{
 		SetState(LobbyState_None);
-		ScreenManager::Pop();
+		ScreenManager.Pop();
 	}
 }
 
