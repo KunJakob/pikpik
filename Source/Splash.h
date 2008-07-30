@@ -49,7 +49,7 @@ public:
 	/**
 	* Called when a game-specific event is executed when active.
 	*/
-	virtual void Notify(XIN xuint iEventType, XIN void* pEventInfo);
+	virtual void Notify(xuint iEventType, void* pEventInfo);
 
 	/**
 	* Called each frame to update the screen when active.
@@ -86,7 +86,7 @@ public:
 	virtual ~CWarningScreen() {}
 
 	// Called when a game-specific event is executed when active.
-	virtual void Notify(XIN xuint iEventType, XIN void* pEventInfo);
+	virtual void Notify(xuint iEventType, void* pEventInfo);
 
 	// Called each frame to render the screen when active.
 	virtual void Render();

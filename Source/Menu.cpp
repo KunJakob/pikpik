@@ -81,8 +81,6 @@ void CMenuLink::RePosition(xuint iElementIndex, xuint iNumElements)
 // =============================================================================
 void CMenuScreen::Load()
 {
-	_GLOBAL.pMenu = this;
-
 	// Initialise the render resources.
 	m_pBackground = new CBackgroundImage("Menu-Background");
 
@@ -321,12 +319,15 @@ void CMenuScreen::ShowNextScreen()
 {
 	if (m_iNextScreen != ScreenIndex_Invalid)
 	{
-		ScreenManager.Push(m_iNextScreen);
+		ScreenManager.Push(m_iNextScreen, true);
 
 		switch (m_iNextScreen)
 		{
 		case ScreenIndex_LobbyScreen:
-			_GLOBAL.pLobby->Start(m_iLobbyMode);
+			{
+				CLobbyScreen* pLobby = (CLobbyScreen*)ScreenManager.FindScreen(ScreenIndex_LobbyScreen);
+				pLobby->Start(m_iLobbyMode);
+			}
 			break;
 		}
 
@@ -486,7 +487,7 @@ void CMenuScreen::Callback_StartGame()
 {
 	CMenuLink* pLink = (CMenuLink*)Interface.GetActiveElement();
 
-	_GLOBAL.pActiveMap = MapManager.GetMap(pLink->m_iElementIndex);
+	Global.m_pActiveMap = MapManager.GetMap(pLink->m_iElementIndex);
 	SetNextScreen(ScreenIndex_GameScreen);
 }
 

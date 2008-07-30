@@ -172,6 +172,9 @@ protected:
 	// Called when an animation event occurs.
 	void OnAnimationEvent(CAnimatedSprite* pSprite, const xchar* pEvent);
 
+	// Broadcast our local details to other players.
+	void NetworkUpdate();
+
 	// The type of the derived class.
 	t_PlayerType m_iType;
 

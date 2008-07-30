@@ -220,7 +220,9 @@ xbool CNetwork::Send(CNetworkPeer* pTo, xuchar cType, BitStream* pStream, Packet
 
 			xFinalStream.Write((xuchar)ID_DATA_PACKET);
 			xFinalStream.Write(cType);
-			xFinalStream.Write(pStream);
+
+			if (pStream)
+				xFinalStream.Write(pStream);
 
 			m_pInterface->Send(&xFinalStream, iPriority, iReliability, iChannel, pTo->m_xAddress, false);
 		}
@@ -236,7 +238,9 @@ xbool CNetwork::Send(CNetworkPeer* pTo, xuchar cType, BitStream* pStream, Packet
 
 			xFinalStream.Write((xuchar)ID_DATA_PACKET);
 			xFinalStream.Write(cType);
-			xFinalStream.Write(pStream);
+
+			if (pStream)
+				xFinalStream.Write(pStream);
 
 			m_pInterface->Send(&xFinalStream, iPriority, iReliability, iChannel, m_pHostPeer->m_xAddress, false);
 		}
@@ -250,9 +254,35 @@ xbool CNetwork::Send(CNetworkPeer* pTo, xuchar cType, BitStream* pStream, Packet
 // =============================================================================
 // Nat Ryall                                                         18-Jun-2008
 // =============================================================================
-xbool CNetwork::Broadcast(CNetworkPeer* pIgnore, xuchar cType, BitStream* pStream, PacketPriority iPriority, PacketReliability iReliability, xchar iChannel /*= 2*/)
+xbool CNetwork::Broadcast(CNetworkPeer* pIgnore, xuchar cType, BitStream* pStream, PacketPriority iPriority, PacketReliability iReliability, xchar iChannel)
 {
-	XMASSERT(false, "Broadcast() is not implemented yet.");
+	XMASSERT(iChannel >= 2 && iChannel <= 31, "Channel index out of bounds.");
+
+	if (iChannel >= 2 && iChannel <= 31)
+	{
+		XMASSERT(m_bHosting, "Relay broadcasting from clients is not implemented yet.");
+
+		if (m_bHosting)
+		{
+			BitStream xFinalStream;
+
+			xFinalStream.Write((xuchar)ID_DATA_PACKET);
+			xFinalStream.Write(cType);
+
+			if (pStream)
+				xFinalStream.Write(pStream);
+
+			m_pInterface->Send(&xFinalStream, iPriority, iReliability, iChannel, pIgnore ? pIgnore->m_xAddress : UNASSIGNED_SYSTEM_ADDRESS, true);
+		}
+		else
+		{
+			// Send via. the host.
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
 // =============================================================================
@@ -365,6 +395,14 @@ xint CNetwork::GetLastPing()
 }
 
 // =============================================================================
+// Nat Ryall                                                         13-Jun-2008
+// =============================================================================
+xint CNetwork::GetUniquePeerID()
+{
+	return m_iLastPeerID++ % (NETWORK_PEER_INVALID_ID - 1);
+}
+
+// =============================================================================
 // Nat Ryall                                                         09-Jun-2008
 // =============================================================================
 CNetworkPeer* CNetwork::CreatePeer()
@@ -385,20 +423,20 @@ CNetworkPeer* CNetwork::CreatePeer()
 }
 
 // =============================================================================
-// Nat Ryall                                                         13-Jun-2008
-// =============================================================================
-xint CNetwork::GetUniquePeerID()
-{
-	return m_iLastPeerID++ % (NETWORK_PEER_INVALID_ID - 1);
-}
-
-// =============================================================================
 // Nat Ryall                                                         19-Jul-2008
 // =============================================================================
 void CNetwork::DestroyPeer(CNetworkPeer* pPeer)
 {
 	if (pPeer)
 		XEN_LIST_ERASE(t_NetworkPeerList, m_lpPeers, pPeer);
+}
+
+// =============================================================================
+// Nat Ryall                                                         30-Jul-2008
+// =============================================================================
+void CNetwork::SortPeers()
+{
+	m_lpPeers.sort();
 }
 
 // =============================================================================

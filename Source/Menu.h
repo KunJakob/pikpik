@@ -144,7 +144,7 @@ public:
 	virtual void Render();
 
 	// Called when a game-specific event is executed when active.
-	virtual void Notify(XIN xuint iEventType, XIN void* pEventInfo) {}
+	virtual void Notify(xuint iEventType, void* pEventInfo) {}
 
 	// Set the menu group to use.
 	void SetMenuGroup(t_MenuGroup iMenuGroup);

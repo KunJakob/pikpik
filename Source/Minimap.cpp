@@ -142,9 +142,9 @@ HTEXTURE CMinimap::Generate(xuint iElementMask)
 		}
 
 		// Players.
-		//if (XFLAGISSET(iElementMask, MinimapElement_Pacman) || XFLAGISSET(iElementMask, MinimapElement_Ghost))
+		if (XFLAGISSET(iElementMask, MinimapElement_Pacman) || XFLAGISSET(iElementMask, MinimapElement_Ghost))
 		{
-			XEN_LIST_FOREACH(t_PlayerList, ppPlayer, _GLOBAL.lpPlayers)
+			XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
 			{
 				CPlayer* pPlayer = *ppPlayer;
 
@@ -175,8 +175,6 @@ HTEXTURE CMinimap::Generate(xuint iElementMask)
 		}
 	}
 	_HGE->Texture_Unlock(m_hMinimap);
-
-	//m_pSprite->SetTexture(m_hMinimap);
 
 	return m_hMinimap;
 }

@@ -21,6 +21,7 @@
 
 // Other.
 #include <Minimap.h>
+#include <Network.h>
 
 //##############################################################################
 
@@ -40,6 +41,9 @@ void CGameScreen::Load()
 	//Need AddRenderCallback();
 #endif
 
+	Global.m_fWorldAlpha = 1.f;
+	Global.m_fMusicEnergy = 0.f;
+
 	LoadMap();
 	LoadMusic();
 
@@ -52,7 +56,7 @@ void CGameScreen::Load()
 
 	Interface.SetCursorVisible(false);
 
-	m_pMinimap = new CMinimap(_GLOBAL.pActiveMap);
+	m_pMinimap = new CMinimap(Global.m_pActiveMap);
 	RenderManager::Add(LayerIndex_Radar, m_pMinimap);
 }
 
@@ -61,10 +65,10 @@ void CGameScreen::Load()
 // =============================================================================
 void CGameScreen::LoadMap()
 {
-	_GLOBAL.pActiveMap->Load();
-	_GLOBAL.fWorldAlpha = 1.f;
+	if (!Network.IsRunning())
+		Global.m_pActiveMap->Load();
 
-	RenderManager::Add(LayerIndex_Map, _GLOBAL.pActiveMap);
+	RenderManager::Add(LayerIndex_Map, Global.m_pActiveMap);
 }
 
 // =============================================================================
@@ -72,8 +76,6 @@ void CGameScreen::LoadMap()
 // =============================================================================
 void CGameScreen::LoadMusic()
 {
-	_GLOBAL.fMusicEnergy = 0.f;
-
 	_FMOD->createStream("Audio\\Level-Test.mp3", FMOD_SOFTWARE, 0, &m_pMusic);
 	_FMOD->playSound(FMOD_CHANNEL_FREE, m_pMusic, false, &m_pChannel);
 }
@@ -83,17 +85,19 @@ void CGameScreen::LoadMusic()
 // =============================================================================
 void CGameScreen::InitialisePlayers()
 {
-	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, _GLOBAL.lpPlayers)
+	// This is temporary until the character select screen is implemented (offline only).
+	if (!Network.IsRunning())
 	{
-		(*ppPlayer)->Reset();
-		(*ppPlayer)->SetLogicType(PlayerLogicType_AI);
-		(*ppPlayer)->SetCurrentBlock(_GLOBAL.pActiveMap->GetSpawnBlock((*ppPlayer)->GetType()));
+		Global.ResetActivePlayers();
+		Global.m_pLocalPlayer = Global.m_lpActivePlayers.front();
 
-		RenderManager::Add(LayerIndex_Player, *ppPlayer);
+		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
+			(*ppPlayer)->SetLogicType(PlayerLogicType_AI);
 	}
 
-	_GLOBAL.pActivePlayer = _GLOBAL.lpPlayers.front();
-	_GLOBAL.pActivePlayer->SetLogicType(PlayerLogicType_Local);
+	// Add all active players to the player render layer.
+	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
+		RenderManager::Add(LayerIndex_Player, *ppPlayer);
 }
 
 // =============================================================================
@@ -101,7 +105,8 @@ void CGameScreen::InitialisePlayers()
 // =============================================================================
 void CGameScreen::Unload()
 {
-	_GLOBAL.pActiveMap->Unload();
+	if (!Network.IsRunning())
+		Global.m_pActiveMap->Unload();
 
 	m_pMusic->release();
 
@@ -127,19 +132,19 @@ void CGameScreen::Update()
 	// Switch between players.
 	if (_HGE->Input_KeyDown(HGEK_SPACE))
 	{
-		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, _GLOBAL.lpPlayers)
+		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
 		{
-			if (_GLOBAL.pActivePlayer == *ppPlayer)
+			if (Global.m_pLocalPlayer == *ppPlayer)
 			{
-				if (*ppPlayer == _GLOBAL.lpPlayers.back())
-					_GLOBAL.pActivePlayer = _GLOBAL.lpPlayers.front();
+				if (*ppPlayer == Global.m_lpActivePlayers.back())
+					ppPlayer = Global.m_lpActivePlayers.begin();
 				else
-				{
 					ppPlayer++;
 
-					_GLOBAL.pActivePlayer = *ppPlayer;
-					_GLOBAL.fWorldAlpha = 1.f;
-				} 
+				Global.m_pLocalPlayer = *ppPlayer;
+				Global.m_fWorldAlpha = 1.f;
+
+				break;
 			}
 		}
 	}
@@ -147,18 +152,18 @@ void CGameScreen::Update()
 	// Switch between logic types.
 	if (_HGE->Input_KeyDown(HGEK_SHIFT))
 	{
-		t_PlayerLogicType iLogicType = _GLOBAL.pActivePlayer->GetLogicType();
+		t_PlayerLogicType iLogicType = Global.m_pLocalPlayer->GetLogicType();
 
 		if (iLogicType == PlayerLogicType_Local)
 			iLogicType = PlayerLogicType_AI;
 		else
 			iLogicType = PlayerLogicType_Local;
 
-		_GLOBAL.pActivePlayer->SetLogicType(iLogicType);
+		Global.m_pLocalPlayer->SetLogicType(iLogicType);
 	}
 
 	// Calculate the map offset.
-	m_xOffset = _GLOBAL.pActivePlayer->GetSprite()->GetPosition() - xpoint(_HSWIDTH, _HSHEIGHT);
+	m_xOffset = Global.m_pLocalPlayer->GetSprite()->GetPosition() - xpoint(_HSWIDTH, _HSHEIGHT);
 
 	// Calculate the music energy using spectrum analysis.
 	CalculateMusicEnergy(m_pChannel);
@@ -171,15 +176,6 @@ void CGameScreen::Update()
 // =============================================================================
 void CGameScreen::Render()
 {
-	//const char* pMusicTitle = "Unknown";
-
-	//FMOD_TAG fmArtist;
-	//FMOD_TAG fmTitle;
-
-	//if (m_pMusic->getTag("ARTIST", 0, &fmArtist) == FMOD_OK && m_pMusic->getTag("TITLE", 0, &fmTitle) == FMOD_OK && fmArtist.data && fmTitle.data)
-	//	pMusicTitle = XFORMAT("%s - %s", fmArtist.data, fmTitle.data);
-
-	//_GLOBAL.pGameFont->Render(pMusicTitle, xpoint(10, 10), HGETEXT_LEFT);
 }
 
 // =============================================================================
@@ -207,7 +203,7 @@ void CGameScreen::CalculateMusicEnergy(FMOD::Channel* pChannel)
 
 	fAverageStrength /= 4.f;
 
-	_GLOBAL.fMusicEnergy = fAverageStrength * 0.1f;
+	Global.m_fMusicEnergy = fAverageStrength * 0.1f;
 }
 
 // =============================================================================
@@ -215,7 +211,7 @@ void CGameScreen::CalculateMusicEnergy(FMOD::Channel* pChannel)
 // =============================================================================
 void CGameScreen::WorldTransform(CRenderable* pRenderable)
 {
-	xpoint xOffset = _GLOBAL.pActivePlayer->GetSprite()->GetPosition() - xpoint(_HSWIDTH, _HSHEIGHT);
+	xpoint xOffset = Global.m_pLocalPlayer->GetSprite()->GetPosition() - xpoint(_HSWIDTH, _HSHEIGHT);
 
 	switch (pRenderable->GetRenderableType())
 	{

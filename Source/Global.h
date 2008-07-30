@@ -77,18 +77,20 @@
 #define _MAXNAMECHARS		16
 
 // Shortcuts.
-#define _GLOBAL				CGlobal::Get()
 #define _HGE				Application::GetInterface()
 #define _FMOD				Application::GetSoundSystem()
 #define _TERMINATE			Application::Terminate()
 #define _TIMEMS				GetTickCount()
 #define _TIMEDELTA			Application::GetTimeDelta()
 #define _TIMEDELTAF			_HGE->Timer_GetDelta()
-#define _LOCALE(NAME)		_GLOBAL.pLocale->GetProperty(NAME)->GetString()
+#define _LOCALE(NAME)		Global.m_pLocale->GetProperty(NAME)->GetString()
 
 // Colour manipulations.
 #define COLOURF(COLF)		(xuchar)((COLF) * 255.f)
 #define ARGBF(A, R, G, B)	ARGB(COLOURF(A), COLOURF(R), COLOURF(G), COLOURF(B))
+
+// Singletons.
+#define Global				CGlobal::Get()
 
 //##############################################################################
 
@@ -159,6 +161,7 @@ enum t_RenderableType
 enum t_NetworkStreamType
 {
 	NetworkStreamType_PlayerInfo,
+	NetworkStreamType_StartGame,
 };
 
 // The lobby start mode.
@@ -181,7 +184,7 @@ enum t_CollisionGroup
 // Common list types.
 typedef xlist<CMetadata*> t_MetadataList;
 typedef xlist<CSprite*> t_SpriteList;
-typedef xlist<CPlayer*> t_PlayerList;
+typedef xvlist<CPlayer*> t_PlayerList;
 
 //##############################################################################
 
@@ -210,35 +213,35 @@ public:
 		return s_Instance;
 	}
 
-	// The menu screen.
-	CMenuScreen* pMenu;
+	// Determine the list of players for the active map and position them.
+	void ResetActivePlayers();
 
-	// The lobby screen.
-	CLobbyScreen* pLobby;
-
-	// The currently active map.
-	CMap* pActiveMap;
-
-	// The player list.
-	t_PlayerList lpPlayers;
-
-	// The currently active player on the local machine.
-	CPlayer* pActivePlayer;
-
-	// The music spectrum energy to determine how fast colours transition.
-	xfloat fMusicEnergy;
-
-	// The map overall alpha.
-	xfloat fWorldAlpha;
+	// The current focus status of the game window.
+	xbool m_bWindowFocused;
 
 	// The global game font.
-	CFont* pGameFont;
+	CFont* m_pGameFont;
 
 	// The global game strings.
-	CMetadata* pLocale;
+	CMetadata* m_pLocale;
 
-	// The next screen to show.
-	t_ScreenIndex iNextScreen;
+	// The currently active map.
+	CMap* m_pActiveMap;
+
+	// The list of all players available to the game.
+	t_PlayerList m_lpPlayers;
+
+	// The list of all active players in the current game.
+	t_PlayerList m_lpActivePlayers;
+
+	// The currently active player on the local machine.
+	CPlayer* m_pLocalPlayer;
+
+	// The music spectrum energy to determine how fast colours transition.
+	xfloat m_fMusicEnergy;
+
+	// The map overall alpha.
+	xfloat m_fWorldAlpha;
 };
 
 //##############################################################################

@@ -231,6 +231,18 @@ public:
 		return m_pName;
 	}
 
+	// Get the number of pacman players allowed on this map.
+	inline xint GetPacmanCount()
+	{
+		return m_iPacmanCount;
+	}
+
+	// Get the number of ghost players allowed on this map.
+	inline xint GetGhostCount()
+	{
+		return m_iGhostCount;
+	}
+
 	// Get the block width of the map as specified in the metadata.
 	inline xint GetWidth()
 	{

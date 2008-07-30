@@ -109,7 +109,7 @@ public:
 	xbool Send(CNetworkPeer* pTo, xuchar cType, BitStream* pStream, PacketPriority iPriority, PacketReliability iReliability, xchar iChannel = 2);
 
 	// Send a data packet to all remote peers (via the host if we are a client).
-	xbool Broadcast(CNetworkPeer* pIgnore,  xuchar cType, BitStream* pStream, PacketPriority iPriority, PacketReliability iReliability, xchar iChannel = 2);
+	xbool Broadcast(CNetworkPeer* pIgnore, xuchar cType, BitStream* pStream, PacketPriority iPriority, PacketReliability iReliability, xchar iChannel = 2);
 
 	// Initialise the network system as a host.
 	void StartHost(xint iMaxPeers, xint iPort, void* pCustomInfo = NULL, xint iCustomInfoSize = 0);
@@ -162,6 +162,12 @@ public:
 		return m_pHostPeer; 
 	}
 
+	// Sort the peers by network ID.
+	void SortPeers();
+
+	// Find an exisiting peer by peer ID.
+	CNetworkPeer* FindPeer(xint iPeerID);
+
 	// Determine if the local machine is the host.
 	inline xbool IsHosting() 
 	{ 
@@ -179,7 +185,7 @@ public:
 
 protected:
 	// Relay a data packet from the host machine to all other peers on behalf of the sending peer.
-	void Relay(CNetworkPeer* pSender, BitStream* pStream);
+	//void Relay(CNetworkPeer* pSender, BitStream* pStream);
 
 	// Process all host notifications.
 	void ProcessHostNotifications(xchar cIdentifier, Packet* pPacket, xuchar* pData, xint iDataSize);
@@ -190,11 +196,11 @@ protected:
 	// Process an incoming packet and dispatch to any callbacks.
 	void ProcessPacket(Packet* pPacket, BitStream* pStream);
 
-	// Create a new peer object.
-	CNetworkPeer* CreatePeer();
-
 	// Geterate a new peer ID. Valid only on the host.
 	xint GetUniquePeerID();
+
+	// Create a new peer object.
+	CNetworkPeer* CreatePeer();
 
 	// Destroy an existing peer.
 	void DestroyPeer(CNetworkPeer* pPeer);
@@ -202,12 +208,9 @@ protected:
 	// Find an existing peer by system address.
 	CNetworkPeer* FindPeer(SystemAddress* pAddress);
 
-	// Find an exisiting peer by peer ID.
-	CNetworkPeer* FindPeer(xint iPeerID);
-
 	// Free all existing peers in the system and fire any leaving notifications.
 	void FreePeers();
-
+	
 	// The local interface.
 	RakPeerInterface* m_pInterface;
 
@@ -263,6 +266,12 @@ public:
 
 	// The network peer custom data.
 	void* m_pData;
+
+	// Compare two peers against each other for sorting.
+	xbool operator < (const CNetworkPeer*& pPeer)
+	{
+		return m_iID < pPeer->m_iID;
+	}
 };
 
 //##############################################################################

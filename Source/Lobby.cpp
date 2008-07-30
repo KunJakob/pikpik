@@ -35,7 +35,6 @@ CLobbyScreen::CLobbyScreen() : CScreen(ScreenIndex_LobbyScreen),
 	m_bPublic(true),
 	m_pSession(NULL)
 {
-	_GLOBAL.pLobby = this;
 }
 
 // =============================================================================
@@ -43,7 +42,6 @@ CLobbyScreen::CLobbyScreen() : CScreen(ScreenIndex_LobbyScreen),
 // =============================================================================
 CLobbyScreen::~CLobbyScreen()
 {
-	_GLOBAL.pLobby = NULL;
 }
 
 // =============================================================================
@@ -73,12 +71,38 @@ void CLobbyScreen::Load()
 // =============================================================================
 void CLobbyScreen::Unload()
 {
+	m_iState = LobbyState_None;
+
 	delete m_pJoinInterface;
 	delete m_pStatusBox;
 
 	delete m_pPeerFont;
 
 	DeleteSessionBoxes();
+}
+
+// =============================================================================
+// Nat Ryall                                                         30-Jul-2008
+// =============================================================================
+void CLobbyScreen::Wake()
+{
+	switch (m_iState)
+	{
+	case LobbyState_Game:
+		{
+			EndGame();
+			SetState(LobbyState_Lobby);
+		}
+		break;
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         30-Jul-2008
+// =============================================================================
+void CLobbyScreen::Sleep()
+{
+	SetState(LobbyState_Game);
 }
 
 // =============================================================================
@@ -122,6 +146,7 @@ void CLobbyScreen::QuitCheck()
 void CLobbyScreen::Update()
 {
 	QuitCheck();
+
 	UpdateParent();
 
 	switch (m_iState)
@@ -129,24 +154,6 @@ void CLobbyScreen::Update()
 	case LobbyState_Lobby:
 		UpdateLobby();
 		break;
-	}
-}
-
-// =============================================================================
-// Nat Ryall                                                         17-Jun-2008
-// =============================================================================
-void CLobbyScreen::UpdateLobby()
-{
-	if (m_pSession && !Match.IsBusy())
-	{
-		if (Network.IsHosting())
-		{
-			if (m_xPingTimer.IsExpired())
-			{
-				Match.PingSession(m_pSession, NULL);
-				m_xPingTimer.ExpireAfter(MATCH_PING_INTERVAL);
-			}
-		}
 	}
 }
 
@@ -159,10 +166,6 @@ void CLobbyScreen::Render()
 
 	switch (m_iState)
 	{
-	case LobbyState_List:
-		RenderList();
-		break;
-
 	case LobbyState_Lobby:
 		RenderLobby();
 		break;
@@ -170,10 +173,26 @@ void CLobbyScreen::Render()
 }
 
 // =============================================================================
-// Nat Ryall                                                         09-Jul-2008
+// Nat Ryall                                                         17-Jun-2008
 // =============================================================================
-void CLobbyScreen::RenderList()
-{	
+void CLobbyScreen::UpdateLobby()
+{
+	if (Network.IsHosting())
+	{
+		// Ping the matchmaking service on set intervals to keep the session alive.
+		if (m_pSession && !Match.IsBusy() && m_xPingTimer.IsExpired())
+		{
+			Match.PingSession(m_pSession, NULL);
+			m_xPingTimer.ExpireAfter(MATCH_PING_INTERVAL);
+		}
+
+		// Start the game when ENTER is pressed (debug).
+		if (_HGE->Input_KeyUp(HGEK_ENTER))
+		{
+			Network.Broadcast(NULL, NetworkStreamType_StartGame, NULL, HIGH_PRIORITY, RELIABLE_ORDERED);
+			StartGame();
+		}
+	}
 }
 
 // =============================================================================
@@ -194,7 +213,7 @@ void CLobbyScreen::RenderLobby()
 		}
 	}
 
-	_GLOBAL.pGameFont->Render(XFORMAT("Ping:  %d", Network.GetLastPing()), xpoint(_SWIDTH - 100, 50), HGETEXT_LEFT);
+	Global.m_pGameFont->Render(XFORMAT("Ping:  %d", Network.GetLastPing()), xpoint(_SWIDTH - 100, 50), HGETEXT_LEFT);
 }
 
 // =============================================================================
@@ -355,6 +374,51 @@ void CLobbyScreen::JoinLobby(const xchar* pHostAddress)
 }
 
 // =============================================================================
+// Nat Ryall                                                         30-Jul-2008
+// =============================================================================
+void CLobbyScreen::StartGame()
+{
+	Global.m_pActiveMap = MapManager.GetMap("M009");
+	Global.m_pActiveMap->Load();
+
+	Global.ResetActivePlayers();
+	
+	// Initialise all players.
+	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
+	{
+		CPlayer* pPlayer = *ppPlayer;
+		pPlayer->SetLogicType(Network.GetLocalPeer()->m_bHost ? PlayerLogicType_AI : PlayerLogicType_Remote);
+	}
+
+	// Setup all network players.
+	xint iPlayerIndex = 0;
+
+	Network.SortPeers();
+
+	XEN_LIST_FOREACH(t_NetworkPeerList, ppPeer, Network.GetPeers())
+	{
+		CNetworkPeer* pPeer = *ppPeer;
+		CNetworkPeerInfo* pInfo = GetPeerInfo(pPeer);
+
+		pInfo->m_pPlayer = Global.m_lpActivePlayers[iPlayerIndex++];
+		pInfo->m_pPlayer->SetLogicType(pPeer->m_bLocal ? PlayerLogicType_Local : PlayerLogicType_Remote);
+
+		if (pPeer->m_bLocal)
+			Global.m_pLocalPlayer = pInfo->m_pPlayer;
+	}
+
+	ScreenManager.Push(ScreenIndex_GameScreen);
+}
+
+// =============================================================================
+// Nat Ryall                                                         30-Jul-2008
+// =============================================================================
+void CLobbyScreen::EndGame()
+{
+	Global.m_pActiveMap->Unload();
+}
+
+// =============================================================================
 // Nat Ryall                                                         10-Jul-2008
 // =============================================================================
 void CLobbyScreen::CloseLobby()
@@ -481,6 +545,7 @@ void CLobbyScreen::OnPeerLeaving(CNetworkPeer* pPeer)
 void CLobbyScreen::BindPacketCallbacks()
 {
 	Network.BindReceiveCallback(NetworkStreamType_PlayerInfo, xbind(this, &CLobbyScreen::OnReceivePlayerInfo));
+	Network.BindReceiveCallback(NetworkStreamType_StartGame, xbind(this, &CLobbyScreen::OnReceiveStartGame));
 }
 
 // =============================================================================
@@ -489,6 +554,15 @@ void CLobbyScreen::BindPacketCallbacks()
 void CLobbyScreen::OnReceivePlayerInfo(CNetworkPeer* pFrom, BitStream* pStream)
 {
 	XLOG("[LobbyScreen] Received player info from peer #%d.", pFrom->m_iID);
+}
+
+// =============================================================================
+// Nat Ryall                                                         30-Jul-2008
+// =============================================================================
+void CLobbyScreen::OnReceiveStartGame(CNetworkPeer* pFrom, BitStream* pStream)
+{
+	XLOG("[LobbyScreen] Received notification to start the game.");
+	StartGame();
 }
 
 // =============================================================================
@@ -647,7 +721,8 @@ void CSessionBox::Render()
 // =============================================================================
 void CSessionBox::OnMouseUp(xpoint xPosition)
 {
-	_GLOBAL.pLobby->JoinLobby(m_pSession->m_sIP.c_str());
+	CLobbyScreen* pLobby = (CLobbyScreen*)ScreenManager.FindScreen(ScreenIndex_LobbyScreen);
+	pLobby->JoinLobby(m_pSession->m_sIP.c_str());
 }
 
 //##############################################################################

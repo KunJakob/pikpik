@@ -73,6 +73,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	s_pInterface->System_SetState(HGE_FRAMEFUNC, &Application::Update);
 	s_pInterface->System_SetState(HGE_RENDERFUNC, &Application::Render);
+	s_pInterface->System_SetState(HGE_FOCUSLOSTFUNC, &Application::OnBlur);
+	s_pInterface->System_SetState(HGE_FOCUSGAINFUNC, &Application::OnFocus);
 	s_pInterface->System_SetState(HGE_TITLE, "PikPik");
 	s_pInterface->System_SetState(HGE_USESOUND, false);
 	s_pInterface->System_SetState(HGE_WINDOWED, true);
@@ -129,15 +131,22 @@ void Application::Initialise()
 {
 	srand(GetTickCount());
 
-	// Load the strings.
-	_GLOBAL.pLocale = new CMetadata(".\\Metadata\\Strings.mta");
+	// Initialise global vars.
+	Global.m_bWindowFocused = true;
+	Global.m_pActiveMap = NULL;
+	Global.m_pLocalPlayer = NULL;
+	Global.m_fMusicEnergy = 0.f;
+	Global.m_fWorldAlpha = 1.f;
 
 	// Load all relevant metadata.
 	ResourceManager::RegisterMetadata(new CMetadata(".\\Metadata\\Sprites.mta"));
 	ResourceManager::RegisterMetadata(new CMetadata(".\\Metadata\\Font.mta"));
 
 	// Initialise the game font.
-	_GLOBAL.pGameFont = new CFont(_FONT("Default"));
+	Global.m_pGameFont = new CFont(_FONT("Default"));
+
+	// Load the locale.
+	Global.m_pLocale = new CMetadata(".\\Metadata\\Strings.mta");
 
 	// Add all required modules to the game.
 	XMODULE(&CollisionManager);
@@ -157,13 +166,15 @@ void Application::Initialise()
 	s_lpScreens.push_back(new CLobbyScreen);
 	s_lpScreens.push_back(new CCharacterScreen);
 
-	ScreenManager.Set(ScreenIndex_LogoScreen);
+	ScreenManager.Set(ScreenIndex_LogoScreen, true);
 
 	// Create all the available players.
-	_GLOBAL.lpPlayers.push_back(new CPacman());
-	_GLOBAL.lpPlayers.push_back(new CGhost(0xFF40F0F0));
-	_GLOBAL.lpPlayers.push_back(new CGhost(0xFFF0F040));
-	_GLOBAL.lpPlayers.push_back(new CGhost(0xFFF040F0));
+	Global.m_lpPlayers.push_back(new CPacman());
+	Global.m_lpPlayers.push_back(new CGhost(0xFF40F0F0));
+	Global.m_lpPlayers.push_back(new CGhost(0xFFF0F040));
+	Global.m_lpPlayers.push_back(new CGhost(0xFFF040F0));
+	Global.m_lpPlayers.push_back(new CGhost(0xFF4040F0));
+	Global.m_lpPlayers.push_back(new CGhost(0xFFF04040));
 
 	// Initialise the matchmaking system.
 	Match.Initialise();
@@ -175,13 +186,13 @@ void Application::Initialise()
 void Application::Deinitialise()
 {
 	// Clear the screen.
-	_GLOBAL.iNextScreen = ScreenIndex_Invalid;
+	//Global.m_iNextScreen = ScreenIndex_Invalid;
 
 	// Free the string metadata.
-	delete _GLOBAL.pLocale;
+	delete Global.m_pLocale;
 
 	// Free the font.
-	delete _GLOBAL.pGameFont;
+	delete Global.m_pGameFont;
 
 	// Deinitialise all modules.
 	Xen::ModuleManager::Deinitialise();
@@ -190,7 +201,7 @@ void Application::Deinitialise()
 	XEN_LIST_ERASE_ALL(s_lpScreens);
 
 	// Free all the players.
-	XEN_LIST_ERASE_ALL(_GLOBAL.lpPlayers);
+	XEN_LIST_ERASE_ALL(Global.m_lpPlayers);
 
 	// Deinitialise the matchmaking system.
 	Match.Deinitialise();
@@ -201,12 +212,6 @@ void Application::Deinitialise()
 // =============================================================================
 xbool Application::Update()
 {
-	if (_GLOBAL.iNextScreen != ScreenIndex_Invalid)
-	{
-		ScreenManager.Set(_GLOBAL.iNextScreen);
-		_GLOBAL.iNextScreen = ScreenIndex_Invalid;
-	}
-
 	s_iTimeDelta = (xuint)(_TIMEDELTAF * 1000.f);
 
 	Network.Update();
@@ -238,6 +243,26 @@ xbool Application::Render()
 	Interface.Render();
 
 	s_pInterface->Gfx_EndScene();
+
+	return false;
+}
+
+// =============================================================================
+// Nat Ryall                                                         30-Jul-2008
+// =============================================================================
+xbool Application::OnBlur()
+{
+	Global.m_bWindowFocused = false;
+
+	return false;
+}
+
+// =============================================================================
+// Nat Ryall                                                         30-Jul-2008
+// =============================================================================
+xbool Application::OnFocus()
+{
+	Global.m_bWindowFocused = true;
 
 	return false;
 }

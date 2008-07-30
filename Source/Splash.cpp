@@ -91,7 +91,8 @@ void CLogoScreen::Render()
 // =============================================================================
 void CLogoScreen::OnFadeComplete()
 {
-	_GLOBAL.iNextScreen = ScreenIndex_WarningScreen;
+	//Global.m_iNextScreen = ScreenIndex_WarningScreen;
+	ScreenManager.Set(ScreenIndex_WarningScreen);
 }
 
 //##############################################################################
@@ -128,7 +129,7 @@ void CWarningScreen::Render()
 
 	static xrect s_xRect(_HSWIDTH - 250, 0, _HSWIDTH + 250, _SHEIGHT);
 
-	_GLOBAL.pGameFont->Render
+	Global.m_pGameFont->Render
 	(
 		_LOCALE("Splash_PhotoWarning"),
 		s_xRect,
@@ -142,7 +143,8 @@ void CWarningScreen::Render()
 // =============================================================================
 void CWarningScreen::OnFadeComplete()
 {
-	_GLOBAL.iNextScreen = ScreenIndex_MenuScreen;
+	//Global.m_iNextScreen = ScreenIndex_MenuScreen;
+	ScreenManager.Set(ScreenIndex_MenuScreen);
 }
 
 //##############################################################################

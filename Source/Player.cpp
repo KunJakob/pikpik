@@ -129,7 +129,7 @@ void CPlayer::Update()
 				if (m_iTime == m_iMoveTime)
 				{
 					m_fTransition = 1.f;
-					m_pCurrentBlock = _GLOBAL.pActiveMap->GetAdjacentBlock((t_AdjacentDirection)m_iTransitionDir, m_pCurrentBlock);
+					m_pCurrentBlock = Global.m_pActiveMap->GetAdjacentBlock((t_AdjacentDirection)m_iTransitionDir, m_pCurrentBlock);
 					m_iTransitionDir = (t_PlayerDirection)((m_iTransitionDir + 2) % PlayerDirection_Max);
 					m_bLeaving = false;
 				}
@@ -155,8 +155,8 @@ void CPlayer::Update()
 
 			m_pSprite->SetPosition(m_pCurrentBlock->GetScreenPosition() + xOffset);
 
-			if (_GLOBAL.pActivePlayer == this)
-				_GLOBAL.fWorldAlpha = Math::Clamp(1.f - m_fTransition, 0.f, 1.f);
+			if (Global.m_pLocalPlayer == this)
+				Global.m_fWorldAlpha = Math::Clamp(1.f - m_fTransition, 0.f, 1.f);
 		}
 		break;
 
@@ -168,7 +168,7 @@ void CPlayer::Update()
 		break;
 	}
 
-	if (this != _GLOBAL.pActivePlayer)
+	if (this != Global.m_pLocalPlayer)
 	{
 		xfloat fVisibility = (m_pCurrentBlock->m_fPlayerVisibility * (1.f - m_fTransition));
 
@@ -258,7 +258,7 @@ void CPlayer::Logic()
 void CPlayer::LogicLocal()
 {
 	// Currently we can only control one player at a time.
-	if (this != _GLOBAL.pActivePlayer)
+	if (this != Global.m_pLocalPlayer || !Global.m_bWindowFocused)
 		return;
 
 	// Check player input for all directions.
@@ -271,6 +271,10 @@ void CPlayer::LogicLocal()
 				Move((t_PlayerDirection)iA);
 		}
 	}
+
+	// Send out our details to all peers.
+	NetworkUpdate();
+
 }
 
 // =============================================================================
@@ -280,6 +284,9 @@ void CPlayer::LogicAI()
 {
 	// Check for a retreat mode/chase mode... otherwise...
 	BehaviourWander();
+
+	// Send out our details to all peers.
+	NetworkUpdate();
 }
 
 // =============================================================================
@@ -302,7 +309,7 @@ void CPlayer::BehaviourWander()
 	for (xint iA = 0; iA < PlayerDirection_Max; ++iA)
 	{
 		iRealDirection[iA] = (t_PlayerDirection)((m_iMoveDir + iA + 3) % PlayerDirection_Max);
-		pMoveDirection[iA] = _GLOBAL.pActiveMap->GetAdjacentBlock((t_AdjacentDirection)iRealDirection[iA], m_pCurrentBlock);
+		pMoveDirection[iA] = Global.m_pActiveMap->GetAdjacentBlock((t_AdjacentDirection)iRealDirection[iA], m_pCurrentBlock);
 
 		if (IsPassable(pMoveDirection[iA]))
 			iDirectionCount++;
@@ -350,6 +357,17 @@ void CPlayer::OnAnimationEvent(CAnimatedSprite* pSprite, const xchar* pEvent)
 	{
 		if (m_pTargetBlock && m_pTargetBlock->IsEdible())
 			m_pTargetBlock->Eat();
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         30-Jul-2008
+// =============================================================================
+void CPlayer::NetworkUpdate()
+{
+	if (Network.IsRunning())
+	{
+		
 	}
 }
 
@@ -454,7 +472,7 @@ void CGhost::Render()
 
 	m_pEyes->SetPosition(m_pSprite->GetPosition());
 
-	if (_GLOBAL.pActivePlayer->GetType() == PlayerType_Pacman || _GLOBAL.pActivePlayer == this)
+	if (Global.m_pLocalPlayer->GetType() == PlayerType_Pacman || Global.m_pLocalPlayer == this)
 		m_pEyes->SetAlpha(m_pSprite->GetAlpha());
 	else
 		m_pEyes->SetAlpha(1.f);

@@ -117,7 +117,7 @@ void CMapBlock::Eat()
 		m_bEaten = true;
 		//xTimer.ExpireAfter(60000);
 
-		_GLOBAL.pActiveMap->m_iPelletsEaten++;
+		Global.m_pActiveMap->m_iPelletsEaten++;
 	}
 }
 
@@ -272,13 +272,13 @@ void CMap::Unload()
 // =============================================================================
 void CMap::Update()
 {
-	if (_GLOBAL.pActivePlayer->m_iType == PlayerType_Ghost)
+	if (Global.m_pLocalPlayer->m_iType == PlayerType_Ghost)
 	{
 		for (xint iA = 0; iA < m_iBlockCount; ++iA)
 			m_xBlocks[iA].m_fVisibility = 0.f;
 
-		AddVisiblePaths(_GLOBAL.pActivePlayer->m_pCurrentBlock, 1.0f - _GLOBAL.pActivePlayer->m_fTransition);
-		AddVisiblePaths(_GLOBAL.pActivePlayer->m_pTargetBlock, _GLOBAL.pActivePlayer->m_fTransition);
+		AddVisiblePaths(Global.m_pLocalPlayer->m_pCurrentBlock, 1.0f - Global.m_pLocalPlayer->m_fTransition);
+		AddVisiblePaths(Global.m_pLocalPlayer->m_pTargetBlock, Global.m_pLocalPlayer->m_fTransition);
 
 		for (xint iA = 0; iA < m_iBlockCount; ++iA)
 		{
@@ -334,7 +334,7 @@ void CMap::Render()
 
 	for (xint iA = 0; iA < 3; ++iA)
 	{
-		xfloat fChannelEnergy = _GLOBAL.fMusicEnergy * (iA + 1);
+		xfloat fChannelEnergy = Global.m_fMusicEnergy * (iA + 1);
 
 		if (m_bColouriseDir[iA])
 		{
@@ -367,7 +367,7 @@ void CMap::Render()
 			m_xBlocks[iA].GetScreenPosition() - m_xOffset, 
 			s_xCentrePoint, 
 			MapManager.m_pTileAreas[iTileType]->xRect,
-			m_xBlocks[iA].m_fVisibility * _GLOBAL.fWorldAlpha, 
+			m_xBlocks[iA].m_fVisibility * Global.m_fWorldAlpha, 
 			(m_xBlocks[iA].m_fAngle / 180.0f) * M_PI
 		);
 	}
@@ -407,7 +407,7 @@ CMapBlock* CMap::GetSpawnBlock(t_PlayerType iPlayerType)
 	{
 		pBlock = m_lpSpawnPoints[iPlayerType][rand() % m_lpSpawnPoints[iPlayerType].size()];
 
-		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, _GLOBAL.lpPlayers)
+		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
 		{
 			if ((*ppPlayer)->GetCurrentBlock() == pBlock)
 				pBlock = NULL;

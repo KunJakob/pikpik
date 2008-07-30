@@ -50,44 +50,34 @@ using namespace Xen;
 //##############################################################################
 namespace Application
 {
-	/**
-	* Initialise the application.
-	*/
+	// Initialise the application.
 	void Initialise();
 
-	/**
-	* Deinitialise the application.
-	*/
+	// Deinitialise the application.
 	void Deinitialise();
 
-	/**
-	* The game update callback.
-	*/
+	// The game update callback.
 	xbool Update();
 
-	/**
-	* The game render callback.
-	*/
+	// The game render callback.
 	xbool Render();
 
-	/**
-	* Call to terminate the application.
-	*/
+	// The focus was lost from the application.
+	xbool OnBlur();
+
+	// The focus was gained on the application.
+	xbool OnFocus();
+
+	// Call to terminate the application.
 	void Terminate();
 
-	/**
-	* Get the application renderer interface.
-	*/
+	// Get the application renderer interface.
 	HGE* GetInterface();
 
-	/**
-	* Get the current time delta in milliseconds.
-	*/
+	// Get the current time delta in milliseconds.
 	xuint GetTimeDelta();
 
-	/**
-	* Get the sound interface.
-	*/
+	// Get the sound interface.
 	FMOD::System* GetSoundSystem();
 }
 

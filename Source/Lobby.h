@@ -60,6 +60,7 @@ enum t_LobbyState
 	LobbyState_Connecting,
 	LobbyState_Joining,
 	LobbyState_Lobby,
+	LobbyState_Game,
 	LobbyState_Leaving,
 	LobbyState_Closing,
 };
@@ -124,6 +125,12 @@ public:
 	// Called when the screen is removed from the screen stack.
 	virtual void Unload();
 
+	// Called once when the screen is placed at the top of the stack.
+	virtual void Wake();
+
+	// Called once when the screen goes out of scope either through destruction or another screen is placed above this on the stack.
+	virtual void Sleep();
+
 	// Called each frame to update the screen when active.
 	virtual void Update();
 
@@ -143,9 +150,6 @@ protected:
 	// Update the main lobby screen.
 	void UpdateLobby();
 
-	// Render the session list.
-	void RenderList();
-
 	// Render the main lobby screen.
 	void RenderLobby();
 
@@ -157,6 +161,12 @@ protected:
 
 	// Join an existing lobby and act as a client.
 	void JoinLobby(const xchar* pHostAddress);
+
+	// Start the game from the lobby.
+	void StartGame();
+
+	// End the game.
+	void EndGame();
 
 	// Close the lobby down and disconnect from the network.
 	void CloseLobby();
@@ -196,6 +206,9 @@ protected:
 
 	// Callback for when a lobby packet is received.
 	void OnReceivePlayerInfo(CNetworkPeer* pFrom, BitStream* pStream);
+
+	// Callback for when a start game placet is received.
+	void OnReceiveStartGame(CNetworkPeer* pFrom, BitStream* pStream);
 
 	// Delete any session box instances we have.
 	void DeleteSessionBoxes();

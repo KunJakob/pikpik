@@ -26,9 +26,6 @@
 //
 //##############################################################################
 
-// Namespaces.
-using namespace Xen;
-
 //##############################################################################
 
 //##############################################################################
@@ -36,16 +33,8 @@ using namespace Xen;
 //                                 DECLARATION
 //
 //##############################################################################
-namespace ToolBox
+namespace Tools
 {
-	// Get a colour value using a float.
-	//xuint GetColourValue(xfloat fColour); 
-
-	// Get a colour, including alpha, using floats.
-	//xuint GetColour(xfloat fA, xfloat fR, xfloat fG, xfloat fB);
-
-	// Get a colour using floats.
-	//xuint GetColour(xfloat fR, xfloat fG, xfloat fB);
 }
 
 //##############################################################################
