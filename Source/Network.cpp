@@ -39,6 +39,7 @@ void CNetwork::Reset()
 	{
 		m_bHosting = false;
 		m_bConnected = false;
+		m_bVerified = false;
 
 		m_iLastPeerID = 0;
 
@@ -51,6 +52,8 @@ void CNetwork::Reset()
 		m_xCallbacks.m_fpNetworkStopped = NULL;
 		m_xCallbacks.m_fpConnectionCompleted = NULL;
 		m_xCallbacks.m_fpConnectionLost = NULL;
+		m_xCallbacks.m_fpVerifyPeer = NULL;
+		m_xCallbacks.m_fpVerificationCompleted = NULL;
 		m_xCallbacks.m_fpPeerJoined = NULL;
 		m_xCallbacks.m_fpPeerLeaving = NULL;
 
@@ -58,6 +61,12 @@ void CNetwork::Reset()
 
 		for (xint iA = 0; iA < 256; ++iA)
 			m_fpReceiveCallbacks[iA] = NULL;
+
+		m_pGamerCard = NULL;
+		m_iGamerCardSize = 0;
+
+		m_pVerificationInfo = NULL;
+		m_iVerificationInfoSize = 0;
 	}
 }
 
@@ -80,7 +89,7 @@ void CNetwork::Update()
 
 			static const char* s_pNetworkID[] =
 			{
-				"ID_INTERNAL_PING",
+				"ID_INTERNAL_PING",  
 				"ID_PING",
 				"ID_PING_OPEN_CONNECTIONS",
 				"ID_CONNECTED_PONG",
@@ -120,6 +129,7 @@ void CNetwork::Update()
 				"ID_REPLICA_MANAGER_DESTRUCTION",
 				"ID_REPLICA_MANAGER_SCOPE_CHANGE",
 				"ID_REPLICA_MANAGER_SERIALIZE",
+				"ID_REPLICA_MANAGER_DOWNLOAD_STARTED",
 				"ID_REPLICA_MANAGER_DOWNLOAD_COMPLETE",
 				"ID_CONNECTION_GRAPH_REQUEST",
 				"ID_CONNECTION_GRAPH_REPLY",
@@ -146,6 +156,7 @@ void CNetwork::Update()
 				"ID_NAT_TARGET_CONNECTION_LOST",
 				"ID_NAT_CONNECT_AT_TIME",
 				"ID_NAT_SEND_OFFLINE_MESSAGE_AT_TIME",
+				"ID_NAT_IN_PROGRESS",
 				"ID_DATABASE_QUERY_REQUEST",
 				"ID_DATABASE_UPDATE_ROW",
 				"ID_DATABASE_REMOVE_ROW",
@@ -161,6 +172,8 @@ void CNetwork::Update()
 				"ID_AUTO_RPC_REMOTE_INDEX",
 				"ID_RPC_REMOTE_ERROR",
 				"ID_DATA_PACKET",
+				"ID_VERIFICATION_REQUEST",
+				"ID_VERIFICATION_SUCCEEDED",
 				"ID_PEER_JOINED",
 				"ID_PEER_LEAVING",
 			};
@@ -297,6 +310,8 @@ void CNetwork::StartHost(xint iMaxPeers, xint iPort, void* pData, xint iDataSize
 		XLOG("[Network] Starting network as a host.");
 
 		m_bHosting = true;
+		m_bVerified = true;
+
 		m_pInterface = RakNetworkFactory::GetRakPeerInterface();
 
 		m_xSocket.hostAddress[0] = NULL;
@@ -312,6 +327,8 @@ void CNetwork::StartHost(xint iMaxPeers, xint iPort, void* pData, xint iDataSize
 		m_pLocalPeer->m_bHost = true;
 		m_pLocalPeer->m_bLocal = true;
 		m_pLocalPeer->m_iID = 0;
+		m_pLocalPeer->m_bVerified = true;
+		m_pLocalPeer->m_pGamerCard = m_pGamerCard;
 
 		if (m_xCallbacks.m_fpNetworkStarted)
 			m_xCallbacks.m_fpNetworkStarted();
@@ -333,6 +350,7 @@ void CNetwork::StartClient(const xchar* pHostAddress, xint iHostPort, void* pDat
 		XLOG("[Network] Starting network as a client.");
 
 		m_bHosting = false;
+
 		m_pInterface = RakNetworkFactory::GetRakPeerInterface();
 
 		m_xSocket.hostAddress[0] = NULL;
@@ -378,9 +396,10 @@ void CNetwork::Stop()
 // =============================================================================
 // Nat Ryall                                                         13-Jun-2008
 // =============================================================================
-void CNetwork::DisconnectPeer(CNetworkPeer* pPeer)
+void CNetwork::DisconnectPeer(SystemAddress& xAddress)
 {
-	XMASSERT(false, "DisconnectPeer() is not implemented yet.");
+	if (m_pInterface)
+		m_pInterface->CloseConnection(xAddress, true, 1);
 }
 
 // =============================================================================
@@ -412,12 +431,15 @@ CNetworkPeer* CNetwork::CreatePeer()
 	pPeer->m_bHost = false;
 	pPeer->m_bLocal = false;
 	pPeer->m_iID = (m_bHosting) ? GetUniquePeerID() : NETWORK_PEER_INVALID_ID;
-	pPeer->m_pData = NULL;
+	pPeer->m_bVerified = false;
+	pPeer->m_pGamerCard = NULL;
 
 	pPeer->m_xAddress.binaryAddress = 0;
 	pPeer->m_xAddress.port = 0;
 
 	m_lpPeers.push_back(pPeer);
+
+	XLOG("[Network] Created peer %d.", pPeer->m_iID);
 
 	return pPeer;
 }
@@ -428,7 +450,17 @@ CNetworkPeer* CNetwork::CreatePeer()
 void CNetwork::DestroyPeer(CNetworkPeer* pPeer)
 {
 	if (pPeer)
+	{	
+		XLOG("[Network] Destroying peer %d.", pPeer->m_iID);
+
+		if (pPeer->m_pGamerCard)
+		{
+			delete pPeer->m_pGamerCard;
+			pPeer->m_pGamerCard = NULL;
+		}
+
 		XEN_LIST_ERASE(t_NetworkPeerList, m_lpPeers, pPeer);
+	}
 }
 
 // =============================================================================
@@ -436,7 +468,15 @@ void CNetwork::DestroyPeer(CNetworkPeer* pPeer)
 // =============================================================================
 void CNetwork::SortPeers()
 {
-	m_lpPeers.sort();
+	m_lpPeers.sort(&OnComparePeers);
+}
+
+// =============================================================================
+// Nat Ryall                                                         31-Jul-2008
+// =============================================================================
+xbool CNetwork::OnComparePeers(const CNetworkPeer* pA, const CNetworkPeer* pB)
+{
+	return pA->m_iID < pB->m_iID;
 }
 
 // =============================================================================
@@ -500,36 +540,110 @@ void CNetwork::ProcessHostNotifications(xchar cIdentifier, Packet* pPacket, xuch
 	// A new client connection was established to this machine.
 	case ID_NEW_INCOMING_CONNECTION:
 		{
-			CNetworkPeer* pJoiningPeer = CreatePeer();
-			pJoiningPeer->m_xAddress = pPacket->systemAddress;
+			CNetworkPeer* pPeer = CreatePeer();
+			pPeer->m_xAddress = pPacket->systemAddress;
+		}
+		break;
 
-			// Notify all of out client-peers of the new peer.
-			XEN_LIST_FOREACH_R(t_NetworkPeerList, ppPeer, m_lpPeers)
+	// A client is requesting verification.
+	case ID_VERIFICATION_REQUEST:
+		{
+			// Find the peer we're working with.
+			CNetworkPeer* pPeer = FindPeer(&pPacket->systemAddress);
+
+			if (pPeer)
 			{
-				if (!(*ppPeer)->m_bLocal)
+				// Read the data sizes before doing anything else.
+				xuint16 iGamerCardSize = 0;
+				xuint16 iVerificationInfoSize = 0;
+
+				xInStream.Read(iGamerCardSize);
+				xInStream.Read(iVerificationInfoSize);
+
+				// Read the gamercard data for this peer.
+				if (iGamerCardSize)
 				{
-					BitStream xOutStream;
-
-					xOutStream.Write((xuint8)ID_PEER_JOINED);
-					xOutStream.Write((xbool)(pJoiningPeer->m_iID == (*ppPeer)->m_iID));
-					xOutStream.Write((xuint16)(*ppPeer)->m_iID);
-
-					m_pInterface->Send(&xOutStream, HIGH_PRIORITY, RELIABLE, 1, pPacket->systemAddress, false);
+					pPeer->m_pGamerCard = new xchar[iGamerCardSize];				
+					xInStream.Read((xchar*)pPeer->m_pGamerCard, iGamerCardSize);
 				}
+
+				// Read the verification information for this peer and execute the verification routine.
+				void* pVerificationInfo = NULL;
+
+				if (iVerificationInfoSize)
+				{
+					pVerificationInfo = new xchar[iVerificationInfoSize];				
+					xInStream.Read((xchar*)pVerificationInfo, iVerificationInfoSize);
+				}
+
+				if (m_xCallbacks.m_fpVerifyPeer)
+					pPeer->m_bVerified = m_xCallbacks.m_fpVerifyPeer(pPeer, pVerificationInfo, iVerificationInfoSize);
+				else
+					pPeer->m_bVerified = true;
+
+				delete pVerificationInfo;
+
+				// Process based on our verification result.
+				if (pPeer->m_bVerified)
+				{
+					// Notify that we have successfully been verified.
+					{
+						BitStream xOutStream;
+
+						xOutStream.Write((xuint8)ID_VERIFICATION_SUCCEEDED);
+
+						m_pInterface->Send(&xOutStream, HIGH_PRIORITY, RELIABLE, 1, pPacket->systemAddress, false);
+					}
+
+					// Notify our new client about all existing verified clients. 
+					XEN_LIST_FOREACH_R(t_NetworkPeerList, ppPeer, m_lpPeers)
+					{
+						if ((*ppPeer)->m_bVerified)
+						{
+							BitStream xOutStream;
+
+							xOutStream.Write((xuint8)ID_PEER_JOINED);
+							xOutStream.Write((xbool)(pPeer->m_iID == (*ppPeer)->m_iID));
+							xOutStream.Write((xuint16)(*ppPeer)->m_iID);
+							xOutStream.Write((xuint16)iGamerCardSize);
+
+							if (iGamerCardSize)
+								xOutStream.Write((xchar*)(*ppPeer)->m_pGamerCard, iGamerCardSize);
+
+							m_pInterface->Send(&xOutStream, HIGH_PRIORITY, RELIABLE, 1, pPacket->systemAddress, false);
+						}
+					}
+
+					// Notify all existing verified clients about the new client.
+					XEN_LIST_FOREACH(t_NetworkPeerList, ppPeer, m_lpPeers)
+					{
+						if (!(*ppPeer)->m_bLocal && *ppPeer != pPeer && (*ppPeer)->m_bVerified)
+						{
+							BitStream xOutStream;
+
+							xOutStream.Write((xuint8)ID_PEER_JOINED);
+							xOutStream.Write(false);
+							xOutStream.Write((xuint16)pPeer->m_iID);
+							xOutStream.Write((xuint16)iGamerCardSize);
+
+							if (iGamerCardSize)
+								xOutStream.Write((xchar*)pPeer->m_pGamerCard, iGamerCardSize);
+
+							m_pInterface->Send(&xOutStream, HIGH_PRIORITY, RELIABLE, 1, (*ppPeer)->m_xAddress, false);
+						}
+					}
+
+					// Fire the join notification.
+					if (m_xCallbacks.m_fpPeerJoined)
+						m_xCallbacks.m_fpPeerJoined(pPeer);
+				}
+				else
+					DisconnectPeer(pPacket->systemAddress);
 			}
+			else
+				DisconnectPeer(pPacket->systemAddress);
 
-			// Assign an ID to the new client and notify them.
-			BitStream xOutStream;
-
-			xOutStream.Write((xuint8)ID_PEER_JOINED);
-			xOutStream.Write(false);
-			xOutStream.Write((xuint16)pJoiningPeer->m_iID);
-
-			m_pInterface->Send(&xOutStream, HIGH_PRIORITY, RELIABLE, 1, pPacket->systemAddress, true);
-
-			// Fire the join notification.
-			if (m_xCallbacks.m_fpPeerJoined)
-				m_xCallbacks.m_fpPeerJoined(pJoiningPeer);
+			// Host receives and processes the gamer card and checks the verification info through the use of a callback.
 		}
 		break;
 
@@ -538,23 +652,24 @@ void CNetwork::ProcessHostNotifications(xchar cIdentifier, Packet* pPacket, xuch
 	case ID_CONNECTION_LOST:
 		{
 			// If we have a record of them, notify all other clients of their disconnection.
-			CNetworkPeer* pLeavingPeer = FindPeer(&pPacket->systemAddress);
+			CNetworkPeer* pPeer = FindPeer(&pPacket->systemAddress);
 			
-			if (pLeavingPeer)
+			if (pPeer)
 			{
+				// Notify all other peers of the disconnection.
 				BitStream xOutStream;
 
 				xOutStream.Write((xuint8)ID_PEER_LEAVING);
-				xOutStream.Write((xuint16)pLeavingPeer->m_iID);
+				xOutStream.Write((xuint16)pPeer->m_iID);
 
 				m_pInterface->Send(&xOutStream, HIGH_PRIORITY, RELIABLE, 1, UNASSIGNED_SYSTEM_ADDRESS, true);
 			}
 
 			// Fire the leaving notification.
 			if (m_xCallbacks.m_fpPeerLeaving)
-				m_xCallbacks.m_fpPeerLeaving(pLeavingPeer);
+				m_xCallbacks.m_fpPeerLeaving(pPeer);
 
-			DestroyPeer(pLeavingPeer);
+			DestroyPeer(pPeer);
 		}
 		break;
 
@@ -576,32 +691,64 @@ void CNetwork::ProcessClientNotifications(xchar cIdentifier, Packet* pPacket, xu
 
 	switch (cIdentifier)
 	{
-	// Client successfully/unsuccessfully connected to the host.
+	// Client successfully connected to the host.
 	case ID_CONNECTION_REQUEST_ACCEPTED:
 		{
 			m_bConnected = true;
+			m_bVerified = false;
 
-			m_pHostPeer = CreatePeer();
-
-			m_pHostPeer->m_bHost = true;
-			m_pHostPeer->m_bLocal = false;
-			m_pHostPeer->m_iID = 0;
-			m_pHostPeer->m_xAddress = pPacket->systemAddress;
-
-			if (m_xCallbacks.m_fpPeerJoined)
-				m_xCallbacks.m_fpPeerJoined(m_pHostPeer);
-
+			// We're connected but not verified yet. Execute early so that verification data can be set in the callback.
 			if (m_xCallbacks.m_fpConnectionCompleted)
 				m_xCallbacks.m_fpConnectionCompleted(true);
+
+			// Send out our gamer card and verification info to the host.
+			BitStream xOutStream;
+
+			xOutStream.Write((xuint8)ID_VERIFICATION_REQUEST);
+
+			xOutStream.Write((xuint16)m_iGamerCardSize);
+			xOutStream.Write((xuint16)m_iVerificationInfoSize);
+
+			if (m_iGamerCardSize)
+				xOutStream.Write((xchar*)m_pGamerCard, m_iGamerCardSize);
+
+			if (m_iVerificationInfoSize)
+				xOutStream.Write((xchar*)m_pVerificationInfo, m_iVerificationInfoSize);
+
+			m_pInterface->Send(&xOutStream, HIGH_PRIORITY, RELIABLE, 1, pPacket->systemAddress, false);
 		}
 		break;
 
+	// Client could not connect to the host.
 	case ID_CONNECTION_ATTEMPT_FAILED:
 		{
 			m_bConnected = false;
+			m_bVerified = false;
 
 			if (m_xCallbacks.m_fpConnectionCompleted)
 				m_xCallbacks.m_fpConnectionCompleted(false);
+		}
+		break;
+
+	// The verification process has completed and was a success.
+	case ID_VERIFICATION_SUCCEEDED:
+		{
+			m_bVerified = true;
+
+			// Initialise a host peer, the local peer will be joined though a notification.
+			//m_pHostPeer = CreatePeer();
+
+			//m_pHostPeer->m_bHost = true;
+			//m_pHostPeer->m_bLocal = false;
+			//m_pHostPeer->m_iID = 0;
+			//m_pHostPeer->m_xAddress = pPacket->systemAddress;
+
+			// Send out our notifications.
+			//if (m_xCallbacks.m_fpPeerJoined)
+			//	m_xCallbacks.m_fpPeerJoined(m_pHostPeer);
+
+			if (m_xCallbacks.m_fpVerificationCompleted)
+				m_xCallbacks.m_fpVerificationCompleted(true);
 		}
 		break;
 
@@ -609,10 +756,19 @@ void CNetwork::ProcessClientNotifications(xchar cIdentifier, Packet* pPacket, xu
 	case ID_DISCONNECTION_NOTIFICATION:
 	case ID_CONNECTION_LOST:
 		{
+			// Remove all existing peers and execute the leaving callbacks.
 			FreePeers();
+
+			// If we were verifying, we should execute the verification completed callback with a failure.
+			if (m_bConnected && !m_bVerified)
+			{
+				if (m_xCallbacks.m_fpVerificationCompleted)
+					m_xCallbacks.m_fpVerificationCompleted(false);
+			}
 
 			// We're no longer connected so notify and shutdown.
 			m_bConnected = false;
+			m_bVerified = false;
 
 			if (m_xCallbacks.m_fpConnectionLost)
 				m_xCallbacks.m_fpConnectionLost();
@@ -624,17 +780,30 @@ void CNetwork::ProcessClientNotifications(xchar cIdentifier, Packet* pPacket, xu
 	// A new peer has been added to the game.
 	case ID_PEER_JOINED:
 		{
+			// Create the new peer structure.
 			CNetworkPeer* pPeer = CreatePeer();
 
+			// Read the stream header information.
 			xbool bLocal = false;
 			xuint16 iID = 0;
+			xuint16 iGamerCardSize = 0;
 
 			xInStream.Read(bLocal);
 			xInStream.Read(iID);
-			
-			pPeer->m_bHost = false;
+			xInStream.Read(iGamerCardSize);
+
+			// Read the gamercard data for this peer.
+			if (iGamerCardSize)
+			{
+				pPeer->m_pGamerCard = new xchar[iGamerCardSize];				
+				xInStream.Read((xchar*)pPeer->m_pGamerCard, iGamerCardSize);
+			}
+
+			// Initalise the peer.
+			pPeer->m_bHost = (iID == 0);
 			pPeer->m_bLocal = bLocal;
 			pPeer->m_iID = (xint)iID;
+			pPeer->m_bVerified = true;
 
 			if (bLocal)
 				m_pLocalPeer = pPeer;
@@ -683,7 +852,8 @@ void CNetwork::ProcessPacket(Packet* pPacket, BitStream* pStream)
 		if (m_fpReceiveCallbacks[cType])
 			m_fpReceiveCallbacks[cType](pPeer, pStream);
 	}
-	
+	else
+		DisconnectPeer(pPacket->systemAddress);
 }
 
 //##############################################################################

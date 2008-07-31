@@ -45,6 +45,8 @@ class CNetworkPeer;
 enum
 {
 	ID_DATA_PACKET = ID_USER_PACKET_ENUM,
+	ID_VERIFICATION_REQUEST,
+	ID_VERIFICATION_SUCCEEDED,
 	ID_PEER_JOINED,
 	ID_PEER_LEAVING,
 };
@@ -69,6 +71,8 @@ public:
 	xfunction(0)<> m_fpNetworkStopped;
 	xfunction(1)<xbool /*Succeeded*/> m_fpConnectionCompleted;
 	xfunction(0)<> m_fpConnectionLost;
+	xfunction(3)<CNetworkPeer* /*Peer*/, void* /*Data*/, xint /*DataLength*/, xbool /*_RETURN_*/> m_fpVerifyPeer;
+	xfunction(1)<xbool /*Succeeded*/> m_fpVerificationCompleted;
 	xfunction(1)<CNetworkPeer* /*Peer*/> m_fpPeerJoined;
 	xfunction(1)<CNetworkPeer* /*Peer*/> m_fpPeerLeaving;
 };
@@ -133,7 +137,7 @@ public:
 	}
 
 	// Forcefully disconnect a peer from the local machine. Valid only on the host.
-	void DisconnectPeer(CNetworkPeer* pPeer);
+	void DisconnectPeer(SystemAddress& xAddress);
 
 	// Get the last ping time to the host or -1 if we are the host or disconnected.
 	xint GetLastPing();
@@ -180,10 +184,45 @@ public:
 		return m_bConnected; 
 	}
 
+	// Determine if the local machine is verified with the host.
+	inline xbool IsVerified() 
+	{ 
+		return m_bVerified; 
+	}
+
+	// Set the data for the local gamer card to be sent to all other peers.
+	inline void SetGamerCard(void* pData, xuint iDataSize) 
+	{ 
+		m_pGamerCard = pData;
+		m_iGamerCardSize = iDataSize;
+	}
+
+	// Get the data for the local gamer card to be sent to all other peers.
+	inline void* GetGamerCard() 
+	{ 
+		return m_pGamerCard; 
+	}
+
+	// Set the verification info to be sent to the host when connecting.
+	inline void SetVerificationInfo(void* pData, xuint iDataSize) 
+	{ 
+		m_pVerificationInfo = pData;
+		m_iVerificationInfoSize = iDataSize;
+	}
+
+	// Get the verification info for the local machine.
+	inline void* GetVerificationInfo() 
+	{ 
+		return m_pVerificationInfo; 
+	}
+
 	// The network callbacks.
 	CNetworkCallbacks m_xCallbacks;
 
 protected:
+	// Comparison routine for sorting peers.
+	static xbool OnComparePeers(const CNetworkPeer* pA, const CNetworkPeer* pB);
+
 	// Relay a data packet from the host machine to all other peers on behalf of the sending peer.
 	//void Relay(CNetworkPeer* pSender, BitStream* pStream);
 
@@ -229,6 +268,9 @@ protected:
 	// Determines if we are connected to a remote machine.
 	xbool m_bConnected;
 
+	// Determines if we were verified by the host.
+	xbool m_bVerified;
+
 	// The array of callback type bindings.
 	t_fpStreamReceived m_fpReceiveCallbacks[256];
 
@@ -240,6 +282,18 @@ protected:
 
 	// Determines if a stop request is pending.
 	xbool m_bStopPending;
+
+	// The local gamer card data.
+	void* m_pGamerCard;
+
+	// The size, in bytes, of the gamer card data.
+	xuint m_iGamerCardSize;
+
+	// The verification data.
+	void* m_pVerificationInfo;
+
+	// The size, in bytes, of the verification info.
+	xuint m_iVerificationInfoSize;
 };
 
 //##############################################################################
@@ -264,14 +318,14 @@ public:
 	// The internal system address managed by RakNet. This is not valid, client to client.
 	SystemAddress m_xAddress;
 
-	// The network peer custom data.
-	void* m_pData;
+	// Specifies if the peer was successfully verified by the host.
+	xbool m_bVerified;
 
-	// Compare two peers against each other for sorting.
-	xbool operator < (const CNetworkPeer*& pPeer)
-	{
-		return m_iID < pPeer->m_iID;
-	}
+	// The network peer gamer card.
+	void* m_pGamerCard;
+
+	// The local peer data.
+	void* m_pData;
 };
 
 //##############################################################################

@@ -365,10 +365,6 @@ void CPlayer::OnAnimationEvent(CAnimatedSprite* pSprite, const xchar* pEvent)
 // =============================================================================
 void CPlayer::NetworkUpdate()
 {
-	if (Network.IsRunning())
-	{
-		
-	}
 }
 
 //##############################################################################

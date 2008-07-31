@@ -67,6 +67,9 @@
 .Status_Connecting
 "Connecting"
 
+.Status_Verifying
+"Verifying"
+
 .Status_Joining
 "Joining"
 

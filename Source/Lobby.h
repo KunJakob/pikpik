@@ -33,8 +33,12 @@
 //
 //##############################################################################
 
-// Get the peer info from a peer structure.
+// Get the gamer card from a peer structure.
+#define GetGamerCard(PEERCLASS) ((CNetworkGamerCard*)(PEERCLASS)->m_pGamerCard)
+
+// Get the local peer info from a peer structure.
 #define GetPeerInfo(PEERCLASS) ((CNetworkPeerInfo*)(PEERCLASS)->m_pData)
+
 
 //##############################################################################
 
@@ -58,6 +62,7 @@ enum t_LobbyState
 	LobbyState_Join,
 	LobbyState_Creating,
 	LobbyState_Connecting,
+	LobbyState_Verifying,
 	LobbyState_Joining,
 	LobbyState_Lobby,
 	LobbyState_Game,
@@ -77,15 +82,29 @@ enum t_MessageDisplayMode
 
 //##############################################################################
 //
+//                             NETWORK GAMER CARD
+//
+//##############################################################################
+class CNetworkGamerCard
+{
+public:
+	// The peer's nickname/gamertag with a terminating NULL.
+	char m_cNickname[_MAXNAMELEN];
+
+	// The player's random seed.
+	xint m_iSeed;
+};
+
+//##############################################################################
+
+//##############################################################################
+//
 //                              NETWORK PEER INFO
 //
 //##############################################################################
 class CNetworkPeerInfo
 {
 public:
-	// The peer's nickname/gamertag with a terminating NULL.
-	char m_cNickname[_MAXNAMELEN];
-
 	// The player character assigned to the peer.
 	union 
 	{
@@ -156,6 +175,12 @@ protected:
 	// Set the internal state.
 	void SetState(t_LobbyState iState);
 
+	// Initialise the local gamer card.
+	void InitialiseGamerCard();
+
+	// Bind all the packet callbacks to the network system.
+	void BindPacketCallbacks();
+
 	// Create a new lobby and act as the host.
 	void CreateLobby();
 
@@ -183,6 +208,9 @@ protected:
 	// Callback for when the join button is clicked in the join interface.
 	void OnJoinClicked(CButtonComponent* pButton, xpoint xOffset);
 
+	// Callback to verify the client data on the host.
+	xbool OnVerifyPeer(CNetworkPeer* pPeer, void* pData, xint iDataLength);
+
 	// Callback for when the network is started.
 	//void OnNetworkStart();
 
@@ -192,6 +220,9 @@ protected:
 	// Callback for when the network has successfully started.
 	void OnConnectionCompleted(xbool bSuccess);
 
+	// Callback for when the network has veen verified.
+	void OnConnectionVerified(xbool bSuccess);
+
 	// Callback for when the network connection has been lost.
 	void OnConnectionLost();
 
@@ -200,9 +231,6 @@ protected:
 
 	// Callback for when a remote peer is just about to leave the game.
 	void OnPeerLeaving(CNetworkPeer* pPeer);
-
-	// Bind all the packet callbacks to the network system.
-	void BindPacketCallbacks();
 
 	// Callback for when a lobby packet is received.
 	void OnReceivePlayerInfo(CNetworkPeer* pFrom, BitStream* pStream);
@@ -224,6 +252,9 @@ protected:
 
 	// The local active session.
 	CSession* m_pSession;
+
+	// The local gamer card.
+	CNetworkGamerCard m_xGamerCard;
 
 	// The join interface.
 	CJoinInterface* m_pJoinInterface;
