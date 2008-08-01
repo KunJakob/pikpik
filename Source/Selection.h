@@ -64,22 +64,22 @@ public:
 	/**
 	* Called when the screen is first added to the screen stack.
 	*/
-	virtual void Load() {}
+	virtual void OnActivate() {}
 
 	/**
 	* Called when the screen is removed from the screen stack.
 	*/
-	virtual void Unload() {}
+	virtual void OnDeactivate() {}
 
 	/**
 	* Called once when the screen is placed at the top of the stack.
 	*/
-	virtual void Wake() {}
+	virtual void OnWake() {}
 
 	/**
 	* Called once when the screen goes out of scope either through destruction or another screen is placed above this on the stack.
 	*/
-	virtual void Sleep() 
+	virtual void OnSleep() 
 	{  
 		m_lpPlayers.clear();
 	}
@@ -87,17 +87,17 @@ public:
 	/**
 	* Called each frame to update the screen when active.
 	*/
-	virtual void Update();
+	virtual void OnUpdate();
 
 	/**
 	* Called each frame to render the screen when active.
 	*/
-	virtual void Render();
+	virtual void OnRender();
 
 	/**
 	* Called when a game-specific event is executed when active.
 	*/
-	virtual void Notify(xuint iEventType, void* pEventInfo) {}
+	virtual void OnNotify(xuint iEventType, void* pEventInfo) {}
 
 	/**
 	* Add a player to the selection screen.

@@ -25,7 +25,7 @@
 // =============================================================================
 // Nat Ryall                                                          6-Apr-2008
 // =============================================================================
-void CLogoScreen::Load()
+void CLogoScreen::OnActivate()
 {
 	m_pImage = new CSprite(_SPRITE("Logo-SAPIAN"));
 
@@ -36,7 +36,7 @@ void CLogoScreen::Load()
 // =============================================================================
 // Nat Ryall                                                          6-Apr-2008
 // =============================================================================
-void CLogoScreen::Unload()
+void CLogoScreen::OnDeactivate()
 {
 	delete m_pImage;
 }
@@ -44,7 +44,7 @@ void CLogoScreen::Unload()
 // =============================================================================
 // Nat Ryall                                                          6-Apr-2008
 // =============================================================================
-void CLogoScreen::Wake()
+void CLogoScreen::OnWake()
 {
 	CFadeScreen::Reset();
 }
@@ -52,7 +52,7 @@ void CLogoScreen::Wake()
 // =============================================================================
 // Nat Ryall                                                          6-Apr-2008
 // =============================================================================
-void CLogoScreen::Notify(xuint iEventType, void* pEventInfo)
+void CLogoScreen::OnNotify(xuint iEventType, void* pEventInfo)
 {
 	switch (iEventType)
 	{
@@ -68,9 +68,9 @@ void CLogoScreen::Notify(xuint iEventType, void* pEventInfo)
 // =============================================================================
 // Nat Ryall                                                          6-Apr-2008
 // =============================================================================
-void CLogoScreen::Update()
+void CLogoScreen::OnUpdate()
 {
-	CFadeScreen::Update();
+	CFadeScreen::OnUpdate();
 
 	m_pImage->SetAlpha(m_fAlpha);
 }
@@ -78,7 +78,7 @@ void CLogoScreen::Update()
 // =============================================================================
 // Nat Ryall                                                          6-Apr-2008
 // =============================================================================
-void CLogoScreen::Render()
+void CLogoScreen::OnRender()
 {
 	xfloat fColour = m_fAlpha * .08f;
 	_HGE->Gfx_Clear(ARGBF(1.f, fColour, fColour, fColour));
@@ -106,7 +106,7 @@ void CLogoScreen::OnFadeComplete()
 // =============================================================================
 // Nat Ryall                                                          6-Apr-2008
 // =============================================================================
-void CWarningScreen::Notify(xuint iEventType, void* pEventInfo)
+void CWarningScreen::OnNotify(xuint iEventType, void* pEventInfo)
 {
 	switch (iEventType)
 	{
@@ -122,7 +122,7 @@ void CWarningScreen::Notify(xuint iEventType, void* pEventInfo)
 // =============================================================================
 // Nat Ryall                                                          4-Jun-2008
 // =============================================================================
-void CWarningScreen::Render()
+void CWarningScreen::OnRender()
 {
 	xfloat fColour = m_fAlpha * .08f;
 	_HGE->Gfx_Clear(ARGBF(1.f, fColour, fColour, fColour));

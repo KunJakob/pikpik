@@ -38,7 +38,7 @@ CCharacterScreen::CCharacterScreen() : CScreen(ScreenIndex_CharacterScreen)
 // =============================================================================
 // Nat Ryall                                                         25-Jun-2008
 // =============================================================================
-void CCharacterScreen::Load()
+void CCharacterScreen::OnActivate()
 {
 	
 }
@@ -46,7 +46,7 @@ void CCharacterScreen::Load()
 // =============================================================================
 // Nat Ryall                                                         25-Jun-2008
 // =============================================================================
-void CCharacterScreen::Unload()
+void CCharacterScreen::OnDeactivate()
 {
 
 }
@@ -54,7 +54,7 @@ void CCharacterScreen::Unload()
 // =============================================================================
 // Nat Ryall                                                         25-Jun-2008
 // =============================================================================
-void CCharacterScreen::Update()
+void CCharacterScreen::OnUpdate()
 {
 	
 }
@@ -62,7 +62,7 @@ void CCharacterScreen::Update()
 // =============================================================================
 // Nat Ryall                                                         25-Jun-2008
 // =============================================================================
-void CCharacterScreen::Render()
+void CCharacterScreen::OnRender()
 {
 }
 

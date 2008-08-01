@@ -77,9 +77,9 @@ void CMenuLink::RePosition(xuint iElementIndex, xuint iNumElements)
 //##############################################################################
 
 // =============================================================================
-// Nat Ryall                                                         11-Apr-2008
+// Nat Ryall                                                         01-Aug-2008
 // =============================================================================
-void CMenuScreen::Load()
+void CMenuScreen::OnLoad()
 {
 	// Initialise the render resources.
 	m_pBackground = new CBackgroundImage("Menu-Background");
@@ -137,7 +137,7 @@ void CMenuScreen::Load()
 	{
 		CMap* pMap = MapManager.GetMap(iA);
 		CMenuLink* pMenuLink = new CMenuLink(MenuGroup_Levels, m_pMenuDefault, pMap->GetName(), xbind(this, &CMenuScreen::Callback_StartGame));
-		
+
 		pMenuLink->RePosition(iA, MapManager.GetMapCount() + 1);
 		m_lpMenuLinks[MenuGroup_Levels].push_back(pMenuLink);
 	}
@@ -146,7 +146,24 @@ void CMenuScreen::Load()
 
 	pMenuLink->RePosition(MapManager.GetMapCount(), MapManager.GetMapCount() + 1);
 	m_lpMenuLinks[MenuGroup_Levels].push_back(pMenuLink);
+}
 
+// =============================================================================
+// Nat Ryall                                                         01-Aug-2008
+// =============================================================================
+void CMenuScreen::OnUnload()
+{
+	delete m_pMenuDefault;
+	delete m_pMenuHighlight; 
+
+	delete m_pBackground;
+}
+
+// =============================================================================
+// Nat Ryall                                                         11-Apr-2008
+// =============================================================================
+void CMenuScreen::OnActivate()
+{
 	// Initialise transition variables.
 	m_iState = MenuState_None;
 	m_iMenuGroup = MenuGroup_None;
@@ -159,18 +176,14 @@ void CMenuScreen::Load()
 // =============================================================================
 // Nat Ryall                                                         11-Apr-2008
 // =============================================================================
-void CMenuScreen::Unload()
+void CMenuScreen::OnDeactivate()
 {
-	delete m_pMenuDefault;
-	delete m_pMenuHighlight; 
-
-	delete m_pBackground;
 }
 
 // =============================================================================
 // Nat Ryall                                                         09-Jun-2008
 // =============================================================================
-void CMenuScreen::Wake()
+void CMenuScreen::OnWake()
 {
 	SetMenuGroup(m_iLastMenuGroup);
 }
@@ -178,14 +191,15 @@ void CMenuScreen::Wake()
 // =============================================================================
 // Nat Ryall                                                         09-Jun-2008
 // =============================================================================
-void CMenuScreen::Sleep()
+void CMenuScreen::OnSleep()
 {
+	int i = 0;
 }
 
 // =============================================================================
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
-void CMenuScreen::Update()
+void CMenuScreen::OnUpdate()
 {
 	// Allow "ESC" to exit the game.
 	if (m_iState == MenuState_Idle && _HGE->Input_KeyUp(HGEK_ESCAPE))
@@ -258,7 +272,7 @@ void CMenuScreen::UpdateTransition(xbool bTransitionIn)
 // =============================================================================
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
-void CMenuScreen::Render()
+void CMenuScreen::OnRender()
 {
 	m_pBackground->Render();
 }

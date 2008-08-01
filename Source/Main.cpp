@@ -166,6 +166,8 @@ void Application::Initialise()
 	s_lpScreens.push_back(new CLobbyScreen);
 	s_lpScreens.push_back(new CCharacterScreen);
 
+	// Load all screen instances and set go to the logo screen.
+	ScreenManager.LoadRegisteredScreens();
 	ScreenManager.Set(ScreenIndex_LogoScreen, true);
 
 	// Create all the available players.
@@ -193,6 +195,9 @@ void Application::Deinitialise()
 
 	// Free the font.
 	delete Global.m_pGameFont;
+
+	// Unload all loaded screens.
+	ScreenManager.UnloadRegisteredScreens();
 
 	// Deinitialise all modules.
 	Xen::ModuleManager::Deinitialise();

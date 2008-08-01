@@ -47,7 +47,7 @@ CSelectionScreen::~CSelectionScreen()
 // =============================================================================
 // Nat Ryall                                                         19-Apr-2008
 // =============================================================================
-void CSelectionScreen::Update()
+void CSelectionScreen::OnUpdate()
 {
 	if (_HGE->Input_KeyDown(HGEK_ESCAPE))
 	{
@@ -59,7 +59,7 @@ void CSelectionScreen::Update()
 // =============================================================================
 // Nat Ryall                                                         19-Apr-2008
 // =============================================================================
-void CSelectionScreen::Render()
+void CSelectionScreen::OnRender()
 {
 }
 

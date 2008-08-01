@@ -38,29 +38,35 @@ public:
 	// Constructor.
 	CGameScreen() : CScreen(ScreenIndex_GameScreen) {}
 
-	// Load.
-	virtual void Load();
-
-	// Unload.
-	virtual void Unload();
-
-	// Wake.
-	virtual void Wake() {}
-
-	// Sleep.
-	virtual void Sleep() {}
-
-	// Update.
-	virtual void Update();
-
-	// Render.
-	virtual void Render();
-
 protected:
-	// Load the currently active map.
+	// Called to load the screen resources.
+	virtual void OnLoad() {}
+
+	// Called to unload the screen resources.
+	virtual void OnUnload() {}
+
+	// Called when the screen is activated.
+	virtual void OnActivate();
+
+	// Called when the state is deactivated.
+	virtual void OnDeactivate();
+
+	// Called when the screen is active and is the immediate screen in the stack.
+	virtual void OnWake() {}
+
+	// Called when the screen is no longer the immediate screen in the stack but is still active.
+	virtual void OnSleep() {}
+
+	// Called to update the screen (updates the parent screen by default).
+	virtual void OnUpdate();
+
+	// Called to render the next screen frame (renders the parent screen by default).
+	virtual void OnRender();
+
+	// OnActivate the currently active map.
 	void LoadMap();
 
-	// Load the game music track.
+	// OnActivate the game music track.
 	void LoadMusic();
 
 	// Initialise all players in the game.
@@ -91,7 +97,7 @@ private:
 	// Transform all players/objects and the world by the current offset to centre the player to the screen.
 	void WorldTransform(CRenderable* pRenderable);
 
-	// (DEBUG) Render collidable objects.
+	// (DEBUG) OnRender collidable objects.
 	void _RenderCollidables(CRenderable* pRenderable);
 };
 

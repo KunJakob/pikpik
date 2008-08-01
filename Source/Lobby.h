@@ -39,7 +39,6 @@
 // Get the local peer info from a peer structure.
 #define GetPeerInfo(PEERCLASS) ((CNetworkPeerInfo*)(PEERCLASS)->m_pData)
 
-
 //##############################################################################
 
 //##############################################################################
@@ -59,13 +58,15 @@ enum t_LobbyState
 	LobbyState_None,
 	LobbyState_Searching,
 	LobbyState_List,
-	LobbyState_Join,
+	LobbyState_Specify,
 	LobbyState_Creating,
 	LobbyState_Connecting,
 	LobbyState_Verifying,
 	LobbyState_Joining,
 	LobbyState_Lobby,
+	LobbyState_Starting,
 	LobbyState_Game,
+	LobbyState_Ending,
 	LobbyState_Leaving,
 	LobbyState_Closing,
 };
@@ -139,22 +140,22 @@ public:
 	virtual ~CLobbyScreen();
 
 	// Called when the screen is first added to the screen stack.
-	virtual void Load();
+	virtual void OnActivate();
 
 	// Called when the screen is removed from the screen stack.
-	virtual void Unload();
+	virtual void OnDeactivate();
 
 	// Called once when the screen is placed at the top of the stack.
-	virtual void Wake();
+	virtual void OnWake();
 
 	// Called once when the screen goes out of scope either through destruction or another screen is placed above this on the stack.
-	virtual void Sleep();
+	virtual void OnSleep();
 
 	// Called each frame to update the screen when active.
-	virtual void Update();
+	virtual void OnUpdate();
 
 	// Called each frame to render the screen when active.
-	virtual void Render();
+	virtual void OnRender();
 
 	// Start and initialise the lobby using the specified mode.
 	void Start(t_LobbyStartMode iStartMode);
@@ -162,11 +163,8 @@ public:
 	// Stop and close the lobby.
 	void Stop();
 
-	// Check for an excape keypress and handle accordingly.
-	void QuitCheck();
-
 protected:
-	// Update the main lobby screen.
+	// OnUpdate the main lobby screen.
 	void UpdateLobby();
 
 	// Render the main lobby screen.
@@ -174,12 +172,6 @@ protected:
 
 	// Set the internal state.
 	void SetState(t_LobbyState iState);
-
-	// Initialise the local gamer card.
-	void InitialiseGamerCard();
-
-	// Bind all the packet callbacks to the network system.
-	void BindPacketCallbacks();
 
 	// Create a new lobby and act as the host.
 	void CreateLobby();
@@ -212,10 +204,10 @@ protected:
 	xbool OnVerifyPeer(CNetworkPeer* pPeer, void* pData, xint iDataLength);
 
 	// Callback for when the network is started.
-	//void OnNetworkStart();
+	void OnNetworkStart();
 
 	// Callback for when the network is stopped.
-	//void OnNetworkStop();
+	void OnNetworkStop();
 
 	// Callback for when the network has successfully started.
 	void OnConnectionCompleted(xbool bSuccess);

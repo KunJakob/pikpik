@@ -57,16 +57,16 @@ public:
 	void SetMode(t_CharacterScreenMode iMode) {}
 
 	// Called when the screen is first added to the screen stack.		
-	virtual void Load();
+	virtual void OnActivate();
 
 	// Called when the screen is removed from the screen stack.		
-	virtual void Unload();
+	virtual void OnDeactivate();
 
 	// Called each frame to update the screen when active.		
-	virtual void Update();
+	virtual void OnUpdate();
 
 	// Called each frame to render the screen when active.	
-	virtual void Render();
+	virtual void OnRender();
 
 protected:
 	// The screen message font.

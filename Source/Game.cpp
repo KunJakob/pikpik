@@ -34,7 +34,7 @@
 // =============================================================================
 // Nat Ryall                                                         11-Apr-2008
 // =============================================================================
-void CGameScreen::Load()
+void CGameScreen::OnActivate()
 {
 #if defined(_DEBUG)
 	//RenderManager::SetRenderCallback(LayerIndex_Player, xbind(this, &CGameScreen::_RenderCollidables));
@@ -103,7 +103,7 @@ void CGameScreen::InitialisePlayers()
 // =============================================================================
 // Nat Ryall                                                         11-Apr-2008
 // =============================================================================
-void CGameScreen::Unload()
+void CGameScreen::OnDeactivate()
 {
 	if (!Network.IsRunning())
 		Global.m_pActiveMap->Unload();
@@ -120,7 +120,7 @@ void CGameScreen::Unload()
 // =============================================================================
 // Nat Ryall                                                         11-Apr-2008
 // =============================================================================
-void CGameScreen::Update()
+void CGameScreen::OnUpdate()
 {
 	// Exit the game.
 	if (_HGE->Input_KeyUp(HGEK_ESCAPE))
@@ -174,7 +174,7 @@ void CGameScreen::Update()
 // =============================================================================
 // Nat Ryall                                                         11-Apr-2008
 // =============================================================================
-void CGameScreen::Render()
+void CGameScreen::OnRender()
 {
 }
 

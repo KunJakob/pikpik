@@ -37,6 +37,8 @@ void CNetwork::Reset()
 
 	if (!m_pInterface)
 	{
+		DestroyPeers();
+
 		m_bHosting = false;
 		m_bConnected = false;
 		m_bVerified = false;
@@ -45,8 +47,6 @@ void CNetwork::Reset()
 
 		m_pLocalPeer = NULL;
 		m_pHostPeer = NULL;
-
-		XEN_LIST_ERASE_ALL(m_lpPeers);
 
 		m_xCallbacks.m_fpNetworkStarted = NULL;
 		m_xCallbacks.m_fpNetworkStopped = NULL;
@@ -330,6 +330,8 @@ void CNetwork::StartHost(xint iMaxPeers, xint iPort, void* pData, xint iDataSize
 		m_pLocalPeer->m_bVerified = true;
 		m_pLocalPeer->m_pGamerCard = m_pGamerCard;
 
+		m_lpVerifiedPeers.push_back(m_pLocalPeer);
+
 		if (m_xCallbacks.m_fpNetworkStarted)
 			m_xCallbacks.m_fpNetworkStarted();
 
@@ -379,7 +381,7 @@ void CNetwork::Stop()
 		XLOG("[Network] Stopping network.");
 
 		if (m_bHosting)
-			FreePeers();
+			DestroyPeers();
 
 		if (m_xCallbacks.m_fpNetworkStopped)
 			m_xCallbacks.m_fpNetworkStopped();
@@ -459,8 +461,22 @@ void CNetwork::DestroyPeer(CNetworkPeer* pPeer)
 			pPeer->m_pGamerCard = NULL;
 		}
 
-		XEN_LIST_ERASE(t_NetworkPeerList, m_lpPeers, pPeer);
+		XEN_LIST_REMOVE(t_NetworkPeerList, m_lpPeers, pPeer);
+		XEN_LIST_REMOVE(t_NetworkPeerList, m_lpVerifiedPeers, pPeer);
+	
+		delete pPeer;
 	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         19-Jul-2008
+// =============================================================================
+void CNetwork::DestroyPeers()
+{
+	XLOG("[Network] Destroying all peers.");
+
+	while (m_lpPeers.size()) 
+		DestroyPeer(m_lpPeers.front());
 }
 
 // =============================================================================
@@ -505,27 +521,6 @@ CNetworkPeer* CNetwork::FindPeer(xint iPeerID)
 	}
 
 	return NULL;
-}
-
-// =============================================================================
-// Nat Ryall                                                         19-Jul-2008
-// =============================================================================
-void CNetwork::FreePeers()
-{
-	// Notify that all peers are leaving if we have a callback.
-	if (m_xCallbacks.m_fpPeerLeaving)
-	{
-		while (m_lpPeers.size()) 
-		{ 
-			m_xCallbacks.m_fpPeerLeaving(m_lpPeers.back());
-
-			delete *m_lpPeers.rbegin(); 
-			m_lpPeers.pop_back(); 
-		}	
-	}
-	// Otherwise just erase them from memory.
-	else
-		XEN_LIST_ERASE_ALL(m_lpPeers);
 }
 
 // =============================================================================
@@ -633,6 +628,9 @@ void CNetwork::ProcessHostNotifications(xchar cIdentifier, Packet* pPacket, xuch
 						}
 					}
 
+					// Add the peer to the verified list.
+					m_lpVerifiedPeers.push_back(pPeer);
+
 					// Fire the join notification.
 					if (m_xCallbacks.m_fpPeerJoined)
 						m_xCallbacks.m_fpPeerJoined(pPeer);
@@ -735,18 +733,6 @@ void CNetwork::ProcessClientNotifications(xchar cIdentifier, Packet* pPacket, xu
 		{
 			m_bVerified = true;
 
-			// Initialise a host peer, the local peer will be joined though a notification.
-			//m_pHostPeer = CreatePeer();
-
-			//m_pHostPeer->m_bHost = true;
-			//m_pHostPeer->m_bLocal = false;
-			//m_pHostPeer->m_iID = 0;
-			//m_pHostPeer->m_xAddress = pPacket->systemAddress;
-
-			// Send out our notifications.
-			//if (m_xCallbacks.m_fpPeerJoined)
-			//	m_xCallbacks.m_fpPeerJoined(m_pHostPeer);
-
 			if (m_xCallbacks.m_fpVerificationCompleted)
 				m_xCallbacks.m_fpVerificationCompleted(true);
 		}
@@ -757,7 +743,7 @@ void CNetwork::ProcessClientNotifications(xchar cIdentifier, Packet* pPacket, xu
 	case ID_CONNECTION_LOST:
 		{
 			// Remove all existing peers and execute the leaving callbacks.
-			FreePeers();
+			DestroyPeers();
 
 			// If we were verifying, we should execute the verification completed callback with a failure.
 			if (m_bConnected && !m_bVerified)
@@ -807,6 +793,9 @@ void CNetwork::ProcessClientNotifications(xchar cIdentifier, Packet* pPacket, xu
 
 			if (bLocal)
 				m_pLocalPeer = pPeer;
+
+			// Add the peer to the verified list.
+			m_lpVerifiedPeers.push_back(pPeer);
 
 			if (m_xCallbacks.m_fpPeerJoined)
 				m_xCallbacks.m_fpPeerJoined(pPeer);

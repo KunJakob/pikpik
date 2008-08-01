@@ -45,7 +45,7 @@ public:
 	void Reset();
 
 	// Called each frame to update the screen when active.
-	virtual void Update();
+	virtual void OnUpdate();
 
 	// Callback for when the screen has finished processing.
 	virtual void OnFadeComplete() {};

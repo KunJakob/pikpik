@@ -154,6 +154,12 @@ public:
 		return m_lpPeers; 
 	}
 
+	// Get the current verified peer list.
+	inline t_NetworkPeerList& GetVerifiedPeers() 
+	{ 
+		return m_lpVerifiedPeers; 
+	}
+
 	// Get the local peer or NULL if there is no local peer.
 	inline CNetworkPeer* GetLocalPeer() 
 	{ 
@@ -216,6 +222,12 @@ public:
 		return m_pVerificationInfo; 
 	}
 
+	// Determine if there are any peers currently being verified.
+	inline xbool IsEveryoneVerified()
+	{
+		return m_lpPeers.size() == m_lpVerifiedPeers.size();
+	}
+
 	// The network callbacks.
 	CNetworkCallbacks m_xCallbacks;
 
@@ -248,13 +260,16 @@ protected:
 	CNetworkPeer* FindPeer(SystemAddress* pAddress);
 
 	// Free all existing peers in the system and fire any leaving notifications.
-	void FreePeers();
+	void DestroyPeers();
 	
 	// The local interface.
 	RakPeerInterface* m_pInterface;
 
 	// The network peer list.
 	t_NetworkPeerList m_lpPeers;
+
+	// The list of network verified peers.
+	t_NetworkPeerList m_lpVerifiedPeers;
 
 	// The local peer.
 	CNetworkPeer* m_pLocalPeer;

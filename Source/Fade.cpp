@@ -54,7 +54,7 @@ void CFadeScreen::Reset()
 // =============================================================================
 // Nat Ryall                                                          6-Apr-2008
 // =============================================================================
-void CFadeScreen::Update()
+void CFadeScreen::OnUpdate()
 {
 	m_iElapsedTime += _TIMEDELTA;
 
