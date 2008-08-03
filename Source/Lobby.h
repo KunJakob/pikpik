@@ -29,20 +29,6 @@
 
 //##############################################################################
 //
-//                                   MACROS
-//
-//##############################################################################
-
-// Get the gamer card from a peer structure.
-#define GetGamerCard(PEERCLASS) ((CNetworkGamerCard*)(PEERCLASS)->m_pGamerCard)
-
-// Get the local peer info from a peer structure.
-#define GetPeerInfo(PEERCLASS) ((CNetworkPeerInfo*)(PEERCLASS)->m_pData)
-
-//##############################################################################
-
-//##############################################################################
-//
 //                                   TYPES
 //
 //##############################################################################
@@ -139,6 +125,25 @@ public:
 	// Deinitialise
 	virtual ~CLobbyScreen();
 
+	// Start and initialise the lobby using the specified mode.
+	void Start(t_LobbyStartMode iStartMode);
+
+	// Stop and close the lobby.
+	void Stop();
+
+	// Get the gamer card from a peer structure.
+	inline CNetworkGamerCard* GetGamerCard(CNetworkPeer* pPeer)
+	{
+		return (CNetworkGamerCard*)pPeer->m_pGamerCard;
+	}
+
+	// Get the local peer info from a peer structure.
+	inline CNetworkPeerInfo* GetPeerInfo(CNetworkPeer* pPeer)
+	{
+		return (CNetworkPeerInfo*)pPeer->m_pData;
+	}
+
+protected:
 	// Called when the screen is first added to the screen stack.
 	virtual void OnActivate();
 
@@ -157,13 +162,6 @@ public:
 	// Called each frame to render the screen when active.
 	virtual void OnRender();
 
-	// Start and initialise the lobby using the specified mode.
-	void Start(t_LobbyStartMode iStartMode);
-
-	// Stop and close the lobby.
-	void Stop();
-
-protected:
 	// OnUpdate the main lobby screen.
 	void UpdateLobby();
 
@@ -172,6 +170,9 @@ protected:
 
 	// Set the internal state.
 	void SetState(t_LobbyState iState);
+
+	// Initialise the network settings.
+	void InitialiseNetwork();
 
 	// Create a new lobby and act as the host.
 	void CreateLobby();
@@ -188,6 +189,9 @@ protected:
 	// Close the lobby down and disconnect from the network.
 	void CloseLobby();
 
+	// Callback for when the join button is clicked in the join interface.
+	void OnJoinClicked(CButtonComponent* pButton, xpoint xOffset);
+
 	// Callback for when the listing of available sessions has completed.
 	void OnListSessionsCompleted(t_MatchResultError iError, xint iSessionCount, CSession* pSessions);
 
@@ -196,9 +200,6 @@ protected:
 
 	// Callback for when the session is closed.
 	void OnCloseSessionCompleted(t_MatchResultError iError, CSession* pSession);
-
-	// Callback for when the join button is clicked in the join interface.
-	void OnJoinClicked(CButtonComponent* pButton, xpoint xOffset);
 
 	// Callback to verify the client data on the host.
 	xbool OnVerifyPeer(CNetworkPeer* pPeer, void* pData, xint iDataLength);

@@ -37,7 +37,8 @@ void CNetwork::Reset()
 
 	if (!m_pInterface)
 	{
-		DestroyPeers();
+		m_lpPeers.clear();
+		m_lpVerifiedPeers.clear();
 
 		m_bHosting = false;
 		m_bConnected = false;
@@ -328,7 +329,12 @@ void CNetwork::StartHost(xint iMaxPeers, xint iPort, void* pData, xint iDataSize
 		m_pLocalPeer->m_bLocal = true;
 		m_pLocalPeer->m_iID = 0;
 		m_pLocalPeer->m_bVerified = true;
-		m_pLocalPeer->m_pGamerCard = m_pGamerCard;
+
+		if (m_iGamerCardSize)
+		{
+			m_pLocalPeer->m_pGamerCard = new xchar[m_iGamerCardSize];				
+			memcpy_s(m_pLocalPeer->m_pGamerCard, m_iGamerCardSize, m_pGamerCard, m_iGamerCardSize);
+		}
 
 		m_lpVerifiedPeers.push_back(m_pLocalPeer);
 
@@ -380,8 +386,7 @@ void CNetwork::Stop()
 	{
 		XLOG("[Network] Stopping network.");
 
-		if (m_bHosting)
-			DestroyPeers();
+		DestroyPeers();
 
 		if (m_xCallbacks.m_fpNetworkStopped)
 			m_xCallbacks.m_fpNetworkStopped();
@@ -441,7 +446,7 @@ CNetworkPeer* CNetwork::CreatePeer()
 
 	m_lpPeers.push_back(pPeer);
 
-	XLOG("[Network] Created peer %d.", pPeer->m_iID);
+	XLOG("[Network] Created a new peer.");
 
 	return pPeer;
 }
@@ -473,8 +478,6 @@ void CNetwork::DestroyPeer(CNetworkPeer* pPeer)
 // =============================================================================
 void CNetwork::DestroyPeers()
 {
-	XLOG("[Network] Destroying all peers.");
-
 	while (m_lpPeers.size()) 
 		DestroyPeer(m_lpPeers.front());
 }
@@ -485,6 +488,7 @@ void CNetwork::DestroyPeers()
 void CNetwork::SortPeers()
 {
 	m_lpPeers.sort(&OnComparePeers);
+	m_lpVerifiedPeers.sort(&OnComparePeers);
 }
 
 // =============================================================================
@@ -584,7 +588,6 @@ void CNetwork::ProcessHostNotifications(xchar cIdentifier, Packet* pPacket, xuch
 					// Notify that we have successfully been verified.
 					{
 						BitStream xOutStream;
-
 						xOutStream.Write((xuint8)ID_VERIFICATION_SUCCEEDED);
 
 						m_pInterface->Send(&xOutStream, HIGH_PRIORITY, RELIABLE, 1, pPacket->systemAddress, false);
@@ -790,6 +793,9 @@ void CNetwork::ProcessClientNotifications(xchar cIdentifier, Packet* pPacket, xu
 			pPeer->m_bLocal = bLocal;
 			pPeer->m_iID = (xint)iID;
 			pPeer->m_bVerified = true;
+
+			if (pPeer->m_bHost)
+				m_pHostPeer = pPeer;
 
 			if (bLocal)
 				m_pLocalPeer = pPeer;

@@ -135,7 +135,7 @@ void CLobbyScreen::OnUpdate()
 
 	case LobbyState_Closing:
 		{
-			if (!Match.IsBusy())
+			if (!Match.IsBusy() && m_pSession)
 				Match.CloseSession(m_pSession, xbind(this, &CLobbyScreen::OnCloseSessionCompleted));
 		}
 		break;
@@ -214,8 +214,8 @@ void CLobbyScreen::Start(t_LobbyStartMode iStartMode)
 	{
 	case LobbyStartMode_JoinPublic:
 		{
-			Match.ListSessions(xbind(this, &CLobbyScreen::OnListSessionsCompleted));
 			SetState(LobbyState_Searching);
+			Match.ListSessions(xbind(this, &CLobbyScreen::OnListSessionsCompleted));
 		}
 		break;
 
@@ -227,13 +227,14 @@ void CLobbyScreen::Start(t_LobbyStartMode iStartMode)
 	
 	case LobbyStartMode_CreatePublic:
 		{
-			m_pSession = Match.CreateSession(4, xbind(this, &CLobbyScreen::OnCreateSessionCompleted));
 			SetState(LobbyState_Creating);
+			m_pSession = Match.CreateSession(4, xbind(this, &CLobbyScreen::OnCreateSessionCompleted));
 		}
 		break;
 
 	case LobbyStartMode_CreatePrivate:
 		{
+			SetState(LobbyState_Creating);
 			CreateLobby();
 		}
 		break;
@@ -332,15 +333,66 @@ void CLobbyScreen::SetState(t_LobbyState iState)
 }
 
 // =============================================================================
+// Nat Ryall                                                         02-Aug-2008
+// =============================================================================
+void CLobbyScreen::InitialiseNetwork()
+{
+	// Initialise the local player's gamer card.
+	static const char* s_pNames[] =
+	{
+		"PeterParker",
+		"Krakken",
+		"w0nd3rw0man",
+		"<M00MIN>",
+		"slygamer123",
+		"Middas",
+		"kazii",
+		"Malus",
+		"robspear",
+		"KRM-Gaute",
+		"|6P|_Pickis",
+		"The-Guvna",
+		"Firefoot",
+		"Shaks",
+		"Rlan",
+		"cadron_9000",
+		"billBo_bacons",
+		"STALLONE [AH]",
+		"TMWNN",
+		"bkt"
+	};
+
+	strcpy_s(m_xGamerCard.m_cNickname, _MAXNAMELEN, s_pNames[rand() % 20]);
+	m_xGamerCard.m_iSeed = rand() % 4096;
+
+	Network.SetGamerCard(&m_xGamerCard, sizeof(CNetworkGamerCard));
+
+	// Initialise the verification info.
+	Network.SetVerificationInfo(_GID, strlen(_GID) + 1);
+
+	// Bind the stream type callbacks.
+	Network.BindReceiveCallback(NetworkStreamType_PlayerInfo, xbind(this, &CLobbyScreen::OnReceivePlayerInfo));
+	Network.BindReceiveCallback(NetworkStreamType_StartGame, xbind(this, &CLobbyScreen::OnReceiveStartGame));
+
+	// Bind all event callbacks.
+	Network.m_xCallbacks.m_fpNetworkStarted = xbind(this, &CLobbyScreen::OnNetworkStart);
+	Network.m_xCallbacks.m_fpNetworkStopped = xbind(this, &CLobbyScreen::OnNetworkStop);
+	Network.m_xCallbacks.m_fpConnectionCompleted = xbind(this, &CLobbyScreen::OnConnectionCompleted);
+	Network.m_xCallbacks.m_fpConnectionLost = xbind(this, &CLobbyScreen::OnConnectionLost);
+	Network.m_xCallbacks.m_fpVerifyPeer = xbind(this, &CLobbyScreen::OnVerifyPeer);
+	Network.m_xCallbacks.m_fpVerificationCompleted = xbind(this, &CLobbyScreen::OnConnectionVerified);
+	Network.m_xCallbacks.m_fpPeerJoined = xbind(this, &CLobbyScreen::OnPeerJoined);
+	Network.m_xCallbacks.m_fpPeerLeaving = xbind(this, &CLobbyScreen::OnPeerLeaving);
+}
+
+// =============================================================================
 // Nat Ryall                                                         10-Jul-2008
 // =============================================================================
 void CLobbyScreen::CreateLobby()
 {
 	Network.Reset();
 
-	Network.m_xCallbacks.m_fpVerifyPeer = xbind(this, &CLobbyScreen::OnVerifyPeer);
-	Network.m_xCallbacks.m_fpPeerJoined = xbind(this, &CLobbyScreen::OnPeerJoined);
-	Network.m_xCallbacks.m_fpPeerLeaving = xbind(this, &CLobbyScreen::OnPeerLeaving);
+	InitialiseNetwork();
 
 	Network.StartHost(4, _HOSTPORT);
 
@@ -354,11 +406,7 @@ void CLobbyScreen::JoinLobby(const xchar* pHostAddress)
 {
 	Network.Reset();
 
-	Network.m_xCallbacks.m_fpConnectionCompleted = xbind(this, &CLobbyScreen::OnConnectionCompleted);
-	Network.m_xCallbacks.m_fpConnectionLost = xbind(this, &CLobbyScreen::OnConnectionLost);
-	Network.m_xCallbacks.m_fpVerificationCompleted = xbind(this, &CLobbyScreen::OnConnectionVerified);
-	Network.m_xCallbacks.m_fpPeerJoined = xbind(this, &CLobbyScreen::OnPeerJoined);
-	Network.m_xCallbacks.m_fpPeerLeaving = xbind(this, &CLobbyScreen::OnPeerLeaving);
+	InitialiseNetwork();
 
 	Network.StartClient(pHostAddress, _HOSTPORT);
 
@@ -412,6 +460,14 @@ void CLobbyScreen::EndGame()
 }
 
 // =============================================================================
+// Nat Ryall                                                         15-Jun-2008
+// =============================================================================
+void CLobbyScreen::OnJoinClicked(CButtonComponent* pButton, xpoint xOffset)
+{
+	JoinLobby(m_pJoinInterface->m_pAddressBox->GetText());
+}
+
+// =============================================================================
 // Nat Ryall                                                         09-Jul-2008
 // =============================================================================
 void CLobbyScreen::OnListSessionsCompleted(t_MatchResultError iError, xint iSessionCount, CSession* pSessions)
@@ -455,14 +511,6 @@ void CLobbyScreen::OnCloseSessionCompleted(t_MatchResultError iError, CSession* 
 }
 
 // =============================================================================
-// Nat Ryall                                                         15-Jun-2008
-// =============================================================================
-void CLobbyScreen::OnJoinClicked(CButtonComponent* pButton, xpoint xOffset)
-{
-	JoinLobby(m_pJoinInterface->m_pAddressBox->GetText());
-}
-
-// =============================================================================
 // Nat Ryall                                                         31-Jul-2008
 // =============================================================================
 xbool CLobbyScreen::OnVerifyPeer(CNetworkPeer* pPeer, void* pData, xint iDataLength)
@@ -475,42 +523,6 @@ xbool CLobbyScreen::OnVerifyPeer(CNetworkPeer* pPeer, void* pData, xint iDataLen
 // =============================================================================
 void CLobbyScreen::OnNetworkStart()
 {
-	// Initialise the local player's gamer card.
-	static const char* s_pNames[] =
-	{
-		"PeterParker",
-		"Krakken",
-		"w0nd3rw0man",
-		"<M00MIN>",
-		"slygamer123",
-		"Middas",
-		"kazii",
-		"Malus",
-		"robspear",
-		"KRM-Gaute",
-		"|6P|_Pickis",
-		"The-Guvna",
-		"Firefoot",
-		"Shaks",
-		"Rlan",
-		"cadron_9000",
-		"billBo_bacons",
-		"STALLONE [AH]",
-		"TMWNN",
-		"bkt"
-	};
-
-	strcpy_s(m_xGamerCard.m_cNickname, _MAXNAMELEN, s_pNames[rand() % 20]);
-	m_xGamerCard.m_iSeed = rand() % 4096;
-
-	Network.SetGamerCard(&m_xGamerCard, sizeof(CNetworkGamerCard));
-
-	// Initialise the verification info.
-	Network.SetVerificationInfo(_GID, strlen(_GID));
-
-	// Bind the stream type callbacks.
-	Network.BindReceiveCallback(NetworkStreamType_PlayerInfo, xbind(this, &CLobbyScreen::OnReceivePlayerInfo));
-	Network.BindReceiveCallback(NetworkStreamType_StartGame, xbind(this, &CLobbyScreen::OnReceiveStartGame));
 }
 
 // =============================================================================
@@ -518,8 +530,21 @@ void CLobbyScreen::OnNetworkStart()
 // =============================================================================
 void CLobbyScreen::OnNetworkStop()
 {
-	SetState(LobbyState_None);
-	ScreenManager.Pop();
+	if (m_iState != LobbyState_None)
+	{
+		// If we have a session still open, close that and return here later.
+		if (Network.IsHosting() && m_pSession)
+		{
+			if (m_iState != LobbyState_Closing)
+				SetState(LobbyState_Closing);
+		}
+		// Otherwise, we're ready to exit so let's leave.
+		else
+		{
+			SetState(LobbyState_None);
+			ScreenManager.Pop();
+		}
+	}
 }
 
 // =============================================================================
@@ -557,9 +582,9 @@ void CLobbyScreen::OnConnectionLost()
 // =============================================================================
 void CLobbyScreen::OnPeerJoined(CNetworkPeer* pPeer)
 {
-	XLOG("[LobbyScreen] Peer #%d joined the game.", pPeer->m_iID);
+	XLOG("[LobbyScreen] '%s' joined the game with the ID %d.", GetGamerCard(pPeer)->m_cNickname, pPeer->m_iID);
 
-	CNetworkPeerInfo* pInfo = new CNetworkPeerInfo;
+	CNetworkPeerInfo* pInfo = new CNetworkPeerInfo();
 	pInfo->m_pPlayer = NULL;
 
 	pPeer->m_pData = pInfo;
@@ -572,7 +597,7 @@ void CLobbyScreen::OnPeerJoined(CNetworkPeer* pPeer)
 // =============================================================================
 void CLobbyScreen::OnPeerLeaving(CNetworkPeer* pPeer)
 {
-	XLOG("[LobbyScreen] Peer #%d is about to leave the game.", pPeer->m_iID);
+	XLOG("[LobbyScreen] '%s' with the ID %d is about to leave the game.", GetGamerCard(pPeer)->m_cNickname, pPeer->m_iID);
 
 	if (CNetworkPeerInfo* pInfo = GetPeerInfo(pPeer))
 		delete pInfo;
