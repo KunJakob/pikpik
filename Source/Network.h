@@ -84,7 +84,7 @@ public:
 //                                   NETWORK
 //
 //##############################################################################
-class CNetwork
+class CNetwork : public CModule
 {
 public:
 	// Singleton instance.
@@ -100,8 +100,11 @@ public:
 	// Reset the system variables.
 	void Reset();
 
+	// Initialise the network system.
+	virtual void OnInitialise();
+
 	// Update the network system.
-	void Update();
+	virtual void OnUpdate();
 
 	// Bind a callback function to a specific packet type.
 	void BindReceiveCallback(xuchar cType, t_fpStreamReceived fpCallback);

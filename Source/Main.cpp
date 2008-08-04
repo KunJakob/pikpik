@@ -21,6 +21,7 @@
 #include <Character.h>
 #include <Match.h>
 #include <Collision.h>
+#include <Player.h>
 
 //##############################################################################
 
@@ -149,9 +150,12 @@ void Application::Initialise()
 	Global.m_pLocale = new CMetadata(".\\Metadata\\Strings.mta");
 
 	// Add all required modules to the game.
+	XMODULE(&Network);
+	//XMODULE(&Match);
 	XMODULE(&CollisionManager);
 	XMODULE(&ScreenManager);
 	XMODULE(&MapManager);
+	//XMODULE(&Interface);
 
 	_MODULE(CRenderModule);
 
@@ -187,9 +191,6 @@ void Application::Initialise()
 // =============================================================================
 void Application::Deinitialise()
 {
-	// Clear the screen.
-	//Global.m_iNextScreen = ScreenIndex_Invalid;
-
 	// Free the string metadata.
 	delete Global.m_pLocale;
 
@@ -219,7 +220,6 @@ xbool Application::Update()
 {
 	s_iTimeDelta = (xuint)(_TIMEDELTAF * 1000.f);
 
-	Network.Update();
 	Match.Update();
 
 	s_pSoundSystem->update();

@@ -72,9 +72,17 @@ void CNetwork::Reset()
 }
 
 // =============================================================================
+// Nat Ryall                                                         04-Aug-2008
+// =============================================================================
+void CNetwork::OnInitialise()
+{
+	Reset();
+}
+
+// =============================================================================
 // Nat Ryall                                                         08-Jun-2008
 // =============================================================================
-void CNetwork::Update()
+void CNetwork::OnUpdate()
 {
 	if (m_bStopPending)
 		Stop();
@@ -86,7 +94,7 @@ void CNetwork::Update()
 			xchar cIdentifier = pPacket->data[0];
 
 			xuchar* pData = &pPacket->data[1];
-			xint iDataSize = pPacket->length;
+			xint iDataSize = pPacket->length - 1;
 
 			static const char* s_pNetworkID[] =
 			{
@@ -233,6 +241,7 @@ xbool CNetwork::Send(CNetworkPeer* pTo, xuchar cType, BitStream* pStream, Packet
 			BitStream xFinalStream;
 
 			xFinalStream.Write((xuchar)ID_DATA_PACKET);
+			xFinalStream.Write((xuint16)m_pLocalPeer->m_iID);
 			xFinalStream.Write(cType);
 
 			if (pStream)
@@ -251,6 +260,7 @@ xbool CNetwork::Send(CNetworkPeer* pTo, xuchar cType, BitStream* pStream, Packet
 			BitStream xFinalStream;
 
 			xFinalStream.Write((xuchar)ID_DATA_PACKET);
+			xFinalStream.Write((xuint16)m_pLocalPeer->m_iID);
 			xFinalStream.Write(cType);
 
 			if (pStream)
@@ -281,6 +291,7 @@ xbool CNetwork::Broadcast(CNetworkPeer* pIgnore, xuchar cType, BitStream* pStrea
 			BitStream xFinalStream;
 
 			xFinalStream.Write((xuchar)ID_DATA_PACKET);
+			xFinalStream.Write((xuint16)m_pLocalPeer->m_iID);
 			xFinalStream.Write(cType);
 
 			if (pStream)
@@ -795,7 +806,10 @@ void CNetwork::ProcessClientNotifications(xchar cIdentifier, Packet* pPacket, xu
 			pPeer->m_bVerified = true;
 
 			if (pPeer->m_bHost)
+			{
 				m_pHostPeer = pPeer;
+				m_pHostPeer->m_xAddress = pPacket->systemAddress;
+			}
 
 			if (bLocal)
 				m_pLocalPeer = pPeer;
@@ -837,7 +851,10 @@ void CNetwork::ProcessClientNotifications(xchar cIdentifier, Packet* pPacket, xu
 // =============================================================================
 void CNetwork::ProcessPacket(Packet* pPacket, BitStream* pStream)
 {
-	CNetworkPeer* pPeer = FindPeer(&pPacket->systemAddress);
+	xuint16 iPeerID;
+	pStream->Read(iPeerID);
+
+	CNetworkPeer* pPeer = FindPeer((xint)iPeerID);
 
 	if (pPeer)
 	{

@@ -132,7 +132,7 @@ public:
 	}
 
 	// Check for valid collisions for managed collidables.
-	virtual void Update();
+	virtual void OnUpdate();
 
 	// Remove all currently managed collidables from the system and reset the manager to defaults.
 	void Reset();

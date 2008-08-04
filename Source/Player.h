@@ -12,6 +12,7 @@
 // Other.
 #include <Renderer.h>
 #include <Map.h>
+#include <Network.h>
 
 //##############################################################################
 
@@ -49,6 +50,15 @@ enum t_PlayerDirection
 	PlayerDirection_Down,
 	/*MAX*/PlayerDirection_Max,
 };
+
+// The player stream types.
+enum t_PlayerStreamType
+{
+	PlayerStreamType_Move,
+};
+
+// Lists.
+typedef xlist<t_PlayerDirection> t_PlayerDirectionList;
 
 //##############################################################################
 
@@ -105,18 +115,6 @@ public:
 		return m_iLogicType; 
 	}
 
-	// Set the player's name.
-	void SetName(const xchar* pName)
-	{
-		strcpy_s(m_cName, _MAXNAMELEN + 1, pName);
-	}
-
-	// Get the player's name.
-	const xchar* GetName()
-	{
-		return m_cName;
-	}
-
 	// Set the player's position using a map block.
 	void SetCurrentBlock(CMapBlock* pBlock);
 
@@ -137,6 +135,9 @@ public:
 	{
 		return m_pSprite->GetPosition();
 	}
+
+	// Process incoming streams.
+	static void OnReceivePlayerUpdate(CNetworkPeer* pFrom, BitStream* pStream);
 
 protected:
 	// Constuctor.
@@ -169,11 +170,11 @@ protected:
 		return !pBlock->IsWall();
 	}
 
-	// Called when an animation event occurs.
-	void OnAnimationEvent(CAnimatedSprite* pSprite, const xchar* pEvent);
-
 	// Broadcast our local details to other players.
 	void NetworkUpdate();
+
+	// Called when an animation event occurs.
+	void OnAnimationEvent(CAnimatedSprite* pSprite, const xchar* pEvent);
 
 	// The type of the derived class.
 	t_PlayerType m_iType;
@@ -211,8 +212,12 @@ protected:
 	// The transition direction.
 	t_PlayerDirection m_iTransitionDir;
 
-	// The player name.
-	xchar m_cName[_MAXNAMELEN + 1];
+	// The queued moves from the network.
+	t_PlayerDirectionList m_liQueuedMoves;
+
+private:
+	// The player's index.
+	xint m_iIndex;
 };
 
 //##############################################################################

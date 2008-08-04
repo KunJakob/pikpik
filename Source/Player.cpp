@@ -21,6 +21,8 @@
 //                                   MACROS
 //
 //##############################################################################
+
+// The time it takes to move the player from one block to the next.
 #define _MOVETIME 200
 
 //##############################################################################
@@ -38,7 +40,7 @@ CPlayer::CPlayer(t_PlayerType iType, const xchar* pSpriteName) : CRenderable(Ren
 	m_iType(iType),
 	m_pSprite(NULL)
 {
-	SetName("Unknown"); // Probably shouldn't have that here, it's more of an online thing.
+	m_iIndex = Global.m_lpPlayers.size();
 
 	m_pSprite = new CAnimatedSprite(_SPRITE(pSpriteName));
 	m_pSprite->SetAnimation("Idle");
@@ -71,6 +73,7 @@ void CPlayer::Reset()
 	m_bLeaving = false;
 	m_iTransitionDir = PlayerDirection_Left;
 	m_iMoveDir = PlayerDirection_Left;
+	m_liQueuedMoves.clear();
 
 	m_pSprite->Play("Idle");
 	m_pSprite->SetAlpha(1.f);
@@ -237,6 +240,24 @@ void CPlayer::Move(t_PlayerDirection iDirection)
 		m_bLeaving = true;
 		SetState(PlayerState_Warp);
 	}
+
+	// Network.
+	if (Network.IsRunning())
+	{
+		if (m_iLogicType == PlayerLogicType_Local || m_iLogicType == PlayerLogicType_AI)
+		{
+			BitStream xStream;
+
+			xStream.Write((xuint8)PlayerStreamType_Move);
+			xStream.Write((xuint8)m_iIndex);
+			xStream.Write((xuint8)iDirection);
+
+			if (Network.IsHosting())
+				Network.Broadcast(NULL, NetworkStreamType_PlayerUpdate, &xStream, HIGH_PRIORITY, RELIABLE_ORDERED);
+			else
+				Network.Send(NULL, NetworkStreamType_PlayerUpdate, &xStream, HIGH_PRIORITY, RELIABLE_ORDERED);
+		}
+	}
 }
 
 // =============================================================================
@@ -294,7 +315,17 @@ void CPlayer::LogicAI()
 // =============================================================================
 void CPlayer::LogicRemote()
 {
-	// Here we need to process incoming commands maybe.
+	if (m_liQueuedMoves.size())
+	{
+		while (m_liQueuedMoves.size() > 1)
+		{
+			m_pCurrentBlock = m_pCurrentBlock->m_pAdjacents[m_liQueuedMoves.front()];
+			m_liQueuedMoves.pop_front();
+		}
+
+		Move(m_liQueuedMoves.front());
+		m_liQueuedMoves.pop_front();
+	}
 }
 
 // =============================================================================
@@ -349,6 +380,13 @@ void CPlayer::BehaviourWander()
 }
 
 // =============================================================================
+// Nat Ryall                                                         30-Jul-2008
+// =============================================================================
+void CPlayer::NetworkUpdate()
+{
+}
+
+// =============================================================================
 // Nat Ryall                                                         16-Apr-2008
 // =============================================================================
 void CPlayer::OnAnimationEvent(CAnimatedSprite* pSprite, const xchar* pEvent)
@@ -361,10 +399,33 @@ void CPlayer::OnAnimationEvent(CAnimatedSprite* pSprite, const xchar* pEvent)
 }
 
 // =============================================================================
-// Nat Ryall                                                         30-Jul-2008
+// Nat Ryall                                                         04-Aug-2008
 // =============================================================================
-void CPlayer::NetworkUpdate()
+void CPlayer::OnReceivePlayerUpdate(CNetworkPeer* pFrom, BitStream* pStream)
 {
+	xuint8 iStreamType;
+	xuint8 iPlayerIndex;
+
+	pStream->Read(iStreamType);
+	pStream->Read(iPlayerIndex);
+
+	CPlayer* pPlayer = (iPlayerIndex < Global.m_lpPlayers.size()) ? Global.m_lpPlayers[iPlayerIndex] : NULL;
+
+	if (pPlayer)
+	{
+		switch (iStreamType)
+		{
+		// Move.
+		case PlayerStreamType_Move:
+			{
+				xuint8 iMoveDirection;
+				pStream->Read(iMoveDirection);
+
+				pPlayer->m_liQueuedMoves.push_back((t_PlayerDirection)iMoveDirection);
+			}
+			break;
+		}
+	}
 }
 
 //##############################################################################

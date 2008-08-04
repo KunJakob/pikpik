@@ -357,10 +357,10 @@ public:
 	}
 
 	// (Module) Load all map resources and determine available maps.
-	virtual void Initialise();
+	virtual void OnInitialise();
 
 	// (Module) Free all map resources and any loaded maps.
-	virtual void Deinitialise();
+	virtual void OnDeinitialise();
 
 	// Get a specific map by index.
 	CMap* GetMap(xint iIndex);

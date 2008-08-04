@@ -65,9 +65,6 @@ void CGameScreen::OnActivate()
 // =============================================================================
 void CGameScreen::LoadMap()
 {
-	if (!Network.IsRunning())
-		Global.m_pActiveMap->Load();
-
 	RenderManager::Add(LayerIndex_Map, Global.m_pActiveMap);
 }
 
@@ -105,9 +102,6 @@ void CGameScreen::InitialisePlayers()
 // =============================================================================
 void CGameScreen::OnDeactivate()
 {
-	if (!Network.IsRunning())
-		Global.m_pActiveMap->Unload();
-
 	m_pMusic->release();
 
 	RenderManager::Reset();

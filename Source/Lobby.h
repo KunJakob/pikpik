@@ -76,7 +76,7 @@ class CNetworkGamerCard
 {
 public:
 	// The peer's nickname/gamertag with a terminating NULL.
-	char m_cNickname[_MAXNAMELEN];
+	char m_cNickname[_MAXNAMECHARS];
 
 	// The player's random seed.
 	xint m_iSeed;
@@ -144,6 +144,12 @@ public:
 	}
 
 protected:
+	// Called to load the screen resources.
+	virtual void OnLoad();
+
+	// Called to unload the screen resources.
+	virtual void OnUnload();
+
 	// Called when the screen is first added to the screen stack.
 	virtual void OnActivate();
 
@@ -189,6 +195,9 @@ protected:
 	// Close the lobby down and disconnect from the network.
 	void CloseLobby();
 
+	// Delete any session box instances we have.
+	void DeleteSessionBoxes();
+
 	// Callback for when the join button is clicked in the join interface.
 	void OnJoinClicked(CButtonComponent* pButton, xpoint xOffset);
 
@@ -225,14 +234,8 @@ protected:
 	// Callback for when a remote peer is just about to leave the game.
 	void OnPeerLeaving(CNetworkPeer* pPeer);
 
-	// Callback for when a lobby packet is received.
-	void OnReceivePlayerInfo(CNetworkPeer* pFrom, BitStream* pStream);
-
 	// Callback for when a start game placet is received.
 	void OnReceiveStartGame(CNetworkPeer* pFrom, BitStream* pStream);
-
-	// Delete any session box instances we have.
-	void DeleteSessionBoxes();
 
 	// The lobby startup mode.
 	t_LobbyStartMode m_iStartMode;

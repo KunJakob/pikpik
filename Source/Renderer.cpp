@@ -32,7 +32,7 @@ static CRenderLayer s_xLayers[RENDERER_MAXLAYERS];
 // =============================================================================
 // Nat Ryall                                                         28-Jul-2008
 // =============================================================================
-void CRenderModule::Initialise()
+void CRenderModule::OnInitialise()
 {
 	RenderManager::Reset();
 }
@@ -40,7 +40,7 @@ void CRenderModule::Initialise()
 // =============================================================================
 // Nat Ryall                                                         28-Jul-2008
 // =============================================================================
-void CRenderModule::Update()
+void CRenderModule::OnUpdate()
 {
 	for (xuint iA = 0; iA < RENDERER_MAXLAYERS; ++iA)
 	{
@@ -55,7 +55,7 @@ void CRenderModule::Update()
 // =============================================================================
 // Nat Ryall                                                         28-Jul-2008
 // =============================================================================
-void CRenderModule::Render()
+void CRenderModule::OnRender()
 {
 	for (xuint iA = 0; iA < RENDERER_MAXLAYERS; ++iA)
 	{

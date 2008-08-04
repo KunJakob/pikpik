@@ -185,6 +185,9 @@ void CMenuScreen::OnDeactivate()
 // =============================================================================
 void CMenuScreen::OnWake()
 {
+	if (Global.m_pActiveMap && Global.m_pActiveMap->IsLoaded())
+		Global.m_pActiveMap->Unload();
+
 	SetMenuGroup(m_iLastMenuGroup);
 }
 
@@ -502,6 +505,8 @@ void CMenuScreen::Callback_StartGame()
 	CMenuLink* pLink = (CMenuLink*)Interface.GetActiveElement();
 
 	Global.m_pActiveMap = MapManager.GetMap(pLink->m_iElementIndex);
+	Global.m_pActiveMap->Load();
+
 	SetNextScreen(ScreenIndex_GameScreen);
 }
 

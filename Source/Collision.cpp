@@ -46,7 +46,7 @@ void CCollisionManager::Reset()
 // =============================================================================
 // Nat Ryall                                                         28-Jul-2008
 // =============================================================================
-void CCollisionManager::Update()
+void CCollisionManager::OnUpdate()
 {
 	XEN_LIST_FOREACH(t_CollidableList, ppCollidable, m_lpCollidables)
 	{

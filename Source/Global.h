@@ -162,6 +162,7 @@ enum t_NetworkStreamType
 {
 	NetworkStreamType_PlayerInfo,
 	NetworkStreamType_StartGame,
+	NetworkStreamType_PlayerUpdate,
 };
 
 // The lobby start mode.

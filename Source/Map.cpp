@@ -429,7 +429,7 @@ CMapBlock* CMap::GetSpawnBlock(t_PlayerType iPlayerType)
 // =============================================================================
 // Nat Ryall                                                         28-Jul-2008
 // =============================================================================
-void CMapManager::Initialise()
+void CMapManager::OnInitialise()
 {
 	m_pMetadata = new CMetadata(".\\Metadata\\Maps.mta");
 
@@ -459,7 +459,7 @@ void CMapManager::Initialise()
 // =============================================================================
 // Nat Ryall                                                         28-Jul-2008
 // =============================================================================
-void CMapManager::Deinitialise()
+void CMapManager::OnDeinitialise()
 {
 	delete m_pMetadata;
 	delete m_pTiles;

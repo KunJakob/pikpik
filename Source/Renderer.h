@@ -55,13 +55,13 @@ class CRenderModule : public CModule
 {
 public:
 	// Initialise.
-	virtual void Initialise();
+	virtual void OnInitialise();
 
 	// Update.
-	virtual void Update();
+	virtual void OnUpdate();
 
 	// Render.
-	virtual void Render();
+	virtual void OnRender();
 };
 
 //##############################################################################
