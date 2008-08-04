@@ -613,7 +613,12 @@ void CLobbyScreen::OnPeerLeaving(CNetworkPeer* pPeer)
 {
 	XLOG("[LobbyScreen] '%s' with the ID %d is about to leave the game.", GetGamerCard(pPeer)->m_cNickname, pPeer->m_iID);
 
-	if (CNetworkPeerInfo* pInfo = GetPeerInfo(pPeer))
+	CNetworkPeerInfo* pInfo = GetPeerInfo(pPeer);
+
+	if (m_iState == LobbyState_Game)
+		pInfo->m_pPlayer->SetLogicType(Network.IsHosting() ? PlayerLogicType_AI : PlayerLogicType_Remote);
+
+	if (pInfo)
 		delete pInfo;
 }
 
@@ -759,9 +764,9 @@ CSessionBox::~CSessionBox()
 // =============================================================================
 // Nat Ryall                                                         13-Jul-2008
 // =============================================================================
-void CSessionBox::Render()
+void CSessionBox::OnRender()
 {
-	CImageComponent::Render();
+	CImageComponent::OnRender();
 
 	m_pTitleFont->Render
 	(

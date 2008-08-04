@@ -14,40 +14,29 @@
 
 //##############################################################################
 //
-//                                   STATIC
-//
-//##############################################################################
-
-// The renderable list.
-static CRenderLayer s_xLayers[RENDERER_MAXLAYERS];
-
-//##############################################################################
-
-//##############################################################################
-//
-//                                   MODULE
+//                                 DEFINITION
 //
 //##############################################################################
 
 // =============================================================================
 // Nat Ryall                                                         28-Jul-2008
 // =============================================================================
-void CRenderModule::OnInitialise()
+void CRenderManager::OnInitialise()
 {
-	RenderManager::Reset();
+	Reset();
 }
 
 // =============================================================================
 // Nat Ryall                                                         28-Jul-2008
 // =============================================================================
-void CRenderModule::OnUpdate()
+void CRenderManager::OnUpdate()
 {
 	for (xuint iA = 0; iA < RENDERER_MAXLAYERS; ++iA)
 	{
-		if (!s_xLayers[iA].bEnabled)
+		if (!m_xLayers[iA].m_bEnabled)
 			continue;
 
-		XEN_LIST_FOREACH(t_RenderableList, ppRenderable, s_xLayers[iA].lpRenderables)
+		XEN_LIST_FOREACH(t_RenderableList, ppRenderable, m_xLayers[iA].m_lpRenderables)
 			(*ppRenderable)->Update();
 	}
 }
@@ -55,97 +44,89 @@ void CRenderModule::OnUpdate()
 // =============================================================================
 // Nat Ryall                                                         28-Jul-2008
 // =============================================================================
-void CRenderModule::OnRender()
+void CRenderManager::OnRender()
 {
 	for (xuint iA = 0; iA < RENDERER_MAXLAYERS; ++iA)
 	{
-		if (!s_xLayers[iA].bEnabled)
+		if (!m_xLayers[iA].m_bEnabled)
 			continue;
 
-		XEN_LIST_FOREACH(t_RenderableList, ppRenderable, s_xLayers[iA].lpRenderables)
+		XEN_LIST_FOREACH(t_RenderableList, ppRenderable, m_xLayers[iA].m_lpRenderables)
 		{
-			if (s_xLayers[iA].fpRenderCallback)
-				s_xLayers[iA].fpRenderCallback(*ppRenderable);
+			if (m_xLayers[iA].m_fpRenderCallback)
+				m_xLayers[iA].m_fpRenderCallback(*ppRenderable);
 			else
 				(*ppRenderable)->Render();
 		}
 	}
 }
 
-//##############################################################################
-
-//##############################################################################
-//
-//                                 DEFINITION
-//
-//##############################################################################
-
 // =============================================================================
 // Nat Ryall                                                          8-Apr-2008
 // =============================================================================
-void RenderManager::Reset()
+void CRenderManager::Reset()
 {
 	for (xuint iA = 0; iA < RENDERER_MAXLAYERS; ++iA)
 	{
-		s_xLayers[iA].iLayer = iA;
-		s_xLayers[iA].bEnabled = true;
-		s_xLayers[iA].fpRenderCallback = NULL;
-		s_xLayers[iA].lpRenderables.clear();
+		m_xLayers[iA].m_iLayer = iA;
+		m_xLayers[iA].m_bEnabled = true;
+		m_xLayers[iA].m_fpRenderCallback = NULL;
+		m_xLayers[iA].m_lpRenderables.clear();
 	}
 }
 
 // =============================================================================
 // Nat Ryall                                                          8-Apr-2008
 // =============================================================================
-void RenderManager::Add(xuint iLayer, CRenderable* pRenderable)
+void CRenderManager::Add(xuint iLayer, CRenderable* pRenderable)
 {
 	XMASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
-	s_xLayers[iLayer].lpRenderables.push_back(pRenderable);
+	m_xLayers[iLayer].m_lpRenderables.push_back(pRenderable);
 }
 
 // =============================================================================
 // Nat Ryall                                                          8-Apr-2008
 // =============================================================================
-void RenderManager::Remove(CRenderable* pRenderable)
+void CRenderManager::Remove(CRenderable* pRenderable)
 {
 	for (xuint iA = 0; iA < RENDERER_MAXLAYERS; ++iA)
-		s_xLayers[iA].lpRenderables.remove(pRenderable);
+		m_xLayers[iA].m_lpRenderables.remove(pRenderable);
 }
 
 // =============================================================================
 // Nat Ryall                                                         14-Apr-2008
 // =============================================================================
-void RenderManager::EnableLayer(xuint iLayer)
+void CRenderManager::EnableLayer(xuint iLayer)
 {
 	XMASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
-	s_xLayers[iLayer].bEnabled = true;
+	m_xLayers[iLayer].m_bEnabled = true;
 }
 
 // =============================================================================
 // Nat Ryall                                                         14-Apr-2008
 // =============================================================================
-void RenderManager::DisableLayer(xuint iLayer)
+void CRenderManager::DisableLayer(xuint iLayer)
 {
 	XMASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
-	s_xLayers[iLayer].bEnabled = false;
+	m_xLayers[iLayer].m_bEnabled = false;
 }
 
 // =============================================================================
 // Nat Ryall                                                         14-Apr-2008
 // =============================================================================
-xbool RenderManager::IsLayerEnabled(xuint iLayer)
+xbool CRenderManager::IsLayerEnabled(xuint iLayer)
 {
 	XMASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
-	return s_xLayers[iLayer].bEnabled;
+	return m_xLayers[iLayer].m_bEnabled;
 }
 
 // =============================================================================
 // Nat Ryall                                                         14-Apr-2008
 // =============================================================================
-void RenderManager::SetRenderCallback(xuint iLayer, t_RenderCallback fpCallback)
+void CRenderManager::SetRenderCallback(xuint iLayer, t_RenderCallback fpCallback)
 {
 	XMASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
-	s_xLayers[iLayer].fpRenderCallback = fpCallback;
+	m_xLayers[iLayer].m_fpRenderCallback = fpCallback;
 }
 
 //##############################################################################

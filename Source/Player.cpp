@@ -289,13 +289,12 @@ void CPlayer::LogicLocal()
 		{
 			// If we can move, begin the transition to the next block.
 			if (!m_pCurrentBlock->m_pAdjacents[iA] || IsPassable(m_pCurrentBlock->m_pAdjacents[iA]))
+			{
 				Move((t_PlayerDirection)iA);
+				break;
+			}
 		}
 	}
-
-	// Send out our details to all peers.
-	NetworkUpdate();
-
 }
 
 // =============================================================================
@@ -305,9 +304,6 @@ void CPlayer::LogicAI()
 {
 	// Check for a retreat mode/chase mode... otherwise...
 	BehaviourWander();
-
-	// Send out our details to all peers.
-	NetworkUpdate();
 }
 
 // =============================================================================
@@ -377,13 +373,6 @@ void CPlayer::BehaviourWander()
 			}
 		}
 	}
-}
-
-// =============================================================================
-// Nat Ryall                                                         30-Jul-2008
-// =============================================================================
-void CPlayer::NetworkUpdate()
-{
 }
 
 // =============================================================================

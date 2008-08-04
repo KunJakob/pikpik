@@ -42,7 +42,7 @@ CLabelElement::~CLabelElement()
 // =============================================================================
 // Nat Ryall                                                         13-May-2008
 // =============================================================================
-void CLabelElement::Render()
+void CLabelElement::OnRender()
 {
 	m_pFont->Render(m_xText.c_str(), GetPosition(), m_iAlignment);
 }
@@ -76,7 +76,7 @@ CImageElement::~CImageElement()
 // =============================================================================
 // Nat Ryall                                                         13-May-2008
 // =============================================================================
-void CImageElement::Render()
+void CImageElement::OnRender()
 {
 	if (m_pArea)
 		m_pSprite->Render(GetPosition(), m_pArea->xRect);
@@ -113,7 +113,7 @@ CRowElement::~CRowElement()
 // =============================================================================
 // Nat Ryall                                                         11-May-2008
 // =============================================================================
-void CRowElement::Render(xrect& xLeft, xrect& xCentre, xrect& xRight)
+void CRowElement::OnRender(xrect& xLeft, xrect& xCentre, xrect& xRight)
 {
 	m_pSprite->Render(GetPosition(), xLeft);
 	m_pSprite->Render(GetPosition() + xpoint(m_xFrameSize.iLeft + m_iWidth, 0), xRight);
@@ -146,7 +146,7 @@ CContainerElement::~CContainerElement()
 // =============================================================================
 // Nat Ryall                                                         11-May-2008
 // =============================================================================
-void CContainerElement::Render(xrect& xTL, xrect& xTC, xrect& xTR, xrect& xML, xrect& xMC, xrect& xMR, xrect& xBL, xrect& xBC, xrect& xBR)
+void CContainerElement::OnRender(xrect& xTL, xrect& xTC, xrect& xTR, xrect& xML, xrect& xMC, xrect& xMR, xrect& xBL, xrect& xBC, xrect& xBR)
 {
 	xpoint xPosition = GetPosition();
 
@@ -199,7 +199,7 @@ CCheckElement::~CCheckElement()
 // =============================================================================
 // Nat Ryall                                                         13-May-2008
 // =============================================================================
-void CCheckElement::Render(xrect& xArea)
+void CCheckElement::OnRender(xrect& xArea)
 {
 	m_pSprite->Render(GetPosition(), xArea);
 }

@@ -170,9 +170,6 @@ protected:
 		return !pBlock->IsWall();
 	}
 
-	// Broadcast our local details to other players.
-	void NetworkUpdate();
-
 	// Called when an animation event occurs.
 	void OnAnimationEvent(CAnimatedSprite* pSprite, const xchar* pEvent);
 

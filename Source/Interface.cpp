@@ -65,7 +65,7 @@ void CInterface::Reset()
 // =============================================================================
 // Nat Ryall                                                          1-May-2008
 // =============================================================================
-void CInterface::Update()
+void CInterface::OnUpdate()
 {
 	m_xLastMousePos = m_xMousePos;
 
@@ -116,7 +116,7 @@ void CInterface::Update()
 // =============================================================================
 // Nat Ryall                                                          1-May-2008
 // =============================================================================
-void CInterface::Render()
+void CInterface::OnRender()
 {
 	if (m_bVisible)
 	{
@@ -260,7 +260,7 @@ void CInterface::UpdateElement(CInterfaceElement* pElement)
 		}
 	}
 
-	pElement->Update();
+	pElement->OnUpdate();
 }
 
 // =============================================================================
@@ -270,7 +270,7 @@ void CInterface::RenderElement(CInterfaceElement* pElement)
 {
 	if (pElement->IsVisible())
 	{
-		pElement->Render();
+		pElement->OnRender();
 
 		XEN_LIST_FOREACH(t_ElementList, ppElement, pElement->m_lpChildElements)
 			RenderElement(*ppElement);

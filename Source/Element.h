@@ -77,7 +77,7 @@ protected:
 	CLabelElement(t_ElementType iElementType, CFontMetadata* pFont);
 
 	// Render the text string using the current font.
-	void Render();
+	void OnRender();
 
 	// The element font.
 	CFont* m_pFont;
@@ -119,7 +119,7 @@ protected:
 	CImageElement(t_ElementType iElementType, CSpriteMetadata* pSprite, CSpriteMetadata::CArea* pArea = NULL);
 
 	// Render the image element using the current area.
-	void Render();
+	void OnRender();
 
 	// The element sprite.
 	CBasicSprite* m_pSprite;
@@ -185,7 +185,7 @@ protected:
 	CRowElement(t_ElementType iElementType, CSpriteMetadata* pSprite);
 
 	// Render a control at the current position and current size using the specified rects for each tile.
-	void Render(xrect& xLeft, xrect& xCentre, xrect& xRight);
+	void OnRender(xrect& xLeft, xrect& xCentre, xrect& xRight);
 
 	// The element sprite.
 	CBasicSprite* m_pSprite;
@@ -295,7 +295,7 @@ protected:
 	CContainerElement(t_ElementType iElementType, CSpriteMetadata* pSprite);
 
 	// Render a window at the current position and current size using the specified rects for each tile.
-	void Render(xrect& xTL, xrect& xTC, xrect& xTR, xrect& xML, xrect& xMC, xrect& xMR, xrect& xBL, xrect& xBC, xrect& xBR);
+	void OnRender(xrect& xTL, xrect& xTC, xrect& xTR, xrect& xML, xrect& xMC, xrect& xMR, xrect& xBL, xrect& xBC, xrect& xBR);
 
 	// The height, in pixels, of the inner container.
 	xint m_iHeight;
@@ -337,7 +337,7 @@ protected:
 	CCheckElement(t_ElementType iElementType, CSpriteMetadata* pSprite);
 
 	// Render the element at the current position using the specified rect area.
-	void Render(xrect& xArea);
+	void OnRender(xrect& xArea);
 
 	// The element sprite.
 	CBasicSprite* m_pSprite;

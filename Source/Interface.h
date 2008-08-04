@@ -80,7 +80,7 @@ typedef xlist<CInterfaceElement*> t_ElementList;
 //                             INTERFACE MANAGER
 //
 //##############################################################################
-class CInterface //: public CInterfaceElement
+class CInterface : public CModule
 {
 public:
 	// Friend.
@@ -103,10 +103,10 @@ public:
 	void Reset();
 
 	// Called to update and fire events for elements.
-	virtual void Update();
+	virtual void OnUpdate();
 
 	// Called to render elements.
-	virtual void Render();
+	virtual void OnRender();
 
 	// Render a box border to the specified dimensions and colour.
 	void RenderBox(xrect xRect, xuint iColour);
@@ -277,12 +277,6 @@ public:
 	// Virtual destructor to ensure proper cleanup of all child classes.
 	virtual ~CInterfaceElement();
 
-	// Optional update virtual function for this element. Called each frame when visible.
-	virtual void Update() {}
-
-	// Required render virtual function for this element. Called each frame when visible.
-	virtual void Render() = 0;
-
 	// Get the parent element that this element belongs to. Returns NULL if top-level.
 	CInterfaceElement* GetParent() 
 	{ 
@@ -349,7 +343,7 @@ public:
 		Move(xPosition - m_xPosition);
 	}
 
-	// CHange the position of the element by specifying an offset.
+	// Change the position of the element by specifying an offset.
 	void Move(xpoint xOffset);
 
 	// Get the screen position of the element.
@@ -388,6 +382,12 @@ public:
 protected:
 	// Set the element type and initialise the element.
 	CInterfaceElement(t_ElementType iType);
+
+	// Optional update virtual function for this element.
+	virtual void OnUpdate() {}
+
+	// Required render virtual function for this element.
+	virtual void OnRender() = 0;
 
 	// Triggered when focus is applied to the element.
 	virtual void OnFocus() {}
@@ -456,7 +456,7 @@ public:
 	virtual ~CScreenElement() {}
 
 	// Render the screen element (does nothing).
-	virtual void Render() {}
+	virtual void OnRender() {}
 
 	// Get the width of the element. This must be overloaded.
 	virtual xint GetWidth() 

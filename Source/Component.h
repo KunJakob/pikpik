@@ -38,7 +38,7 @@ public:
 	virtual ~CLabelComponent();
 
 	// Render the element.
-	virtual void Render();
+	virtual void OnRender();
 };
 
 //##############################################################################
@@ -58,7 +58,7 @@ public:
 	virtual ~CImageComponent();
 
 	// Render the element.
-	virtual void Render();
+	virtual void OnRender();
 };
 
 //##############################################################################
@@ -81,7 +81,7 @@ public:
 	virtual ~CButtonComponent();
 
 	// Render the button.
-	virtual void Render();
+	virtual void OnRender();
 
 	// Get the height of the button.
 	virtual xint GetHeight()
@@ -179,10 +179,10 @@ public:
 	virtual ~CInputComponent();
 
 	// Update the component.
-	virtual void Update();
+	virtual void OnUpdate();
 
 	// Render the component.
-	virtual void Render();
+	virtual void OnRender();
 
 	// Get the height of the button.
 	virtual xint GetHeight()
@@ -283,7 +283,7 @@ public:
 	virtual ~CProgressComponent();
 
 	// Render the component.
-	virtual void Render();
+	virtual void OnRender();
 
 	// Get the height of the button.
 	virtual xint GetHeight()
@@ -331,7 +331,7 @@ public:
 	virtual ~CWindowComponent();
 
 	// Render the button.
-	virtual void Render();
+	virtual void OnRender();
 
 	// Set the window title text.
 	inline void SetTitle(const xchar* pTitle)
@@ -419,7 +419,7 @@ public:
 	virtual ~CGroupComponent();
 
 	// Render the button.
-	virtual void Render();
+	virtual void OnRender();
 
 	// Set the group title text.
 	inline void SetTitle(const xchar* pTitle)
@@ -483,7 +483,7 @@ public:
 	virtual ~CCheckComponent();
 
 	// Render the element.
-	virtual void Render();
+	virtual void OnRender();
 
 	// Get the width of the element.
 	virtual xint GetWidth()
@@ -619,7 +619,7 @@ public:
 	virtual ~CTextLink();
 
 	// Render the element.
-	virtual void Render();
+	virtual void OnRender();
 
 	// Get the element width in pixels.
 	virtual xint GetWidth()

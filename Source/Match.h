@@ -93,9 +93,6 @@ enum t_SessionStatus
 	SessionStatus_Timeout,
 };
 
-// Lists.
-//typedef xvlist<CSession*> t_SessionList;
-
 //##############################################################################
 
 //##############################################################################
@@ -172,7 +169,7 @@ protected:
 //                                   MATCH
 //
 //##############################################################################
-class CMatch
+class CMatch : public CModule
 {
 public:
 	// Callbacks.
@@ -196,13 +193,13 @@ public:
 	virtual ~CMatch();
 
 	// Initialise the matchmaking service.
-	void Initialise();
+	virtual void OnInitialise();
 
 	// Deinitialise the matchmaking service.
-	void Deinitialise();
+	virtual void OnDeinitialise();
 
 	// Update the service and process any pending operation.
-	void Update();
+	virtual void OnUpdate();
 
 	// List a selection of available sessions on the server.
 	xbool ListSessions(t_OnListSessionsCompleted fpCallback);

@@ -151,16 +151,15 @@ void Application::Initialise()
 
 	// Add all required modules to the game.
 	XMODULE(&Network);
-	//XMODULE(&Match);
+	XMODULE(&Match);
 	XMODULE(&CollisionManager);
 	XMODULE(&ScreenManager);
 	XMODULE(&MapManager);
-	//XMODULE(&Interface);
-
-	_MODULE(CRenderModule);
+	XMODULE(&RenderManager);
+	XMODULE(&Interface);
 
 	// Initialise all modules.
-	Xen::ModuleManager::Initialise();
+	ModuleManager.Initialise();
 
 	// Create all the screen instances.
 	s_lpScreens.push_back(new CLogoScreen);
@@ -181,9 +180,6 @@ void Application::Initialise()
 	Global.m_lpPlayers.push_back(new CGhost(0xFFF040F0));
 	Global.m_lpPlayers.push_back(new CGhost(0xFF4040F0));
 	Global.m_lpPlayers.push_back(new CGhost(0xFFF04040));
-
-	// Initialise the matchmaking system.
-	Match.Initialise();
 }
 
 // =============================================================================
@@ -201,16 +197,13 @@ void Application::Deinitialise()
 	ScreenManager.UnloadRegisteredScreens();
 
 	// Deinitialise all modules.
-	Xen::ModuleManager::Deinitialise();
+	ModuleManager.Deinitialise();
 
 	// Free all screen instances.
 	XEN_LIST_ERASE_ALL(s_lpScreens);
 
 	// Free all the players.
 	XEN_LIST_ERASE_ALL(Global.m_lpPlayers);
-
-	// Deinitialise the matchmaking system.
-	Match.Deinitialise();
 }
 
 // =============================================================================
@@ -220,13 +213,9 @@ xbool Application::Update()
 {
 	s_iTimeDelta = (xuint)(_TIMEDELTAF * 1000.f);
 
-	Match.Update();
-
 	s_pSoundSystem->update();
 
-	Xen::ModuleManager::Update();
-
-	Interface.Update();
+	ModuleManager.Update();
 
 	hgeInputEvent hgEvent;
 
@@ -243,9 +232,7 @@ xbool Application::Render()
 {
 	s_pInterface->Gfx_BeginScene();
 
-	Xen::ModuleManager::Render();
-
-	Interface.Render();
+	ModuleManager.Render();
 
 	s_pInterface->Gfx_EndScene();
 

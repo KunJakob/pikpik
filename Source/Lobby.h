@@ -402,7 +402,7 @@ public:
 	virtual ~CSessionBox();
 
 	// Render the element.
-	virtual void Render();
+	virtual void OnRender();
 
 protected:
 	// Triggered when the left mouse-button is released within the element area.

@@ -49,15 +49,15 @@ void CGameScreen::OnActivate()
 
 	InitialisePlayers();
 
-	RenderManager::Add(LayerIndex_Background, &m_xBackground);
+	RenderManager.Add(LayerIndex_Background, &m_xBackground);
 	
-	RenderManager::SetRenderCallback(LayerIndex_Map, xbind(this, &CGameScreen::WorldTransform));
-	RenderManager::SetRenderCallback(LayerIndex_Player, xbind(this, &CGameScreen::WorldTransform));
+	RenderManager.SetRenderCallback(LayerIndex_Map, xbind(this, &CGameScreen::WorldTransform));
+	RenderManager.SetRenderCallback(LayerIndex_Player, xbind(this, &CGameScreen::WorldTransform));
 
 	Interface.SetCursorVisible(false);
 
 	m_pMinimap = new CMinimap(Global.m_pActiveMap);
-	RenderManager::Add(LayerIndex_Radar, m_pMinimap);
+	RenderManager.Add(LayerIndex_Radar, m_pMinimap);
 }
 
 // =============================================================================
@@ -65,7 +65,7 @@ void CGameScreen::OnActivate()
 // =============================================================================
 void CGameScreen::LoadMap()
 {
-	RenderManager::Add(LayerIndex_Map, Global.m_pActiveMap);
+	RenderManager.Add(LayerIndex_Map, Global.m_pActiveMap);
 }
 
 // =============================================================================
@@ -94,7 +94,7 @@ void CGameScreen::InitialisePlayers()
 
 	// Add all active players to the player render layer.
 	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
-		RenderManager::Add(LayerIndex_Player, *ppPlayer);
+		RenderManager.Add(LayerIndex_Player, *ppPlayer);
 }
 
 // =============================================================================
@@ -102,13 +102,12 @@ void CGameScreen::InitialisePlayers()
 // =============================================================================
 void CGameScreen::OnDeactivate()
 {
+	delete m_pMinimap;
+
 	m_pMusic->release();
 
-	RenderManager::Reset();
-
+	RenderManager.Reset();
 	Interface.SetCursorVisible(true);
-
-	delete m_pMinimap;
 }
 
 // =============================================================================

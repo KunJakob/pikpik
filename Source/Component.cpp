@@ -35,9 +35,9 @@ CLabelComponent::~CLabelComponent()
 // =============================================================================
 // Nat Ryall                                                         13-May-2008
 // =============================================================================
-void CLabelComponent::Render()
+void CLabelComponent::OnRender()
 {
-	CLabelElement::Render();
+	CLabelElement::OnRender();
 }
 
 //##############################################################################
@@ -65,9 +65,9 @@ CImageComponent::~CImageComponent()
 // =============================================================================
 // Nat Ryall                                                         13-May-2008
 // =============================================================================
-void CImageComponent::Render()
+void CImageComponent::OnRender()
 {
-	CImageElement::Render();
+	CImageElement::OnRender();
 }
 
 //##############################################################################
@@ -114,9 +114,9 @@ CButtonComponent::~CButtonComponent()
 // =============================================================================
 // Nat Ryall                                                         11-May-2008
 // =============================================================================
-void CButtonComponent::Render()
+void CButtonComponent::OnRender()
 {
-	CRowElement::Render(m_pL[m_iButtonState]->xRect, m_pC[m_iButtonState]->xRect, m_pR[m_iButtonState]->xRect);
+	CRowElement::OnRender(m_pL[m_iButtonState]->xRect, m_pC[m_iButtonState]->xRect, m_pR[m_iButtonState]->xRect);
 
 	if (m_pFont)
 		m_pFont->Render(m_xText.c_str(), xrect(0, 0, GetSize()) + GetPosition(), HGETEXT_CENTER | HGETEXT_MIDDLE);
@@ -160,7 +160,7 @@ CInputComponent::~CInputComponent()
 // =============================================================================
 // Nat Ryall                                                         12-May-2008
 // =============================================================================
-void CInputComponent::Update()
+void CInputComponent::OnUpdate()
 {
 	m_iFlashTimer = (m_iFlashTimer + _TIMEDELTA) % 1000;
 }
@@ -168,10 +168,10 @@ void CInputComponent::Update()
 // =============================================================================
 // Nat Ryall                                                         12-May-2008
 // =============================================================================
-void CInputComponent::Render()
+void CInputComponent::OnRender()
 {
 	// Render the element area.
-	CRowElement::Render(m_pL->xRect, m_pC->xRect, m_pR->xRect);
+	CRowElement::OnRender(m_pL->xRect, m_pC->xRect, m_pR->xRect);
 
 	// Get the render text and render text offset.
 	xstring xRenderText = m_xText;
@@ -301,9 +301,9 @@ CProgressComponent::~CProgressComponent()
 // =============================================================================
 // Nat Ryall                                                         13-May-2008
 // =============================================================================
-void CProgressComponent::Render()
+void CProgressComponent::OnRender()
 {
-	CRowElement::Render(m_pL->xRect, m_pC->xRect, m_pR->xRect);
+	CRowElement::OnRender(m_pL->xRect, m_pC->xRect, m_pR->xRect);
 
 	if (m_fProgress)
 		m_pSprite->RenderTiled(GetPosition() + xpoint(m_xFrameSize.iLeft, 0), xpoint((xint)((xfloat)m_iWidth * m_fProgress), 0), m_pProgress->xRect);
@@ -359,10 +359,10 @@ CWindowComponent::~CWindowComponent()
 // =============================================================================
 // Nat Ryall                                                         11-May-2008
 // =============================================================================
-void CWindowComponent::Render()
+void CWindowComponent::OnRender()
 {
 	// Render the container.
-	CContainerElement::Render(m_pTL->xRect, m_pTC->xRect, m_pTR->xRect, m_pML->xRect, m_pMC->xRect, m_pMR->xRect, m_pBL->xRect, m_pBC->xRect, m_pBR->xRect);
+	CContainerElement::OnRender(m_pTL->xRect, m_pTC->xRect, m_pTR->xRect, m_pML->xRect, m_pMC->xRect, m_pMR->xRect, m_pBL->xRect, m_pBC->xRect, m_pBR->xRect);
 
 	// Render the window title.
 	if (m_pFont)
@@ -417,12 +417,12 @@ CGroupComponent::~CGroupComponent()
 // =============================================================================
 // Nat Ryall                                                         20-May-2008
 // =============================================================================
-void CGroupComponent::Render()
+void CGroupComponent::OnRender()
 {
 	bool bTitle = m_pFont && m_xTitle.length();
 
 	// Render the container.
-	CContainerElement::Render(m_pTL->xRect, bTitle ? xrect() : m_pTC->xRect, m_pTR->xRect, m_pML->xRect, m_pMC->xRect, m_pMR->xRect, m_pBL->xRect, m_pBC->xRect, m_pBR->xRect);
+	CContainerElement::OnRender(m_pTL->xRect, bTitle ? xrect() : m_pTC->xRect, m_pTR->xRect, m_pML->xRect, m_pMC->xRect, m_pMR->xRect, m_pBL->xRect, m_pBC->xRect, m_pBR->xRect);
 
 	// Render the window title.
 	if (bTitle)
@@ -481,13 +481,13 @@ CCheckComponent::~CCheckComponent()
 // =============================================================================
 // Nat Ryall                                                         13-May-2008
 // =============================================================================
-void CCheckComponent::Render()
+void CCheckComponent::OnRender()
 {
 	xrect xArea = m_pBox[m_iCheckState]->xRect;
-	CCheckElement::Render(xArea);
+	CCheckElement::OnRender(xArea);
 
 	if (m_bChecked)
-		CCheckElement::Render(m_pCheck->xRect);
+		CCheckElement::OnRender(m_pCheck->xRect);
 
 	if (m_pFont)
 	{		
@@ -596,7 +596,7 @@ CTextLink::~CTextLink()
 // =============================================================================
 // Nat Ryall                                                         10-Jul-2008
 // =============================================================================
-void CTextLink::Render()
+void CTextLink::OnRender()
 {
 	m_pText->SetPosition(GetPosition());
 	m_pText->Render();
