@@ -25,7 +25,7 @@
 #define Network CNetwork::Get()
 
 // The maximum ID for network peers is invalid.
-#define NETWORK_PEER_INVALID_ID 0xFFFF
+#define NETWORK_PEER_INVALID_ID 0xFF
 
 //##############################################################################
 
@@ -45,6 +45,7 @@ class CNetworkPeer;
 enum
 {
 	ID_DATA_PACKET = ID_USER_PACKET_ENUM,
+	ID_DATA_PACKET_BROADCAST,
 	ID_VERIFICATION_REQUEST,
 	ID_VERIFICATION_SUCCEEDED,
 	ID_PEER_JOINED,
@@ -235,20 +236,26 @@ public:
 	CNetworkCallbacks m_xCallbacks;
 
 protected:
+	// Execute the send.
+	//xbool InternalSend(xint iPacketID, CNetworkPeer* pFrom, CNetworkPeer* pTarget, xuchar cType, BitStream* pStream, PacketPriority iPriority, PacketReliability iReliability, xchar iChannel);
+
+	// Make a standard data packet that will be going directly to the destination.
+	void FormatDataStream(BitStream& xStream, xint iPacketID, xint iFromID, xint iTargetID, xint iStreamType);
+
+	// Make a standard data packet that will be relayed on the host.
+	void FormatDataStream(BitStream& xStream, xint iPacketID, xint iFromID, xint iTargetID, xint iStreamType, xint iPriority, xint iReliability, xint iChannel);
+
 	// Comparison routine for sorting peers.
 	static xbool OnComparePeers(const CNetworkPeer* pA, const CNetworkPeer* pB);
 
-	// Relay a data packet from the host machine to all other peers on behalf of the sending peer.
-	//void Relay(CNetworkPeer* pSender, BitStream* pStream);
-
 	// Process all host notifications.
-	void ProcessHostNotifications(xchar cIdentifier, Packet* pPacket, xuchar* pData, xint iDataSize);
+	void OnProcessHostNotification(xchar cIdentifier, Packet* pPacket, xuchar* pData, xint iDataSize);
 
 	// Process all client notifications.
-	void ProcessClientNotifications(xchar cIdentifier, Packet* pPacket, xuchar* pData, xint iDataSize);
+	void OnProcessClientNotification(xchar cIdentifier, Packet* pPacket, xuchar* pData, xint iDataSize);
 
 	// Process an incoming packet and dispatch to any callbacks.
-	void ProcessPacket(Packet* pPacket, BitStream* pStream);
+	void OnProcessPacket(Packet* pPacket, BitStream* pStream);
 
 	// Geterate a new peer ID. Valid only on the host.
 	xint GetUniquePeerID();

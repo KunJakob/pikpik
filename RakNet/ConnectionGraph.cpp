@@ -326,8 +326,7 @@ void ConnectionGraph::OnConnectionGraphUpdate(RakPeerInterface *peer, Packet *pa
 	DeserializeIgnoreList(ignoreList, &inBitstream);
 
 	// Forward the updated graph to all participants.
-	if (ignoreList.HasData(packet->systemAddress)==false)
-		ignoreList.Insert(packet->systemAddress,packet->systemAddress, true);
+	ignoreList.Insert(packet->systemAddress,packet->systemAddress, false);
 	BroadcastGraphUpdate(ignoreList, peer);
 }
 void ConnectionGraph::OnNewConnection(RakPeerInterface *peer, Packet *packet)
@@ -348,8 +347,7 @@ void ConnectionGraph::OnNewConnection(RakPeerInterface *peer, Packet *packet)
 		return;
 	DataStructures::OrderedList<SystemAddress,SystemAddress> ignoreList;
 	DeserializeIgnoreList(ignoreList, &inBitstream);
-	if (ignoreList.HasData(packet->systemAddress)==false)
-		ignoreList.Insert(packet->systemAddress,packet->systemAddress, true);
+	ignoreList.Insert(packet->systemAddress,packet->systemAddress, false);
 	AddAndRelayConnection(ignoreList, node1, node2, ping, peer);	
 }
 bool ConnectionGraph::OnConnectionLost(RakPeerInterface *peer, Packet *packet, unsigned char packetId)
@@ -367,8 +365,7 @@ bool ConnectionGraph::OnConnectionLost(RakPeerInterface *peer, Packet *packet, u
 		return false;
 	DataStructures::OrderedList<SystemAddress,SystemAddress> ignoreList;
 	DeserializeIgnoreList(ignoreList, &inBitstream);
-	if (ignoreList.HasData(packet->systemAddress)==false)
-		ignoreList.Insert(packet->systemAddress, packet->systemAddress, true);
+	ignoreList.Insert(packet->systemAddress, packet->systemAddress, false);
 	
 	return RemoveAndRelayConnection(ignoreList, packetId, node1, node2, peer);
 }
@@ -492,8 +489,7 @@ void ConnectionGraph::RemoveParticipant(SystemAddress systemAddress)
 
 void ConnectionGraph::AddParticipant(SystemAddress systemAddress)
 {
-	if (participantList.HasData(systemAddress)==false)
-		participantList.Insert(systemAddress,systemAddress, true);
+	participantList.Insert(systemAddress,systemAddress, false);
 }
 
 void ConnectionGraph::AddAndRelayConnection(DataStructures::OrderedList<SystemAddress,SystemAddress> &ignoreList, const SystemAddressAndGroupId &conn1, const SystemAddressAndGroupId &conn2, unsigned short ping, RakPeerInterface *peer)
@@ -523,10 +519,8 @@ void ConnectionGraph::AddAndRelayConnection(DataStructures::OrderedList<SystemAd
 	outBitstream.Write(conn2.systemAddress);
 	outBitstream.Write(conn2.groupId);
 	outBitstream.Write(ping);
-	if (ignoreList.HasData(conn2.systemAddress)==false)
-		ignoreList.Insert(conn2.systemAddress,conn2.systemAddress, true);
-	if (ignoreList.HasData(conn1.systemAddress)==false)
-		ignoreList.Insert(conn1.systemAddress,conn1.systemAddress, true);
+	ignoreList.Insert(conn2.systemAddress,conn2.systemAddress, false);
+	ignoreList.Insert(conn1.systemAddress,conn1.systemAddress, false);
 	SerializeIgnoreListAndBroadcast(&outBitstream, ignoreList, peer);
 }
 bool ConnectionGraph::RemoveAndRelayConnection(DataStructures::OrderedList<SystemAddress,SystemAddress> &ignoreList, unsigned char packetId, const SystemAddress node1, const SystemAddress node2, RakPeerInterface *peer)
@@ -543,10 +537,8 @@ bool ConnectionGraph::RemoveAndRelayConnection(DataStructures::OrderedList<Syste
 	outBitstream.Write(node1);
 	outBitstream.Write(node2);
 
-	if (ignoreList.HasData(node1)==false)
-		ignoreList.Insert(node1,node1, true);
-	if (ignoreList.HasData(node2)==false)
-		ignoreList.Insert(node2,node2, true);
+	ignoreList.Insert(node1,node1, false);
+	ignoreList.Insert(node2,node2, false);
 	SerializeIgnoreListAndBroadcast(&outBitstream, ignoreList, peer);
 
 	return true;
@@ -572,8 +564,7 @@ void ConnectionGraph::SerializeIgnoreListAndBroadcast(RakNet::BitStream *outBits
 		return;
 
 	SystemAddress self = peer->GetExternalID(sendList[0]);
-	if (ignoreList.HasData(self)==false)
-		ignoreList.Insert(self,self, true);
+	ignoreList.Insert(self,self, false);
 	outBitstream->Write((unsigned short) (ignoreList.Size()+sendList.Size()));
 	for (i=0; i < ignoreList.Size(); i++)
 		outBitstream->Write(ignoreList[i]);

@@ -5,10 +5,7 @@
 #include <stdarg.h>
 // localtime
 #include <time.h>
-
-#if defined(__GNUC__)
-#define _vsnprintf vsnprintf
-#endif
+#include "LinuxStrings.h"
 
 char * EpochTimeToString(long long time)
 {

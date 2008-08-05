@@ -11,7 +11,7 @@
 #pragma warning( push )
 #endif
 
-/// A simple class to create work threads that processes a queue of functions with data.
+/// A simple class to create worker threads that processes a queue of functions with data.
 /// This class does not allocate or deallocate memory.  It is up to the user to handle memory management.
 /// InputType and OutputType are stored directly in a queue.  For large structures, if you plan to delete from the middle of the queue,
 /// you might wish to store pointers rather than the structures themselves so the array can shift efficiently.
@@ -110,10 +110,13 @@ struct RAK_DLL_EXPORT ThreadPool : public RakNet::RakMemoryOverride
 	/// The number of currently active threads.
 	int NumThreadsWorking(void);
 
+	/// Have the threads been signaled to be stopped?
+	bool WasStopped(void) const;
+
 protected:
 	// It is valid to cancel input before it is processed.  To do so, lock the inputQueue with inputQueueMutex,
 	// Scan the list, and remove the item you don't want.
-	SimpleMutex inputQueueMutex, outputQueueMutex, workingThreadCountMutex;
+	SimpleMutex inputQueueMutex, outputQueueMutex, workingThreadCountMutex, runThreadsMutex;
 
 	void* (*perThreadDataFactory)();
 	void (*perThreadDataDestructor)(void*);
@@ -138,7 +141,7 @@ protected:
 	*/
 
 	/// \internal
-	bool threadsRunning;
+	bool runThreads;
 	/// \internal
 	int numThreadsRunning;
 	/// \internal
@@ -207,8 +210,13 @@ void* WorkerThread( void* arguments )
 		}		
 #endif
 
-		if (threadPool->threadsRunning==false)
+		threadPool->runThreadsMutex.Lock();
+		if (threadPool->runThreads==false)
+		{
+			threadPool->runThreadsMutex.Unlock();
 			break;
+		}
+		threadPool->runThreadsMutex.Unlock();
 
 		threadPool->workingThreadCountMutex.Lock();
 		++threadPool->numThreadsWorking;
@@ -259,7 +267,7 @@ void* WorkerThread( void* arguments )
 template <class InputType, class OutputType>
 ThreadPool<InputType, OutputType>::ThreadPool()
 {
-	threadsRunning=false;
+	runThreads=false;
 	numThreadsRunning=0;
 }
 template <class InputType, class OutputType>
@@ -274,8 +282,13 @@ bool ThreadPool<InputType, OutputType>::StartThreads(int numThreads, int stackSi
 {
 	(void) stackSize;
 
-	if (threadsRunning==true)
+	runThreadsMutex.Lock();
+	if (runThreads==true)
+	{
+		runThreadsMutex.Unlock();
 		return false;
+	}
+	runThreadsMutex.Unlock();
 
 #ifdef _WIN32
 	quitAndIncomingDataEvents[0]=CreateEvent(0, true, false, 0);
@@ -284,6 +297,10 @@ bool ThreadPool<InputType, OutputType>::StartThreads(int numThreads, int stackSi
 
 	perThreadDataFactory=_perThreadDataFactory;
 	perThreadDataDestructor=_perThreadDataDestructor;
+
+	runThreadsMutex.Lock();
+	runThreads=true;
+	runThreadsMutex.Unlock();
 
 	numThreadsWorking=0;
 	unsigned threadId = 0;
@@ -298,9 +315,6 @@ bool ThreadPool<InputType, OutputType>::StartThreads(int numThreads, int stackSi
 			return false;
 		}
 	}
-
-	threadsRunning=true;
-
 	// Wait for number of threads running to increase to numThreads
 	bool done=false;
 	while (done==false)
@@ -317,10 +331,15 @@ bool ThreadPool<InputType, OutputType>::StartThreads(int numThreads, int stackSi
 template <class InputType, class OutputType>
 void ThreadPool<InputType, OutputType>::StopThreads(void)
 {
-	if (threadsRunning==false)
+	runThreadsMutex.Lock();
+	if (runThreads==false)
+	{
+		runThreadsMutex.Unlock();
 		return;
+	}
 
-	threadsRunning=false;
+	runThreads=false;
+	runThreadsMutex.Unlock();
 
 #ifdef _WIN32
 	// Quit event
@@ -397,8 +416,10 @@ OutputType ThreadPool<InputType, OutputType>::GetOutput(void)
 template <class InputType, class OutputType>
 void ThreadPool<InputType, OutputType>::Clear(void)
 {
-	if (threadsRunning)
+	runThreadsMutex.Lock();
+	if (runThreads)
 	{
+		runThreadsMutex.Unlock();
 		inputQueueMutex.Lock();
 		inputFunctionQueue.Clear();
 		inputQueue.Clear();
@@ -510,6 +531,16 @@ template <class InputType, class OutputType>
 int ThreadPool<InputType, OutputType>::NumThreadsWorking(void)
 {
 	return numThreadsWorking;
+}
+
+template <class InputType, class OutputType>
+bool ThreadPool<InputType, OutputType>::WasStopped(void) const
+{
+	bool b;
+	runThreadsMutex.Lock();
+	b = runThreads;
+	runThreadsMutex.Unlock();
+	return b;
 }
 
 #ifdef _MSC_VER

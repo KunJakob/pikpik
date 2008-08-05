@@ -167,7 +167,6 @@ void FileList::AddFilesFromDirectory(const char *applicationDirectory, const cha
 	char fullPath[520];
 	_finddata_t fileInfo;
 	intptr_t dir;
-	int file;
 	FILE *fp;
 	char *dirSoFar, *fileData;
 	dirSoFar=(char*) rakMalloc( 520 );
@@ -181,11 +180,8 @@ void FileList::AddFilesFromDirectory(const char *applicationDirectory, const cha
 	if (rootLen)
 	{
 		strcpy(dirSoFar, root);
-		if (dirSoFar[strlen(dirSoFar)-1]!='/' && dirSoFar[strlen(dirSoFar)-1]!='\\')
-		{
-			strcat(dirSoFar, "\\"); // Only \ works with system commands, used by AutopatcherClient
+		if (FixEndingSlash(dirSoFar))
 			rootLen++;
-		}
 	}
 	else
 		dirSoFar[0]=0;
@@ -193,10 +189,7 @@ void FileList::AddFilesFromDirectory(const char *applicationDirectory, const cha
 	if (subDirectory)
 	{
 		strcat(dirSoFar, subDirectory);
-		if (dirSoFar[strlen(dirSoFar)-1]!='/' && dirSoFar[strlen(dirSoFar)-1]!='\\')
-		{
-			strcat(dirSoFar, "\\"); // Only \ works with system commands, used by AutopatcherClient
-		}
+		FixEndingSlash(dirSoFar);
 	}
 	if (callback)
 		callback->OnAddFilesFromDirectoryStarted(this, dirSoFar);
@@ -206,8 +199,11 @@ void FileList::AddFilesFromDirectory(const char *applicationDirectory, const cha
 	{
 		dirSoFar=dirList.Pop();
 		strcpy(fullPath, dirSoFar);
-		strcat(fullPath, "*.*");
-		dir=_findfirst(fullPath, &fileInfo ); // Read .
+		// Changed from *.* to * for Linux compatibility
+		strcat(fullPath, "*");
+
+
+                dir=_findfirst(fullPath, &fileInfo );
 		if (dir==-1)
 		{
 			_findclose(dir);
@@ -217,15 +213,20 @@ void FileList::AddFilesFromDirectory(const char *applicationDirectory, const cha
 				rakFree(dirList[i]);
 			return;
 		}
-		file=_findnext(dir, &fileInfo ); // Read ..
-		file=_findnext(dir, &fileInfo ); // Skip ..
 
 //		printf("Adding %s. %i remaining.\n", fullPath, dirList.Size());
 		if (callback)
 			callback->OnDirectory(this, fullPath, dirList.Size());
 
-		while (file!=-1)
+                do
 		{
+                    // no guarantee these entries are first...
+                    if (strcmp("." , fileInfo.name) == 0 ||
+                        strcmp("..", fileInfo.name) == 0)
+                    {
+                        continue;
+                    }
+                    
 			if ((fileInfo.attrib & (_A_HIDDEN | _A_SUBDIR | _A_SYSTEM))==0)
 			{
 				strcpy(fullPath, dirSoFar);
@@ -243,7 +244,7 @@ void FileList::AddFilesFromDirectory(const char *applicationDirectory, const cha
 					fclose(fp);
 
 					unsigned int hash = SuperFastHash(fileData+HASH_LENGTH, fileInfo.size);
-					memcpy(fileData, &hash, sizeof(HASH_LENGTH));
+					memcpy(fileData, &hash, HASH_LENGTH);
 
 //					sha1.Reset();
 //					sha1.Update( ( unsigned char* ) fileData+HASH_LENGTH, fileInfo.size );
@@ -291,8 +292,8 @@ void FileList::AddFilesFromDirectory(const char *applicationDirectory, const cha
 				strcat(newDir, "/");
 				dirList.Push(newDir);
 			}
-			file=_findnext(dir, &fileInfo );
-		}
+
+		} while (_findnext(dir, &fileInfo ) != -1);
 
 		_findclose(dir);
 		rakFree(dirSoFar);
@@ -469,8 +470,7 @@ void FileList::ListMissingOrChangedFiles(const char *applicationDirectory, FileL
 	for (i=0; i < fileList.Size(); i++)
 	{
 		strcpy(fullPath, applicationDirectory);
-		if (fullPath[strlen(fullPath)-1]!='/' && fullPath[strlen(fullPath)-1]!='\\')
-			strcat(fullPath, "\\"); // Only \ works with system commands, used by AutopatcherClient
+		FixEndingSlash(fullPath);
 		strcat(fullPath,fileList[i].filename);
 		fp=fopen(fullPath, "rb");
 		if (fp==0)
@@ -527,8 +527,7 @@ void FileList::PopulateDataFromDisk(const char *applicationDirectory, bool write
 	{
 		rakFree(fileList[i].data);
 		strcpy(fullPath, applicationDirectory);
-		if (fullPath[strlen(fullPath)-1]!='/' && fullPath[strlen(fullPath)-1]!='\\')
-			strcat(fullPath, "\\");// Only \ works with system commands, used by AutopatcherClient
+		FixEndingSlash(fullPath);
 		strcat(fullPath,fileList[i].filename);
 		fp=fopen(fullPath, "rb");
 		if (fp)
@@ -606,8 +605,7 @@ void FileList::WriteDataToDisk(const char *applicationDirectory)
 	for (i=0; i < fileList.Size(); i++)
 	{
 		strcpy(fullPath, applicationDirectory);
-		if (fullPath[strlen(fullPath)-1]!='/' && fullPath[strlen(fullPath)-1]!='\\')
-			strcat(fullPath, "\\"); // Only \ works with system commands, used by AutopatcherClient
+		FixEndingSlash(fullPath);
 		strcat(fullPath,fileList[i].filename);
 		
 		// Security - Don't allow .. in the filename anywhere so you can't write outside of the root directory
@@ -651,17 +649,16 @@ void FileList::DeleteFiles(const char *applicationDirectory)
 		}
 
 		strcpy(fullPath, applicationDirectory);
-		if (fullPath[strlen(fullPath)-1]!='/' && fullPath[strlen(fullPath)-1]!='\\')
-			strcat(fullPath, "\\"); // Only \ works with system commands, used by AutopatcherClient
+		FixEndingSlash(fullPath);
 		strcat(fullPath, fileList[i].filename);
 
 #ifdef _MSC_VER
 #pragma warning( disable : 4966 ) // unlink declared depreciated by Microsoft in order to make it harder to be cross platform.  I don't agree it's depreciated.
 #endif
-        int result = _unlink(fullPath);
+        int result = unlink(fullPath);
 		if (result!=0)
 		{
-			printf("FileList::DeleteFiles: unlink (%s) failed.", fullPath);
+			printf("FileList::DeleteFiles: unlink (%s) failed.\n", fullPath);
 		}
 	}
 }
@@ -669,6 +666,25 @@ void FileList::DeleteFiles(const char *applicationDirectory)
 void FileList::SetCallback(FileListProgress *cb)
 {
 	callback=cb;
+}
+
+bool FileList::FixEndingSlash(char *str)
+{
+#ifdef _WIN32
+	if (str[strlen(str)-1]!='/' && str[strlen(str)-1]!='\\')
+	{
+		strcat(str, "\\"); // Only \ works with system commands, used by AutopatcherClient
+		return true;
+	}
+#else
+	if (str[strlen(str)-1]!='\\' && str[strlen(str)-1]!='/')
+	{
+		strcat(str, "/"); // Only / works with Linux
+		return true;
+	}
+#endif
+
+	return false;
 }
 
 #ifdef _MSC_VER

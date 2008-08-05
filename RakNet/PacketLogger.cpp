@@ -267,6 +267,10 @@ const char* PacketLogger::BaseIDTOString(unsigned char Id)
 			"ID_READY_EVENT_ALL_SET",
 			"ID_READY_EVENT_QUERY",
 			"ID_LOBBY_GENERAL",
+			"ID_AUTO_RPC_CALL",
+			"ID_AUTO_RPC_REMOTE_INDEX",
+			"ID_AUTO_RPC_UNKNOWN_REMOTE_INDEX",
+			"ID_RPC_REMOTE_ERROR",
 	};
 
 	return (char*)IDTable[Id];

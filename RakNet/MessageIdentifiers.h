@@ -34,7 +34,7 @@
 /// \endcode 
 ///
 /// \note All these enumerations should be casted to (unsigned char) before writing them to RakNet::BitStream
-enum
+enum DefaultMessageIDTypes
 {
 	//
 	// RESERVED TYPES - DO NOT CHANGE THESE
@@ -77,7 +77,7 @@ enum
 
 	/// RakPeer - In a client/server environment, our connection request to the server has been accepted.
 	ID_CONNECTION_REQUEST_ACCEPTED,
-	/// RakPeer - Sent to the player when a connection request cannot be completed due to inability to connect.
+	/// RakPeer - Sent to the player when a connection request cannot be completed due to inability to connect. 
 	ID_CONNECTION_ATTEMPT_FAILED,
 	/// RakPeer - Sent a connect request to a system we are currently connected to.
 	ID_ALREADY_CONNECTED,
@@ -85,9 +85,9 @@ enum
 	ID_NEW_INCOMING_CONNECTION,
 	/// RakPeer - The system we attempted to connect to is not accepting new connections.
 	ID_NO_FREE_INCOMING_CONNECTIONS,
-	/// RakPeer - The system specified in Packet::systemAddress has disconnected from us.  For the client, this would mean the server has shutdown.
+	/// RakPeer - The system specified in Packet::systemAddress has disconnected from us.  For the client, this would mean the server has shutdown. 
 	ID_DISCONNECTION_NOTIFICATION,
-	/// RakPeer - Reliable packets cannot be delivered to the system specified in Packet::systemAddress.  The connection to that system has been closed.
+	/// RakPeer - Reliable packets cannot be delivered to the system specified in Packet::systemAddress.  The connection to that system has been closed. 
 	ID_CONNECTION_LOST,
 	/// RakPeer - We preset an RSA public key which does not match what the system we connected to is using.
 	ID_RSA_PUBLIC_KEY_MISMATCH,
@@ -109,7 +109,7 @@ enum
 	ID_REMOTE_CONNECTION_LOST,
 	/// ConnectionGraph plugin - In a client/server environment, a client other than ourselves has connected.  Packet::systemAddress is modified to reflect the systemAddress of the client that is not connected directly to us. The packet encoding is SystemAddress 1, ConnectionGraphGroupID 1, SystemAddress 2, ConnectionGraphGroupID 2
 	ID_REMOTE_NEW_INCOMING_CONNECTION,
-	// RakPeer - Downloading a large message. Format is ID_DOWNLOAD_PROGRESS (MessageID), partCount (unsigned int), partTotal (unsigned int), partLength (unsigned int), first part data (length <= MAX_MTU_SIZE)
+	// RakPeer - Downloading a large message. Format is ID_DOWNLOAD_PROGRESS (MessageID), partCount (unsigned int), partTotal (unsigned int), partLength (unsigned int), first part data (length <= MAX_MTU_SIZE). See the three parameters partCount, partTotal and partLength in OnFileProgress in FileListTransferCBInterface.h
 	ID_DOWNLOAD_PROGRESS,
 	
 	/// FileListTransfer plugin - Setup data
@@ -222,6 +222,9 @@ enum
 
 	/// Auto RPC functionName to index mapping
 	ID_AUTO_RPC_REMOTE_INDEX,
+
+	/// Auto RPC functionName to index mapping, lookup failed. Will try to auto recover
+	ID_AUTO_RPC_UNKNOWN_REMOTE_INDEX,
 
 	/// Auto RPC error code
 	/// See AutoRPC.h for codes, stored in packet->data[1]

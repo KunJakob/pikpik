@@ -217,6 +217,38 @@ void BitStream::Write( BitStream *bitStream, BitSize_t numberOfBits )
 		numberOfBitsUsed++;
 	}
 }
+void BitStream::Write( BitStream &bitStream, BitSize_t numberOfBits )
+{
+	Write(&bitStream, numberOfBits);
+}
+void BitStream::Write( BitStream &bitStream )
+{
+	Write(&bitStream);
+}
+bool BitStream::Read( BitStream *bitStream, BitSize_t numberOfBits )
+{
+	if (GetNumberOfUnreadBits() < numberOfBits)
+		return false;
+	bitStream->Write(this, numberOfBits);
+	return true;
+}
+bool BitStream::Read( BitStream *bitStream )
+{
+	bitStream->Write(this);
+	return true;
+}
+bool BitStream::Read( BitStream &bitStream, BitSize_t numberOfBits )
+{
+	if (GetNumberOfUnreadBits() < numberOfBits)
+		return false;
+	bitStream.Write(this, numberOfBits);
+	return true;
+}
+bool BitStream::Read( BitStream &bitStream )
+{
+	bitStream.Write(this);
+	return true;
+}
 
 // Read an array or casted stream
 bool BitStream::Read( char* output, const unsigned int numberOfBytes )
@@ -758,6 +790,7 @@ void BitStream::IgnoreBytes( const unsigned int numberOfBytes )
 }
 
 // Move the write pointer to a position on the array.  Dangerous if you don't know what you are doing!
+// Doesn't work with non-aligned data!
 void BitStream::SetWriteOffset( const BitSize_t offset )
 {
 	numberOfBitsUsed = offset;
@@ -838,7 +871,7 @@ void BitStream::ReverseBytesInPlace(unsigned char *data,const unsigned int lengt
 {
 	unsigned char temp;
 	BitSize_t i;
-	for (i=0; i < length; i++)
+	for (i=0; i < (length>>1); i++)
 	{
 		temp = data[i];
 		data[i]=data[length-i-1];
@@ -865,6 +898,14 @@ bool BitStream::IsNetworkOrder(void)
 	static bool isNetworkOrder=(htonl(12345) == 12345);
 	return isNetworkOrder;
 #endif
+}
+bool BitStream::Read(char *var)
+{
+	return RakString::Deserialize(var,this);
+}
+bool BitStream::Read(unsigned char *var)
+{
+	return RakString::Deserialize((char*) var,this);
 }
 
 #ifdef _MSC_VER

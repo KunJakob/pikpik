@@ -2,12 +2,11 @@
 #include "RakAssert.h"
 #include "RakMemoryOverride.h"
 #include "SimpleMutex.h"
+#include "BitStream.h"
+#include <stdarg.h>
 #include <string.h>
 #include "LinuxStrings.h"
-
-#if defined(__GNUC__)
-#define _vsnprintf vsnprintf
-#endif
+#include "StringCompressor.h"
 
 using namespace RakNet;
 
@@ -46,6 +45,24 @@ RakString::RakString(unsigned char input)
 	str[1]=0;
 	Assign(str);
 }
+RakString::RakString(const unsigned char *format, ...){
+	char text[8096];
+	va_list ap;
+	va_start(ap, format);
+	_vsnprintf(text, 8096, (const char*) format, ap);
+	va_end(ap);
+	text[8096-1]=0;
+	Assign(text);
+}
+RakString::RakString(const char *format, ...){
+	char text[8096];
+	va_list ap;
+	va_start(ap, format);
+	_vsnprintf(text, 8096, format, ap);
+	va_end(ap);
+	text[8096-1]=0;
+	Assign(text);
+}
 RakString::RakString( const RakString & rhs)
 {
 	sharedString=rhs.sharedString;
@@ -71,6 +88,13 @@ RakString& RakString::operator = ( const char *str )
 RakString& RakString::operator = ( char *str )
 {
 	return operator = ((const char*)str);
+}
+RakString& RakString::operator = ( const char c )
+{
+	char buff[2];
+	buff[0]=c;
+	buff[1]=0;
+	return operator = ((const char*)buff);
 }
 void RakString::Realloc(SharedString *sharedString, size_t bytes)
 {
@@ -133,6 +157,13 @@ RakString& RakString::operator +=( const char *str )
 RakString& RakString::operator +=( char *str )
 {
 	return operator += ((const char*)str);
+}
+RakString& RakString::operator +=( const char c )
+{
+	char buff[2];
+	buff[0]=c;
+	buff[1]=0;
+	return operator += ((const char*)buff);
 }
 unsigned char RakString::operator[] ( const unsigned int position ) const
 {
@@ -263,12 +294,14 @@ void RakString::Replace(unsigned index, unsigned count, unsigned char c)
 }
 void RakString::Erase(unsigned index, unsigned count)
 {
-	RakAssert(index+count < GetLength());
+	size_t len = GetLength();
+	RakAssert(index+count <= len);
+        
 	Clone();
 	unsigned i;
-	for (i=index; i < count; i++)
+	for (i=index; i < len-count; i++)
 	{
-		sharedString->c_str[i]=sharedString->c_str[i+index];
+		sharedString->c_str[i]=sharedString->c_str[i+count];
 	}
 	sharedString->c_str[i]=0;
 }
@@ -339,19 +372,141 @@ bool RakString::IPAddressMatch(const char *IP)
 	// No match found.
 	return false;
 }
+void RakString::URLEncode(void)
+{
+	RakString result;
+
+	size_t strLen = strlen(sharedString->c_str);
+	unsigned i;
+	char c;
+	for (i=0; i < strLen; i++)
+	{
+		c=sharedString->c_str[i];
+		if (
+			(c<=47) ||
+			(c>=58 && c<=64) ||
+			(c>=91 && c<=96) ||
+			(c>=123)
+			)
+		{
+			result += RakNet::RakString("%%%2X", c);
+		}
+		else
+		{
+			result += c;
+		}
+	}
+
+	*this = result;
+}
+void RakString::FreeMemory(void)
+{
+	for (unsigned int i=0; i < freeList.Size(); i++)
+		delete freeList[i];
+	freeList.Clear();
+}
+void RakString::Serialize(BitStream *bs)
+{
+	Serialize(sharedString->c_str, bs);
+}
+void RakString::Serialize(const char *str, BitStream *bs)
+{
+	unsigned short l = (unsigned short) strlen(str);
+	bs->Write(l);
+	bs->WriteAlignedBytes((const unsigned char*) str, (const unsigned int) l);
+}
+void RakString::SerializeCompressed(BitStream *bs, int languageId, bool writeLanguageId)
+{
+	SerializeCompressed(C_String(), bs, languageId, writeLanguageId);
+}
+void RakString::SerializeCompressed(const char *str, BitStream *bs, int languageId, bool writeLanguageId)
+{
+	if (writeLanguageId)
+		bs->WriteCompressed(languageId);
+	stringCompressor->EncodeString(str,0xFFFF,bs,languageId);
+}
+bool RakString::Deserialize(BitStream *bs)
+{
+	Clear();
+
+	bool b;
+	unsigned short l;
+	b=bs->Read(l);
+	if (l>0)
+	{
+		Allocate(((unsigned int) l)+1);
+		b=bs->ReadAlignedBytes((unsigned char*) sharedString->c_str, l);
+		if (b)
+			sharedString->c_str[l]=0;
+		else
+			Clear();
+	}
+	return b;
+}
+bool RakString::Deserialize(char *str, BitStream *bs)
+{
+	bool b;
+	unsigned short l;
+	b=bs->Read(l);
+	if (b && l>0)
+		b=bs->ReadAlignedBytes((unsigned char*) str, l);
+
+	if (b==false)
+		str[0]=0;
+	return b;
+}
+bool RakString::DeserializeCompressed(BitStream *bs, bool readLanguageId)
+{
+	unsigned int languageId;
+	if (readLanguageId)
+		bs->ReadCompressed(languageId);
+	else
+		languageId=0;
+	return stringCompressor->DecodeString(this,0xFFFF,bs,languageId);
+}
+bool RakString::DeserializeCompressed(char *str, BitStream *bs, bool readLanguageId)
+{
+	unsigned int languageId;
+	if (readLanguageId)
+		bs->ReadCompressed(languageId);
+	else
+		languageId=0;
+	return stringCompressor->DecodeString(str,0xFFFF,bs,languageId);
+}
+const char *RakString::ToString(int64_t i)
+{
+	static int index=0;
+	static char buff[64][64];
+#if defined(_WIN32)
+	sprintf(buff[index], "%I64d", i);
+#else
+	sprintf(buff[index], "%lld", i);
+#endif
+	int lastIndex=index;
+	if (++index==64)
+		index=0;
+	return buff[lastIndex];
+}
+const char *RakString::ToString(uint64_t i)
+{
+	static int index=0;
+	static char buff[64][64];
+#if defined(_WIN32)
+	sprintf(buff[index], "%I64u", i);
+#else
+	sprintf(buff[index], "%llu", i);
+#endif
+	int lastIndex=index;
+	if (++index==64)
+		index=0;
+	return buff[lastIndex];
+}
 void RakString::Clear(void)
 {
 	Free();
 }
-void RakString::Assign(const char *str)
+void RakString::Allocate(size_t len)
 {
-	if (str==0 || str[0]==0)
-	{
-		sharedString=&emptyString;
-		return;
-	}
-
-	size_t len = strlen(str)+1;
 	poolMutex.Lock();
 	// sharedString = RakString::pool.Allocate();
 	if (RakString::freeList.Size()==0)
@@ -383,7 +538,17 @@ void RakString::Assign(const char *str)
 		sharedString->bigString=(char*)rakMalloc(sharedString->bytesUsed);
 		sharedString->c_str=sharedString->bigString;
 	}
+}
+void RakString::Assign(const char *str)
+{
+	if (str==0 || str[0]==0)
+	{
+		sharedString=&emptyString;
+		return;
+	}
 
+	size_t len = strlen(str)+1;
+	Allocate(len);
 	memcpy(sharedString->c_str, str, len);
 
 }

@@ -26,6 +26,8 @@ typedef int socklen_t;
 #include <unistd.h>
 #include <fcntl.h>
 #include <arpa/inet.h>
+#include <errno.h>  // error numbers
+#include <stdio.h> // printf
 #endif
 
 #if defined(_PS3)
@@ -38,6 +40,16 @@ static unsigned short HACK_APP_PORT;
 #include <string.h>
 #endif
 #endif
+
+#ifdef _WIN32
+#elif defined(_PS3)
+#define closesocket socketclose
+#else
+#define closesocket close
+#include <unistd.h>
+#endif
+
+#include <stdio.h>
 
 #include "ExtendedOverlappedPool.h"
 
@@ -122,6 +134,23 @@ SOCKET SocketLayer::Connect( SOCKET writeSocket, unsigned int binaryAddress, uns
 
 	return writeSocket;
 }
+bool SocketLayer::IsPortInUse(unsigned short port)
+{
+	SOCKET listenSocket;
+	sockaddr_in listenerSocketAddress;
+	// Listen on our designated Port#
+	listenerSocketAddress.sin_port = htons( port );
+	listenSocket = socket( AF_INET, SOCK_DGRAM, 0 );
+	if ( listenSocket == (SOCKET) -1 )
+		return true;
+	// bind our name to the socket
+	// Fill in the rest of the address structure
+	listenerSocketAddress.sin_family = AF_INET;
+	listenerSocketAddress.sin_addr.s_addr = INADDR_ANY;
+	int ret = bind( listenSocket, ( struct sockaddr * ) & listenerSocketAddress, sizeof( listenerSocketAddress ) );
+	closesocket(listenSocket);
+	return ret <= -1;
+}
 SOCKET SocketLayer::CreateBoundSocket( unsigned short port, bool blockingSocket, const char *forceHostAddress )
 {
 	(void) blockingSocket;
@@ -168,7 +197,6 @@ SOCKET SocketLayer::CreateBoundSocket( unsigned short port, bool blockingSocket,
 	}
 
 	int sock_opt = 1;
-
 	if ( setsockopt( listenSocket, SOL_SOCKET, SO_REUSEADDR, ( char * ) & sock_opt, sizeof ( sock_opt ) ) == -1 )
 	{
 #if defined(_WIN32) && !defined(_XBOX360) && defined(_DEBUG)
@@ -183,6 +211,7 @@ SOCKET SocketLayer::CreateBoundSocket( unsigned short port, bool blockingSocket,
 		LocalFree( messageBuffer );
 #endif
 	}
+
 
 	// This doubles the max throughput rate
 	sock_opt=1024*256;
@@ -261,7 +290,7 @@ SOCKET SocketLayer::CreateBoundSocket( unsigned short port, bool blockingSocket,
 	// bind our name to the socket
 	ret = bind( listenSocket, ( struct sockaddr * ) & listenerSocketAddress, sizeof( listenerSocketAddress ) );
 
-	if ( ret == -1 )
+	if ( ret <= -1 )
 	{
 #if defined(_WIN32) && !defined(_XBOX360) && defined(_DEBUG)
 		DWORD dwIOError = GetLastError();
@@ -273,6 +302,38 @@ SOCKET SocketLayer::CreateBoundSocket( unsigned short port, bool blockingSocket,
 		printf( "bind(...) failed:Error code - %d\n%s", dwIOError, messageBuffer );
 		//Free the buffer.
 		LocalFree( messageBuffer );
+#elif (defined(__GNUC__)  || defined(__GCCXML__) || defined(_PS3)) && !defined(__WIN32)
+		switch (ret)
+		{
+		case EBADF:
+			printf("bind(): sockfd is not a valid descriptor.\n"); break;
+#ifndef _PS3
+		case ENOTSOCK:
+			printf("bind(): Argument is a descriptor for a file, not a socket.\n"); break;
+#endif
+		case EINVAL:
+			printf("bind(): The addrlen is wrong, or the socket was not in the AF_UNIX family.\n"); break;
+		case EROFS:
+			printf("bind(): The socket inode would reside on a read-only file system.\n"); break;
+		case EFAULT:
+			printf("bind(): my_addr points outside the user's accessible address space.\n"); break;
+		case ENAMETOOLONG:
+			printf("bind(): my_addr is too long.\n"); break;
+		case ENOENT:
+			printf("bind(): The file does not exist.\n"); break;
+		case ENOMEM:
+			printf("bind(): Insufficient kernel memory was available.\n"); break;
+		case ENOTDIR:
+			printf("bind(): A component of the path prefix is not a directory.\n"); break;
+		case EACCES:
+			printf("bind(): Search permission is denied on a component of the path prefix.\n"); break;
+#ifndef _PS3
+		case ELOOP:
+			printf("bind(): Too many symbolic links were encountered in resolving my_addr.\n"); break;
+#endif
+		default:
+			printf("Unknown bind() error %i.\n", ret); break;
+		}
 #endif
 
 		return (SOCKET) -1;
@@ -522,13 +583,13 @@ int SocketLayer::SendTo( SOCKET s, const char *data, int length, unsigned int bi
 	return 1; // error
 }
 
-int SocketLayer::SendTo( SOCKET s, const char *data, int length, char ip[ 16 ], unsigned short port )
+int SocketLayer::SendTo( SOCKET s, const char *data, int length, const char ip[ 16 ], unsigned short port )
 {
 	unsigned int binaryAddress;
 	binaryAddress = inet_addr( ip );
 	return SendTo( s, data, length, binaryAddress, port );
 }
-int SocketLayer::SendToTTL( SOCKET s, const char *data, int length, char ip[ 16 ], unsigned short port, int ttl )
+int SocketLayer::SendToTTL( SOCKET s, const char *data, int length, const char ip[ 16 ], unsigned short port, int ttl )
 {
 #if !defined(_XBOX360)
 	int oldTTL;

@@ -3,14 +3,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#include "LinuxStrings.h"
 
 // #define _PRINTF_DEBUG
 
 #define ECHO_INPUT
-
-#if (defined(__GNUC__)  || defined(__GCCXML__))
-#define _vsnprintf vsnprintf
-#endif
 
 #ifdef _MSC_VER
 #pragma warning( push )

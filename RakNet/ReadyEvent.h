@@ -41,12 +41,6 @@ enum ReadyEventSystemStatus
 	/// This remote system has completed the ReadyEvent
 	RES_ALL_READY,
 
-	/// ----------- Usually errors ---------------
-	/// The remote system called SetEvent(thisEvent,true) with our system in its wait list, but we are not waiting on them ourselves (asymetry)
-	/// This is usually a bug.
-	RES_READY_NOT_WAITING,
-	/// Same as RES_READY_NOT_WAITING, but when that system is also done waiting for all systems in its own wait list
-	RES_ALL_READY_NOT_WAITING,
 		/// Error code, we couldn't look up the system because the event was unknown
 	RES_UNKNOWN_EVENT,
 };
@@ -99,6 +93,7 @@ public:
 
 	/// Returns if the wait list is a subset of the completion list.
 	/// Call this after all systems you want to wait for have been added with AddToWaitList
+	/// If you are waiting for a specific number of systems (such as players later connecting), also check GetRemoteWaitListSize(eventId) to be equal to 1 less than the total number of participants.
 	/// \param[in] eventId A user-defined identifier
 	/// \return True on completion. False (failure) on unknown eventId, or the set is not completed.
 	bool IsEventCompleted(int eventId) const;
@@ -163,17 +158,23 @@ public:
 
 	// ---------------------------- ALL INTERNAL AFTER HERE ----------------------------
 	/// \internal
+	/// Status of a remote system
+	struct RemoteSystem
+	{
+		MessageID lastSentStatus, lastReceivedStatus;
+		SystemAddress systemAddress;
+	};
+	static int RemoteSystemCompBySystemAddress( const SystemAddress &key, const RemoteSystem &data );
+	/// \internal
 	/// An event, with a set of systems we are waiting for, a set of systems that are signaled, and a set of systems with completed events
 	struct ReadyEventNode
 	{
 		int eventId; // Sorted on this
-		bool eventSignaled; // For our local system, is this event signaled? Defaults to false.
-		DataStructures::OrderedList<SystemAddress,SystemAddress> waitList; // Systems the user is waiting for to complete
-		DataStructures::OrderedList<SystemAddress,SystemAddress> readySystemList; // Systems that have indicated they are ready. Mutually exclusive with completeList
-		DataStructures::OrderedList<SystemAddress,SystemAddress> completedSystemList; // Systems that have indicated they are ready, and all systems they are waiting on are ready. Mutually exclusive with readyList
+		MessageID eventStatus;
+		DataStructures::OrderedList<SystemAddress,RemoteSystem,ReadyEvent::RemoteSystemCompBySystemAddress> systemList;
 	};
-
 	static int ReadyEventNodeComp( const int &key, ReadyEvent::ReadyEventNode * const &data );
+
 
 protected:
 	// --------------------------------------------------------------------------------------------
@@ -183,32 +184,35 @@ protected:
 	virtual PluginReceiveResult OnReceive(RakPeerInterface *peer, Packet *packet);
 	virtual void OnCloseConnection(RakPeerInterface *peer, SystemAddress systemAddress);
 	virtual void OnShutdown(RakPeerInterface *peer);
-
-	void OnReadyEventSet(RakPeerInterface *peer, Packet *packet);
-	void OnReadyEventUnset(RakPeerInterface *peer, Packet *packet);
-	PluginReceiveResult OnReadyEventCompletedSystem(RakPeerInterface *peer, Packet *packet);
-	void OnReadyEventQuery(RakPeerInterface *peer, Packet *packet);
 	
 	void Clear(void);
-	bool IsEventCompletedByIndex(unsigned eventIndex) const;
+	/*
 	bool AnyWaitersCompleted(unsigned eventIndex) const;
 	bool AllWaitersCompleted(unsigned eventIndex) const;
 	bool AllWaitersReady(unsigned eventIndex) const;
-	unsigned CreateEvent(int eventId, bool isReady);
 	void SendAllReady(unsigned eventId, SystemAddress address);
 	void BroadcastAllReady(unsigned eventIndex);
-	void SendReadyUpdate(unsigned eventIndex, SystemAddress address);
 	void SendReadyStateQuery(unsigned eventId, SystemAddress address);
 	void BroadcastReadyUpdate(unsigned eventIndex);
-	void RemoveFromAllLists(SystemAddress address);
 	bool AddToWaitListInternal(unsigned eventIndex, SystemAddress address);
-	void PushCompletionPacket(unsigned eventId);
 	bool IsLocked(unsigned eventIndex) const;
-	bool SetEventByIndex(int eventIndex, bool isReady);
 	bool IsAllReadyByIndex(unsigned eventIndex) const;
+	*/
+
+	void SendReadyStateQuery(unsigned eventId, SystemAddress address);
+	void SendReadyUpdate(unsigned eventIndex, unsigned systemIndex, bool forceIfNotDefault);
+	void BroadcastReadyUpdate(unsigned eventIndex, bool forceIfNotDefault);
+	void RemoveFromAllLists(SystemAddress address);
+	void OnReadyEventQuery(RakPeerInterface *peer, Packet *packet);
+	void PushCompletionPacket(unsigned eventId);
+	bool AddToWaitListInternal(unsigned eventIndex, SystemAddress address);
+	void OnReadyEventPacketUpdate(RakPeerInterface *peer, Packet *packet);
+	void UpdateReadyStatus(unsigned eventIndex);
+	bool IsEventCompletedByIndex(unsigned eventIndex) const;
+	unsigned CreateEvent(int eventId, bool isReady);
+	bool SetEventByIndex(int eventIndex, bool isReady);
 
 	DataStructures::OrderedList<int, ReadyEventNode*, ReadyEvent::ReadyEventNodeComp> readyEventNodeList;
-
 	unsigned char channel;
 	RakPeerInterface *rakPeer;
 };

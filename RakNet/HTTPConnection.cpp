@@ -30,7 +30,7 @@ using namespace RakNet;
 HTTPConnection::HTTPConnection(TCPInterface& _tcp, const char *_host, unsigned short _port)
     : tcp(_tcp), host(_host), port(_port), state(RAK_HTTP_INITIAL) {}
 
-void HTTPConnection::Post(const char *remote_path, const char *data)
+void HTTPConnection::Post(const char *remote_path, const char *data, const char *_contentType)
 {
     if(state == RAK_HTTP_IDLE)
         state = RAK_HTTP_ESTABLISHED;
@@ -41,6 +41,7 @@ void HTTPConnection::Post(const char *remote_path, const char *data)
 
     outgoing = data;
     path = remote_path; 
+	contentType=_contentType;
 
     incoming.Clear();
 }
@@ -91,13 +92,13 @@ void HTTPConnection::Update(void)
 	{
 		RakString request("POST %s HTTP/1.0\r\n"
 			"Host: %s\r\n"
-			"User-Agent: SMM-1\r\n"
-			"Content-Type: application/octet-stream\r\n"
+			"Content-Type: %s\r\n"
 			"Content-Length: %u\r\n"
 			"\r\n"
 			"%s",
 			path.C_String(),
 			host.C_String(),
+			contentType.C_String(),
 			(unsigned) outgoing.GetLength(),
 			outgoing.C_String());
 		tcp.Send(request, (unsigned int) strlen(request), server);

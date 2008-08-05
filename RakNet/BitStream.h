@@ -27,6 +27,7 @@
 #include "RakNetDefines.h"
 #include "Export.h"
 #include "RakNetTypes.h"
+#include "RakString.h"
 #include <assert.h>
 #include <math.h>
 #include <float.h>
@@ -34,9 +35,6 @@
 #ifdef _MSC_VER
 #pragma warning( push )
 #endif
-
-/// Arbitrary size, just picking something likely to be larger than most packets
-#define BITSTREAM_STACK_ALLOCATION_SIZE 256
 
 /// The namespace RakNet is not consistently used.  It's only purpose is to avoid compiler errors for classes whose names are very common.
 /// For the most part I've tried to avoid this simply by using names very likely to be unique for my classes.
@@ -182,7 +180,6 @@ namespace RakNet
 		/// \param[in] numberOfBitsToSerialize The number of bits to write 
 		/// \param[in] rightAlignedBits if true data will be right aligned 
 		/// \return true if \a writeToBitstream is true.  true if \a writeToBitstream is false and the read was successful.  false if \a writeToBitstream is false and the read was not successful.
-		template <class templateType>
 		bool SerializeBits(bool writeToBitstream, unsigned char* input, const BitSize_t numberOfBitsToSerialize, const bool rightAlignedBits = true );
 
 		/// Write any integral type to a bitstream.  Undefine __BITSTREAM_NATIVE_END if you need endian swapping.
@@ -265,6 +262,14 @@ namespace RakNet
 		template <class templateType>
 			bool ReadCompressedDelta(templateType &var);
 
+		/// Read one bitstream to another
+		/// \param[in] numberOfBits bits to read
+		/// \param bitStream the bitstream to read into from
+		bool Read( BitStream *bitStream, BitSize_t numberOfBits );
+		bool Read( BitStream *bitStream );
+		bool Read( BitStream &bitStream, BitSize_t numberOfBits );
+		bool Read( BitStream &bitStream );
+
 		/// Write an array or casted stream or raw data.  This does NOT do endian swapping.
 		/// \param[in] input a byte buffer 
 		/// \param[in] numberOfBytes the size of \a input in bytes 
@@ -275,6 +280,8 @@ namespace RakNet
 		/// \param bitStream the bitstream to copy from
 		void Write( BitStream *bitStream, BitSize_t numberOfBits );
 		void Write( BitStream *bitStream );
+		void Write( BitStream &bitStream, BitSize_t numberOfBits );
+		void Write( BitStream &bitStream );
 		
 		/// Read a normalized 3D vector, using (at most) 4 bytes + 3 bits instead of 12-24 bytes.  Will further compress y or z axis aligned vectors.
 		/// Accurate to 1/32767.5.
@@ -503,6 +510,11 @@ namespace RakNet
 		BitSize_t GetNumberOfBitsAllocated(void) const;
 
 
+		// Read strings, non reference
+		bool Read(char *var);
+		bool Read(unsigned char *var);
+
+
 		/// ---- Member function template specialization declarations ----
 		// Used for VC7
 #if defined(_MSC_VER) && _MSC_VER == 1300
@@ -516,17 +528,30 @@ namespace RakNet
 		template <>
 			void Write(SystemAddress var);
 
+		/// Write an networkID to a bitstream
+		/// \param[in] var The value to write
+		template <>
+			void Write(NetworkID var);
+
+		/// Write a string to a bitstream
+		/// \param[in] var The value to write
+		template <>
+			void Write(const char* var);
+		template <>
+			void Write(const unsigned char* var);
+		template <>
+			void Write(char* var);
+		template <>
+			void Write(unsigned char* var);
+		template <>
+			void Write(RakString var);
+
 		/// Write a systemAddress.  If the current value is different from the last value
 		/// the current value will be written.  Otherwise, a single bit will be written
 		/// \param[in] currentValue The current value to write
 		/// \param[in] lastValue The last value to compare against
 		template <>
 			void WriteDelta(SystemAddress currentValue, SystemAddress lastValue);
-
-		/// Write an networkID to a bitstream
-		/// \param[in] var The value to write
-		template <>
-			void Write(NetworkID var);
 
 		/// Write an networkID.  If the current value is different from the last value
 		/// the current value will be written.  Otherwise, a single bit will be written
@@ -558,6 +583,18 @@ namespace RakNet
 		template <>
 			void WriteCompressed(double var);
 
+		/// Compressed string
+		template <>
+			void WriteCompressed(const char* var);
+		template <>
+			void WriteCompressed(const unsigned char* var);
+		template <>
+			void WriteCompressed(char* var);
+		template <>
+			void WriteCompressed(unsigned char* var);
+		template <>
+			void WriteCompressed(RakString var);
+
 		/// Write a bool delta.  Same thing as just calling Write
 		/// \param[in] currentValue The current value to write
 		/// \param[in] lastValue The last value to compare against
@@ -583,6 +620,15 @@ namespace RakNet
 		template <>
 			bool Read(NetworkID &var);
 
+		/// Read a String from a bitstream
+		/// \param[in] var The value to read
+		template <>
+			bool Read(char *&var);
+		template <>
+			bool Read(unsigned char *&var);
+		template <>
+			bool Read(RakString &var);
+
 		/// Read a bool from a bitstream
 		/// \param[in] var The value to read
 		template <>
@@ -602,7 +648,14 @@ namespace RakNet
 
 		/// For values between -1 and 1
 		template <>
-			bool ReadCompressed(double &var);
+		bool ReadCompressed(double &var);
+
+		template <>
+			bool ReadCompressed(char* &var);
+		template <>
+			bool ReadCompressed(unsigned char *&var);
+		template <>
+			bool ReadCompressed(RakString &var);
 
 		/// Read a bool from a bitstream
 		/// \param[in] var The value to read
@@ -620,7 +673,7 @@ namespace RakNet
 
 		BitStream( const BitStream &invalid) {
 			(void) invalid;
-			
+			assert(0);
 		}
 
 		/// Assume the input source points to a native type, compress and write it.
@@ -758,8 +811,7 @@ namespace RakNet
 			return true;
 		}
 
-		template <class templateType>
-		bool BitStream::SerializeBits(bool writeToBitstream, unsigned char* input, const BitSize_t numberOfBitsToSerialize, const bool rightAlignedBits )
+		inline bool BitStream::SerializeBits(bool writeToBitstream, unsigned char* input, const BitSize_t numberOfBitsToSerialize, const bool rightAlignedBits )
 		{
 			if (writeToBitstream)
 				WriteBits(input,numberOfBitsToSerialize,rightAlignedBits);
@@ -843,6 +895,34 @@ namespace RakNet
 		if (NetworkID::IsPeerToPeerMode()) // Use the function rather than directly access the member or DLL users will get an undefined external error
 			Write(var.systemAddress);
 		Write(var.localSystemAddress);
+	}
+
+	/// Write a string to a bitstream
+	/// \param[in] var The value to write
+	template <>
+		inline void BitStream::Write(RakString var)
+	{
+		var.Serialize(this);
+	}
+	template <>
+		inline void BitStream::Write(const char * var)
+	{
+		RakString::Serialize(var, this);
+	}
+	template <>
+		inline void BitStream::Write(const unsigned char * var)
+	{
+		Write((const char*)var);
+	}
+	template <>
+		inline void BitStream::Write(char * var)
+	{
+		Write((const char*)var);
+	}
+	template <>
+		inline void BitStream::Write(unsigned char * var)
+	{
+		Write((const char*)var);
 	}
 
 	/// Write any integral type to a bitstream.  If the current value is different from the last value
@@ -999,6 +1079,33 @@ namespace RakNet
 		Write((unsigned long)((var+1.0)*2147483648.0));
 	}
 
+	/// Compress the string
+	template <>
+		inline void BitStream::WriteCompressed(RakString var)
+	{
+		var.SerializeCompressed(this,0,false);
+	}
+	template <>
+		inline void BitStream::WriteCompressed(const char * var)
+	{
+		RakString::SerializeCompressed(var,this,0,false);
+	}
+	template <>
+		inline void BitStream::WriteCompressed(const unsigned char * var)
+	{
+		WriteCompressed((const char*) var);
+	}
+	template <>
+		inline void BitStream::WriteCompressed(char * var)
+	{
+		WriteCompressed((const char*) var);
+	}
+	template <>
+		inline void BitStream::WriteCompressed(unsigned char * var)
+	{
+		WriteCompressed((const char*) var);
+	}
+
 	/// Write any integral type to a bitstream.  If the current value is different from the last value
 	/// the current value will be written.  Otherwise, a single bit will be written
 	/// For floating point, this is lossy, using 2 bytes for a float and 4 for a double.  The range must be between -1 and +1.
@@ -1147,6 +1254,26 @@ namespace RakNet
 		return Read(var.localSystemAddress);
 	}
 
+	/// Read an networkID from a bitstream
+	/// \param[in] var The value to read
+	template <>
+		inline bool BitStream::Read(RakString &var)
+	{
+		return var.Deserialize(this);
+	}
+	template <>
+		inline bool BitStream::Read(char *&var)
+	{
+		return RakString::Deserialize(var,this);
+	}
+	template <>
+		inline bool BitStream::Read(unsigned char *&var)
+	{
+		return RakString::Deserialize((char*) var,this);
+	}
+
+	// asdf
+
 	/// Read any integral type from a bitstream.  If the written value differed from the value compared against in the write function,
 	/// var will be updated.  Otherwise it will retain the current value.
 	/// ReadDelta is only valid from a previous call to WriteDelta
@@ -1246,6 +1373,22 @@ namespace RakNet
 		return false;
 	}
 
+	/// For strings
+	template <>
+		inline bool BitStream::ReadCompressed(RakString &var)
+	{
+		return var.DeserializeCompressed(this,false);
+	}
+	template <>
+	inline bool BitStream::ReadCompressed(char *&var)
+	{
+		return RakString::DeserializeCompressed(var,this,false);
+	}
+	template <>
+	inline bool BitStream::ReadCompressed(unsigned char *&var)
+	{
+		return RakString::DeserializeCompressed((char*) var,this,false);
+	}
 
 	/// Read any integral type from a bitstream.  If the written value differed from the value compared against in the write function,
 	/// var will be updated.  Otherwise it will retain the current value.
@@ -1373,9 +1516,9 @@ namespace RakNet
 		if (qx < 0.0) qx=0.0;
 		if (qy < 0.0) qy=0.0;
 		if (qz < 0.0) qz=0.0;
-		qx = _copysign( qx, m21 - m12 );
-		qy = _copysign( qy, m02 - m20 );
-		qz = _copysign( qz, m10 - m01 );
+		qx = copysign( qx, m21 - m12 );
+		qy = copysign( qy, m02 - m20 );
+		qz = copysign( qz, m10 - m01 );
 
 		WriteNormQuat(qw,qx,qy,qz);
 	}
@@ -1527,6 +1670,21 @@ namespace RakNet
 
 		return true;
 	}
+
+	template <class templateType>
+	BitStream& operator<<(BitStream& out, templateType& c)
+	{
+		out.Write(c);
+		return out;
+	}
+	template <class templateType>
+	BitStream& operator>>(BitStream& in, templateType& c)
+	{
+		bool success = in.Read(c);
+		assert(success);
+		return in;
+	}
+
 }
 
 #ifdef _MSC_VER

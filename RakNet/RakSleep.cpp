@@ -9,6 +9,9 @@
 #include <unistd.h> // usleep
 #endif
 
+
+#include "RakSleep.h"
+
 void RakSleep(unsigned int ms)
 {
 #ifdef _WIN32

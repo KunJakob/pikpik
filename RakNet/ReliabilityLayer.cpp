@@ -148,6 +148,7 @@ void ReliabilityLayer::InitializeVariables( void )
 	splitPacketId = 0;
 	throughputCapCountdown=0;
 	sendMessageNumberIndex = 0;
+	internalOrderIndex=0;
 	lastUpdateTime= RakNet::GetTimeNS();
 	lastTimeBetweenPacketsIncrease=lastTimeBetweenPacketsDecrease=0;
     remoteSystemTime=0;
@@ -1030,6 +1031,8 @@ bool ReliabilityLayer::Send( char *data, BitSize_t numberOfBitsToSend, PacketPri
 	internalPacket->messageNumber = (MessageNumberType) -1;
 	internalPacket->messageNumberAssigned=false;
 
+	internalPacket->messageInternalOrder = internalOrderIndex++;
+
 	internalPacket->priority = priority;
 	internalPacket->reliability = reliability;
 	internalPacket->splitPacketCount = 0;
@@ -1105,6 +1108,46 @@ void ReliabilityLayer::Update( SOCKET s, SystemAddress systemAddress, int MTUSiz
 							  unsigned bitsPerSecondLimit,
 							  DataStructures::List<PluginInterface*> &messageHandlerList )
 {
+	// Debug memory leaks
+	/*
+	if (0)
+	{
+		printf("orderingList.Size()=%i\n", orderingList.Size());
+		printf("outputQueue.Size()=%i\n", outputQueue.Size());
+		printf("acknowlegements.Size()=%i\n", acknowlegements.Size());
+		printf("resendList.Size()=%i\n", resendList.Size());
+		printf("resendQueue.Size()=%i\n", resendQueue.Size());
+		for (int i=0; i < NUMBER_OF_PRIORITIES; i++)
+			printf("sendPacketSet[%i].Size()=%i\n", i, sendPacketSet[i].Size());
+		printf("splitPacketChannelList.Size()=%i\n", splitPacketChannelList.Size());
+		printf("hasReceivedPacketQueue.Size()=%i\n", hasReceivedPacketQueue.Size());
+#ifndef _RELEASE
+		printf("delayList.Size()=%i\n", delayList.Size());
+#endif
+		printf("internalPacketPool.GetAvailablePagesSize()=%i\n", internalPacketPool.GetAvailablePagesSize());
+		printf("internalPacketPool.GetUnavailablePagesSize()=%i\n", internalPacketPool.GetUnavailablePagesSize());
+		printf("internalPacketPool.GetMemoryPoolPageSize()=%i\n", internalPacketPool.GetMemoryPoolPageSize());
+		printf("sendMessageNumberIndex=%i\n", sendMessageNumberIndex);
+		printf("deadConnection=%i\n", deadConnection);
+		printf("cheater=%i\n", cheater);
+		printf("splitPacketId=%i\n", splitPacketId);
+		printf("blockWindowIncreaseUntilTime=%i\n", blockWindowIncreaseUntilTime);
+		printf("receivedPacketsBaseIndex=%i\n", receivedPacketsBaseIndex);
+		printf("lastUpdateTime=%I64u\n", lastUpdateTime);
+		printf("timeBetweenPackets=%I64u\n", timeBetweenPackets);
+		printf("nextSendTime=%I64u\n", nextSendTime);
+		printf("ackPing=%I64u\n", ackPing);
+		printf("ackPingSum=%I64u\n", ackPingSum);
+		printf("ackPingIndex=%i\n", ackPingIndex);
+		printf("continuousSend=%i\n", continuousSend);
+		printf("sendPacketCount=%i\n", sendPacketCount);
+		printf("receivePacketCount=%i\n", receivePacketCount);
+		char buffer[10000];
+		StatisticsToString( &statistics, buffer, 2 );
+		printf("%s\n", buffer);
+	}
+*/
+
 	// This line is necessary because the timer isn't accurate
 	if (time <= lastUpdateTime)
 	{
@@ -1460,7 +1503,8 @@ bool ReliabilityLayer::GenerateDatagram( RakNet::BitStream *output, int MTUSize,
 			statistics.packetsContainingOnlyAcknowlegementsAndResends++;
 
 	//		printf("internalPacket->messageNumber=%i time=%i timeBetween=%i\n", internalPacket->messageNumber, (RakNetTime)(time/(RakNetTimeNS)1000), (RakNetTime)(timeBetweenPackets/(RakNetTimeNS)1000));
-			internalPacket->nextActionTime = time + (RakNetTimeNS)100000 + (ackPingSum>>7);
+			// Using a one second resend for the 2nd resend on fixes abnormal disconnections due to flooding
+			internalPacket->nextActionTime = time + (RakNetTimeNS)1000000;
 
 			//printf("PACKETLOSS\n ");
 
@@ -2772,6 +2816,112 @@ RakNetTimeNS ReliabilityLayer::GetAckPing(void) const
 {
 	return ackPing;
 }
+//-------------------------------------------------------------------------------------------------------
+/*
+int InternalPacketCompByInternalOrderIndex( InternalPacket * const &key, InternalPacket * const &data )
+{
+	int64_t holeCount = (key->messageInternalOrder-data->messageInternalOrder);
+	int64_t absHoleCount = holeCount>0 ? holeCount : -holeCount;
+	MessageNumberType typeRange = (MessageNumberType)-1;
+	if (absHoleCount > typeRange/2)
+	{
+		if (holeCount>0)
+			return -1;
+		else if (holeCount<0)
+			return 1;
+	}
+	else
+	{
+		if (holeCount>0)
+			return 1;
+		else if (holeCount<0)
+			return -1;
+	}
+	if (key->splitPacketIndex>data->splitPacketIndex)
+		return 1;
+	if (key->splitPacketIndex<data->splitPacketIndex)
+		return -1;
+	return 0;
+}
+void ReliabilityLayer::GetUndeliveredMessages(RakNet::BitStream *messages, int MTUSize)
+{
+	DataStructures::OrderedList<InternalPacket*, InternalPacket*, InternalPacketCompByInternalOrderIndex> undeliveredMessages;
+	unsigned int i,j,k;
+	for (i=0; i < resendQueue.Size(); i++)
+	{
+		if (resendQueue[i]->nextActionTime==0)
+			continue;
+		undeliveredMessages.Insert(resendQueue[i],resendQueue[i],true);
+	}
+
+	for ( i = 0; i < NUMBER_OF_PRIORITIES; i++ )
+	{
+		for (j=0; j < sendPacketSet[ i ].Size(); j++)
+			undeliveredMessages.Insert( sendPacketSet[ i ][ j ],sendPacketSet[ i ][ j ],true);
+	}
+
+	unsigned char zeroBlock[MAXIMUM_MTU_SIZE];
+	memset(zeroBlock,0,MAXIMUM_MTU_SIZE);
+	unsigned int messagesConcatenated=0;
+	uint64_t totalBitLength;
+	BitSize_t oldWriteOffset;
+	unsigned int lastSplitPacketIndex, lastSplitPacketId;
+	messages->Reset();
+	messages->Write((unsigned int) undeliveredMessages.Size());
+	i=0;
+	while (i < undeliveredMessages.Size())
+	{
+		// Write message size
+		if (undeliveredMessages[i]->splitPacketCount>0)
+		{
+			lastSplitPacketId=undeliveredMessages[i]->splitPacketId;
+			lastSplitPacketIndex=0;
+			j=i;
+			totalBitLength=0;
+			unsigned int headerLength = (unsigned int) BITS_TO_BYTES( GetBitStreamHeaderLength( undeliveredMessages[i] ) );
+			unsigned int maxDataSize = MTUSize - UDP_HEADER_SIZE;
+			// How much to send in the largest block
+			unsigned int maximumSendBlock = maxDataSize - headerLength;
+			// Calculate the total bit length of all the messages, using the split MTU if not known
+			while (j < undeliveredMessages.Size() && lastSplitPacketId==undeliveredMessages[j]->splitPacketId && undeliveredMessages[j]->splitPacketCount>0)
+			{
+				for (k=lastSplitPacketIndex; k < undeliveredMessages[j]->splitPacketIndex; k++)
+					totalBitLength+=BYTES_TO_BITS(maximumSendBlock);
+				totalBitLength+=undeliveredMessages[j]->dataBitLength;
+				lastSplitPacketIndex=undeliveredMessages[j]->splitPacketIndex+1;
+				j++;
+			}
+			messages->Write((unsigned int) BITS_TO_BYTES(totalBitLength));
+			while (i < undeliveredMessages.Size() && lastSplitPacketId==undeliveredMessages[i]->splitPacketId && undeliveredMessages[i]->splitPacketCount>0)
+			{
+				// Write blocks of 0 for unknown data
+				for (j=lastSplitPacketIndex; j < undeliveredMessages[i]->splitPacketIndex; j++)
+					messages->WriteAlignedBytes(zeroBlock,BITS_TO_BYTES(undeliveredMessages[i]->dataBitLength));
+				// Write the data
+				messages->WriteAlignedBytes(undeliveredMessages[i]->data, BITS_TO_BYTES(undeliveredMessages[i]->dataBitLength));
+				lastSplitPacketIndex=undeliveredMessages[i]->splitPacketIndex+1;
+				messagesConcatenated++;
+				i++;
+			}
+		}
+		else
+		{
+			messages->Write((unsigned int) BITS_TO_BYTES(undeliveredMessages[i]->dataBitLength));
+			// Write the data
+			messages->WriteAlignedBytes(undeliveredMessages[i]->data, BITS_TO_BYTES(undeliveredMessages[i]->dataBitLength));
+			i++;
+		}
+	}
+
+
+	oldWriteOffset=messages->GetWriteOffset();
+	messages->SetWriteOffset(0);
+	messages->Write((unsigned int) undeliveredMessages.Size()-messagesConcatenated);
+	messages->SetWriteOffset(oldWriteOffset);
+
+}
+*/
+
 //-------------------------------------------------------------------------------------------------------
 /*
 void ReliabilityLayer::SetDoFastThroughputReactions(bool fast)

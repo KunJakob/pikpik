@@ -8,6 +8,9 @@
 #include "RakNetTypes.h"
 #include "RakPeerInterface.h"
 #include <assert.h>
+#ifdef _PS3
+#include <alloca.h>
+#endif
 
 #ifdef _MSC_VER
 #pragma warning( push )
@@ -289,21 +292,21 @@ bool FileListTransfer::DecodeFile(Packet *packet, bool fullFile)
 	unsigned int partCount=0;
 	unsigned int partTotal=0;
 	unsigned int partLength=0;
+	onFileStruct.fileData=0;
 	if (fullFile==false)
 	{
-		inBitStream.Read(partCount);
-		inBitStream.Read(partTotal);
-		inBitStream.Read(partLength);
+		// Disable endian swapping on reading this, as it's generated locally in ReliabilityLayer.cpp
+		inBitStream.ReadBits( (unsigned char* ) &partCount, BYTES_TO_BITS(sizeof(partCount)), true );
+		inBitStream.ReadBits( (unsigned char* ) &partTotal, BYTES_TO_BITS(sizeof(partTotal)), true );
+		inBitStream.ReadBits( (unsigned char* ) &partLength, BYTES_TO_BITS(sizeof(partLength)), true );
 		inBitStream.IgnoreBits(8);
+		// The header is appended to every chunk, which we continue to read after this statement block
 	}
 	inBitStream.Read(onFileStruct.context);
 	inBitStream.Read(onFileStruct.setID);
 	FileListReceiver *fileListReceiver;
 	if (fileListReceivers.Has(onFileStruct.setID)==false)
 	{
-#ifdef _DEBUG
-		assert(0);
-#endif
 		return false;
 	}
 	fileListReceiver=fileListReceivers.Get(onFileStruct.setID);
@@ -391,7 +394,41 @@ bool FileListTransfer::DecodeFile(Packet *packet, bool fullFile)
 
 	}
 	else
-		fileListReceiver->downloadHandler->OnFileProgress(&onFileStruct, partCount, partTotal, partLength);
+	{
+		inBitStream.AlignReadToByteBoundary();
+
+		bool usedAlloca=false;
+		char *firstDataChunk;
+		unsigned int unreadBits = inBitStream.GetNumberOfUnreadBits();
+		unsigned int unreadBytes = BITS_TO_BYTES(unreadBits);
+		if (unreadBytes>0)
+		{
+#if !defined(_XBOX360)
+			if (unreadBits < MAX_ALLOCA_STACK_ALLOCATION)
+			{
+				firstDataChunk = ( char* ) alloca( unreadBytes );
+				usedAlloca=true;
+			}
+			else
+#endif
+				firstDataChunk = (char*) rakMalloc( unreadBytes );
+
+			// Read partLength bytes, reported to OnFileProgress
+
+			if (fileListReceiver->isCompressed)
+				fileListReceiver->tree.DecodeArray(&inBitStream, unreadBits, partLength, (unsigned char*) firstDataChunk);
+			else
+				inBitStream.Read((char*)firstDataChunk, unreadBytes );
+
+		}
+		else
+			firstDataChunk=0;
+
+		fileListReceiver->downloadHandler->OnFileProgress(&onFileStruct, partCount, partTotal, unreadBytes, firstDataChunk);
+
+		if (usedAlloca==false)
+			delete [] firstDataChunk;
+	}
 
 	return true;
 }

@@ -19,7 +19,6 @@
 #ifdef _WIN32
 #else
 #include <sys/time.h>
-#define closesocket close
 #include <unistd.h>
 #include <pthread.h>
 #endif
@@ -30,6 +29,14 @@
 #include "RakSleep.h"
 
 #ifdef _DO_PRINTF
+#endif
+
+#ifdef _WIN32
+#elif defined(_PS3)
+#define closesocket socketclose
+#else
+#define closesocket close
+#include <unistd.h>
 #endif
 
 RAK_THREAD_DECLARATION(UpdateTCPInterfaceLoop);
@@ -273,6 +280,8 @@ void TCPInterface::CloseConnection( SystemAddress systemAddress )
 }
 void TCPInterface::DeallocatePacket( Packet *packet )
 {
+	if (packet==0)
+		return;
 	assert(incomingMessages.CheckReadUnlockOrder(packet));
 	rakFree(packet->data);
 	incomingMessages.ReadUnlock();

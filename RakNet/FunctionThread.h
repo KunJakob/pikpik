@@ -21,6 +21,7 @@
 #include "SingleProducerConsumer.h"
 #include "ThreadPool.h"
 #include "RakMemoryOverride.h"
+#include "Export.h"
 
 namespace RakNet
 {
@@ -30,7 +31,7 @@ class Functor;
 
 /// FunctionThread takes a stream of classes that implement a processing function, processes them in a thread, and calls a callback with the result.
 /// It's a useful way to call blocking functions that you do not want to block, such as file writes and database operations.
-class FunctionThread : public RakNet::RakMemoryOverride
+class RAK_DLL_EXPORT FunctionThread : public RakNet::RakMemoryOverride
 {
 public:
 	FunctionThread();

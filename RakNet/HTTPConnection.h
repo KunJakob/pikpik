@@ -48,7 +48,8 @@ public:
 	/// \pre IsBusy()==false
     /// \param path the path on the remote server you want to POST to. For example "mywebpage/index.html"
     /// \param data A NULL terminated string to submit to the server
-    void Post(const char *path, const char *data);
+	/// \param contentType "Content-Type:" passed to post.
+    void Post(const char *path, const char *data, const char *_contentType="application/x-www-form-urlencoded");
     
     /// Get data returned by the HTTP server
     /// If IsFinished()==false then this may be empty or a partial
@@ -113,7 +114,7 @@ private:
 		RAK_HTTP_ESTABLISHED,
 		RAK_HTTP_REQUEST_SENT,
 		RAK_HTTP_IDLE } state;
-    RakNet::RakString outgoing, incoming, path;
+    RakNet::RakString outgoing, incoming, path, contentType;
     DataStructures::Queue<BadResponse> badResponses;
     void Process(Packet *packet); // the workhorse
     

@@ -21,11 +21,11 @@
 #include "RakNetTypes.h"
 #include "Export.h"
 #include "RakMemoryOverride.h"
+#include "NetworkIDObject.h"
 
-class NetworkIDObject;
 
 // O(1) instead of O(log2n) but takes more memory if less than 1/3 of the mappings are used.
-#define NETWORK_ID_USE_PTR_TABLE
+// #define NETWORK_ID_USE_PTR_TABLE
 
 /// \internal
 /// \brief A node in the AVL tree that holds the mapping between NetworkID and pointers.
@@ -83,11 +83,25 @@ public:
 
 	/// If you use a parent, returns this instance rather than the parent object.
 	/// \pre You must first call SetNetworkIDManager before using this function
-	void* GET_BASE_OBJECT_FROM_ID( NetworkID x );
+	NetworkIDObject* GET_BASE_OBJECT_FROM_ID( NetworkID x );
 
 	/// Returns the parent object, or this instance if you don't use a parent.
+	/// \depreciated, use the template form. This form requires that NetworkIDObject is the basemost derived class
 	/// \pre You must first call SetNetworkIDManager before using this function
 	void* GET_OBJECT_FROM_ID( NetworkID x );
+
+	/// Returns the parent object, or this instance if you don't use a parent.
+	/// Supports NetworkIDObject anywhere in the inheritance hierarchy
+	/// \pre You must first call SetNetworkIDManager before using this function
+	template <class returnType>
+	returnType GET_OBJECT_FROM_ID(NetworkID x) {
+		NetworkIDObject *nio = GET_BASE_OBJECT_FROM_ID(x);
+		if (nio==0)
+			return 0;
+		if (nio->GetParent())
+			return (returnType) nio->GetParent();
+		return (returnType) nio;
+	}
 
 protected:
 	SystemAddress externalSystemAddress;

@@ -48,8 +48,8 @@ void CMatchQuery::Reset()
 // =============================================================================
 void CMatchQuery::AddValue(const xchar* pKey, const xchar* pValue)
 {
-	xstring sKey = FormatString(pKey);
-	xstring sValue = FormatString(pValue);
+	xstring sKey = EncodeString(pKey);
+	xstring sValue = EncodeString(pValue);
 
 	if (sKey.length() && sValue.length())
 	{
@@ -84,9 +84,30 @@ void CMatchQuery::AddValue(const xchar* pKey, xint iValue)
 // =============================================================================
 // Nat Ryall                                                         02-Jul-2008
 // =============================================================================
-xstring CMatchQuery::FormatString(xstring sString)
+xstring CMatchQuery::EncodeString(xstring sString)
 {
-	return sString;
+	xstring sResult;
+
+	for (xuint iA = 0; iA < sString.length(); ++iA)
+	{
+		xchar cChar = sString[iA];
+
+		// Only numbers and letters are valid.
+		// 48-57  == '0'-'9'
+		// 65-90  == 'A'-'Z'
+		// 97-122 == 'a'-'z'
+		if ((cChar >= 48 && cChar <= 57) || (cChar >= 65 && cChar <= 90) || (cChar >= 97 && cChar <= 122))
+		{
+			sResult += cChar;
+		}
+		// Otherwise encode in a '%FF' format.
+		else
+		{
+			sResult += XFORMAT("%%%02X", cChar);
+		}
+	}
+
+	return sResult;
 }
 
 //##############################################################################
@@ -130,6 +151,7 @@ t_MatchResultError CMatchResult::ProcessResult(const xchar* pResult)
 		while (pToken)
 		{
 			xchar* pValue = strchr(pToken, '=');
+
 			*pValue = 0;
 			++pValue;
 
@@ -310,7 +332,7 @@ xbool CMatch::ListSessions(t_OnListSessionsCompleted fpCallback)
 		xQuery.AddValue("gid", _GID);
 		xQuery.AddValue("limit", MATCH_SESSION_LIMIT);
 
-		m_pHTTP->Post("/match.php?list", xQuery.GetQuery());
+		m_pHTTP->Post("/match.php?list", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
 
 		// Start the operation.
 		m_iOperation = MatchOperation_ListSessions;
@@ -353,7 +375,7 @@ CSession* CMatch::CreateSession(xint iTotalSlots, t_OnCreateSessionCompleted fpC
 		xQuery.AddValue("uslots", 1);
 		xQuery.AddValue("info", m_pSession->m_sInfo);
 
-		m_pHTTP->Post("/match.php?create", xQuery.GetQuery());
+		m_pHTTP->Post("/match.php?create", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
 
 		// Start the operation.
 		m_iOperation = MatchOperation_CreateSession;
@@ -383,7 +405,7 @@ xbool CMatch::PingSession(CSession* pSession, t_OnPingSessionCompleted fpCallbac
 		xQuery.AddValue("sid", pSession->m_sSessionID);
 		xQuery.AddValue("pass", pSession->m_sPassword);
 
-		m_pHTTP->Post("/match.php?ping", xQuery.GetQuery());
+		m_pHTTP->Post("/match.php?ping", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
 
 		// Start the operation.
 		m_pSession = pSession;
@@ -417,7 +439,7 @@ xbool CMatch::UpdateSession(CSession* pSession, t_OnUpdateSessionCompleted fpCal
 		xQuery.AddValue("uslots", pSession->m_iTotalSlots);
 		xQuery.AddValue("info", pSession->m_sInfo);
 
-		m_pHTTP->Post("/match.php?update", xQuery.GetQuery());
+		m_pHTTP->Post("/match.php?update", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
 
 		// Start the operation.
 		m_pSession = pSession;
@@ -448,7 +470,7 @@ xbool CMatch::CloseSession(CSession* pSession, t_OnCloseSessionCompleted fpCallb
 		xQuery.AddValue("sid", pSession->m_sSessionID);
 		xQuery.AddValue("pass", pSession->m_sPassword);
 
-		m_pHTTP->Post("/match.php?close", xQuery.GetQuery());
+		m_pHTTP->Post("/match.php?close", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
 
 		// Start the operation.
 		pSession->m_iStatus = SessionStatus_Closing;

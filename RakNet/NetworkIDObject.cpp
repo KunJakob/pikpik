@@ -18,6 +18,10 @@
 #include "NetworkIDManager.h"
 #include "RakAssert.h"
 
+#if !defined (_WIN32) && !defined (_XBOX360)
+#include <alloca.h>
+#endif
+
 unsigned int NetworkIDObject::nextAllocationNumber=0;
 
 //////////////////////////////////////////////////////////////////////

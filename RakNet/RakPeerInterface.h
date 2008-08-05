@@ -88,7 +88,8 @@ public:
 
 	/// Sets how many incoming connections are allowed. If this is less than the number of players currently connected,
 	/// no more players will be allowed to connect.  If this is greater than the maximum number of peers allowed,
-	/// it will be reduced to the maximum number of peers allowed.  Defaults to 0.
+	/// it will be reduced to the maximum number of peers allowed.
+	/// Defaults to 0, meaning by default, nobody can connect to you
 	/// \param[in] numberAllowed Maximum number of incoming connections allowed.
 	virtual void SetMaximumIncomingConnections( unsigned short numberAllowed )=0;
 
@@ -282,8 +283,9 @@ public:
 	/// Returns if a particular systemAddress is connected to us (this also returns true if we are in the process of connecting)
 	/// \param[in] systemAddress The SystemAddress we are referring to
 	/// \param[in] includeInProgress If true, also return true for connections that are in progress but haven't completed
+	/// \param[in] includeDisconnecting If true, also return true for connections that are in the process of disconnecting
 	/// \return True if this system is connected and active, false otherwise.
-	virtual bool IsConnected(const SystemAddress systemAddress, bool includeInProgress=false)=0;
+	virtual bool IsConnected(const SystemAddress systemAddress, bool includeInProgress=false, bool includeDisconnecting=false)=0;
 
 	/// Given a systemAddress, returns an index from 0 to the maximum number of players allowed - 1.
 	/// \param[in] systemAddress The SystemAddress we are referring to

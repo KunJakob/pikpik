@@ -8,10 +8,9 @@
 
 #if (defined(__GNUC__)  || defined(__GCCXML__)) && !defined(__WIN32)
 
-#include <sys/types.h>
 #include <dirent.h>
-#include <string.h>
-#include <stdio.h>
+
+#include "RakString.h"
 
 #define _A_NORMAL 		0x00 		// Normal file
 #define _A_RDONLY 		0x01 		// Read-only file
@@ -28,9 +27,12 @@
 #define FA_DIREC 			0x10 		// Synonym of _A_SUBDIR
 #define FA_ARCH 			0x20 		// Synonym of _A_ARCH
 
+
+const unsigned STRING_BUFFER_SIZE = 512;
+
 typedef struct _finddata_t
 {
-	char            name[260];
+	char            name[STRING_BUFFER_SIZE];
 	int            attrib;
 	unsigned long   size;
 } _finddata;
@@ -40,7 +42,8 @@ typedef struct _finddata_t
 typedef struct _findinfo_t
 {
 	DIR*	openedDir;
-	char	filter[260];
+	RakNet::RakString filter;    
+	RakNet::RakString dirName;
 } _findinfo;
 
 long _findfirst(const char *name, _finddata_t *f);

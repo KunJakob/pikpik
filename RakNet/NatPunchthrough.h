@@ -160,7 +160,7 @@ protected:
 	void OnConnectAtTime(RakPeerInterface *peer, Packet *packet);
 	void OnSendOfflineMessageAtTime(RakPeerInterface *peer, Packet *packet);
 	void RemoveRequestByFacilitator(SystemAddress systemAddress);
-	void LogOut(char *l);
+	void LogOut(const char *l);
 	PluginReceiveResult OnConnectionAttemptFailed(Packet *packet);
 	PluginReceiveResult OnNewIncomingConnection(Packet *packet);
 	PluginReceiveResult OnConnectionRequestAccepted(Packet *packet);

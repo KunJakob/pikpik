@@ -159,6 +159,9 @@ public:
 	// If true, will update time between packets quickly based on ping calculations
 	//void SetDoFastThroughputReactions(bool fast);
 
+	// Encoded as numMessages[unsigned int], message1BitLength[unsigned int], message1Data (aligned), ...
+	//void GetUndeliveredMessages(RakNet::BitStream *messages, int MTUSize);
+
 private:
 
 	/// Generates a datagram (coalesced packets)
@@ -289,7 +292,7 @@ private:
 	
 	DataStructures::Queue<InternalPacket*> sendPacketSet[ NUMBER_OF_PRIORITIES ];
     DataStructures::OrderedList<SplitPacketIdType, SplitPacketChannel*, SplitPacketChannelComp> splitPacketChannelList;
-	MessageNumberType sendMessageNumberIndex;
+	MessageNumberType sendMessageNumberIndex, internalOrderIndex;
 	//unsigned int windowSize;
 	RakNetTimeNS lastAckTime;
 	RakNet::BitStream updateBitStream;

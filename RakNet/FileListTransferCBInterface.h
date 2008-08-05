@@ -59,11 +59,17 @@ public:
 	/// Got part of a big file.
 	/// You can get these notifications by calling RakPeer::SetSplitMessageProgressInterval
 	/// Otherwise you will only get complete files.
-	virtual void OnFileProgress(OnFileStruct *onFileStruct,unsigned int partCount,unsigned int partTotal,unsigned int partLength) {
+	/// \param[in] onFileStruct General information about this file, such as the filename and the first \a partLength bytes. You do NOT need to save this data yourself. The complete file will arrive normally.
+	/// \param[in] partCount The zero based index into partTotal. The percentage complete done of this file is 100 * (partCount+1)/partTotal
+	/// \param[in] partTotal The total number of parts this file was split into. Each part will be roughly the MTU size, minus the UDP header and RakNet headers
+	/// \param[in] partLength How many bytes long firstDataChunk is
+	/// \param[in] firstDataChunk The first \a partLength of the final file. If you store identifying information about the file in the first \a partLength bytes, you can read them while the download is taking place. If this hasn't arrived yet, firstDataChunk will be 0
+	virtual void OnFileProgress(OnFileStruct *onFileStruct,unsigned int partCount,unsigned int partTotal,unsigned int partLength, char *firstDataChunk) {
 		(void) onFileStruct;
 		(void) partCount;
 		(void) partTotal;
 		(void) partLength;
+		(void) firstDataChunk;
 	}
 
 	/// Called while the handler is active by FileListTransfer

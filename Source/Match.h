@@ -29,6 +29,9 @@
 // Singleton accessor.
 #define Match CMatch::Get()
 
+// The matchmaking query encoding type.
+#define MATCH_ENCODING_TYPE "application/x-www-form-urlencoded"
+
 // Query & result headers.
 #define MATCH_QUERY_HEADER "match://"
 #define MATCH_RESULT_HEADER "result://"
@@ -126,7 +129,7 @@ public:
 
 protected:
 	// Format the string to remove any unsafe characters.
-	xstring FormatString(xstring sString);
+	xstring EncodeString(xstring sString);
 
 	// The final formatted query to be sent.
 	xstring m_sQuery;

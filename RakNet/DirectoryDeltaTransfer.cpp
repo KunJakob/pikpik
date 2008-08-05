@@ -38,7 +38,7 @@ public:
 		return onFileCallback->OnFile(onFileStruct);
 	}
 
-	virtual void OnFileProgress(OnFileStruct *onFileStruct,unsigned int partCount,unsigned int partTotal,unsigned int partLength)
+	virtual void OnFileProgress(OnFileStruct *onFileStruct,unsigned int partCount,unsigned int partTotal,unsigned int partLength, char *firstDataChunk)
 	{
 		char fullPathToDir[1024];
 
@@ -50,7 +50,7 @@ public:
 		else
 			fullPathToDir[0]=0;
 
-		onFileCallback->OnFileProgress(onFileStruct, partCount, partTotal, partLength);
+		onFileCallback->OnFileProgress(onFileStruct, partCount, partTotal, partLength, firstDataChunk);
 	}
 	virtual bool OnDownloadComplete(void)
 	{
@@ -101,13 +101,14 @@ void DirectoryDeltaTransfer::AddUploadsFromSubdirectory(const char *subdir)
 {
 	availableUploads->AddFilesFromDirectory(applicationDirectory, subdir, true, false, true, 0);
 }
-unsigned short DirectoryDeltaTransfer::DownloadFromSubdirectory(const char *subdir, const char *outputSubdir, bool prependAppDirToOutputSubdir, SystemAddress host, FileListTransferCBInterface *onFileCallback, PacketPriority _priority, char _orderingChannel)
+unsigned short DirectoryDeltaTransfer::DownloadFromSubdirectory(const char *subdir, const char *outputSubdir, bool prependAppDirToOutputSubdir, SystemAddress host, FileListTransferCBInterface *onFileCallback, PacketPriority _priority, char _orderingChannel, FileListProgress *cb)
 {
 	if (rakPeer->IsConnected(host)==false)
 		return (unsigned short) -1;
 
 	DDTCallback *transferCallback;
 	FileList localFiles;
+	localFiles.SetCallback(cb);
 	// Get a hash of all the files that we already have (if any)
 	localFiles.AddFilesFromDirectory(prependAppDirToOutputSubdir ? applicationDirectory : 0, outputSubdir, true, false, true, 0);
 

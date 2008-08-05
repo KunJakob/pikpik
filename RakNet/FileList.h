@@ -158,6 +158,8 @@ public:
 
 	// Here so you can read it, but don't modify it
 	DataStructures::List<FileListNode> fileList;
+
+	static bool FixEndingSlash(char *str);
 protected:
 	FileListProgress *callback;
 };

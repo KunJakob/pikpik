@@ -56,7 +56,7 @@ NetworkIDNode::NetworkIDNode( NetworkID _networkID, NetworkIDObject *_object )
 
 
 //-------------------------------------------------------------------------------------
-void* NetworkIDManager::GET_BASE_OBJECT_FROM_ID( NetworkID x )
+NetworkIDObject* NetworkIDManager::GET_BASE_OBJECT_FROM_ID( NetworkID x )
 {
 	if ( x == UNASSIGNED_NETWORK_ID )
 		return 0;
@@ -86,7 +86,7 @@ void* NetworkIDManager::GET_OBJECT_FROM_ID( NetworkID x )
 	if (x.localSystemAddress==65535)
 		return 0;
 
-	// You can't use this technique in peer to peer mode.  Undefine NETWORK_ID_USE_HASH in NetworkIDManager.h
+	// You can't use this technique in peer to peer mode.  Undefine NETWORK_ID_USE_PTR_TABLE in NetworkIDManager.h
 	assert(NetworkID::peerToPeerMode==false);
 	if (IDArray[x.localSystemAddress])
 	{
@@ -134,7 +134,7 @@ NetworkIDManager::NetworkIDManager(void)
 	// Last element is reserved for UNASSIGNED_NETWORK_ID
 	IDArray = (NetworkIDObject**) rakMalloc(sizeof(NetworkIDObject*) * 65534);
 	memset(IDArray,0,sizeof(NetworkIDObject*)*65534);
-	// You can't use this technique in peer to peer mode.  Undefine NETWORK_ID_USE_HASH in NetworkIDManager.h
+	// You can't use this technique in peer to peer mode.  Undefine NETWORK_ID_USE_PTR_TABLE in NetworkIDManager.h
 	assert(NetworkID::peerToPeerMode==false);
 #endif
 }

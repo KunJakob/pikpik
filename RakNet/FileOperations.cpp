@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include "_FindFirst.h"
 #endif
+#include "errno.h"
 
 #ifdef _MSC_VER
 #pragma warning( push )
@@ -25,43 +26,43 @@ bool WriteFileWithDirectories( const char *path, char *data, unsigned dataLength
 	int index;
 	FILE *fp;
 	char *pathCopy;
-#ifndef _WIN32
-
-	char *systemCommand;
-#endif
+	int res;
 
 	if ( path == 0 || path[ 0 ] == 0 )
 		return false;
-
-#ifndef _WIN32
-
-	systemCommand = (char*) rakMalloc( strlen( path ) + 1 + 6 );
-
-#endif
 
 	pathCopy = (char*) rakMalloc( strlen( path ) + 1 );
 
 	strcpy( pathCopy, path );
 
-	index = 0;
-
-	while ( pathCopy[ index ] )
+	// Ignore first / if there is one
+	if (pathCopy[0])
 	{
-		if ( pathCopy[ index ] == '/' || pathCopy[ index ] == '\\')
+		index = 1;
+		while ( pathCopy[ index ] )
 		{
-			pathCopy[ index ] = 0;
-#ifdef _WIN32
-#pragma warning( disable : 4996 ) // mkdir declared depreciated by Microsoft in order to make it harder to be cross platform.  I don't agree it's depreciated.
-			mkdir( pathCopy );
-#else
-
-			mkdir( pathCopy, 0744 );
-#endif
-
-			pathCopy[ index ] = '/';
+			if ( pathCopy[ index ] == '/' || pathCopy[ index ] == '\\')
+			{
+				pathCopy[ index ] = 0;
+	
+	#ifdef _WIN32
+	#pragma warning( disable : 4966 ) // mkdir declared depreciated by Microsoft in order to make it harder to be cross platform.  I don't agree it's depreciated.
+				res = mkdir( pathCopy );
+	#else
+	
+				res = mkdir( pathCopy, 0744 );
+	#endif
+				if (res<0 && errno!=EEXIST)
+				{
+					rakFree(pathCopy);
+					return false;
+				}
+	
+				pathCopy[ index ] = '/';
+			}
+	
+			index++;
 		}
-
-		index++;
 	}
 
 	if (data)
@@ -71,9 +72,6 @@ bool WriteFileWithDirectories( const char *path, char *data, unsigned dataLength
 		if ( fp == 0 )
 		{
 			rakFree(pathCopy);
-#ifndef _WIN32
-			rakFree(systemCommand);
-#endif
 			return false;
 		}
 
@@ -85,17 +83,19 @@ bool WriteFileWithDirectories( const char *path, char *data, unsigned dataLength
 	{
 #ifdef _WIN32
 #pragma warning( disable : 4966 ) // mkdir declared depreciated by Microsoft in order to make it harder to be cross platform.  I don't agree it's depreciated.
-		mkdir( pathCopy );
+		res = mkdir( pathCopy );
 #else
-		mkdir( pathCopy, 0744 );
+		res = mkdir( pathCopy, 0744 );
 #endif
+
+		if (res<0 && errno!=EEXIST)
+		{
+			rakFree(pathCopy);
+			return false;
+		}
 	}
 
 	rakFree(pathCopy);
-#ifndef _WIN32
-	rakFree(systemCommand);
-#endif
-
 
 	return true;
 }
@@ -157,4 +157,5 @@ void QuoteIfSpaces(char *str)
 #ifdef _MSC_VER
 #pragma warning( pop )
 #endif
+
 

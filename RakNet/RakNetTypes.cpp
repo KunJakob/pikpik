@@ -71,7 +71,7 @@ bool SystemAddress::operator<( const SystemAddress& right ) const
 {
 	return ( ( binaryAddress < right.binaryAddress ) || ( ( binaryAddress == right.binaryAddress ) && ( port < right.port ) ) );
 }
-char *SystemAddress::ToString(bool writePort) const
+const char *SystemAddress::ToString(bool writePort) const
 {
 	if (*this==UNASSIGNED_SYSTEM_ADDRESS)
 		return "UNASSIGNED_SYSTEM_ADDRESS";
@@ -103,7 +103,7 @@ char *SystemAddress::ToString(bool writePort) const
 #endif
 void SystemAddress::SetBinaryAddress(const char *str)
 {
-	if (str[0]<'0' || str[0]>'2')
+	if (str[0]<'0' || str[0]>'9')
 	{
 #if !defined(_XBOX360)
 		const char *ip = ( char* ) SocketLayer::Instance()->DomainNameToIP( str );

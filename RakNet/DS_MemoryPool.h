@@ -44,6 +44,10 @@ namespace DataStructures
 		MemoryBlockType *Allocate(void);
 		void Release(MemoryBlockType *m);
 		void Clear(void);
+
+		int GetAvailablePagesSize(void) const {return availablePagesSize;}
+		int GetUnavailablePagesSize(void) const {return unavailablePagesSize;}
+		int GetMemoryPoolPageSize(void) const {return memoryPoolPageSize;}
 	protected:
 		int BlocksPerPage(void) const;
 		void AllocateFirst(void);

@@ -72,11 +72,16 @@ public:
 	/// \return A new socket used for communication.
 	SOCKET Connect( SOCKET writeSocket, unsigned int binaryAddress, unsigned short port );
 	
-	// Creates a bound socket to listen for incoming connections on the specified port
+	/// Creates a bound socket to listen for incoming connections on the specified port
 	/// \param[in] port the port number 
 	/// \param[in] blockingSocket 
 	/// \return A new socket used for accepting clients 
 	SOCKET CreateBoundSocket( unsigned short port, bool blockingSocket, const char *forceHostAddress );
+
+	/// Returns if this specified port is in use, for UDP
+	/// \param[in] port the port number 
+	/// \return If this port is already in use
+	static bool IsPortInUse(unsigned short port);
 
 	#if !defined(_XBOX360)
 	const char* DomainNameToIP( const char *domainName );
@@ -115,7 +120,7 @@ public:
 	/// \param[in] ip The address of the remote host in dotted notation.
 	/// \param[in] port The port number to send to.
 	/// \return 0 on success, nonzero on failure.
-	int SendTo( SOCKET s, const char *data, int length, char ip[ 16 ], unsigned short port );
+	int SendTo( SOCKET s, const char *data, int length, const char ip[ 16 ], unsigned short port );
 
 	/// Call sendto (UDP obviously)
 	/// It won't reach the recipient, except on a LAN
@@ -127,7 +132,7 @@ public:
 	/// \param[in] port The port number to send to.
 	/// \param[in] ttl Max hops of datagram
 	/// \return 0 on success, nonzero on failure.
-	int SendToTTL( SOCKET s, const char *data, int length, char ip[ 16 ], unsigned short port, int ttl );
+	int SendToTTL( SOCKET s, const char *data, int length, const char ip[ 16 ], unsigned short port, int ttl );
 
 	/// Call sendto (UDP obviously)
 	/// \param[in] s the socket

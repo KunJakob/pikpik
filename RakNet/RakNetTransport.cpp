@@ -6,10 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-
-#if (defined(__GNUC__)  || defined(__GCCXML__))
-#define _vsnprintf vsnprintf
-#endif
+#include "LinuxStrings.h"
 
 #ifdef _MSC_VER
 #pragma warning( push )

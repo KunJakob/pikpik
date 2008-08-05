@@ -1,4 +1,4 @@
-#define RAKNET_VERSION "3.23"
+#define RAKNET_VERSION "3.25"
 
 #define RAKNET_REVISION "$Revision$"
 

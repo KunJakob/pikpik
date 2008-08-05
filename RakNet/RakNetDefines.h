@@ -38,3 +38,7 @@
 /// Note that OpenSSL carries its own license restrictions that you should be aware of. If you don't agree, don't enable this define
 /// This also requires that you enable header search paths to DependentExtensions\openssl-0.9.8g
 /// #define OPEN_SSL_CLIENT_SUPPORT
+
+/// Threshold at which to do a malloc / free rather than pushing data onto a fixed stack for the bitstream class
+/// Arbitrary size, just picking something likely to be larger than most packets
+#define BITSTREAM_STACK_ALLOCATION_SIZE 1024

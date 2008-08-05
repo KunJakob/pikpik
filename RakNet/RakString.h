@@ -3,15 +3,14 @@
 
 #include "Export.h"
 #include "DS_List.h"
+#include "RakNetTypes.h" // int64_t
 #include <stdio.h>
-#include <stdarg.h>
-
-#if defined(__GNUC__)
-#define _vsnprintf vsnprintf
-#endif
 
 namespace RakNet
 {
+
+class BitStream;
+
 /// \brief String class
 /// Has the following improvements over std::string
 /// Reference counting: Suitable to store in lists
@@ -24,24 +23,8 @@ public:
 	RakString();
 	RakString(char input);
 	RakString(unsigned char input);
-	RakString(const unsigned char *format, ...){
-		char text[8096];
-		va_list ap;
-		va_start(ap, format);
-		_vsnprintf(text, 8096, (const char*) format, ap);
-		va_end(ap);
-		text[8096-1]=0;
-		Assign(text);
-	}
-	RakString(const char *format, ...){
-		char text[8096];
-		va_list ap;
-		va_start(ap, format);
-		_vsnprintf(text, 8096, format, ap);
-		va_end(ap);
-		text[8096-1]=0;
-		Assign(text);
-	}
+	RakString(const unsigned char *format, ...);
+	RakString(const char *format, ...);
 	~RakString();
 	RakString( const RakString & rhs);
 
@@ -55,11 +38,13 @@ public:
 	RakString& operator = ( const RakString& rhs );
 	RakString& operator = ( const char *str );
 	RakString& operator = ( char *str );
+	RakString& operator = ( const char c );
 
 	/// Concatenation
 	RakString& operator +=( const RakString& rhs);
 	RakString& operator += ( const char *str );
 	RakString& operator += ( char *str );
+	RakString& operator += ( const char c );
 
 	/// Character index. Do not use to change the string however.
 	unsigned char operator[] ( const unsigned int position ) const;
@@ -110,7 +95,52 @@ public:
 
 	/// Does the given IP address match the IP address encoded into this string, accounting for wildcards?
 	bool IPAddressMatch(const char *IP);
-	
+
+	/// URL Encode the string. See http://www.codeguru.com/cpp/cpp/cpp_mfc/article.php/c4029/
+	void URLEncode(void);
+
+	/// RakString uses a freeList of old no-longer used strings
+	/// Call this function to clear this memory on shutdown
+	static void FreeMemory(void);
+
+	/// Serialize to a bitstream, uncompressed (slightly faster)
+	/// \param[out] bs Bitstream to serialize to
+	void Serialize(BitStream *bs);
+
+	/// Static version of the Serialize function
+	static void Serialize(const char *str, BitStream *bs);
+
+	/// Serialize to a bitstream, compressed (better bandwidth usage)
+	/// \param[out]  bs Bitstream to serialize to
+	/// \param[in] languageId languageId to pass to the StringCompressor class
+	/// \param[in] writeLanguageId encode the languageId variable in the stream. If false, 0 is assumed, and DeserializeCompressed will not look for this variable in the stream (saves bandwidth)
+	/// \pre StringCompressor::AddReference must have been called to instantiate the class (Happens automatically from RakPeer::Startup())
+	void SerializeCompressed(BitStream *bs, int languageId=0, bool writeLanguageId=false);
+
+	/// Static version of the SerializeCompressed function
+	static void SerializeCompressed(const char *str, BitStream *bs, int languageId=0, bool writeLanguageId=false);
+
+	/// Deserialize what was written by Serialize
+	/// \param[in] bs Bitstream to serialize from
+	/// \return true if the deserialization was successful
+	bool Deserialize(BitStream *bs);
+
+	/// Static version of the Deserialize() function
+	static bool Deserialize(char *str, BitStream *bs);
+
+	/// Deserialize compressed string, written by SerializeCompressed
+	/// \param[in] bs Bitstream to serialize from
+	/// \param[in] readLanguageId If true, looks for the variable langaugeId in the data stream. Must match what was passed to SerializeCompressed
+	/// \return true if the deserialization was successful
+	/// \pre StringCompressor::AddReference must have been called to instantiate the class (Happens automatically from RakPeer::Startup())
+	bool DeserializeCompressed(BitStream *bs, bool readLanguageId=false);
+
+	/// Static version of the DeserializeCompressed() function
+	static bool DeserializeCompressed(char *str, BitStream *bs, bool readLanguageId=false);
+
+	static const char *ToString(int64_t i);
+	static const char *ToString(uint64_t i);
+
 	/// \internal
 	static size_t GetSizeToAllocate(size_t bytes)
 	{
@@ -155,6 +185,7 @@ public:
 	static int RakStringComp( RakString const &key, RakString const &data );
 
 protected:
+	void Allocate(size_t len);
 	void Assign(const char *str);
 	void Clone(void);
 	void Free(void);

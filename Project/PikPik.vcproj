@@ -938,6 +938,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\RakNet\InlineFunctor.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\RakNet\InlineFunctor.h"
+					>
+				</File>
+				<File
 					RelativePath="..\RakNet\InternalPacket.h"
 					>
 				</File>
@@ -947,6 +955,10 @@
 				</File>
 				<File
 					RelativePath="..\RakNet\Itoa.h"
+					>
+				</File>
+				<File
+					RelativePath="..\RakNet\Kbhit.h"
 					>
 				</File>
 				<File

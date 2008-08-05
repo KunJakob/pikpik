@@ -32,6 +32,7 @@ struct InternalPacket;
 struct DownloadRequest;
 class FileListTransfer;
 class FileListTransferCBInterface;
+class FileListProgress;
 
 /// \defgroup DIRECTORY_DELTA_TRANSFER_GROUP DirectoryDeltaTransfer
 /// \ingroup PLUGINS_GROUP
@@ -93,8 +94,9 @@ public:
 	/// \param[in] onFileCallback Callback to call per-file (optional).  When fileIndex+1==setCount in the callback then the download is done
 	/// \param[in] _priority See RakPeerInterface::Send()
 	/// \param[in] _orderingChannel See RakPeerInterface::Send()
+	/// \param[in] cb Callback to get progress updates. Pass 0 to not use.
 	/// \return A set ID, identifying this download set.  Returns 65535 on host unreachable.
-	unsigned short DownloadFromSubdirectory(const char *subdir, const char *outputSubdir, bool prependAppDirToOutputSubdir, SystemAddress host, FileListTransferCBInterface *onFileCallback, PacketPriority _priority, char _orderingChannel);
+	unsigned short DownloadFromSubdirectory(const char *subdir, const char *outputSubdir, bool prependAppDirToOutputSubdir, SystemAddress host, FileListTransferCBInterface *onFileCallback, PacketPriority _priority, char _orderingChannel, FileListProgress *cb);
 
 	/// Clear all allowed uploads previously set with AddUploadsFromSubdirectory
 	void ClearUploads(void);

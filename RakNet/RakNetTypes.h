@@ -47,17 +47,7 @@ typedef unsigned char MessageID;
 
 typedef unsigned int BitSize_t;
 
-#ifdef _STDINT_H
-// top tip: these types are mandated to be two's a compliment, so bitops work on them
-typedef ::uint8_t             uint8_t;
-typedef ::uint16_t            uint16_t;
-typedef ::uint32_t            uint32_t;
-typedef ::uint64_t            uint64_t;
-typedef ::int8_t             int8_t;
-typedef ::int16_t            int16_t;
-typedef ::int32_t            int32_t;
-typedef ::int64_t            int64_t;
-#else
+#ifndef _STDINT_H
 typedef unsigned char         uint8_t;
 typedef unsigned short        uint16_t;
 typedef unsigned int          uint32_t;
@@ -108,7 +98,7 @@ struct RAK_DLL_EXPORT SystemAddress
 
 	// Return the systemAddress as a string in the format <IP>:<Port>
 	// Note - returns a static string.  Not thread-safe or safe for multiple calls per line.
-	char *ToString(bool writePort=true) const;
+	const char *ToString(bool writePort=true) const;
 
 	// Sets the binary address part from a string.  Doesn't set the port
 	void SetBinaryAddress(const char *str);

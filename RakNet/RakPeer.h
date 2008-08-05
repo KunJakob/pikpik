@@ -96,7 +96,8 @@ public:
 
 	/// Sets how many incoming connections are allowed. If this is less than the number of players currently connected,
 	/// no more players will be allowed to connect.  If this is greater than the maximum number of peers allowed,
-	/// it will be reduced to the maximum number of peers allowed.  Defaults to 0.
+	/// it will be reduced to the maximum number of peers allowed.
+	/// Defaults to 0, meaning by default, nobody can connect to you
 	/// \param[in] numberAllowed Maximum number of incoming connections allowed.
 	void SetMaximumIncomingConnections( unsigned short numberAllowed );
 
@@ -290,8 +291,9 @@ public:
 	/// Returns if a particular systemAddress is connected to us (this also returns true if we are in the process of connecting)
 	/// \param[in] systemAddress The SystemAddress we are referring to
 	/// \param[in] includeInProgress If true, also return true for connections that are in progress but haven't completed
+	/// \param[in] includeDisconnecting If true, also return true for connections that are in the process of disconnecting
 	/// \return True if this system is connected and active, false otherwise.
-	bool IsConnected(const SystemAddress systemAddress, bool includeInProgress=false);
+	bool IsConnected(const SystemAddress systemAddress, bool includeInProgress=false, bool includeDisconnecting=false);
 
 	/// Given a systemAddress, returns an index from 0 to the maximum number of players allowed - 1.
 	/// This includes systems which were formerly connected, but are not now connected
@@ -757,7 +759,10 @@ protected:
 	//DataStructures::List<DataStructures::List<MemoryBlock>* > automaticVariableSynchronizationList;
 	DataStructures::List<BanStruct*> banList;
 	DataStructures::List<PluginInterface*> messageHandlerList;
-	DataStructures::SingleProducerConsumer<RequestedConnectionStruct> requestedConnectionList;
+	// DataStructures::SingleProducerConsumer<RequestedConnectionStruct> requestedConnectionList;
+
+	DataStructures::Queue<RequestedConnectionStruct*> requestedConnectionQueue;
+	SimpleMutex requestedConnectionQueueMutex;
 
 	/// Compression stuff
 	unsigned int frequencyTable[ 256 ];
@@ -783,7 +788,7 @@ protected:
 		NetworkID networkID;
 		bool blockingCommand; // Only used for RPC
 		char *data;
-		enum {BCS_SEND, BCS_CLOSE_CONNECTION, /*BCS_RPC, BCS_RPC_SHIFT,*/ BCS_DO_NOTHING} command;
+		enum {BCS_SEND, BCS_CLOSE_CONNECTION, BCS_CANCEL_CONNECTION_ATTEMPT, /*BCS_RPC, BCS_RPC_SHIFT,*/ BCS_DO_NOTHING} command;
 	};
 
 	// Single producer single consumer queue using a linked list
@@ -857,6 +862,7 @@ protected:
 	/// True to allow connection accepted packets from anyone.  False to only allow these packets from servers we requested a connection to.
 	bool allowConnectionResponseIPMigration;
 
+	SystemAddress firstExternalID;
 	int splitMessageProgressInterval;
 	RakNetTime unreliableTimeout;
 #if defined(_PS3)
@@ -867,8 +873,11 @@ protected:
 	// immediately while waiting on blocked RPCs
 	DataStructures::SingleProducerConsumer<Packet*> packetSingleProducerConsumer;
 	//DataStructures::Queue<Packet*> pushedBackPacket, outOfOrderDeallocatedPacket;
+	// A free-list of packets, to reduce memory fragmentation
 	DataStructures::Queue<Packet*> packetPool;
+	// Used for object lookup for RPC (actually depreciated, since RPC is depreciated)
 	NetworkIDManager *networkIDManager;
+	// Systems in this list will not go through the secure connection process, even when secure connections are turned on. Wildcards are accepted.
 	DataStructures::List<RakNet::RakString> securityExceptionList;
 
 };

@@ -759,7 +759,7 @@ void NatPunchthrough::OnSendOfflineMessageAtTime(RakPeerInterface *peer, Packet 
 	rakPeer->SendTTL(senderAddrWithIPort.ToString(false), senderAddrWithIPort.port, false);
 	*/
 }
-void NatPunchthrough::LogOut(char *l)
+void NatPunchthrough::LogOut(const char *l)
 {
 	if (log)
 		log->OnMessage(l);
@@ -777,6 +777,10 @@ void NatPunchthrough::ConnectionRequest::GetAddressList(RakPeerInterface *rakPee
 	fallback.port=publicAddress.port;
 	if (excludeConnected==false || rakPeer->IsConnected(fallback,true)==false)
 		fallbackAddresses.Insert(fallback);
+
+	if (privateAddress!=publicAddress && privateAddress!=UNASSIGNED_SYSTEM_ADDRESS && (excludeConnected==false ||rakPeer->IsConnected(privateAddress,true)==false))
+		fallbackAddresses.Insert(privateAddress);
+
 	fallback.port=publicAddress.port+1;
 	if (excludeConnected==false || rakPeer->IsConnected(fallback,true)==false)
 		fallbackAddresses.Insert(fallback);
@@ -811,8 +815,6 @@ void NatPunchthrough::ConnectionRequest::GetAddressList(RakPeerInterface *rakPee
 		fallbackAddresses.Insert(fallback);
 		*/
 
-	if (privateAddress!=publicAddress && privateAddress!=UNASSIGNED_SYSTEM_ADDRESS && (excludeConnected==false ||rakPeer->IsConnected(privateAddress,true)==false))
-		fallbackAddresses.Insert(privateAddress);
 }
 
 #ifdef _MSC_VER

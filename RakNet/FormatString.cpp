@@ -2,10 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-
-#if defined(__GNUC__)
-#define _vsnprintf vsnprintf
-#endif
+#include "LinuxStrings.h"
 
 char * FormatString(const char *format, ...)
 {
