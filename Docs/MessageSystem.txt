@@ -1,0 +1,19 @@
+Client:
+
+	Send(NULL):		Send to the host.
+	Send(X):		Send to the 'X' via. host.
+	Broadcast(NULL):	Send to all clients via. host.
+	Broadcast(X):		Send to all clients except 'X' via. host.
+
+	- Clients always send to the host.
+	- If BROADCAST == true, have the host broadcast to all except the specified peer.
+
+Host:
+
+	Send(NULL):		Invalid.
+	Send(X):		Send to 'X'.
+	Broadcast(NULL):	Send to all clients.
+	Broadcast(X):		Send to all clients except 'X'.
+
+	- Always performs a direct send.
+	- No need for BROADCAST param.
