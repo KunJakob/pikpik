@@ -44,8 +44,8 @@ class CNetworkPeer;
 // The custom RakNet message identifiers.
 enum
 {
-	ID_DATA_PACKET = ID_USER_PACKET_ENUM,
-	ID_DATA_PACKET_BROADCAST,
+	ID_DATA_STREAM = ID_USER_PACKET_ENUM,
+	ID_DATA_STREAM_RELAY,
 	ID_VERIFICATION_REQUEST,
 	ID_VERIFICATION_SUCCEEDED,
 	ID_PEER_JOINED,
@@ -114,10 +114,10 @@ public:
 	void UnbindReceiveCallback(xuchar cType);
 
 	// Send a data packet to a remote peer. "pTo" is the peer to send to when sending from the host and is ignored otherwise.
-	xbool Send(CNetworkPeer* pTo, xuchar cType, BitStream* pStream, PacketPriority iPriority, PacketReliability iReliability, xchar iChannel = 2);
+	xbool Send(CNetworkPeer* pTo, xint iStreamType, BitStream* pStream, PacketPriority iPriority, PacketReliability iReliability, xchar iChannel = 2);
 
 	// Send a data packet to all remote peers (via the host if we are a client).
-	xbool Broadcast(CNetworkPeer* pIgnore, xuchar cType, BitStream* pStream, PacketPriority iPriority, PacketReliability iReliability, xchar iChannel = 2);
+	xbool Broadcast(CNetworkPeer* pIgnore, xint iStreamType, BitStream* pStream, PacketPriority iPriority, PacketReliability iReliability, xchar iChannel = 2);
 
 	// Initialise the network system as a host.
 	void StartHost(xint iMaxPeers, xint iPort, void* pCustomInfo = NULL, xint iCustomInfoSize = 0);
@@ -236,14 +236,11 @@ public:
 	CNetworkCallbacks m_xCallbacks;
 
 protected:
-	// Execute the send.
-	//xbool InternalSend(xint iPacketID, CNetworkPeer* pFrom, CNetworkPeer* pTarget, xuchar cType, BitStream* pStream, PacketPriority iPriority, PacketReliability iReliability, xchar iChannel);
-
 	// Make a standard data packet that will be going directly to the destination.
-	void FormatDataStream(BitStream& xStream, xint iPacketID, xint iFromID, xint iTargetID, xint iStreamType);
+	BitStream* CreateManagedStream(xint iPacketType, xint iFrom, xint iTo, xint iStreamType, BitStream* pStream);
 
 	// Make a standard data packet that will be relayed on the host.
-	void FormatDataStream(BitStream& xStream, xint iPacketID, xint iFromID, xint iTargetID, xint iStreamType, xint iPriority, xint iReliability, xint iChannel);
+	BitStream* CreateManagedStream(xint iPacketType, xint iFrom, xint iTo, xint iStreamType, xint iPriority, xint iReliability, xint iChannel, BitStream* pStream);
 
 	// Comparison routine for sorting peers.
 	static xbool OnComparePeers(const CNetworkPeer* pA, const CNetworkPeer* pB);

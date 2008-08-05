@@ -537,6 +537,9 @@ xbool CLobbyScreen::OnVerifyPeer(CNetworkPeer* pPeer, void* pData, xint iDataLen
 // =============================================================================
 void CLobbyScreen::OnNetworkStart()
 {
+#if !defined(_RELEASE)
+	Network.GetInterface()->ApplyNetworkSimulator(XKB(56), 80, 40);
+#endif
 }
 
 // =============================================================================
