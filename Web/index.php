@@ -2,7 +2,6 @@
 
 	// Includes.
 	include("_mysql.php");
-	include("_stream.php");
 	include("_constant.php");
 	include("_result.php");
 	
@@ -16,7 +15,7 @@
 	// Read in the stream values.
 	$stream_values = $_POST;
 	
-	if (!$stream_values)
+	if (!$_POST)
 	{
 		include("_match_public.php");
 		

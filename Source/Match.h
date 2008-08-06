@@ -32,8 +32,7 @@
 // The matchmaking query encoding type.
 #define MATCH_ENCODING_TYPE "application/x-www-form-urlencoded"
 
-// Query & result headers.
-#define MATCH_QUERY_HEADER "match://"
+// Result header.
 #define MATCH_RESULT_HEADER "result://"
 
 // The operation timeout in milliseconds.
@@ -208,7 +207,7 @@ public:
 	xbool ListSessions(t_OnListSessionsCompleted fpCallback);
 
 	// Create a new session with the specified params.
-	CSession* CreateSession(xint iTotalSlots, t_OnCreateSessionCompleted fpCallback);
+	CSession* CreateSession(xint iTotalSlots, const xchar* pTitle, t_OnCreateSessionCompleted fpCallback);
 
 	// Ping a session to prevent it from timing out.
 	xbool PingSession(CSession* pSession, t_OnPingSessionCompleted fpCallback);

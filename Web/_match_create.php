@@ -19,20 +19,20 @@
 	// ==================================================
 	// Initialise variables for the operation.
 	// ==================================================
-	$gid		= $stream_values["gid"];
+	$gid		= $_POST["gid"];
 	$time		= $current_time;
 	$expiry		= $current_time + $SESSION_TIMEOUT;
 	$owner		= $_SERVER["REMOTE_ADDR"];
-	$sid		= $stream_values["sid"];
+	$sid		= $_POST["sid"];
 	$pass		= GeneratePassword();
 	$ip			= $_SERVER["REMOTE_ADDR"];
 	$port		= 0;
 	$state		= $STATUS_ACTIVE;
-	$title		= $stream_values["title"];
-	$tslots		= $stream_values["tslots"];
-	$uslots		= $stream_values["uslots"];
+	$title		= $_POST["title"];
+	$tslots		= $_POST["tslots"];
+	$uslots		= $_POST["uslots"];
 	$players	= "";
-	$info		= $stream_values["info"];
+	$info		= $_POST["info"];
 	
 	// ==================================================
 	// Verify all input data.

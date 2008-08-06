@@ -231,7 +231,7 @@ void CLobbyScreen::Start(t_LobbyStartMode iStartMode)
 	case LobbyStartMode_CreatePublic:
 		{
 			SetState(LobbyState_Creating);
-			m_pSession = Match.CreateSession(4, xbind(this, &CLobbyScreen::OnCreateSessionCompleted));
+			m_pSession = Match.CreateSession(4, "PikPik Beta Server", xbind(this, &CLobbyScreen::OnCreateSessionCompleted));
 		}
 		break;
 

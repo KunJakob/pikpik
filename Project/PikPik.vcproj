@@ -1495,15 +1495,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Web\_stream.php"
-				>
-			</File>
-			<File
 				RelativePath="..\Web\_verify.php"
 				>
 			</File>
 			<File
-				RelativePath="..\Web\match.php"
+				RelativePath="..\Web\index.php"
 				>
 			</File>
 		</Filter>

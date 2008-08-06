@@ -31,7 +31,7 @@
 	
 	if (!$query)
 	{
-		echo "Query failed...";
+		echo "<font face=\"Verdana\" size=\"1\">Query Failed...</font>";
 		die;
 	}
 	
@@ -39,7 +39,7 @@
 	
 	if (!$num_results)
 	{
-		echo "No results to display...";
+		echo "<font face=\"Verdana\" size=\"1\">No Sessions Available...</font>";
 		die;
 	}
 	

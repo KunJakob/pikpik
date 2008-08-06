@@ -40,7 +40,7 @@ CMatchQuery::CMatchQuery()
 // =============================================================================
 void CMatchQuery::Reset()
 {
-	m_sQuery = MATCH_QUERY_HEADER;
+	m_sQuery.clear();
 }
 
 // =============================================================================
@@ -53,7 +53,7 @@ void CMatchQuery::AddValue(const xchar* pKey, const xchar* pValue)
 
 	if (sKey.length() && sValue.length())
 	{
-		if (m_sQuery.length() != strlen(MATCH_QUERY_HEADER))
+		if (m_sQuery.length())
 			m_sQuery += '&';
 
 		m_sQuery += sKey;
@@ -239,7 +239,7 @@ void CMatch::OnInitialise()
 		m_pTCP = new TCPInterface();
 		m_pTCP->Start(0, 64);
 
-		m_pHTTP = new HTTPConnection(*m_pTCP, "sapian.net");
+		m_pHTTP = new HTTPConnection(*m_pTCP, "match.sapian.net");
 	}
 }
 
@@ -332,7 +332,7 @@ xbool CMatch::ListSessions(t_OnListSessionsCompleted fpCallback)
 		xQuery.AddValue("gid", _GID);
 		xQuery.AddValue("limit", MATCH_SESSION_LIMIT);
 
-		m_pHTTP->Post("/match.php?list", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
+		m_pHTTP->Post("/index.php?list", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
 
 		// Start the operation.
 		m_iOperation = MatchOperation_ListSessions;
@@ -350,7 +350,7 @@ xbool CMatch::ListSessions(t_OnListSessionsCompleted fpCallback)
 // =============================================================================
 // Nat Ryall                                                         02-Jul-2008
 // =============================================================================
-CSession* CMatch::CreateSession(xint iTotalSlots, t_OnCreateSessionCompleted fpCallback)
+CSession* CMatch::CreateSession(xint iTotalSlots, const xchar* pTitle, t_OnCreateSessionCompleted fpCallback)
 {
 	XMASSERT(!IsBusy(), "An operation is already processing.");
 
@@ -363,7 +363,7 @@ CSession* CMatch::CreateSession(xint iTotalSlots, t_OnCreateSessionCompleted fpC
 		m_pSession->m_bOwned = true;
 		m_pSession->m_sSessionID = GenerateSessionID().c_str();
 		m_pSession->m_iTotalSlots = iTotalSlots;
-		m_pSession->m_sTitle = "PikPik";
+		m_pSession->m_sTitle = pTitle;
 
 		// Generate and send the operation query.
 		CMatchQuery xQuery;
@@ -375,7 +375,7 @@ CSession* CMatch::CreateSession(xint iTotalSlots, t_OnCreateSessionCompleted fpC
 		xQuery.AddValue("uslots", 1);
 		xQuery.AddValue("info", m_pSession->m_sInfo);
 
-		m_pHTTP->Post("/match.php?create", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
+		m_pHTTP->Post("/index.php?create", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
 
 		// Start the operation.
 		m_iOperation = MatchOperation_CreateSession;
@@ -405,7 +405,7 @@ xbool CMatch::PingSession(CSession* pSession, t_OnPingSessionCompleted fpCallbac
 		xQuery.AddValue("sid", pSession->m_sSessionID);
 		xQuery.AddValue("pass", pSession->m_sPassword);
 
-		m_pHTTP->Post("/match.php?ping", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
+		m_pHTTP->Post("/index.php?ping", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
 
 		// Start the operation.
 		m_pSession = pSession;
@@ -439,7 +439,7 @@ xbool CMatch::UpdateSession(CSession* pSession, t_OnUpdateSessionCompleted fpCal
 		xQuery.AddValue("uslots", pSession->m_iTotalSlots);
 		xQuery.AddValue("info", pSession->m_sInfo);
 
-		m_pHTTP->Post("/match.php?update", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
+		m_pHTTP->Post("/index.php?update", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
 
 		// Start the operation.
 		m_pSession = pSession;
@@ -470,7 +470,7 @@ xbool CMatch::CloseSession(CSession* pSession, t_OnCloseSessionCompleted fpCallb
 		xQuery.AddValue("sid", pSession->m_sSessionID);
 		xQuery.AddValue("pass", pSession->m_sPassword);
 
-		m_pHTTP->Post("/match.php?close", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
+		m_pHTTP->Post("/index.php?close", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
 
 		// Start the operation.
 		pSession->m_iStatus = SessionStatus_Closing;
