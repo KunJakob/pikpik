@@ -27,6 +27,9 @@
 // The maximum ID for network peers is invalid.
 #define NETWORK_PEER_INVALID_ID 0xFF
 
+// The maximum time to wait before disconnecting if a reliable packet cannot be sent.
+#define NETWORK_PEER_TIMEOUT 6000
+
 //##############################################################################
 
 //##############################################################################
@@ -141,7 +144,7 @@ public:
 	}
 
 	// Forcefully disconnect a peer from the local machine. Valid only on the host.
-	void DisconnectPeer(SystemAddress& xAddress);
+	void Kick(SystemAddress& xAddress);
 
 	// Get the last ping time to the host or -1 if we are the host or disconnected.
 	xint GetLastPing();

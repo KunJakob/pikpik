@@ -358,6 +358,7 @@ void CNetwork::StartHost(xint iMaxPeers, xint iPort, void* pData, xint iDataSize
 
 		m_pInterface->Startup(iMaxPeers, 0, &m_xSocket, 1);
 		m_pInterface->SetMaximumIncomingConnections(iMaxPeers);
+		m_pInterface->SetTimeoutTime(NETWORK_PEER_TIMEOUT, UNASSIGNED_SYSTEM_ADDRESS);
 		m_pInterface->SetOccasionalPing(true);
 
 		m_pHostPeer = CreatePeer();
@@ -404,6 +405,7 @@ void CNetwork::StartClient(const xchar* pHostAddress, xint iHostPort, void* pDat
 
 		m_pInterface->Startup(1, 0, &m_xSocket, 1);
 		m_pInterface->Connect(pHostAddress, iHostPort, NULL, 0, 0);
+		m_pInterface->SetTimeoutTime(NETWORK_PEER_TIMEOUT, UNASSIGNED_SYSTEM_ADDRESS);
 
 		m_pHostPeer = NULL;
 		m_pLocalPeer = NULL;
@@ -426,10 +428,10 @@ void CNetwork::Stop()
 
 		DestroyPeers();
 
+		m_pInterface->Shutdown(500);
+
 		if (m_xCallbacks.m_fpNetworkStopped)
 			m_xCallbacks.m_fpNetworkStopped();
-
-		m_pInterface->Shutdown(1);
 
 		RakNetworkFactory::DestroyRakPeerInterface(m_pInterface);
 		m_pInterface = NULL;
@@ -441,10 +443,10 @@ void CNetwork::Stop()
 // =============================================================================
 // Nat Ryall                                                         13-Jun-2008
 // =============================================================================
-void CNetwork::DisconnectPeer(SystemAddress& xAddress)
+void CNetwork::Kick(SystemAddress& xAddress)
 {
 	if (m_pInterface)
-		m_pInterface->CloseConnection(xAddress, true, 1);
+		m_pInterface->CloseConnection(xAddress, true);
 }
 
 // =============================================================================
@@ -482,11 +484,9 @@ CNetworkPeer* CNetwork::CreatePeer()
 	pPeer->m_bHost = false;
 	pPeer->m_bLocal = false;
 	pPeer->m_iID = (m_bHosting) ? GetUniquePeerID() : NETWORK_PEER_INVALID_ID;
+	pPeer->m_xAddress = UNASSIGNED_SYSTEM_ADDRESS;
 	pPeer->m_bVerified = false;
 	pPeer->m_pGamerCard = NULL;
-
-	pPeer->m_xAddress.binaryAddress = 0;
-	pPeer->m_xAddress.port = 0;
 
 	m_lpPeers.push_back(pPeer);
 
@@ -503,6 +503,9 @@ void CNetwork::DestroyPeer(CNetworkPeer* pPeer)
 	if (pPeer)
 	{	
 		XLOG("[Network] Destroying peer %d.", pPeer->m_iID);
+
+		if (pPeer->m_xAddress != UNASSIGNED_SYSTEM_ADDRESS)
+			Kick(pPeer->m_xAddress);
 
 		if (pPeer->m_pGamerCard)
 		{
@@ -683,10 +686,10 @@ void CNetwork::OnProcessHostNotification(xchar cIdentifier, Packet* pPacket, xuc
 						m_xCallbacks.m_fpPeerJoined(pPeer);
 				}
 				else
-					DisconnectPeer(pPacket->systemAddress);
+					Kick(pPacket->systemAddress);
 			}
 			else
-				DisconnectPeer(pPacket->systemAddress);
+				Kick(pPacket->systemAddress);
 		}
 		break;
 
