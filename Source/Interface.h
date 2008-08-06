@@ -34,7 +34,7 @@
 
 // Shortcuts.
 #define Interface CInterface::Get()
-#define InterfaceRoot CInterface::Get().GetRootElement()
+#define InterfaceScreen CInterface::Get().GetScreen()
 
 //##############################################################################
 
@@ -108,13 +108,10 @@ public:
 	// Called to render elements.
 	virtual void OnRender();
 
-	// Render a box border to the specified dimensions and colour.
-	void RenderBox(xrect xRect, xuint iColour);
-
 	// Get the base screen element that all other elements should attach to.
-	CScreenElement* GetRootElement()
+	CScreenElement* GetScreen()
 	{
-		return m_pRoot;
+		return m_pScreen;
 	}
 
 	// Get a list of all existing elements.
@@ -180,18 +177,6 @@ public:
 		m_bDebugRender = bDebug;
 	}
 
-	// Specify is the interface system should be rendered or not.
-	void SetVisible(xbool bVisible)
-	{
-		m_bVisible = bVisible;
-	}
-
-	// Determine if the interface system is currently visible.
-	xbool IsVisible()
-	{
-		return m_bVisible;
-	}
-
 	// Specify is the cursor should be rendered or not.
 	void SetCursorVisible(xbool bVisible)
 	{
@@ -224,13 +209,10 @@ protected:
 	void RenderElement(CInterfaceElement* pElement);
 
 	// The base container object.
-	CScreenElement* m_pRoot;
+	CScreenElement* m_pScreen;
 
 	// The cursor sprite.
 	CBasicSprite* m_pCursor[ElementType_Max];
-
-	// The interface visibility.
-	xbool m_bVisible;
 
 	// The cursor visibility.
 	xbool m_bCursorVisible;
@@ -254,6 +236,12 @@ protected:
 	t_MetadataList m_lpMetadata;
 
 private:
+	// Render a box to the specified dimensions and colour.
+	void RenderBox(xrect xRect, xuint iColour);
+
+	// Render a box border to the specified dimensions and colour.
+	void RenderBoxBorder(xrect xRect, xuint iColour);
+
 	// Tracking variable for finding the current active element.
 	xbool m_bFoundActive;
 
@@ -387,7 +375,7 @@ protected:
 	virtual void OnUpdate() {}
 
 	// Required render virtual function for this element.
-	virtual void OnRender() = 0;
+	virtual void OnRender() {};
 
 	// Triggered when focus is applied to the element.
 	virtual void OnFocus() {}
@@ -454,9 +442,6 @@ public:
 
 	// Virtual destructor to ensure proper cleanup of all child classes.
 	virtual ~CScreenElement() {}
-
-	// Render the screen element (does nothing).
-	virtual void OnRender() {}
 
 	// Get the width of the element. This must be overloaded.
 	virtual xint GetWidth() 

@@ -296,8 +296,8 @@ public:
 	// Attach all elements to the interface.
 	inline void AttachElements()
 	{
-		InterfaceRoot->Attach(m_pStatusBox);
-		InterfaceRoot->Attach(m_pLabel);
+		InterfaceScreen->Attach(m_pStatusBox);
+		InterfaceScreen->Attach(m_pLabel);
 	}
 
 protected:
@@ -330,8 +330,8 @@ public:
 	// Attach all elements to the interface.
 	inline void AttachElements()
 	{
-		InterfaceRoot->Attach(m_pAcceptLink);
-		InterfaceRoot->Attach(m_pCancelLink);
+		InterfaceScreen->Attach(m_pAcceptLink);
+		InterfaceScreen->Attach(m_pCancelLink);
 	}
 
 	// Render the message interface.
@@ -370,8 +370,8 @@ public:
 	// Attach all elements to the interface.
 	inline void AttachElements()
 	{
-		InterfaceRoot->Attach(m_pAddressBox);
-		InterfaceRoot->Attach(m_pJoinButton);
+		InterfaceScreen->Attach(m_pAddressBox);
+		InterfaceScreen->Attach(m_pJoinButton);
 	}
 
 protected:

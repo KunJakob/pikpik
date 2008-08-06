@@ -22,15 +22,14 @@
 // Nat Ryall                                                          1-May-2008
 // =============================================================================
 CInterface::CInterface() :
-	m_pRoot(NULL),
-	m_bVisible(true),
+	m_pScreen(NULL),
 	m_bCursorVisible(true),
 	m_pActiveElement(NULL),
 	m_pFocusedElement(NULL),
 	m_bFoundActive(false),
 	m_bDebugRender(false)
 {
-	m_pRoot = new CScreenElement();
+	m_pScreen = new CScreenElement();
 	Reset();
 }
 
@@ -39,7 +38,7 @@ CInterface::CInterface() :
 // =============================================================================
 CInterface::~CInterface()
 {
-	delete m_pRoot;
+	delete m_pScreen;
 
 	for (xint iA = 0; iA < ElementType_Max; ++iA)
 	{
@@ -56,7 +55,7 @@ void CInterface::Reset()
 	m_pActiveElement = NULL;
 	m_pFocusedElement = NULL;
 
-	m_pRoot->DetachAll();
+	m_pScreen->DetachAll();
 
 	for (xint iA = 0; iA < ElementType_Max; ++iA)
 		m_pCursor[iA] = NULL;
@@ -80,7 +79,7 @@ void CInterface::OnUpdate()
 
 	m_bFoundActive = false;
 
-	UpdateElement(m_pRoot);
+	UpdateElement(m_pScreen);
 
 	if (m_pFocusedElement)
 	{
@@ -118,50 +117,47 @@ void CInterface::OnUpdate()
 // =============================================================================
 void CInterface::OnRender()
 {
-	if (m_bVisible)
+	RenderElement(m_pScreen);
+
+	// Render debug boxes over the interface to show the active and focused elements.
+	if (m_pScreen->IsVisible())
 	{
-		RenderElement(m_pRoot);
-
-		// Render debug boxes over the interface to show the active and focused elements.
-		if (m_bDebugRender)
+		if (m_pActiveElement)
 		{
-			if (m_pActiveElement)
-			{
-				xrect xRect = m_pActiveElement->GetArea();
-				xuint iColour = ARGB(255, 32, 32, 32);
+			xrect xRect = m_pActiveElement->GetArea();
+			xuint iColour = ARGB(255, 32, 32, 32);
 
-				RenderBox(xRect, iColour);
-			}
-
-			if (m_pFocusedElement)
-			{
-				xrect xRect = m_pFocusedElement->GetFocusArea() + xrect(2, 2, -1, -1);
-				xuint iColour = ARGB(255, 255, 0, 0);
-
-				RenderBox(xRect, iColour);
-			}
+			RenderBox(xRect, iColour);
 		}
 
-		// Render the cursor.
-		if (m_bCursorVisible && _HGE->Input_IsMouseOver() && m_pCursor[ElementType_Unknown])
+		if (m_pFocusedElement)
 		{
-			CBasicSprite* pCursor = m_pCursor[ElementType_Unknown];
+			xrect xRect = m_pFocusedElement->GetFocusArea() + xrect(2, 2, -1, -1);
+			xuint iColour = ARGB(255, 255, 0, 0);
 
-			// If we have an active element and an custom cursor exists.
-			if (m_pActiveElement && m_pCursor[m_pActiveElement->GetType()])
-			{
-				CInterfaceElement* pElement = m_pActiveElement;
-
-				while (pElement->IsEnabled() && pElement != m_pRoot)
-					pElement = pElement->GetParent();
-
-				// Check that the there is nothing disabled and so blocking the custom cursor.
-				if (pElement->IsEnabled())
-					pCursor = m_pCursor[m_pActiveElement->GetType()];
-			}
-
-			pCursor->Render(m_xMousePos);
+			RenderBoxBorder(xRect, iColour);
 		}
+	}
+
+	// Render the cursor.
+	if (m_bCursorVisible && _HGE->Input_IsMouseOver() && m_pCursor[ElementType_Unknown])
+	{
+		CBasicSprite* pCursor = m_pCursor[ElementType_Unknown];
+
+		// If we have an active element and an custom cursor exists.
+		if (m_pActiveElement && m_pCursor[m_pActiveElement->GetType()])
+		{
+			CInterfaceElement* pElement = m_pActiveElement;
+
+			while (pElement->IsEnabled() && pElement != m_pScreen)
+				pElement = pElement->GetParent();
+
+			// Check that the there is nothing disabled and so blocking the custom cursor.
+			if (pElement->IsEnabled())
+				pCursor = m_pCursor[m_pActiveElement->GetType()];
+		}
+
+		pCursor->Render(m_xMousePos);
 	}
 }
 
@@ -185,6 +181,17 @@ void CInterface::RenderBox(xrect xRect, xuint iColour)
 	xQuad.v[0].col = xQuad.v[1].col = xQuad.v[2].col = xQuad.v[3].col = iColour;
 
 	_HGE->Gfx_RenderQuad(&xQuad);
+}
+
+// =============================================================================
+// Nat Ryall                                                         06-Aug-2008
+// =============================================================================
+void CInterface::RenderBoxBorder(xrect xRect, xuint iColour)
+{
+	_HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iTop, iColour);
+	_HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iBottom, iColour);
+	_HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iBottom, iColour);
+	_HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iTop, iColour);
 }
 
 // =============================================================================
@@ -226,41 +233,44 @@ xbool CInterface::IsMouseOver(CInterfaceElement* pElement)
 // =============================================================================
 void CInterface::UpdateElement(CInterfaceElement* pElement)
 {
-	// Iterate through all children in reverse-render order.
-	XEN_LIST_FOREACH_R(t_ElementList, ppElement, pElement->m_lpChildElements)
-		UpdateElement(*ppElement);
-
-	if (pElement->IsVisible() && pElement->IsEnabled())
+	if (pElement->IsEnabled())
 	{
-		if (Math::Intersect(m_xMousePos, pElement->GetArea()))
+		// Iterate through all children in reverse-render order.
+		XEN_LIST_FOREACH_R(t_ElementList, ppElement, pElement->m_lpChildElements)
+			UpdateElement(*ppElement);
+
+		if (pElement->IsVisible())
 		{
-			// If we are the first element intersecting, we become the active element.
-			if (!m_bFoundActive)
+			if (Math::Intersect(m_xMousePos, pElement->GetArea()))
 			{
-				m_bFoundActive = true;
-
-				if (m_pActiveElement && m_pActiveElement != pElement)
-					m_pActiveElement->OnMouseLeave();
-
-				m_pActiveElement = pElement;
-				m_pActiveElement->OnMouseEnter();
-			}
-
-			// If we're the active element, check for mouse clicks.
-			if (m_pActiveElement == pElement)
-			{
-				if (_HGE->Input_KeyDown(HGEK_LBUTTON))
+				// If we are the first element intersecting, we become the active element.
+				if (!m_bFoundActive)
 				{
-					SetFocus(pElement);
-					pElement->OnMouseDown(m_xMousePos);
+					m_bFoundActive = true;
+
+					if (m_pActiveElement && m_pActiveElement != pElement)
+						m_pActiveElement->OnMouseLeave();
+
+					m_pActiveElement = pElement;
+					m_pActiveElement->OnMouseEnter();
 				}
-				else if (_HGE->Input_KeyUp(HGEK_LBUTTON))
-					pElement->OnMouseUp(m_xMousePos);
+
+				// If we're the active element, check for mouse clicks.
+				if (m_pActiveElement == pElement)
+				{
+					if (_HGE->Input_KeyDown(HGEK_LBUTTON))
+					{
+						SetFocus(pElement);
+						pElement->OnMouseDown(m_xMousePos);
+					}
+					else if (_HGE->Input_KeyUp(HGEK_LBUTTON))
+						pElement->OnMouseUp(m_xMousePos);
+				}
 			}
 		}
-	}
 
-	pElement->OnUpdate();
+		pElement->OnUpdate();
+	}
 }
 
 // =============================================================================

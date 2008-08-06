@@ -273,14 +273,14 @@ void CLobbyScreen::Stop()
 // =============================================================================
 void CLobbyScreen::SetState(t_LobbyState iState)
 {
-	InterfaceRoot->DetachAll();
+	InterfaceScreen->DetachAll();
 
 	switch (iState)
 	{
 	case LobbyState_List:
 		{
 			for (int iA = 0; iA < m_iSessionCount; ++iA)
-				InterfaceRoot->Attach(m_pSessionBoxes[iA]);
+				InterfaceScreen->Attach(m_pSessionBoxes[iA]);
 		}
 		break;
 
@@ -680,10 +680,10 @@ CStatusBox::CStatusBox()
 // =============================================================================
 CStatusBox::~CStatusBox()
 {
-	InterfaceRoot->Detach(m_pStatusBox);
+	InterfaceScreen->Detach(m_pStatusBox);
 	delete m_pStatusBox;
 
-	InterfaceRoot->Detach(m_pLabel);
+	InterfaceScreen->Detach(m_pLabel);
 	delete m_pLabel;
 }
 
@@ -724,10 +724,10 @@ CJoinInterface::CJoinInterface()
 // =============================================================================
 CJoinInterface::~CJoinInterface()
 {
-	InterfaceRoot->Detach(m_pAddressBox);
+	InterfaceScreen->Detach(m_pAddressBox);
 	delete m_pAddressBox;
 
-	InterfaceRoot->Detach(m_pJoinButton);
+	InterfaceScreen->Detach(m_pJoinButton);
 	delete m_pJoinButton;
 }
 

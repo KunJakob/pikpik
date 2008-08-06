@@ -291,6 +291,8 @@ void CMenuScreen::SetState(t_MenuState iState)
 	{
 	case MenuState_None:
 		{
+			InterfaceScreen->SetEnabled(true);
+
 			m_iLastMenuGroup = m_iMenuGroup;
 			m_iMenuGroup = MenuGroup_None;
 
@@ -300,20 +302,20 @@ void CMenuScreen::SetState(t_MenuState iState)
 
 	case MenuState_TransitionIn:
 		{
-			InterfaceRoot->SetEnabled(false);
+			InterfaceScreen->SetEnabled(false);
 			InitTransition(true);
 		}
 		break;
 
 	case MenuState_Idle:
 		{
-			InterfaceRoot->SetEnabled(true);
+			InterfaceScreen->SetEnabled(true);
 		}
 		break;
 
 	case MenuState_TransitionOut:
 		{
-			InterfaceRoot->SetEnabled(false);
+			InterfaceScreen->SetEnabled(false);
 			InitTransition(false);
 		}
 		break;
@@ -392,12 +394,12 @@ void CMenuScreen::AttachMenuGroup(t_MenuGroup iMenuGroup)
 {
 	m_iMenuGroup = iMenuGroup;
 
-	InterfaceRoot->DetachAll();
+	InterfaceScreen->DetachAll();
 
 	if (iMenuGroup != MenuGroup_None)
 	{
 		XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[iMenuGroup])
-			InterfaceRoot->Attach(*ppMenuLink);
+			InterfaceScreen->Attach(*ppMenuLink);
 	}
 }
 
