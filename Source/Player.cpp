@@ -252,10 +252,7 @@ void CPlayer::Move(t_PlayerDirection iDirection)
 			xStream.Write((xuint8)m_iIndex);
 			xStream.Write((xuint8)iDirection);
 
-			if (Network.IsHosting())
-				Network.Broadcast(NULL, NetworkStreamType_PlayerUpdate, &xStream, HIGH_PRIORITY, RELIABLE_ORDERED);
-			else
-				Network.Send(NULL, NetworkStreamType_PlayerUpdate, &xStream, HIGH_PRIORITY, RELIABLE_ORDERED);
+			Network.Broadcast(NULL, NetworkStreamType_PlayerUpdate, &xStream, HIGH_PRIORITY, RELIABLE_ORDERED);
 		}
 	}
 }

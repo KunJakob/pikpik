@@ -237,10 +237,10 @@ public:
 
 protected:
 	// Make a standard data packet that will be going directly to the destination.
-	BitStream* CreateStream(xint iFrom, xint iStreamType, BitStream* pStream);
+	BitStream* CreateStream(xint iStreamType, xint iFrom, BitStream* pStream);
 
 	// Make a standard data packet that will be relayed on the host.
-	BitStream* CreateRoutedStream(xbool bBroadcast, xint iFrom, xint iTo, xint iStreamType, xint iPriority, xint iReliability, xint iChannel, BitStream* pStream);
+	BitStream* CreateRoutedStream(xint iStreamType, xint iFrom, xint iTo, xint iPriority, xint iReliability, xint iChannel, xbool bBroadcast, BitStream* pStream);
 
 	// Comparison routine for sorting peers.
 	static xbool OnComparePeers(const CNetworkPeer* pA, const CNetworkPeer* pB);
@@ -264,7 +264,7 @@ protected:
 	void DestroyPeer(CNetworkPeer* pPeer);
 
 	// Find an existing peer by system address.
-	CNetworkPeer* FindPeer(SystemAddress* pAddress);
+	CNetworkPeer* FindPeer(SystemAddress& xAddress);
 
 	// Free all existing peers in the system and fire any leaving notifications.
 	void DestroyPeers();

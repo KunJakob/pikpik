@@ -240,10 +240,8 @@ xbool CNetwork::Send(CNetworkPeer* pTo, xint iStreamType, BitStream* pStream, Pa
 	{
 		XMASSERT(pTo, "You must specify a recepient when sending a packet from the host.");
 
-		pFinalStream = CreateStream(m_pLocalPeer->m_iID, iStreamType, pStream);
-		
-		if (pFinalStream)
-			bSuccess = m_pInterface->Send(pFinalStream, iPriority, iReliability, iChannel, pTo->m_xAddress, false);
+		pFinalStream = CreateStream(iStreamType, m_pLocalPeer->m_iID, pStream);
+		bSuccess = m_pInterface->Send(pFinalStream, iPriority, iReliability, iChannel, pTo->m_xAddress, false);
 	}
 	// If we are the client.
 	else
@@ -251,12 +249,11 @@ xbool CNetwork::Send(CNetworkPeer* pTo, xint iStreamType, BitStream* pStream, Pa
 		XMASSERT(m_pHostPeer, "Cannot send from the client until the host peer is validated.");
 
 		if (!pTo || pTo == m_pHostPeer)
-			pFinalStream = CreateStream(m_pLocalPeer->m_iID, iStreamType, pStream);
+			pFinalStream = CreateStream(iStreamType, m_pLocalPeer->m_iID, pStream);
 		else
-			pFinalStream = CreateRoutedStream(false, m_pLocalPeer->m_iID, pTo->m_iID, iStreamType, iPriority, iReliability, iChannel, pStream);
+			pFinalStream = CreateRoutedStream(iStreamType, m_pLocalPeer->m_iID, pTo->m_iID, iPriority, iReliability, iChannel, false, pStream);
 		
-		if (pFinalStream)
-			bSuccess = m_pInterface->Send(pFinalStream, iPriority, iReliability, iChannel, m_pHostPeer->m_xAddress, false);
+		bSuccess = m_pInterface->Send(pFinalStream, iPriority, iReliability, iChannel, m_pHostPeer->m_xAddress, false);
 	}
 
 	// If a stream exists, free it now.
@@ -281,20 +278,16 @@ xbool CNetwork::Broadcast(CNetworkPeer* pIgnore, xint iStreamType, BitStream* pS
 	// If we are the host.
 	if (m_bHosting)
 	{
-		pFinalStream = CreateStream(m_pLocalPeer->m_iID, iStreamType, pStream);
-
-		if (pFinalStream)
-			bSuccess = m_pInterface->Send(pFinalStream, iPriority, iReliability, iChannel, pIgnore ? pIgnore->m_xAddress : UNASSIGNED_SYSTEM_ADDRESS, true);
+		pFinalStream = CreateStream(iStreamType, m_pLocalPeer->m_iID, pStream);
+		bSuccess = m_pInterface->Send(pFinalStream, iPriority, iReliability, iChannel, pIgnore ? pIgnore->m_xAddress : UNASSIGNED_SYSTEM_ADDRESS, true);
 	}
 	// If we are the client.
 	else
 	{
 		XMASSERT(m_pHostPeer, "Cannot send from the client until the host peer is validated.");
 
-		pFinalStream = CreateRoutedStream(true, m_pLocalPeer->m_iID, pIgnore ? pIgnore->m_iID : NETWORK_PEER_INVALID_ID, iStreamType, iPriority, iReliability, iChannel, pStream);
-
-		if (pFinalStream)
-			bSuccess = m_pInterface->Send(pFinalStream, iPriority, iReliability, iChannel, m_pHostPeer->m_xAddress, false);
+		pFinalStream = CreateRoutedStream(iStreamType, m_pLocalPeer->m_iID, pIgnore ? pIgnore->m_iID : NETWORK_PEER_INVALID_ID, iPriority, iReliability, iChannel, true, pStream);
+		bSuccess = m_pInterface->Send(pFinalStream, iPriority, iReliability, iChannel, m_pHostPeer->m_xAddress, false);
 	}
 
 	// If a stream exists, free it now.
@@ -307,7 +300,7 @@ xbool CNetwork::Broadcast(CNetworkPeer* pIgnore, xint iStreamType, BitStream* pS
 // =============================================================================
 // Nat Ryall                                                         05-Aug-2008
 // =============================================================================
-BitStream* CNetwork::CreateStream(xint iFrom, xint iStreamType, BitStream* pStream)
+BitStream* CNetwork::CreateStream(xint iStreamType, xint iFrom, BitStream* pStream)
 {
 	BitStream* pFinalStream = new BitStream();
 
@@ -315,7 +308,7 @@ BitStream* CNetwork::CreateStream(xint iFrom, xint iStreamType, BitStream* pStre
 	pFinalStream->Write((xuint8)iStreamType);
 	pFinalStream->Write((xuint8)iFrom);
 
-	if (pFinalStream)
+	if (pStream)
 		pFinalStream->Write(pStream);
 
 	return pFinalStream;
@@ -324,19 +317,20 @@ BitStream* CNetwork::CreateStream(xint iFrom, xint iStreamType, BitStream* pStre
 // =============================================================================
 // Nat Ryall                                                         05-Aug-2008
 // =============================================================================
-BitStream* CNetwork::CreateRoutedStream(xbool bBroadcast, xint iFrom, xint iTo, xint iStreamType, xint iPriority, xint iReliability, xint iChannel, BitStream* pStream)
+BitStream* CNetwork::CreateRoutedStream(xint iStreamType, xint iFrom, xint iTo, xint iPriority, xint iReliability, xint iChannel, xbool bBroadcast, BitStream* pStream)
 {
 	BitStream* pFinalStream = new BitStream();
 
 	pFinalStream->Write((xuint8)ID_ROUTED_STREAM);
-	pFinalStream->Write((xuint8)bBroadcast);
 	pFinalStream->Write((xuint8)iStreamType);
 	pFinalStream->Write((xuint8)iFrom);
 	pFinalStream->Write((xuint8)iTo);
 	pFinalStream->Write((xuint8)iPriority);
 	pFinalStream->Write((xuint8)iReliability);
 	pFinalStream->Write((xuint8)iChannel);
-	if (pFinalStream)
+	pFinalStream->Write((xuint8)bBroadcast);
+
+	if (pStream)
 		pFinalStream->Write(pStream);
 
 	return pFinalStream;
@@ -469,12 +463,12 @@ xint CNetwork::GetLastPing()
 // =============================================================================
 xint CNetwork::GetUniquePeerID()
 {
-	do 
+	while (FindPeer(m_iLastPeerID) != NULL) 
 	{
-		m_iLastPeerID = (m_iLastPeerID + 1) % (NETWORK_PEER_INVALID_ID - 1);
+		m_iLastPeerID++;
+		m_iLastPeerID %= NETWORK_PEER_INVALID_ID - 1;
 	} 
-	while (FindPeer(m_iLastPeerID) != NULL);
-	
+
 	return m_iLastPeerID;
 }
 
@@ -552,11 +546,11 @@ xbool CNetwork::OnComparePeers(const CNetworkPeer* pA, const CNetworkPeer* pB)
 // =============================================================================
 // Nat Ryall                                                         09-Jun-2008
 // =============================================================================
-CNetworkPeer* CNetwork::FindPeer(SystemAddress* pAddress)
+CNetworkPeer* CNetwork::FindPeer(SystemAddress& xAddress)
 {
 	XEN_LIST_FOREACH(t_NetworkPeerList, ppPeer, m_lpPeers)
 	{
-		if ((*ppPeer)->m_xAddress == *pAddress)
+		if ((*ppPeer)->m_xAddress == xAddress)
 			return *ppPeer;
 	}
 
@@ -598,7 +592,7 @@ void CNetwork::OnProcessHostNotification(xchar cIdentifier, Packet* pPacket, xuc
 	case ID_VERIFICATION_REQUEST:
 		{
 			// Find the peer we're working with.
-			CNetworkPeer* pPeer = FindPeer(&pPacket->systemAddress);
+			CNetworkPeer* pPeer = FindPeer(pPacket->systemAddress);
 
 			if (pPeer)
 			{
@@ -701,7 +695,7 @@ void CNetwork::OnProcessHostNotification(xchar cIdentifier, Packet* pPacket, xuc
 	case ID_CONNECTION_LOST:
 		{
 			// If we have a record of them, notify all other clients of their disconnection.
-			CNetworkPeer* pPeer = FindPeer(&pPacket->systemAddress);
+			CNetworkPeer* pPeer = FindPeer(pPacket->systemAddress);
 			
 			if (pPeer)
 			{
@@ -732,52 +726,78 @@ void CNetwork::OnProcessHostNotification(xchar cIdentifier, Packet* pPacket, xuc
 	// Received a data packet from a client to broadcast to other peers.
 	case ID_ROUTED_STREAM:
 		{
-			xuint8 bBroadcast;
 			xuint8 iStreamType;
 			xuint8 iFrom;
 			xuint8 iTo;
 			xuint8 iPriority;
 			xuint8 iReliability;
 			xuint8 iChannel;
+			xuint8 bBroadcast;
 
-			BitStream xStream;
-
-			xInStream.Read(bBroadcast);
 			xInStream.Read(iStreamType);
 			xInStream.Read(iFrom);
 			xInStream.Read(iTo);
 			xInStream.Read(iPriority);
 			xInStream.Read(iReliability);
 			xInStream.Read(iChannel);
+			xInStream.Read(bBroadcast);
+
+			BitStream xAppendStream;
 
 			if (xInStream.GetNumberOfUnreadBits())
-				xInStream.Read(xStream);
+				xInStream.Read(xAppendStream);
 
 			// Check if the host should process this packet.
 			if (bBroadcast && iTo != m_pLocalPeer->m_iID)
 			{
-				BitStream xProcessStream;
+				BitStream xLocalStream;
 
-				xProcessStream.Write(iStreamType);
-				xProcessStream.Write(iFrom);
+				xLocalStream.Write(iStreamType);
+				xLocalStream.Write(iFrom);
 
-				if (xStream.GetNumberOfBitsUsed())
-					xProcessStream.Write(xStream);
+				if (xAppendStream.GetNumberOfBitsUsed())
+				{
+					xLocalStream.Write(xAppendStream);
+					xAppendStream.SetReadOffset(0);
+				}
 
-				OnProcessPacket(pPacket, &xProcessStream);
+				OnProcessPacket(pPacket, &xLocalStream);
 			}
 
 			// Forward or broadcast the stream.
 			CNetworkPeer* pToPeer = FindPeer(iTo);
-			BitStream* pOutStream = xStream.GetNumberOfBitsUsed() ? &xStream : NULL; 
+
+			BitStream* pFinalStream = NULL;
+			BitStream* pAppendStream = xAppendStream.GetNumberOfBitsUsed() ? &xAppendStream : NULL; 
 
 			if (bBroadcast)
-				Broadcast(pToPeer, iStreamType, pOutStream, (PacketPriority)iPriority, (PacketReliability)iReliability, iChannel);
+			{
+				pFinalStream = CreateStream(iStreamType, iFrom, pAppendStream);
+
+				XEN_LIST_FOREACH(t_NetworkPeerList, ppPeer, m_lpVerifiedPeers)
+				{
+					CNetworkPeer* pWorkingPeer = *ppPeer;
+
+					if (pWorkingPeer != pToPeer && pWorkingPeer->m_iID != iFrom && !pWorkingPeer->m_bLocal)
+					{
+						XLOG("[Network] Forwarding broadcasted packet from peer %d to peer %d", iFrom, pWorkingPeer->m_iID);
+						m_pInterface->Send(pFinalStream, (PacketPriority)iPriority, (PacketReliability)iReliability, iChannel, pWorkingPeer->m_xAddress, false);
+					}
+				}
+			}
 			else
 			{
 				if (pToPeer)
-					Send(pToPeer, iStreamType, pOutStream, (PacketPriority)iPriority, (PacketReliability)iReliability, iChannel);
+				{
+					pFinalStream = CreateStream(iStreamType, iFrom, pAppendStream);
+
+					XLOG("[Network] Forwarding packet from peer %d to peer %d", iFrom, pToPeer->m_iID);
+					m_pInterface->Send(pFinalStream, (PacketPriority)iPriority, (PacketReliability)iReliability, iChannel, pToPeer->m_xAddress, false);
+				}
 			}
+
+			if (pFinalStream)
+				delete pFinalStream;
 		}
 		break;
 	}
@@ -948,13 +968,13 @@ void CNetwork::OnProcessPacket(Packet* pPacket, BitStream* pStream)
 
 	CNetworkPeer* pPeer = FindPeer((xint)iFrom);
 
+	XLOG("[Network] Received a packet from peer %d.", iFrom);
+
 	if (pPeer)
 	{
 		if (m_fpReceiveCallbacks[iStreamType])
 			m_fpReceiveCallbacks[iStreamType](pPeer, pStream);
 	}
-	else
-		DisconnectPeer(pPacket->systemAddress);
 }
 
 //##############################################################################

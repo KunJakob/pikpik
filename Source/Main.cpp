@@ -180,6 +180,9 @@ void Application::Initialise()
 	Global.m_lpPlayers.push_back(new CGhost(0xFF4040F0));
 	Global.m_lpPlayers.push_back(new CGhost(0xFFF0F040));
 	Global.m_lpPlayers.push_back(new CGhost(0xFFF040F0));
+	
+	// Execute the first frame update.
+	Update();
 }
 
 // =============================================================================
