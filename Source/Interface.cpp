@@ -120,7 +120,7 @@ void CInterface::OnRender()
 	RenderElement(m_pScreen);
 
 	// Render debug boxes over the interface to show the active and focused elements.
-	if (m_pScreen->IsVisible())
+	if (m_bDebugRender && m_pScreen->IsVisible())
 	{
 		if (m_pActiveElement)
 		{
@@ -316,7 +316,6 @@ CInterfaceElement::CInterfaceElement(t_ElementType iType) :
 	m_bVisible(true),
 	m_bEnabled(true)
 {
-	Interface.RegisterElement(this);
 }
 
 // =============================================================================
@@ -324,7 +323,6 @@ CInterfaceElement::CInterfaceElement(t_ElementType iType) :
 // =============================================================================
 CInterfaceElement::~CInterfaceElement()
 {
-	Interface.DeregisterElement(this);
 }
 
 // =============================================================================
@@ -346,6 +344,8 @@ void CInterfaceElement::Attach(CInterfaceElement* pElement)
 	pElement->m_pParent = this;
 
 	m_lpChildElements.push_back(pElement);
+
+	Interface.RegisterElement(this);
 }
 
 // =============================================================================
@@ -362,6 +362,8 @@ void CInterfaceElement::Detach(CInterfaceElement* pElement)
 
 	if (pElement == Interface.m_pFocusedElement)
 		Interface.m_pFocusedElement = NULL;
+
+	Interface.DeregisterElement(this);
 }
 
 // =============================================================================
