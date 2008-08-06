@@ -105,15 +105,7 @@ void CLobbyScreen::OnWake()
 	case LobbyState_Game:
 		{
 			EndGame();
-
-			// If we're hosting, close the game for all players.
-			if (Network.IsHosting())
-			{
-				SetState(LobbyState_Lobby);
-			}
-			// Oterwise, leave the game session as we were never told to quit.
-			else
-				Stop();
+			Stop();
 		}
 		break;
 	}
