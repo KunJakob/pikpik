@@ -44,8 +44,8 @@ class CNetworkPeer;
 // The custom RakNet message identifiers.
 enum
 {
-	ID_DATA_STREAM = ID_USER_PACKET_ENUM,
-	ID_DATA_STREAM_RELAY,
+	ID_STREAM = ID_USER_PACKET_ENUM,
+	ID_ROUTED_STREAM,
 	ID_VERIFICATION_REQUEST,
 	ID_VERIFICATION_SUCCEEDED,
 	ID_PEER_JOINED,
@@ -237,10 +237,10 @@ public:
 
 protected:
 	// Make a standard data packet that will be going directly to the destination.
-	BitStream* CreateManagedStream(xint iPacketType, xint iFrom, xint iTo, xint iStreamType, BitStream* pStream);
+	BitStream* CreateStream(xint iFrom, xint iStreamType, BitStream* pStream);
 
 	// Make a standard data packet that will be relayed on the host.
-	BitStream* CreateManagedStream(xint iPacketType, xint iFrom, xint iTo, xint iStreamType, xint iPriority, xint iReliability, xint iChannel, BitStream* pStream);
+	BitStream* CreateRoutedStream(xbool bBroadcast, xint iFrom, xint iTo, xint iStreamType, xint iPriority, xint iReliability, xint iChannel, BitStream* pStream);
 
 	// Comparison routine for sorting peers.
 	static xbool OnComparePeers(const CNetworkPeer* pA, const CNetworkPeer* pB);

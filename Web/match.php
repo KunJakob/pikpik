@@ -14,7 +14,7 @@
 	$current_time		= time();
 	
 	// Read in the stream values.
-	$stream_values = Stream_GenerateAssocArray();
+	$stream_values = $_POST;
 	
 	if (!$stream_values)
 	{
