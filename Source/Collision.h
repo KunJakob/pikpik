@@ -73,11 +73,6 @@ public:
 		return m_iCollisionType;
 	}
 
-	// Check if the object is actually collidable at the present time. 
-	// This can be used for optimisation and disabling collision per-object.
-	// It is important that both objects must remain valid for the duration of the call.
-	virtual xbool IsCollidable(CCollidable* pWith) = 0;
-
 	// Get the collision point.
 	virtual xpoint GetCollisionPoint() 
 	{ 
@@ -95,6 +90,10 @@ public:
 	{ 
 		return xcircle(); 
 	}
+
+	// Check if the object is actually collidable at the present time.
+	// ~note It is important that both objects must remain valid for the duration of the call.
+	virtual xbool IsCollidable(CCollidable* pWith) = 0;
 
 	// Callback that is executed when a valid collision occurs.
 	virtual void OnCollision(CCollidable* pWith) = 0;
@@ -131,11 +130,14 @@ public:
 		return s_Instance;
 	}
 
+	// Constructor.
+	CCollisionManager();
+
 	// Check for valid collisions for managed collidables.
 	virtual void OnUpdate();
 
-	// Remove all currently managed collidables from the system and reset the manager to defaults.
-	void Reset();
+	// Render collision bounds for debugging purposes.
+	//virtual void OnRender();
 
 	// Add a collidable to the manager. Events will be fired between types automatically once added.
 	void Add(CCollidable* pCollidable);
@@ -143,12 +145,25 @@ public:
 	// Remove a collidable from the manager.
 	void Remove(CCollidable* pCollidable);
 
+	// Remove all currently managed collidables from the system.
+	void RemoveAll();
+
 	// Check if two collidables are colliding regardless of type.
-	xbool IsColliding(CCollidable* pA, CCollidable* pB);
+	xbool AreColliding(CCollidable* pA, CCollidable* pB);
 
 protected:
-	// The list of
+	// The list of collidable objects to be compared against each other.
 	t_CollidableList m_lpCollidables;
+
+	// TODO: Think about adding collision layers "m_lpCollidables[CollisionLayer_Max]".
+	// Collision layers can have the same collision element added to them as another layer but only collisions in each layer are valid.
+
+private:
+	// Draw a box.
+	//void DrawBox(xrect xRect, xuint iColour);
+
+	// Draw a circle.
+	//void DrawCircle(xfloat fX, xfloat fY, xfloat fRadius, xint iSegments, xuint iColour);
 };
 
 //##############################################################################

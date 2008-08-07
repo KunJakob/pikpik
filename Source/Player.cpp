@@ -425,7 +425,7 @@ void CPlayer::OnReceivePlayerUpdate(CNetworkPeer* pFrom, BitStream* pStream)
 // =============================================================================
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
-CPacman::CPacman() : CPlayer(PlayerType_Pacman, "Player-Pacman")
+CPacman::CPacman() : CPlayer(PlayerType_Pacman, "Player-Pacman"), CCollidable(CollisionGroup_Player, CollisionType_Circle)
 {
 	SetState(PlayerState_Idle);
 }
@@ -466,6 +466,29 @@ void CPacman::SetState(t_PlayerState iState)
 	CPlayer::SetState(iState);
 }
 
+// =============================================================================
+// Nat Ryall                                                         07-Aug-2008
+// =============================================================================
+xcircle CPacman::GetCollisionCircle()
+{
+	return xcircle(m_pSprite->GetPosition(), m_pSprite->GetAreaWidth() / 2);
+}
+
+// =============================================================================
+// Nat Ryall                                                         07-Aug-2008
+// =============================================================================
+xbool CPacman::IsCollidable(CCollidable* pWith)
+{
+	return false;
+}
+
+// =============================================================================
+// Nat Ryall                                                         07-Aug-2008
+// =============================================================================
+void CPacman::OnCollision(CCollidable* pWith)
+{
+}
+
 //##############################################################################
 
 //##############################################################################
@@ -477,7 +500,7 @@ void CPacman::SetState(t_PlayerState iState)
 // =============================================================================
 // Nat Ryall                                                         16-Apr-2008
 // =============================================================================
-CGhost::CGhost(xuint iColour) : CPlayer(PlayerType_Ghost, "Player-Ghost"),
+CGhost::CGhost(xuint iColour) : CPlayer(PlayerType_Ghost, "Player-Ghost"), CCollidable(CollisionGroup_Player, CollisionType_Circle),
 	m_pEyes(NULL),
 	m_iColour(iColour)
 {
@@ -552,5 +575,27 @@ void CGhost::SetState(t_PlayerState iState)
 	CPlayer::SetState(iState);
 }
 
+// =============================================================================
+// Nat Ryall                                                         07-Aug-2008
+// =============================================================================
+xcircle CGhost::GetCollisionCircle()
+{
+	return xcircle(m_pSprite->GetPosition(), m_pSprite->GetAreaWidth() / 2);
+}
+
+// =============================================================================
+// Nat Ryall                                                         07-Aug-2008
+// =============================================================================
+xbool CGhost::IsCollidable(CCollidable* pWith)
+{
+	return false;
+}
+
+// =============================================================================
+// Nat Ryall                                                         07-Aug-2008
+// =============================================================================
+void CGhost::OnCollision(CCollidable* pWith)
+{
+}
 
 //##############################################################################

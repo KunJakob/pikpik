@@ -399,6 +399,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Source\Save.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Save.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\Selection.cpp"
 				>
 			</File>
@@ -436,6 +444,14 @@
 			</File>
 			<File
 				RelativePath="..\Source\Trap.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Visor.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Visor.h"
 				>
 			</File>
 		</Filter>

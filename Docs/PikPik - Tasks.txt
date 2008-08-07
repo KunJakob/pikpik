@@ -1,0 +1,13 @@
+- Saving:
+  - Save settings to a file.
+  - Encrypted?
+  - Ini?
+  - Default values if entry missing.
+  - Version checking.
+- Player collision detection.
+- Full screen fading.
+- In-game interface.
+- Options screen.
+- Credits screen.
+  - Scrolling images and text.
+- Voice chat.

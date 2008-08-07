@@ -1,5 +1,6 @@
 Options
- - Radar Transparency: 0.25 - 1.0
+ - Interface Transparency: [0.25..1.0] (1.0)
+ - Music: [On/Off] (On)
 
 Online Options
- - Nickname: 16 Chars Max
+ - Nickname: ["Player"] (16 Chars Max)

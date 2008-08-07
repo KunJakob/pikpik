@@ -171,12 +171,6 @@ public:
 		return _HGE->Input_GetKeyState(HGEK_LBUTTON);
 	}
 
-	// Switch the debug renderer on or off.
-	void SetDebugRender(xbool bDebug)
-	{
-		m_bDebugRender = bDebug;
-	}
-
 	// Specify is the cursor should be rendered or not.
 	void SetCursorVisible(xbool bVisible)
 	{
@@ -187,6 +181,12 @@ public:
 	xbool IsCursorVisible()
 	{
 		return m_bCursorVisible;
+	}
+
+	// Switch the debug renderer on or off.
+	void SetDebugRender(xbool bDebug)
+	{
+		m_bDebugRender = bDebug;
 	}
 
 protected:

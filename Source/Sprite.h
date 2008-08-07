@@ -275,17 +275,17 @@ public:
 	/**
 	* Get the width of the entire sprite image.
 	*/
-	xuint GetImageWidth()
+	xint GetImageWidth()
 	{
-		return (xuint)_HGE->Texture_GetWidth(m_pMetadata->GetSprite()->GetTexture(), true);
+		return _HGE->Texture_GetWidth(m_pMetadata->GetSprite()->GetTexture(), true);
 	}
 
 	/**
 	* Get the height of the entire sprite image.
 	*/
-	xuint GetImageHeight()
+	xint GetImageHeight()
 	{
-		return (xuint)_HGE->Texture_GetHeight(m_pMetadata->GetSprite()->GetTexture(), true);
+		return _HGE->Texture_GetHeight(m_pMetadata->GetSprite()->GetTexture(), true);
 	}
 
 	/**
@@ -443,7 +443,7 @@ public:
 	/**
 	* Get the width of the current area or the entire image if there is no active area.
 	*/
-	xuint GetAreaWidth()
+	xint GetAreaWidth()
 	{
 		return m_pArea ? m_pArea->xRect.Width() : GetImageWidth();
 	}
@@ -451,7 +451,7 @@ public:
 	/**
 	* Get the height of the current area or the entire image if there is no active area.
 	*/
-	xuint GetAreaHeight()
+	xint GetAreaHeight()
 	{
 		return m_pArea ? m_pArea->xRect.Height() : GetImageHeight();
 	}

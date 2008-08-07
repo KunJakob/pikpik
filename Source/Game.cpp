@@ -89,7 +89,16 @@ void CGameScreen::InitialisePlayers()
 		Global.m_pLocalPlayer = Global.m_lpActivePlayers.front();
 
 		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
-			(*ppPlayer)->SetLogicType(PlayerLogicType_AI);
+		{
+			CPlayer* pPlayer = *ppPlayer;
+			
+			pPlayer->SetLogicType(PlayerLogicType_AI);
+		
+			if (pPlayer->GetType() == PlayerType_Pacman)
+				CollisionManager.Add((CPacman*)pPlayer);
+			else if (pPlayer->GetType() == PlayerType_Ghost)
+				CollisionManager.Add((CGhost*)pPlayer);
+		}
 	}
 
 	// Add all active players to the player render layer.
@@ -108,6 +117,8 @@ void CGameScreen::OnDeactivate()
 
 	RenderManager.Reset();
 	Interface.SetCursorVisible(true);
+
+	CollisionManager.RemoveAll();
 }
 
 // =============================================================================

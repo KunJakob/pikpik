@@ -1,0 +1,12 @@
+- Send each move unreliably with a "MoveID" (sequenced).
+  - Do this several times per move.
+  - If the last move we received != movieid, add it to the sequence.
+  - With each move send:
+    - Block ID.
+    - Move direction.
+  - With this information, all corrections should be possible.
+    - We can ensure ourid == blockid and warp if not.
+- At the end of a "visibility strip" (direction changes from horizontal to vertical && move is allowed).
+  - Send out the strip we just walked reliably (not ordered).
+  - Remove the strip completely on all other machines.
+- Even with a failure

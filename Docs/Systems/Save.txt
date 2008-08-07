@@ -1,0 +1,11 @@
+SaveManager.RegisterValue("PlayerName", "Krakken");
+SaveManager.RegisterValue("EnableMusic", true);
+SaveManager.RegisterValue("InterfaceTransparency", 1.0f);
+
+SaveManager.Save("Options.ini");
+SaveManager.Load("Options.ini");
+
+SaveManager.GetString("PlayerName");
+SaveManager.GetBool("EnableMusic");
+
+void RegisterValue(const xchar* pKey, const xchar* pValue);

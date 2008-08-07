@@ -13,6 +13,7 @@
 #include <Renderer.h>
 #include <Map.h>
 #include <Network.h>
+#include <Collision.h>
 
 //##############################################################################
 
@@ -224,7 +225,7 @@ private:
 //                                   PACMAN
 //
 //##############################################################################
-class CPacman : public CPlayer
+class CPacman : public CPlayer, public CCollidable
 {
 public:
 	// Costructor.
@@ -242,6 +243,16 @@ protected:
 
 	// Called to change the state of the player object.
 	virtual void SetState(t_PlayerState iState);
+
+	// Get the collision circle.
+	virtual xcircle GetCollisionCircle();
+
+	// Check if the object is actually collidable at the present time. 
+	// ~note It is important that both objects must remain valid for the duration of the call.
+	virtual xbool IsCollidable(CCollidable* pWith);
+
+	// Callback that is executed when a valid collision occurs.
+	virtual void OnCollision(CCollidable* pWith);
 };
 
 //##############################################################################
@@ -251,7 +262,7 @@ protected:
 //                                   GHOST
 //
 //##############################################################################
-class CGhost : public CPlayer
+class CGhost : public CPlayer, public CCollidable
 {
 public:
 	// Constructor.
@@ -276,6 +287,16 @@ public:
 	}
 
 protected:
+	// Get the collision circle.
+	virtual xcircle GetCollisionCircle();
+
+	// Check if the object is actually collidable at the present time. 
+	// ~note It is important that both objects must remain valid for the duration of the call.
+	virtual xbool IsCollidable(CCollidable* pWith);
+
+	// Callback that is executed when a valid collision occurs.
+	virtual void OnCollision(CCollidable* pWith);
+
 	// The ghost's eyes.
 	CSprite* m_pEyes;
 

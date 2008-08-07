@@ -22,6 +22,7 @@
 #include <Match.h>
 #include <Collision.h>
 #include <Player.h>
+#include <Visor.h>
 
 //##############################################################################
 
@@ -152,9 +153,9 @@ void Application::Initialise()
 	// Add all required modules to the game.
 	XMODULE(&Network);
 	XMODULE(&Match);
-	XMODULE(&CollisionManager);
 	XMODULE(&MapManager);
 	XMODULE(&ScreenManager);
+	XMODULE(&CollisionManager);
 	XMODULE(&RenderManager);
 	XMODULE(&Interface);
 
@@ -168,6 +169,7 @@ void Application::Initialise()
 	s_lpScreens.push_back(new CGameScreen);
 	s_lpScreens.push_back(new CLobbyScreen);
 	s_lpScreens.push_back(new CCharacterScreen);
+	s_lpScreens.push_back(new CVisorScreen);
 
 	// Load all screen instances and set go to the logo screen.
 	ScreenManager.LoadScreens();

@@ -54,6 +54,10 @@
 #include <vector>
 #include <map>
 
+// Other.
+#include <limits.h>
+#include <float.h>
+
 //##############################################################################
 
 //##############################################################################
@@ -128,6 +132,7 @@ enum t_ScreenIndex
 	ScreenIndex_SelectionScreen,
 	ScreenIndex_LobbyScreen,
 	ScreenIndex_CharacterScreen,
+	ScreenIndex_VisorScreen,
 };
 
 // Layer index.

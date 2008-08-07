@@ -93,18 +93,11 @@ xstring CMatchQuery::EncodeString(xstring sString)
 		xchar cChar = sString[iA];
 
 		// Only numbers and letters are valid.
-		// 48-57  == '0'-'9'
-		// 65-90  == 'A'-'Z'
-		// 97-122 == 'a'-'z'
-		if ((cChar >= 48 && cChar <= 57) || (cChar >= 65 && cChar <= 90) || (cChar >= 97 && cChar <= 122))
-		{
+		if (String::IsAlphaNumeric(cChar))
 			sResult += cChar;
-		}
 		// Otherwise encode in a '%FF' format.
 		else
-		{
 			sResult += XFORMAT("%%%02X", cChar);
-		}
 	}
 
 	return sResult;
