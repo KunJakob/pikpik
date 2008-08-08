@@ -1,0 +1,30 @@
+Gameplay Objectives: Melody Mode
+
+ - Game starts.
+ - You are centred over your character who is "warming up".
+ - The target melody transitions onto the screen.
+ - The countdown begins, 3..2..1..
+ - A big "GO" appears on the screen.
+ - Movement is awarded to the players.
+ - The "runner" PikPik starts collecting stars.
+   - If correct, a "collect" effect is played (this could be the note of the colour).
+   - If incorrect, an "error" effect is played (this could be a "flat" note).
+ - If the player is caught:
+   - All "chaser" PikPiks play a "win" animation.
+   - All "runner" PikPiks play a "lose" animation.
+   - A life is dropped from the "runner".
+   - If there are lives remaning:
+     - The screen transitions out.
+     - The game restarts.
+   - If all lives are spent:
+     - The game moves on to the scoreboard.
+ - If the player collects the sequence:
+   - The final song with all the notes is played.
+   - The PikPiks play a "dance" animation.
+   - All "runner" PikPiks play a "win" animation.
+   - All "chaser" PikPiks play a "lose" animation.
+   - The screen transitions out.
+   - If there is another level to play:
+     - The next level starts.
+   - If all levels were played:
+     - The game moves on to the scoreboard.
