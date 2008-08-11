@@ -1422,6 +1422,10 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Crypto"
+				>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Metadata"

@@ -1,0 +1,3 @@
+Metadata:		.mta
+Compiled Metadata:	.cmt
+Encrypted Metadata:	.emt
