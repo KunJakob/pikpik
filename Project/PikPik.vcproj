@@ -183,6 +183,14 @@
 			Name="Source"
 			>
 			<File
+				RelativePath="..\Source\Audio.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Audio.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\Background.cpp"
 				>
 			</File>
@@ -220,6 +228,14 @@
 			</File>
 			<File
 				RelativePath="..\Source\Component.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Crypt.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Crypt.h"
 				>
 			</File>
 			<File
