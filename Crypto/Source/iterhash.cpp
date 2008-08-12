@@ -1,12 +1,12 @@
 // iterhash.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 // prevent Sun's CC compiler from including this file automatically
 #if !defined(__SUNPRO_CC) || defined(CRYPTOPP_MANUALLY_INSTANTIATE_TEMPLATES)
 
-#include "Crypto/iterhash.h"
-#include "Crypto/misc.h"
+#include "iterhash.h"
+#include "misc.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

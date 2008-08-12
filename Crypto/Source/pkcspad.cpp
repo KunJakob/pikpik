@@ -1,11 +1,11 @@
 // pkcspad.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 #ifndef CRYPTOPP_PKCSPAD_CPP	// SunCC workaround: compiler could cause this file to be included twice
 #define CRYPTOPP_PKCSPAD_CPP
 
-#include "Crypto/pkcspad.h"
+#include "pkcspad.h"
 #include <assert.h>
 
 NAMESPACE_BEGIN(CryptoPP)

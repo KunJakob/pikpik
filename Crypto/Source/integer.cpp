@@ -1,20 +1,20 @@
 // integer.cpp - written and placed in the public domain by Wei Dai
 // contains public domain code contributed by Alister Lee and Leonard Janke
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 #ifndef CRYPTOPP_IMPORTS
 
-#include "Crypto/integer.h"
-#include "Crypto/modarith.h"
-#include "Crypto/nbtheory.h"
-#include "Crypto/asn.h"
-#include "Crypto/oids.h"
-#include "Crypto/words.h"
-#include "Crypto/algparam.h"
-#include "Crypto/pubkey.h"		// for P1363_KDF2
-#include "Crypto/sha.h"
-#include "Crypto/cpu.h"
+#include "integer.h"
+#include "modarith.h"
+#include "nbtheory.h"
+#include "asn.h"
+#include "oids.h"
+#include "words.h"
+#include "algparam.h"
+#include "pubkey.h"		// for P1363_KDF2
+#include "sha.h"
+#include "cpu.h"
 
 #include <iostream>
 

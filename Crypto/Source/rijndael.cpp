@@ -47,14 +47,14 @@ being unloaded from L1 cache, until that round is finished.
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 #ifndef CRYPTOPP_IMPORTS
 #ifndef CRYPTOPP_GENERATE_X64_MASM
 
-#include "Crypto/rijndael.h"
-#include "Crypto/misc.h"
-#include "Crypto/cpu.h"
+#include "rijndael.h"
+#include "misc.h"
+#include "cpu.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

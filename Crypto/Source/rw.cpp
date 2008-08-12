@@ -1,9 +1,9 @@
 // rw.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
-#include "Crypto/rw.h"
-#include "Crypto/nbtheory.h"
-#include "Crypto/asn.h"
+#include "pch.h"
+#include "rw.h"
+#include "nbtheory.h"
+#include "asn.h"
 
 #ifndef CRYPTOPP_IMPORTS
 

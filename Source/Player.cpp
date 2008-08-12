@@ -40,7 +40,7 @@ CPlayer::CPlayer(t_PlayerType iType, const xchar* pSpriteName) : CRenderable(Ren
 	m_iType(iType),
 	m_pSprite(NULL)
 {
-	m_iIndex = Global.m_lpPlayers.size();
+	m_iIndex = (xint)Global.m_lpPlayers.size();
 
 	m_pSprite = new CAnimatedSprite(_SPRITE(pSpriteName));
 	m_pSprite->SetAnimation("Idle");

@@ -3,13 +3,13 @@
 // Steve Reid implemented SHA-1. Wei Dai implemented SHA-2.
 // Both are in the public domain.
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 #ifndef CRYPTOPP_IMPORTS
 
-#include "Crypto/sha.h"
-#include "Crypto/misc.h"
-#include "Crypto/cpu.h"
+#include "sha.h"
+#include "misc.h"
+#include "cpu.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

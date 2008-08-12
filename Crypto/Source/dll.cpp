@@ -3,7 +3,7 @@
 #define CRYPTOPP_MANUALLY_INSTANTIATE_TEMPLATES
 #define CRYPTOPP_DEFAULT_NO_DLL
 
-#include "Crypto/dll.h"
+#include "dll.h"
 #pragma warning(default: 4660)
 
 #if defined(CRYPTOPP_EXPORTS) && defined(CRYPTOPP_WIN32_AVAILABLE)

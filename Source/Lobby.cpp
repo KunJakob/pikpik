@@ -371,7 +371,7 @@ void CLobbyScreen::InitialiseNetwork()
 	Network.SetGamerCard(&m_xGamerCard, sizeof(CNetworkGamerCard));
 
 	// Initialise the verification info.
-	Network.SetVerificationInfo(_GID, strlen(_GID) + 1);
+	Network.SetVerificationInfo(_GID, (xint)strlen(_GID) + 1);
 
 	// Bind the stream type callbacks.
 	Network.BindReceiveCallback(NetworkStreamType_StartGame, xbind(this, &CLobbyScreen::OnReceiveStartGame));

@@ -1,12 +1,12 @@
 // algebra.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 #ifndef CRYPTOPP_ALGEBRA_CPP	// SunCC workaround: compiler could cause this file to be included twice
 #define CRYPTOPP_ALGEBRA_CPP
 
-#include "Crypto/algebra.h"
-#include "Crypto/integer.h"
+#include "algebra.h"
+#include "integer.h"
 
 #include <vector>
 

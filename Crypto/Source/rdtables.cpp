@@ -1,10 +1,10 @@
 // Rijndael tables
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 #ifndef CRYPTOPP_IMPORTS
 
-#include "Crypto/rijndael.h"
+#include "rijndael.h"
 
 // VC60 workaround: gives a C4786 warning without this function
 // when runtime lib is set to multithread debug DLL

@@ -1,7 +1,7 @@
 // pssr.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
-#include "Crypto/pssr.h"
+#include "pch.h"
+#include "pssr.h"
 #include <functional>
 
 NAMESPACE_BEGIN(CryptoPP)

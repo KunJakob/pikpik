@@ -45,7 +45,11 @@
 #endif
 #endif
 
-#pragma comment(lib, "cryptopp")
+#ifdef _DEBUG
+#pragma comment(lib, "cryptd")
+#else
+#pragma comment(lib, "crypt")
+#endif
 
 #endif		// #ifdef CRYPTOPP_IMPORTS
 

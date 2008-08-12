@@ -1,11 +1,11 @@
 // trdlocal.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 #ifndef CRYPTOPP_IMPORTS
 #ifdef THREADS_AVAILABLE
 
-#include "Crypto/trdlocal.h"
+#include "trdlocal.h"
 
 #ifdef HAS_WINTHREADS
 #include <windows.h>

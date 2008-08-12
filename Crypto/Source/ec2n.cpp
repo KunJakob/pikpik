@@ -1,14 +1,14 @@
 // ec2n.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 #ifndef CRYPTOPP_IMPORTS
 
-#include "Crypto/ec2n.h"
-#include "Crypto/asn.h"
+#include "ec2n.h"
+#include "asn.h"
 
-#include "Crypto/Source/algebra.cpp"
-#include "Crypto/Source/eprecomp.cpp"
+#include "algebra.cpp"
+#include "eprecomp.cpp"
 
 NAMESPACE_BEGIN(CryptoPP)
 

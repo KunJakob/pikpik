@@ -1,14 +1,14 @@
 // ecp.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 #ifndef CRYPTOPP_IMPORTS
 
-#include "Crypto/ecp.h"
-#include "Crypto/asn.h"
-#include "Crypto/nbtheory.h"
+#include "ecp.h"
+#include "asn.h"
+#include "nbtheory.h"
 
-#include "Crypto/Source/algebra.cpp"
+#include "algebra.cpp"
 
 NAMESPACE_BEGIN(CryptoPP)
 

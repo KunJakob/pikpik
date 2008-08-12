@@ -1,11 +1,11 @@
 // misc.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 #ifndef CRYPTOPP_IMPORTS
 
-#include "Crypto/misc.h"
-#include "Crypto/words.h"
+#include "misc.h"
+#include "words.h"
 #include <new>
 
 NAMESPACE_BEGIN(CryptoPP)

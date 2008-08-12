@@ -1,18 +1,18 @@
 // eccrypto.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 // prevent Sun's CC compiler from including this file automatically
 #if !defined(__SUNPRO_CC) || defined(CRYPTOPP_MANUALLY_INSTANTIATE_TEMPLATES)
 
 #ifndef CRYPTOPP_IMPORTS
 
-#include "Crypto/eccrypto.h"
-#include "Crypto/nbtheory.h"
-#include "Crypto/oids.h"
-#include "Crypto/hex.h"
-#include "Crypto/argnames.h"
-#include "Crypto/ec2n.h"
+#include "eccrypto.h"
+#include "nbtheory.h"
+#include "oids.h"
+#include "hex.h"
+#include "argnames.h"
+#include "ec2n.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

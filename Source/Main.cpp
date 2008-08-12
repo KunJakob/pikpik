@@ -24,6 +24,8 @@
 #include <Player.h>
 #include <Visor.h>
 
+#include <Crypto/rsa.h>
+
 //##############################################################################
 
 //##############################################################################
@@ -93,19 +95,32 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		if (eSoundResult == FMOD_OK && s_pInterface->System_Initiate())
 		{
+			HWND hWindow = s_pInterface->System_GetState(HGE_HWND);
+
 			try
 			{
 				Application::Initialise();
+
 				s_pInterface->System_Start();
-				Application::Deinitialise();
 			}
 			catch (Xen::CException xException)
 			{
-				MessageBox(s_pInterface->System_GetState(HGE_HWND), xException.GetDetailedMessage().c_str(), "Error", MB_OK | MB_ICONERROR);
+				_TERMINATE;
+
+				MessageBox(hWindow, xException.GetDetailedMessage().c_str(), "Application Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
 				XLOG(xException.GetDetailedMessage().c_str());
+			}
+			catch (CryptoPP::Exception xException)
+			{
+				_TERMINATE;
+
+				MessageBox(hWindow, xException.what(), "Cryptographic Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
+				XLOG(xException.what());
 			}
 
 			s_pInterface->System_Shutdown();
+
+			Application::Deinitialise();
 		}
 
 		s_pSoundSystem->release();
@@ -131,6 +146,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 // =============================================================================
 void Application::Initialise()
 {
+	// Seed the random number generator.
 	srand(GetTickCount());
 
 	// Initialise global vars.
@@ -216,16 +232,19 @@ void Application::Deinitialise()
 // =============================================================================
 xbool Application::Update()
 {
-	s_iTimeDelta = (xuint)(_TIMEDELTAF * 1000.f);
+	if (!s_bTerminate)
+	{
+		s_iTimeDelta = (xuint)(_TIMEDELTAF * 1000.f);
 
-	s_pSoundSystem->update();
+		s_pSoundSystem->update();
 
-	ModuleManager.Update();
+		ModuleManager.Update();
 
-	hgeInputEvent hgEvent;
+		hgeInputEvent hgEvent;
 
-	while (s_pInterface->Input_GetEvent(&hgEvent))
-		ScreenManager.Event(hgEvent.type, &hgEvent);
+		while (s_pInterface->Input_GetEvent(&hgEvent))
+			ScreenManager.Event(hgEvent.type, &hgEvent);
+	}
 
 	return s_bTerminate;
 }
@@ -235,12 +254,15 @@ xbool Application::Update()
 // =============================================================================
 xbool Application::Render()
 {
-	s_pInterface->Gfx_BeginScene();
+	if (!s_bTerminate)
+	{
+		s_pInterface->Gfx_BeginScene();
 
-	ModuleManager.Render();
+		ModuleManager.Render();
 
-	s_pInterface->Gfx_EndScene();
-
+		s_pInterface->Gfx_EndScene();
+	}
+		
 	return false;
 }
 

@@ -1,15 +1,15 @@
 // gf2n.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 #ifndef CRYPTOPP_IMPORTS
 
-#include "Crypto/gf2n.h"
-#include "Crypto/algebra.h"
-#include "Crypto/words.h"
-#include "Crypto/randpool.h"
-#include "Crypto/asn.h"
-#include "Crypto/oids.h"
+#include "gf2n.h"
+#include "algebra.h"
+#include "words.h"
+#include "randpool.h"
+#include "asn.h"
+#include "oids.h"
 
 #include <iostream>
 

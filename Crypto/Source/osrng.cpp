@@ -2,15 +2,15 @@
 
 // Thanks to Leonard Janke for the suggestion for AutoSeededRandomPool.
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 #ifndef CRYPTOPP_IMPORTS
 
-#include "Crypto/osrng.h"
+#include "osrng.h"
 
 #ifdef OS_RNG_AVAILABLE
 
-#include "Crypto/rng.h"
+#include "rng.h"
 
 #ifdef CRYPTOPP_WIN32_AVAILABLE
 #ifndef _WIN32_WINNT

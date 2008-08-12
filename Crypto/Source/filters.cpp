@@ -1,13 +1,13 @@
 // filters.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 #ifndef CRYPTOPP_IMPORTS
 
-#include "Crypto/filters.h"
-#include "Crypto/mqueue.h"
-#include "Crypto/fltrimpl.h"
-#include "Crypto/argnames.h"
+#include "filters.h"
+#include "mqueue.h"
+#include "fltrimpl.h"
+#include "argnames.h"
 #include <memory>
 #include <functional>
 

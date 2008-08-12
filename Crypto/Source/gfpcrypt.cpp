@@ -1,13 +1,13 @@
 // dsa.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 #ifndef CRYPTOPP_IMPORTS
 
-#include "Crypto/gfpcrypt.h"
-#include "Crypto/asn.h"
-#include "Crypto/oids.h"
-#include "Crypto/nbtheory.h"
+#include "gfpcrypt.h"
+#include "asn.h"
+#include "oids.h"
+#include "nbtheory.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

@@ -1,18 +1,18 @@
 // cryptlib.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 #ifndef CRYPTOPP_IMPORTS
 
-#include "Crypto/cryptlib.h"
-#include "Crypto/misc.h"
-#include "Crypto/filters.h"
-#include "Crypto/algparam.h"
-#include "Crypto/fips140.h"
-#include "Crypto/argnames.h"
-#include "Crypto/fltrimpl.h"
-#include "Crypto/trdlocal.h"
-#include "Crypto/osrng.h"
+#include "cryptlib.h"
+#include "misc.h"
+#include "filters.h"
+#include "algparam.h"
+#include "fips140.h"
+#include "argnames.h"
+#include "fltrimpl.h"
+#include "trdlocal.h"
+#include "osrng.h"
 
 #include <memory>
 

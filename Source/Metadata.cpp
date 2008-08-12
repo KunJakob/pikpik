@@ -106,7 +106,7 @@ void CMetadata::UpdateLoad(xuint iChunkSize)
 
 		if (m_hFile == INVALID_HANDLE_VALUE)
 		{
-			SetError(XFORMAT("Failed to open the file.", m_pFile));
+			SetError(XFORMAT("Failed to open the file: %s.", m_pFile));
 			return;
 		}
 

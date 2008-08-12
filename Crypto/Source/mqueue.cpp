@@ -1,10 +1,10 @@
 // mqueue.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 #ifndef CRYPTOPP_IMPORTS
 
-#include "Crypto/mqueue.h"
+#include "mqueue.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

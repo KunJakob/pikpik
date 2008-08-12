@@ -1,12 +1,12 @@
 // nbtheory.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 #ifndef CRYPTOPP_IMPORTS
 
-#include "Crypto/nbtheory.h"
-#include "Crypto/modarith.h"
-#include "Crypto/algparam.h"
+#include "nbtheory.h"
+#include "modarith.h"
+#include "algparam.h"
 
 #include <math.h>
 #include <vector>

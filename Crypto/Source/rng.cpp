@@ -1,9 +1,9 @@
 // rng.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
-#include "Crypto/rng.h"
-#include "Crypto/fips140.h"
+#include "rng.h"
+#include "fips140.h"
 
 #include <time.h>
 #include <math.h>

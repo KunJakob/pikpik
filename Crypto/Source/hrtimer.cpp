@@ -1,8 +1,8 @@
 // hrtimer.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
-#include "Crypto/hrtimer.h"
-#include "Crypto/misc.h"
+#include "pch.h"
+#include "hrtimer.h"
+#include "misc.h"
 #include <stddef.h>		// for NULL
 #include <time.h>
 

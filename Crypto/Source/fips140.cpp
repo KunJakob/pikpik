@@ -1,11 +1,11 @@
 // fips140.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 #ifndef CRYPTOPP_IMPORTS
 
-#include "Crypto/fips140.h"
-#include "Crypto/trdlocal.h"	// needs to be included last for cygwin
+#include "fips140.h"
+#include "trdlocal.h"	// needs to be included last for cygwin
 
 NAMESPACE_BEGIN(CryptoPP)
 

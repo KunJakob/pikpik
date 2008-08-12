@@ -4,14 +4,14 @@
 // of reusing random numbers after state rollback (which may occur
 // when running in a virtual machine like VMware).
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 #ifndef CRYPTOPP_IMPORTS
 
-#include "Crypto/randpool.h"
-#include "Crypto/aes.h"
-#include "Crypto/sha.h"
-#include "Crypto/hrtimer.h"
+#include "randpool.h"
+#include "aes.h"
+#include "sha.h"
+#include "hrtimer.h"
 #include <time.h>
 
 NAMESPACE_BEGIN(CryptoPP)

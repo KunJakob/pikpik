@@ -1,14 +1,14 @@
 // eprecomp.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 // prevent Sun's CC compiler from including this file automatically
 #if !defined(__SUNPRO_CC) || defined(CRYPTOPP_MANUALLY_INSTANTIATE_TEMPLATES)
 
 #ifndef CRYPTOPP_IMPORTS
 
-#include "Crypto/eprecomp.h"
-#include "Crypto/asn.h"
+#include "eprecomp.h"
+#include "asn.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

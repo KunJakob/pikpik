@@ -1,11 +1,11 @@
 // cpu.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 #ifndef CRYPTOPP_IMPORTS
 
-#include "Crypto/cpu.h"
-#include "Crypto/misc.h"
+#include "cpu.h"
+#include "misc.h"
 #include <algorithm>
 
 #ifdef __GNUC__

@@ -49,6 +49,9 @@
 // FMOD.
 #include <FMOD/fmod.hpp>
 
+// Crypto++
+#include <Crypto/dll.h>
+
 // STL.
 #include <list>
 #include <vector>

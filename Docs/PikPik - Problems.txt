@@ -54,3 +54,9 @@ Problems:
 - If so, how far will this go? Scalable? On/Off behaviours? Timer delays?
 - Will the player's current progress be shown to other players?
 - Will the progress re-start or transfer or manage personally when caught?
+- How will I prevent full versions being copied or at least block them ASAP?
+- How will I keep the product alive?
+- Are there lives?
+- What happens if all lives are lost?
+- Are trophies awarded to players? Special effects?
+- Will music affect the level in any way?

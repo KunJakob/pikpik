@@ -1,11 +1,11 @@
 // fipstest.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
+#include "pch.h"
 
 #ifndef CRYPTOPP_IMPORTS
 
 #define CRYPTOPP_DEFAULT_NO_DLL
-#include "Crypto/dll.h"
+#include "dll.h"
 
 #ifdef CRYPTOPP_WIN32_AVAILABLE
 #define _WIN32_WINNT 0x0400

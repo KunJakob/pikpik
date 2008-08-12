@@ -1,7 +1,7 @@
 // emsa2.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
-#include "Crypto/emsa2.h"
+#include "pch.h"
+#include "emsa2.h"
 
 #ifndef CRYPTOPP_IMPORTS
 

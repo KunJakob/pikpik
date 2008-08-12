@@ -1,17 +1,17 @@
 // rsa.cpp - written and placed in the public domain by Wei Dai
 
-#include "Crypto/pch.h"
-#include "Crypto/rsa.h"
-#include "Crypto/asn.h"
-#include "Crypto/oids.h"
-#include "Crypto/modarith.h"
-#include "Crypto/nbtheory.h"
-#include "Crypto/sha.h"
-#include "Crypto/algparam.h"
-#include "Crypto/fips140.h"
+#include "pch.h"
+#include "rsa.h"
+#include "asn.h"
+#include "oids.h"
+#include "modarith.h"
+#include "nbtheory.h"
+#include "sha.h"
+#include "algparam.h"
+#include "fips140.h"
 
 #if !defined(NDEBUG) && !defined(CRYPTOPP_IS_DLL)
-#include "Crypto/pssr.h"
+#include "pssr.h"
 NAMESPACE_BEGIN(CryptoPP)
 void RSA_TestInstantiations()
 {
