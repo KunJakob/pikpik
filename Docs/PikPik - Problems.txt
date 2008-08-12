@@ -1,0 +1,56 @@
+Problems:
+
+- How do we know who's being chased?
+- How do we know who is chasing?
+- How do we determine who is the first to chase?
+- Is the game like tag or is the game over once the chasee is caught?
+- How is the map rendered?
+- What assistances do players have?
+- What options in the game are configurable?
+- What modes are in the game and what are their rules?
+- Will there be any unlockables from single player?
+- How will single player pan out?
+- Will there be a back/ongoing story?
+- How many levels will there be in single player and multiplayer?
+- Will the maps be different?
+- What are the restrictions of the demo?
+- How will data be distributed?
+- Can we patch the data or do we need to re-download each time?
+- How will the game be advertised?
+- What percentage of sales will go to who.
+- How many traps/powers can you collect?
+- How do you use a power/trap?
+- How are powers/traps displayed on screen?
+- Is there a radar?
+- If there is, are there zones where the radar becomes more helpful?
+- How is the music collection displayed?
+- What happens when it plays back? Does it light up?
+- What options are available to the player?
+- How are online settings changed? 
+- Are they a sub-menu? Are they their own menu?
+- At the end of a game, what happens?
+- Are there scoreboards?
+- What scores are tracked and shown?
+- Is account creation necessary for stats tracking?
+- What is the point of online mode? 
+- Is it just for fun?
+- How will the "PacMan" mode work?
+- What can each player see when playing (FOV)?
+- Is this different depending on the player?
+- Are there several level "zones"? If so which ones?
+- Why are the PikPiks doing what they are doing?
+- Are there any enemies to hate?
+- What exactly is the point of the game?
+- What motivates players to play?
+- What makes the game fun and addictive?
+- Are levels grouped into zones?
+- How many zones? How many levels per zone?
+- How is the transition from zone to zone shown?
+- How is each level introduced?
+- Is there a loading screen betweem levels?
+- What animations are needed for the PikPiks?
+- Are pikpiks all the same with different graphics or do they move/react in their own ways?
+- Will AI have difficulty toggling?
+- If so, how far will this go? Scalable? On/Off behaviours? Timer delays?
+- Will the player's current progress be shown to other players?
+- Will the progress re-start or transfer or manage personally when caught?

@@ -1,0 +1,3 @@
+Rules:
+
+- Several PikPiks of the same race can play in the same game.
