@@ -64,6 +64,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="$(SolutionDir)HGE\Lib\hge.lib $(SolutionDir)HGE\Lib\hgehelp.lib $(SolutionDir)FMOD\Lib\fmodex_vc.lib ws2_32.lib"
+				OutputFile="$(OutDir)\pikpikd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(SolutionDir)Crypto\Lib"
 				IgnoreDefaultLibraryNames="libc;libcmt"
@@ -143,6 +144,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="$(SolutionDir)HGE\Lib\hge.lib $(SolutionDir)HGE\Lib\hgehelp.lib $(SolutionDir)FMOD\Lib\fmodex_vc.lib ws2_32.lib"
+				OutputFile="$(OutDir)\pikpik.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(SolutionDir)Crypto\Lib"
 				IgnoreDefaultLibraryNames="libc;libcmt"
