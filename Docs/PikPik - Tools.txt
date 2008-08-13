@@ -1,0 +1,18 @@
+metacomp:
+
+- Simplify metadata whitespaces to just use a single space.
+- Encrypt metadata with the shared key.
+- Save the metadata to an encoded file name.
+
+
+codesign:
+
+- Sign an exe on disk and write to a file ("pikpik.dll").
+
+
+rescomp:
+
+- Build a file list by searching a directory.
+- From the file list, build a file table with:
+  - Local Path, Offset, Size.
+- Align and write the file contents to the locations specified in the table.

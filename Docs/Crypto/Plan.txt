@@ -1,7 +1,7 @@
 Metadata:
 
 - Sign the metadata and then encrypt it.
-- Save the password in the metadata.
+- Save the password in the executable.
 - Save the signature in the executable.
 
 - When the metadata loads, read the signature from the executable.

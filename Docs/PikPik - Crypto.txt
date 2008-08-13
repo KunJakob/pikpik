@@ -1,0 +1,5 @@
+- Encrypt the metadata with AES and a shared key.
+- Save the password and public key in the final executable, hex encoded.
+- Sign the final executable and save the signature to "pikpik.dll"
+- In the initialisation, self-test the application against the signature (from memory).
+- If it fails, load a hex encoded error message with "Unknown Code Source". 
