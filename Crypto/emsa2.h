@@ -5,11 +5,11 @@
 	This file contains various padding schemes for public key algorithms.
 */
 
-#include "Crypto/cryptlib.h"
-#include "Crypto/pubkey.h"
+#include "cryptlib.h"
+#include "pubkey.h"
 
 #ifdef CRYPTOPP_IS_DLL
-#include "Crypto/sha.h"
+#include "sha.h"
 #endif
 
 NAMESPACE_BEGIN(CryptoPP)

@@ -28,9 +28,9 @@
 #ifndef CRYPTOPP_STRCIPHR_H
 #define CRYPTOPP_STRCIPHR_H
 
-#include "Crypto/seckey.h"
-#include "Crypto/secblock.h"
-#include "Crypto/argnames.h"
+#include "seckey.h"
+#include "secblock.h"
+#include "argnames.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 
@@ -291,7 +291,7 @@ public:
 NAMESPACE_END
 
 #ifdef CRYPTOPP_MANUALLY_INSTANTIATE_TEMPLATES
-#include "Crypto/Source/strciphr.cpp"
+#include "strciphr.cpp"
 #endif
 
 NAMESPACE_BEGIN(CryptoPP)

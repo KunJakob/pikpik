@@ -1,10 +1,10 @@
 #ifndef CRYPTOPP_ECP_H
 #define CRYPTOPP_ECP_H
 
-#include "Crypto/modarith.h"
-#include "Crypto/eprecomp.h"
-#include "Crypto/smartptr.h"
-#include "Crypto/pubkey.h"
+#include "modarith.h"
+#include "eprecomp.h"
+#include "smartptr.h"
+#include "pubkey.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

@@ -1,8 +1,8 @@
 #ifndef CRYPTOPP_EPRECOMP_H
 #define CRYPTOPP_EPRECOMP_H
 
-#include "Crypto/integer.h"
-#include "Crypto/algebra.h"
+#include "integer.h"
+#include "algebra.h"
 #include <vector>
 
 NAMESPACE_BEGIN(CryptoPP)
@@ -67,7 +67,7 @@ private:
 NAMESPACE_END
 
 #ifdef CRYPTOPP_MANUALLY_INSTANTIATE_TEMPLATES
-#include "Crypto/Source/eprecomp.cpp"
+#include "eprecomp.cpp"
 #endif
 
 #endif

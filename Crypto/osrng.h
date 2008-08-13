@@ -1,15 +1,15 @@
 #ifndef CRYPTOPP_OSRNG_H
 #define CRYPTOPP_OSRNG_H
 
-#include "Crypto/config.h"
+#include "config.h"
 
 #ifdef OS_RNG_AVAILABLE
 
-#include "Crypto/randpool.h"
-#include "Crypto/rng.h"
-#include "Crypto/aes.h"
-#include "Crypto/sha.h"
-#include "Crypto/fips140.h"
+#include "randpool.h"
+#include "rng.h"
+#include "aes.h"
+#include "sha.h"
+#include "fips140.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

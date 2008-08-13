@@ -3,7 +3,7 @@
 #ifndef CRYPTOPP_QUEUE_H
 #define CRYPTOPP_QUEUE_H
 
-#include "Crypto/simple.h"
+#include "simple.h"
 //#include <algorithm>
 
 NAMESPACE_BEGIN(CryptoPP)

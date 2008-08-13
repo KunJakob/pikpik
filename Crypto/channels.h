@@ -1,8 +1,8 @@
 #ifndef CRYPTOPP_CHANNELS_H
 #define CRYPTOPP_CHANNELS_H
 
-#include "Crypto/simple.h"
-#include "Crypto/smartptr.h"
+#include "simple.h"
+#include "smartptr.h"
 #include <map>
 #include <list>
 

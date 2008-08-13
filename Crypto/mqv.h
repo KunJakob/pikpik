@@ -4,7 +4,7 @@
 /** \file
 */
 
-#include "Crypto/gfpcrypt.h"
+#include "gfpcrypt.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

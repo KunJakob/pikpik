@@ -6,8 +6,8 @@
 #ifndef CRYPTOPP_SIMPLE_H
 #define CRYPTOPP_SIMPLE_H
 
-#include "Crypto/cryptlib.h"
-#include "Crypto/misc.h"
+#include "cryptlib.h"
+#include "misc.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

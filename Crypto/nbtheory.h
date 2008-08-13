@@ -3,8 +3,8 @@
 #ifndef CRYPTOPP_NBTHEORY_H
 #define CRYPTOPP_NBTHEORY_H
 
-#include "Crypto/integer.h"
-#include "Crypto/algparam.h"
+#include "integer.h"
+#include "algparam.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

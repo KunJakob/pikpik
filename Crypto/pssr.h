@@ -1,11 +1,11 @@
 #ifndef CRYPTOPP_PSSR_H
 #define CRYPTOPP_PSSR_H
 
-#include "Crypto/pubkey.h"
-#include "Crypto/emsa2.h"
+#include "pubkey.h"
+#include "emsa2.h"
 
 #ifdef CRYPTOPP_IS_DLL
-#include "Crypto/sha.h"
+#include "sha.h"
 #endif
 
 NAMESPACE_BEGIN(CryptoPP)

@@ -3,10 +3,10 @@
 
 /*! \file */
 
-#include "Crypto/cryptlib.h"
-#include "Crypto/secblock.h"
-#include "Crypto/misc.h"
-#include "Crypto/algebra.h"
+#include "cryptlib.h"
+#include "secblock.h"
+#include "misc.h"
+#include "algebra.h"
 
 #include <iosfwd>
 

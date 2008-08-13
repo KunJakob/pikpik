@@ -5,13 +5,13 @@
 	Implementation of schemes based on DL over GF(p)
 */
 
-#include "Crypto/pubkey.h"
-#include "Crypto/modexppc.h"
-#include "Crypto/sha.h"
-#include "Crypto/algparam.h"
-#include "Crypto/asn.h"
-#include "Crypto/smartptr.h"
-#include "Crypto/hmac.h"
+#include "pubkey.h"
+#include "modexppc.h"
+#include "sha.h"
+#include "algparam.h"
+#include "asn.h"
+#include "smartptr.h"
+#include "hmac.h"
 
 #include <limits.h>
 

@@ -1,10 +1,10 @@
 #ifndef CRYPTOPP_ITERHASH_H
 #define CRYPTOPP_ITERHASH_H
 
-#include "Crypto/cryptlib.h"
-#include "Crypto/secblock.h"
-#include "Crypto/misc.h"
-#include "Crypto/simple.h"
+#include "cryptlib.h"
+#include "secblock.h"
+#include "misc.h"
+#include "simple.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 
@@ -96,7 +96,7 @@ protected:
 NAMESPACE_END
 
 #ifdef CRYPTOPP_MANUALLY_INSTANTIATE_TEMPLATES
-#include "Crypto/Source/iterhash.cpp"
+#include "iterhash.cpp"
 #endif
 
 NAMESPACE_BEGIN(CryptoPP)

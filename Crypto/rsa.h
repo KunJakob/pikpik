@@ -6,11 +6,11 @@
 	ciphers and signature schemes as defined in PKCS #1 v2.0.
 */
 
-#include "Crypto/pubkey.h"
-#include "Crypto/asn.h"
-#include "Crypto/pkcspad.h"
-#include "Crypto/oaep.h"
-#include "Crypto/emsa2.h"
+#include "pubkey.h"
+#include "asn.h"
+#include "pkcspad.h"
+#include "oaep.h"
+#include "emsa2.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

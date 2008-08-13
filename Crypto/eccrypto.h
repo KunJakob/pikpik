@@ -4,16 +4,16 @@
 /*! \file
 */
 
-#include "Crypto/pubkey.h"
-#include "Crypto/integer.h"
-#include "Crypto/asn.h"
-#include "Crypto/hmac.h"
-#include "Crypto/sha.h"
-#include "Crypto/gfpcrypt.h"
-#include "Crypto/dh.h"
-#include "Crypto/mqv.h"
-#include "Crypto/ecp.h"
-#include "Crypto/ec2n.h"
+#include "pubkey.h"
+#include "integer.h"
+#include "asn.h"
+#include "hmac.h"
+#include "sha.h"
+#include "gfpcrypt.h"
+#include "dh.h"
+#include "mqv.h"
+#include "ecp.h"
+#include "ec2n.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 
@@ -255,7 +255,7 @@ struct ECIES
 NAMESPACE_END
 
 #ifdef CRYPTOPP_MANUALLY_INSTANTIATE_TEMPLATES
-#include "Crypto/Source/eccrypto.cpp"
+#include "eccrypto.cpp"
 #endif
 
 NAMESPACE_BEGIN(CryptoPP)

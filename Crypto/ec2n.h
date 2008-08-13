@@ -1,10 +1,10 @@
 #ifndef CRYPTOPP_EC2N_H
 #define CRYPTOPP_EC2N_H
 
-#include "Crypto/gf2n.h"
-#include "Crypto/eprecomp.h"
-#include "Crypto/smartptr.h"
-#include "Crypto/pubkey.h"
+#include "gf2n.h"
+#include "eprecomp.h"
+#include "smartptr.h"
+#include "pubkey.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

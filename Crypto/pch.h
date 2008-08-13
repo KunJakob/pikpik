@@ -3,17 +3,17 @@
 
 #ifdef CRYPTOPP_GENERATE_X64_MASM
 
-	#include "Crypto/cpu.h"
+	#include "cpu.h"
 
 #else
 
-	#include "Crypto/config.h"
+	#include "config.h"
 
 	#ifdef USE_PRECOMPILED_HEADERS
-		#include "Crypto/simple.h"
-		#include "Crypto/secblock.h"
-		#include "Crypto/misc.h"
-		#include "Crypto/smartptr.h"
+		#include "simple.h"
+		#include "secblock.h"
+		#include "misc.h"
+		#include "smartptr.h"
 	#endif
 
 #endif

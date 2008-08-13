@@ -8,31 +8,31 @@
 #define CRYPTOPP_IMPORTS
 #endif
 
-#include "Crypto/aes.h"
-#include "Crypto/cbcmac.h"
-#include "Crypto/channels.h"
-#include "Crypto/des.h"
-#include "Crypto/dh.h"
-#include "Crypto/dsa.h"
-#include "Crypto/ec2n.h"
-#include "Crypto/eccrypto.h"
-#include "Crypto/ecp.h"
-#include "Crypto/files.h"
-#include "Crypto/fips140.h"
-#include "Crypto/hex.h"
-#include "Crypto/hmac.h"
-#include "Crypto/modes.h"
-#include "Crypto/mqueue.h"
-#include "Crypto/nbtheory.h"
-#include "Crypto/osrng.h"
-#include "Crypto/pkcspad.h"
-#include "Crypto/pssr.h"
-#include "Crypto/randpool.h"
-#include "Crypto/rsa.h"
-#include "Crypto/rw.h"
-#include "Crypto/sha.h"
-#include "Crypto/skipjack.h"
-#include "Crypto/trdlocal.h"
+#include "aes.h"
+#include "cbcmac.h"
+#include "channels.h"
+#include "des.h"
+#include "dh.h"
+#include "dsa.h"
+#include "ec2n.h"
+#include "eccrypto.h"
+#include "ecp.h"
+#include "files.h"
+#include "fips140.h"
+#include "hex.h"
+#include "hmac.h"
+#include "modes.h"
+#include "mqueue.h"
+#include "nbtheory.h"
+#include "osrng.h"
+#include "pkcspad.h"
+#include "pssr.h"
+#include "randpool.h"
+#include "rsa.h"
+#include "rw.h"
+#include "sha.h"
+#include "skipjack.h"
+#include "trdlocal.h"
 
 #ifdef CRYPTOPP_IMPORTS
 
@@ -45,11 +45,7 @@
 #endif
 #endif
 
-#ifdef _DEBUG
-#pragma comment(lib, "cryptd")
-#else
-#pragma comment(lib, "crypt")
-#endif
+#pragma comment(lib, "cryptopp")
 
 #endif		// #ifdef CRYPTOPP_IMPORTS
 

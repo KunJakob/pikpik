@@ -1,9 +1,9 @@
 #ifndef CRYPTOPP_FILES_H
 #define CRYPTOPP_FILES_H
 
-#include "Crypto/cryptlib.h"
-#include "Crypto/filters.h"
-#include "Crypto/argnames.h"
+#include "cryptlib.h"
+#include "filters.h"
+#include "argnames.h"
 
 #include <iostream>
 #include <fstream>

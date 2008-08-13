@@ -1,9 +1,9 @@
 #ifndef CRYPTOPP_BASECODE_H
 #define CRYPTOPP_BASECODE_H
 
-#include "Crypto/filters.h"
-#include "Crypto/algparam.h"
-#include "Crypto/argnames.h"
+#include "filters.h"
+#include "algparam.h"
+#include "argnames.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

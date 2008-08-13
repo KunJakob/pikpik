@@ -1,7 +1,7 @@
 #ifndef CRYPTOPP_AES_H
 #define CRYPTOPP_AES_H
 
-#include "Crypto/rijndael.h"
+#include "rijndael.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

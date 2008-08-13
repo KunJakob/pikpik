@@ -3,7 +3,7 @@
 
 // crypto-related ASN.1 object identifiers
 
-#include "Crypto/asn.h"
+#include "asn.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

@@ -5,8 +5,8 @@
 	FIPS 140 related functions and classes.
 */
 
-#include "Crypto/cryptlib.h"
-#include "Crypto/secblock.h"
+#include "cryptlib.h"
+#include "secblock.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

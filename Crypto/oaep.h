@@ -1,8 +1,8 @@
 #ifndef CRYPTOPP_OAEP_H
 #define CRYPTOPP_OAEP_H
 
-#include "Crypto/pubkey.h"
-#include "Crypto/sha.h"
+#include "pubkey.h"
+#include "sha.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

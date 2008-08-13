@@ -1,7 +1,7 @@
 #ifndef CRYPTOPP_ARGNAMES_H
 #define CRYPTOPP_ARGNAMES_H
 
-#include "Crypto/cryptlib.h"
+#include "cryptlib.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

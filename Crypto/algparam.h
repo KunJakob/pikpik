@@ -1,9 +1,9 @@
 #ifndef CRYPTOPP_ALGPARAM_H
 #define CRYPTOPP_ALGPARAM_H
 
-#include "Crypto/cryptlib.h"
-#include "Crypto/smartptr.h"
-#include "Crypto/secblock.h"
+#include "cryptlib.h"
+#include "smartptr.h"
+#include "secblock.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

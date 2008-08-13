@@ -3,8 +3,8 @@
 #ifndef CRYPTOPP_RNG_H
 #define CRYPTOPP_RNG_H
 
-#include "Crypto/cryptlib.h"
-#include "Crypto/filters.h"
+#include "cryptlib.h"
+#include "filters.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

@@ -1,8 +1,8 @@
 #ifndef CRYPTOPP_ASN_H
 #define CRYPTOPP_ASN_H
 
-#include "Crypto/filters.h"
-#include "Crypto/queue.h"
+#include "filters.h"
+#include "queue.h"
 #include <vector>
 
 NAMESPACE_BEGIN(CryptoPP)

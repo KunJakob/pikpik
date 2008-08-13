@@ -3,10 +3,10 @@
 
 // implementations are in integer.cpp
 
-#include "Crypto/cryptlib.h"
-#include "Crypto/misc.h"
-#include "Crypto/integer.h"
-#include "Crypto/algebra.h"
+#include "cryptlib.h"
+#include "misc.h"
+#include "integer.h"
+#include "algebra.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

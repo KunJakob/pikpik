@@ -6,8 +6,8 @@
 /** \file
 */
 
-#include "Crypto/seckey.h"
-#include "Crypto/misc.h"
+#include "seckey.h"
+#include "misc.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

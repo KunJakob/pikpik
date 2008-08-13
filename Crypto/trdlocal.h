@@ -1,11 +1,11 @@
 #ifndef CRYPTOPP_TRDLOCAL_H
 #define CRYPTOPP_TRDLOCAL_H
 
-#include "Crypto/config.h"
+#include "config.h"
 
 #ifdef THREADS_AVAILABLE
 
-#include "Crypto/misc.h"
+#include "misc.h"
 
 #ifdef HAS_WINTHREADS
 typedef unsigned long ThreadLocalIndexType;

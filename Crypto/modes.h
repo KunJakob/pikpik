@@ -4,12 +4,12 @@
 /*! \file
 */
 
-#include "Crypto/cryptlib.h"
-#include "Crypto/secblock.h"
-#include "Crypto/misc.h"
-#include "Crypto/strciphr.h"
-#include "Crypto/argnames.h"
-#include "Crypto/algparam.h"
+#include "cryptlib.h"
+#include "secblock.h"
+#include "misc.h"
+#include "strciphr.h"
+#include "argnames.h"
+#include "algparam.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

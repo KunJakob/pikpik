@@ -3,8 +3,8 @@
 
 /** \file */
 
-#include "Crypto/cryptlib.h"
-#include "Crypto/secblock.h"
+#include "cryptlib.h"
+#include "secblock.h"
 
 #include <iosfwd>
 #include <algorithm>

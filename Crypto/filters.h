@@ -1,12 +1,12 @@
 #ifndef CRYPTOPP_FILTERS_H
 #define CRYPTOPP_FILTERS_H
 
-#include "Crypto/simple.h"
-#include "Crypto/secblock.h"
-#include "Crypto/misc.h"
-#include "Crypto/smartptr.h"
-#include "Crypto/queue.h"
-#include "Crypto/algparam.h"
+#include "simple.h"
+#include "secblock.h"
+#include "misc.h"
+#include "smartptr.h"
+#include "queue.h"
+#include "algparam.h"
 #include <deque>
 
 NAMESPACE_BEGIN(CryptoPP)

@@ -1,7 +1,7 @@
 #ifndef CRYPTOPP_WORDS_H
 #define CRYPTOPP_WORDS_H
 
-#include "Crypto/misc.h"
+#include "misc.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

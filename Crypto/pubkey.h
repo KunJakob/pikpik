@@ -32,11 +32,11 @@
 	The "DL_" prefix means an implementation using group operations (in groups where discrete log is hard).
 */
 
-#include "Crypto/modarith.h"
-#include "Crypto/filters.h"
-#include "Crypto/eprecomp.h"
-#include "Crypto/fips140.h"
-#include "Crypto/argnames.h"
+#include "modarith.h"
+#include "filters.h"
+#include "eprecomp.h"
+#include "fips140.h"
+#include "argnames.h"
 #include <memory>
 
 // VC60 workaround: this macro is defined in shlobj.h and conflicts with a template parameter used in this file

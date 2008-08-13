@@ -1,8 +1,8 @@
 #ifndef CRYPTOPP_MQUEUE_H
 #define CRYPTOPP_MQUEUE_H
 
-#include "Crypto/queue.h"
-#include "Crypto/filters.h"
+#include "queue.h"
+#include "filters.h"
 #include <deque>
 
 NAMESPACE_BEGIN(CryptoPP)
