@@ -25,6 +25,11 @@
 #include <Visor.h>
 
 #include <Crypto/rsa.h>
+#include <Crypto/osrng.h>
+#include <Crypto/hex.h>
+#include <Crypto/files.h>
+#include <Crypto/aes.h>
+#include <Crypto/filters.h>
 
 //##############################################################################
 
@@ -203,23 +208,36 @@ void Application::Initialise()
 	Update();
 
 	// Generate a public and private key.
-	/*using namespace CryptoPP;
+	using namespace CryptoPP;
 
-	const xchar* pSeed = "v!&HDhVZThtej-j)_y*=X1}s.Y/,H:etvNlnO&,2>Wo@Xf-L8sybqvZhLr3N:K1L";
-	const xchar* pPassword = "1Y=6AtU$?cRg]uUz),O487/THV=7+?/iTxE8=aU.bsXk44Ok!^!y-^,3c-nctuw0";
+	xstring xSeed;
+	FileSource("../Crypto/Keys/RSA-Hex-2048-Public.txt", true, new StringSink(xSeed));
 
 	RandomPool xRandomGenerator;
-	xRandomGenerator.IncorporateEntropy((const byte*)pSeed, strlen(pSeed));
+	xRandomGenerator.IncorporateEntropy((const byte*)xSeed.c_str(), xSeed.length());
 
 	RSAES_PKCS1v15_Decryptor xPrivateKey(xRandomGenerator, 2048);
-	HexEncoder xPrivateEncoder(new FileSink("Crypto/Keys/RSA-Hex-2048-Private.txt"));
+	HexEncoder xPrivateEncoder(new FileSink("../Crypto/Keys/RSA-Hex-2048-Private.txt"));
 	xPrivateKey.DEREncode(xPrivateEncoder);
 	xPrivateEncoder.MessageEnd();
 
 	RSAES_OAEP_SHA_Encryptor xPublicKey(xPrivateKey);
-	HexEncoder xPublicEncoder(new FileSink("Crypto/Keys/RSA-Hex-2048-Public.txt"));
+	HexEncoder xPublicEncoder(new FileSink("../Crypto/Keys/RSA-Hex-2048-Public.txt"));
 	xPublicKey.DEREncode(xPublicEncoder);
-	xPrivateEncoder.MessageEnd();*/
+	xPrivateEncoder.MessageEnd();
+
+	//FileSource("../Crypto/Keys/RSA-512-Seed.txt", true, new HexEncoder(new FileSink("../Crypto/Keys/RSA-Hex-512-Seed.txt")));
+	//FileSource("../Crypto/Keys/AES-4096-Password.txt", true, new HexEncoder(new FileSink("../Crypto/Keys/AES-Hex-4096-Password.txt")));
+
+	/*xstring xHexPassword = 
+		#include <Crypto/Keys/AES-Hex-4096-Password.txt>
+	;
+
+	xstring xPassword;
+	StringSource(xHexPassword, true, new HexDecoder(new StringSink(xPassword)));
+
+	AESEncryption xEncryptor;
+	xEncryptor.SetKey((const byte*)xPassword.c_str(), xPassword.length());*/
 }
 
 // =============================================================================

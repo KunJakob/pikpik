@@ -51,7 +51,7 @@
 				OmitFramePointers="true"
 				PreprocessorDefinitions="NDEBUG;_WINDOWS;WIN32"
 				StringPooling="true"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough=""
@@ -191,7 +191,7 @@
 				Optimization="0"
 				EnableIntrinsicFunctions="true"
 				PreprocessorDefinitions="_DEBUG;_WINDOWS;WIN32"
-				RuntimeLibrary="1"
+				RuntimeLibrary="3"
 				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough=""
@@ -213,6 +213,7 @@
 				Name="VCLibrarianTool"
 				OutputFile="$(OutDir)Lib\cryptsd.lib"
 				SuppressStartupBanner="true"
+				IgnoreDefaultLibraryNames="libc;libcmt"
 			/>
 			<Tool
 				Name="VCALinkTool"

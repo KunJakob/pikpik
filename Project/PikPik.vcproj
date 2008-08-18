@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(SolutionDir)HGE\Lib\hge.lib $(SolutionDir)HGE\Lib\hgehelp.lib $(SolutionDir)FMOD\Lib\fmodex_vc.lib ws2_32.lib"
+				AdditionalDependencies="$(SolutionDir)HGE\Lib\hge.lib $(SolutionDir)HGE\Lib\hgehelp.lib $(SolutionDir)FMOD\Lib\fmodex_vc.lib $(SolutionDir)Crypto\Lib\cryptsd.lib ws2_32.lib"
 				OutputFile="$(OutDir)\pikpikd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(SolutionDir)Crypto\Lib"
@@ -143,7 +143,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(SolutionDir)HGE\Lib\hge.lib $(SolutionDir)HGE\Lib\hgehelp.lib $(SolutionDir)FMOD\Lib\fmodex_vc.lib ws2_32.lib"
+				AdditionalDependencies="$(SolutionDir)HGE\Lib\hge.lib $(SolutionDir)HGE\Lib\hgehelp.lib $(SolutionDir)FMOD\Lib\fmodex_vc.lib $(SolutionDir)Crypto\Lib\crypts.lib ws2_32.lib"
 				OutputFile="$(OutDir)\pikpik.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(SolutionDir)Crypto\Lib"
@@ -1446,6 +1446,14 @@
 				Name="Crypto"
 				>
 				<File
+					RelativePath="..\Crypto\3way.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\adler32.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Crypto\aes.h"
 					>
 				</File>
@@ -1458,6 +1466,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Crypto\arc4.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Crypto\argnames.h"
 					>
 				</File>
@@ -1466,7 +1478,31 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Crypto\base32.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\base64.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Crypto\basecode.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\blowfish.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\blumshub.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\camellia.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\cast.h"
 					>
 				</File>
 				<File
@@ -1486,7 +1522,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Crypto\crc.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Crypto\cryptlib.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\default.h"
 					>
 				</File>
 				<File
@@ -1498,7 +1542,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Crypto\dh2.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Crypto\dll.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\dmac.h"
 					>
 				</File>
 				<File
@@ -1518,11 +1570,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Crypto\elgamal.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Crypto\emsa2.h"
 					>
 				</File>
 				<File
 					RelativePath="..\Crypto\eprecomp.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\esign.h"
 					>
 				</File>
 				<File
@@ -1542,11 +1602,27 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Crypto\gf256.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\gf2_32.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Crypto\gf2n.h"
 					>
 				</File>
 				<File
 					RelativePath="..\Crypto\gfpcrypt.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\gost.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\gzip.h"
 					>
 				</File>
 				<File
@@ -1558,11 +1634,47 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Crypto\hrtimer.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\ida.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\idea.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Crypto\integer.h"
 					>
 				</File>
 				<File
 					RelativePath="..\Crypto\iterhash.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\lubyrack.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\luc.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\mars.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\md2.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\md4.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\md5.h"
 					>
 				</File>
 				<File
@@ -1598,6 +1710,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Crypto\network.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\nr.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Crypto\oaep.h"
 					>
 				</File>
@@ -1610,11 +1730,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Crypto\panama.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Crypto\pch.h"
 					>
 				</File>
 				<File
 					RelativePath="..\Crypto\pkcspad.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\polynomi.h"
 					>
 				</File>
 				<File
@@ -1626,7 +1754,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Crypto\pwdbased.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Crypto\queue.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\rabin.h"
 					>
 				</File>
 				<File
@@ -1634,7 +1770,27 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Crypto\rc2.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\rc5.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\rc6.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\resource.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Crypto\rijndael.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\ripemd.h"
 					>
 				</File>
 				<File
@@ -1650,6 +1806,18 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Crypto\safer.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\salsa.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\seal.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Crypto\secblock.h"
 					>
 				</File>
@@ -1658,7 +1826,23 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Crypto\serpent.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\serpentp.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Crypto\sha.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\shacal2.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\shark.h"
 					>
 				</File>
 				<File
@@ -1674,6 +1858,18 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Crypto\socketft.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\sosemanuk.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\square.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Crypto\stdcpp.h"
 					>
 				</File>
@@ -1682,11 +1878,71 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Crypto\tea.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\tiger.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Crypto\trdlocal.h"
 					>
 				</File>
 				<File
+					RelativePath="..\Crypto\trunhash.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\ttmac.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\twofish.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\vmac.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\wait.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\wake.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\whrlpool.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\winpipes.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Crypto\words.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\xtr.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\xtrcrypt.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\zdeflate.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\zinflate.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Crypto\zlib.h"
 					>
 				</File>
 			</Filter>
