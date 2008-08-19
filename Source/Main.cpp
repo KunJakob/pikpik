@@ -208,10 +208,10 @@ void Application::Initialise()
 	Update();
 
 	// Generate a public and private key.
-	using namespace CryptoPP;
+	/*using namespace CryptoPP;
 
 	xstring xSeed;
-	FileSource("../Crypto/Keys/RSA-Hex-2048-Public.txt", true, new StringSink(xSeed));
+	FileSource("../Crypto/Keys/RSA-512-Seed.txt", true, new StringSink(xSeed));
 
 	RandomPool xRandomGenerator;
 	xRandomGenerator.IncorporateEntropy((const byte*)xSeed.c_str(), xSeed.length());
@@ -224,20 +224,7 @@ void Application::Initialise()
 	RSAES_OAEP_SHA_Encryptor xPublicKey(xPrivateKey);
 	HexEncoder xPublicEncoder(new FileSink("../Crypto/Keys/RSA-Hex-2048-Public.txt"));
 	xPublicKey.DEREncode(xPublicEncoder);
-	xPrivateEncoder.MessageEnd();
-
-	//FileSource("../Crypto/Keys/RSA-512-Seed.txt", true, new HexEncoder(new FileSink("../Crypto/Keys/RSA-Hex-512-Seed.txt")));
-	//FileSource("../Crypto/Keys/AES-4096-Password.txt", true, new HexEncoder(new FileSink("../Crypto/Keys/AES-Hex-4096-Password.txt")));
-
-	/*xstring xHexPassword = 
-		#include <Crypto/Keys/AES-Hex-4096-Password.txt>
-	;
-
-	xstring xPassword;
-	StringSource(xHexPassword, true, new HexDecoder(new StringSink(xPassword)));
-
-	AESEncryption xEncryptor;
-	xEncryptor.SetKey((const byte*)xPassword.c_str(), xPassword.length());*/
+	xPrivateEncoder.MessageEnd();*/
 }
 
 // =============================================================================
