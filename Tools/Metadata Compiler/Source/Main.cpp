@@ -1,0 +1,125 @@
+//##############################################################################
+//
+//                                   INCLUDE
+//
+//##############################################################################
+
+// Local.
+#include <Main.h>
+
+// Standard Lib.
+#include <iostream>
+#include <string>
+
+// Crypto.
+#include <Crypto/cryptlib.h>
+#include <Crypto/filters.h>
+#include <Crypto/modes.h>
+#include <Crypto/files.h>
+#include <Crypto/aes.h>
+#include <Crypto/hex.h>
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                   MACROS
+//
+//##############################################################################
+
+// The instruction sheet.
+#define TEXT_HEADER \
+		"\n" \
+		"  Metadata Compiler" "\n" \
+		"  Revision 1" "\n" \
+		"  ---------------------------------------------------------------------------  " "\n" \
+		"  Copyright © SAPIAN, 2008, All Rights Reserved" "\n" \
+		"\n" \
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                   TYPES
+//
+//##############################################################################
+
+// Namespace.
+using namespace std;
+using namespace CryptoPP;
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                    MAIN
+//
+//##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                         19-Aug-2008
+// =============================================================================
+int main(int iNumArgs, const char* pArgs[])
+{
+	// Output the header.
+	cout << TEXT_HEADER;
+
+	// If we have enough arguments to process the command.
+	if (iNumArgs == 5)
+	{
+		const char* pInputFile = pArgs[1];
+		const char* pOutputFile = pArgs[2];
+		const char* pInputKeyFile = pArgs[3];
+		const char* pOutputKeyFile = pArgs[4];
+
+		// Read the key in and hex encode it.
+		string xKey;
+		FileSource(pInputKeyFile, true, new StringSink(xKey));
+		StringSource(xKey, true, new HexEncoder(new FileSink(pOutputKeyFile)));
+
+		// Read in the specified file.
+		string xMetadata;
+		FileSource(pInputFile, true, new StringSink(xMetadata));
+
+		// Format the metadata to single "space" separation.
+		string xFormattedMetadata;
+
+		bool bSeenWhiteSpace = false;
+		bool bIsQuotes = false;
+
+		for (int iA = 0; iA < (int)xMetadata.length(); ++iA)
+		{
+			if (!bIsQuotes && iswspace(xMetadata[iA]))
+			{
+				if (!bSeenWhiteSpace)
+				{
+					xFormattedMetadata += ' ';
+					bSeenWhiteSpace = true;
+				}
+			}
+			else
+			{
+				if (xMetadata[iA] == '"')
+					bIsQuotes = !bIsQuotes;
+
+				bSeenWhiteSpace = false;
+				xFormattedMetadata += xMetadata[iA];
+			}
+		}
+
+		// Encrypt the metadata and write the output file.
+		byte cIV[AES::BLOCKSIZE];
+
+		CTR_Mode<AES>::Encryption xAES((byte*)xKey.c_str(), xKey.length() / 2, cIV);
+		StringSource(xFormattedMetadata, true, new StreamTransformationFilter(xAES, new FileSink(pOutputFile)));
+
+		// Decrypt the file.
+		//CTR_Mode<AES>::Decryption xAESD((byte*)xKey.c_str(), xKey.length() / 2, cIV);
+		//FileSource(pOutputFile, true, new StreamTransformationFilter(xAESD, new FileSink("Decrypted.txt")));
+	}
+
+	// Pause and exit.
+	return 0;
+}
+
+//##############################################################################
