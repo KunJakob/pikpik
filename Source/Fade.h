@@ -51,10 +51,22 @@ public:
 	virtual void OnFadeComplete() {};
 
 protected:
+	// The current action being performed in the fade.
 	t_FadeScreenStage m_iStage;
+
+	// The time to fade in/out.
 	xuint m_iFadeTime;
+
+	// The time to display before fading out.
 	xuint m_iDisplayTime;
+
+	// The current elapsed time for the operation.
 	xuint m_iElapsedTime;
+
+	// The total time elapsed.
+	xuint m_iTotalTime;
+
+	// The current alpha level to apply.
 	xfloat m_fAlpha;
 };
 

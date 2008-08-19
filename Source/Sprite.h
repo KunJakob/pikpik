@@ -44,26 +44,16 @@
 //                                 SPRITE FILE
 //
 //##############################################################################
-
-/**
-* The sprite resource file.
-*/
 class CSpriteFile : public CResourceFile
 {
 public:
-	/**
-	* Constructor: Initialise the file.
-	*/
+	// Constructor: Initialise the file.
 	CSpriteFile(const xchar* pFile);
 
-	/**
-	* Destructor: Clean up the file memory.
-	*/
+	// Destructor: Clean up the file memory.
 	virtual ~CSpriteFile();
 
-	/**
-	* Get the sprite object.
-	*/
+	// Get the sprite object.
 	hgeSprite* GetResource()
 	{
 		return (hgeSprite*)pResource;
@@ -77,10 +67,6 @@ public:
 //                               SPRITE METADATA
 //
 //##############################################################################
-
-/**
-* The sprite metadata.
-*/
 class CSpriteMetadata : public CResourceMetadata
 {
 public:
@@ -94,79 +80,87 @@ public:
 	typedef xlist<CFrame*> t_FrameList;
 	typedef xlist<CAnimation*> t_AnimationList;
 
-	/**
-	* Constructor: Initialise the metadata.
-	*/
+	// Constructor: Initialise the metadata.
 	CSpriteMetadata(CDataset* pDataset);
 
-	/**
-	* Destructor: Deinitialise the metadata.
-	*/
+	// Destructor: Deinitialise the metadata.
 	virtual ~CSpriteMetadata();
 
-	/**
-	* Get the sprite object.
-	*/
+	// Get the sprite object.
 	hgeSprite* GetSprite()
 	{
 		return pFile->GetResource();
 	}
 
-	/**
-	* Find an area by name.
-	*/
+	// Find an area by name.
 	CArea* FindArea(const xchar* pName);
 
-	/**
-	* Find a frame in the specified animation.
-	*/
+	// Find a frame in the specified animation.
 	CFrame* FindFrame(CAnimation* pAnimation, const xchar* pName);
 
-	/**
-	* Find an animation by name.
-	*/
+	// Find an animation by name.
 	CAnimation* FindAnimation(const xchar* pName);
 
 public:
-	CSpriteFile* pFile;								// The sprite file used for rendering.
+	// The sprite file used for rendering.
+	CSpriteFile* pFile;
 
 	/**
-	* Specifies an area within a surface.
+	// Specifies an area within a surface.
 	*/
 	class CArea
 	{
 	public:
-		const xchar* pName;							// The name of the area to reference with.
-		xrect xRect;										// Rect defining the pixels on the image to render.
+		// The name of the area to reference with.
+		const xchar* pName;
+
+		// Rect defining the pixels on the image to render.
+		xrect xRect;
 	};
 
-	t_AreaList lpAreas;								// The list of areas specified for the surface.
+	// The list of areas specified for the surface.
+	t_AreaList lpAreas;
 
 	/**
-	* Describes a single frame of an animation.
+	// Describes a single frame of an animation.
 	*/
 	class CFrame
 	{
 	public:
-		const xchar* pName;							// The named identifier for the frame.
-		CArea* pArea;										// The area to render for the animation frame.
-		xuint iDelay;										// The amount of time to hold the animation frame.
-		const xchar* pEvent;						// The event string for this frame. This is NULL unless an event is set.
-		CFrame* pNextFrame;							// The next frame in the animation sequence. If this is NULL, the animation stops here.
+		// The named identifier for the frame.
+		const xchar* pName;
+
+		// The area to render for the animation frame.
+		CArea* pArea;			
+
+		// The amount of time to hold the animation frame.
+		xuint iDelay;
+
+		// The event string for this frame. This is NULL unless an event is set.
+		const xchar* pEvent;
+
+		// The next frame in the animation sequence. If this is NULL, the animation stops here.
+		CFrame* pNextFrame;
 	};
 
 	/**
-	* Describes an animation of frames using the specified surface.
+	// Describes an animation of frames using the specified surface.
 	*/
 	class CAnimation
 	{
 	public:
-		const xchar* pName;							// The named identifier of the animation.
-		xuint iAnimationTime;						// The total animation time for all frames.
-		t_FrameList lpFrames;						// A list of frames used in the animation.
+		// The named identifier of the animation.
+		const xchar* pName;
+
+		// The total animation time for all frames.
+		xuint iAnimationTime;
+
+		// A list of frames used in the animation.
+		t_FrameList lpFrames;
 	};
 
-	t_AnimationList lpAnimations;			// The animations available in the sprite.
+	// The animations available in the sprite.
+	t_AnimationList lpAnimations;			
 };
 
 //##############################################################################
@@ -179,134 +173,104 @@ public:
 class CBasicSprite
 {
 public:
-	/**
-	* Constructor.
-	*/
+	// Constructor.
 	CBasicSprite(CSpriteMetadata* pMetadata) : m_pMetadata(pMetadata) {}
 
-	/**
-	* Destructor.
-	*/
+	// Destructor.
 	virtual ~CBasicSprite() {}
 
-	/**
-	* Render the sprite with the specified attributes.
-	* @param xPosition The screen position to render at.
-	* @param xAnchor The area relative anchor point to use when positioning and rotating the sprite.
-	* @param xArea The coordinates within the image to render.
-	* @param fAlpha The alpha level between 0.0 and 1.0 to render the sprite at.
-	* @param fAngle The angle in radians to render at using the centre of the image as an anchor.
-	*/
+	// Render the sprite with the specified attributes.
+	// ~xPosition The screen position to render at.
+	// ~xAnchor The area relative anchor point to use when positioning and rotating the sprite.
+	// ~xArea The coordinates within the image to render.
+	// ~fAlpha The alpha level between 0.0 and 1.0 to render the sprite at.
+	// ~fAngle The angle in radians to render at using the centre of the image as an anchor.
 	void Render(xpoint xPosition, xpoint xAnchor, xrect xArea, xfloat fAlpha, xfloat fAngle);
 
-	/**
-	* Render the sprite with the specified attributes.
-	* @param xAnchor The area relative anchor point to use when positioning and rotating the sprite.
-	* @param xPosition The screen position to render at.
-	* @param xArea The coordinates within the image to render.
-	*/
+	// Render the sprite with the specified attributes.
+	// ~xAnchor The area relative anchor point to use when positioning and rotating the sprite.
+	// ~xPosition The screen position to render at.
+	// ~xArea The coordinates within the image to render.
 	inline void Render(xpoint xPosition, xpoint xAnchor, xrect xArea)
 	{
 		Render(xPosition, xAnchor, xArea, 1.f, 0.f);
 	}
 
-	/**
-	* Render the sprite with the specified attributes.
-	* @param xPosition The screen position to render at.
-	* @param xArea The coordinates within the image to render.
-	*/
+	// Render the sprite with the specified attributes.
+	// ~xPosition The screen position to render at.
+	// ~xArea The coordinates within the image to render.
 	inline void Render(xpoint xPosition, xrect xArea)
 	{
 		Render(xPosition, xpoint(), xArea, 1.f, 0.f);
 	}
 
-	/**
-	* Render the sprite with the specified attributes.
-	* @param xPosition The screen position to render at.
-	*/
+	// Render the sprite with the specified attributes.
+	// ~xPosition The screen position to render at.
 	inline void Render(xpoint xPosition)
 	{
 		Render(xPosition, xpoint(), GetImageRect(), 1.f, 0.f);
 	}
 
-	/**
-	* Render the sprite, tiling the image to the rect.
-	* @param xPosition The screen position to render at.
-	* @param xSize The size of the area from the position to tile over.
-	* @param xAnchor The area relative anchor point to use when positioning and rotating the sprite.
-	* @param xArea The coordinates within the image to render.
-	* @param fAlpha The alpha level between 0.0 and 1.0 to render the sprite at.
-	*/
+	// Render the sprite, tiling the image to the rect.
+	// ~xPosition The screen position to render at.
+	// ~xSize The size of the area from the position to tile over.
+	// ~xAnchor The area relative anchor point to use when positioning and rotating the sprite.
+	// ~xArea The coordinates within the image to render.
+	// ~fAlpha The alpha level between 0.0 and 1.0 to render the sprite at.
 	void RenderTiled(xpoint xPosition, xpoint xSize, xpoint xAnchor, xrect xArea, xfloat fAlpha);
 
-	/**
-	* Render the sprite, tiling the image to the rect.
-	* @param xPosition The screen position to render at.
-	* @param xSize The size of the area from the position to tile over.
-	* @param xAnchor The area relative anchor point to use when positioning and rotating the sprite.
-	* @param xArea The coordinates within the image to render.
-	*/
+	// Render the sprite, tiling the image to the rect.
+	// ~xPosition The screen position to render at.
+	// ~xSize The size of the area from the position to tile over.
+	// ~xAnchor The area relative anchor point to use when positioning and rotating the sprite.
+	// ~xArea The coordinates within the image to render.
 	inline void RenderTiled(xpoint xPosition, xpoint xSize, xpoint xAnchor, xrect xArea)
 	{
 		RenderTiled(xPosition, xSize, xAnchor, xArea, 1.f);
 	}
 
-	/**
-	* Render the sprite, tiling the image to the rect.
-	* @param xPosition The screen position to render at.
-	* @param xSize The size of the area from the position to tile over.
-	* @param xArea The coordinates within the image to render.
-	*/
+	// Render the sprite, tiling the image to the rect.
+	// ~xPosition The screen position to render at.
+	// ~xSize The size of the area from the position to tile over.
+	// ~xArea The coordinates within the image to render.
 	inline void RenderTiled(xpoint xPosition, xpoint xSize, xrect xArea)
 	{
 		RenderTiled(xPosition, xSize, xpoint(), xArea, 1.f);
 	}
 
-	/**
-	* Render the sprite, tiling the image to the rect.
-	* @param xPosition The screen position to render at.
-	* @param xSize The size of the area from the position to tile over.
-	*/
+	// Render the sprite, tiling the image to the rect.
+	// ~xPosition The screen position to render at.
+	// ~xSize The size of the area from the position to tile over.
 	inline void RenderTiled(xpoint xPosition, xpoint xSize)
 	{
 		RenderTiled(xPosition, xSize, xpoint(), GetImageRect(), 1.f);
 	}
 
-	/**
-	* Get the width of the entire sprite image.
-	*/
+	// Get the width of the entire sprite image.
 	xint GetImageWidth()
 	{
 		return _HGE->Texture_GetWidth(m_pMetadata->GetSprite()->GetTexture(), true);
 	}
 
-	/**
-	* Get the height of the entire sprite image.
-	*/
+	// Get the height of the entire sprite image.
 	xint GetImageHeight()
 	{
 		return _HGE->Texture_GetHeight(m_pMetadata->GetSprite()->GetTexture(), true);
 	}
 
-	/**
-	* Get the width and height of the image.
-	*/
+	// Get the width and height of the image.
 	xpoint GetImageSize()
 	{
 		return xpoint(GetImageWidth(), GetImageHeight());
 	}
 
-	/**
-	* Get the rect of the entire sprite image.
-	*/
+	// Get the rect of the entire sprite image.
 	xrect GetImageRect()
 	{
 		return xrect(0, 0, (xuint)GetImageWidth(), (xuint)GetImageHeight());
 	}
 
-	/**
-	* Get the sprite metadata structure. This is for advanced use only.
-	*/
+	// Get the sprite metadata structure. This is for advanced use only.
 	CSpriteMetadata* GetMetadata()
 	{
 		return m_pMetadata;
@@ -327,146 +291,110 @@ protected:
 class CSprite : public CBasicSprite, public CRenderable
 {
 public:
-	/**
-	* Constructor.
-	*/
+	// Constructor.
 	CSprite(CSpriteMetadata* pMetadata);
 
-	/**
-	* Render the sprite with all current attributes.
-	*/
+	// Render the sprite with all current attributes.
 	virtual void Render();
 
-	/**
-	* Set the current area to render.
-	*/
+	// Set the current area to render.
 	void SetArea(CSpriteMetadata::CArea* pArea)
 	{
 		m_pArea = pArea;
 	}
 
-	/**
-	* Set the current area to render.
-	*/
+	// Set the current area to render.
 	void SetArea(const xchar* pName)
 	{
 		SetArea(m_pMetadata->FindArea(pName));
 	}
 
-	/**
-	* Get the current area set for the sprite.
-	*/
+	// Get the current area set for the sprite.
 	CSpriteMetadata::CArea* GetArea()
 	{
 		return m_pArea;
 	}
 
-	/**
-	* Set the area-relative anchor point to use when positioning and rotating the sprite.
-	*/
+	// Set the area-relative anchor point to use when positioning and rotating the sprite.
 	void SetAnchor(xpoint xAnchor)
 	{
 		m_xAnchor = xAnchor;
 	}
 
-	/**
-	* Get the area-relative anchor point to use when positioning and rotating the sprite.
-	*/
+	// Get the area-relative anchor point to use when positioning and rotating the sprite.
 	xpoint GetAnchor()
 	{
 		return m_xAnchor;
 	}
 
-	/**
-	* Set the sprite position. 
-	* @note The sprite is rendered from the anchor point at the specified screen position.
-	*/
+	// Set the sprite position. 
+	// ~note The sprite is rendered from the anchor point at the specified screen position.
 	void SetPosition(xpoint xPosition)
 	{
 		m_xPosition = xPosition;
 	}
 
-	/**
-	* Add an offset to the current position.
-	* @note The sprite is rendered from the anchor point at the specified screen position.
-	*/
+	// Add an offset to the current position.
+	// ~note The sprite is rendered from the anchor point at the specified screen position.
 	void OffsetPosition(xpoint xOffset)
 	{
 		SetPosition(GetPosition() + xOffset);
 	}
 
-	/**
-	* Get the current sprite position in screen coordinates.
-	* @note The sprite is rendered from the anchor point at the specified screen position.
-	*/
+	// Get the current sprite position in screen coordinates.
+	// ~note The sprite is rendered from the anchor point at the specified screen position.
 	xpoint GetPosition()
 	{
 		return m_xPosition;
 	}
 
-	/**
-	* Set the alpha-blending level of the sprite.
-	* @param iAlpha Value between 0.0f (transparent) and 1.0f (opaque).
-	*/
+	// Set the alpha-blending level of the sprite.
+	// ~iAlpha Value between 0.0f (transparent) and 1.0f (opaque).
 	void SetAlpha(xfloat iAlpha)
 	{
 		m_fAlpha = Math::Clamp(iAlpha, 0.f, 1.f);
 	}
 
-	/**
-	* Get the current alpha level of the sprite.
-	* @return Value between 0.0f (transparent) and 1.0f (opaque).
-	*/
+	// Get the current alpha level of the sprite.
+	// ~return Value between 0.0f (transparent) and 1.0f (opaque).
 	xfloat GetAlpha()
 	{
 		return m_fAlpha;
 	}
 
-	/**
-	* Set the rotation angle of the sprite.
-	* @param bDegrees Specify true if the angle is in degrees, otherwise use radians.
-	*/
+	// Set the rotation angle of the sprite.
+	// ~bDegrees Specify true if the angle is in degrees, otherwise use radians.
 	void SetAngle(xfloat fAngle, xbool bDegrees = false)
 	{
 		m_fAngle = !bDegrees ? fAngle : (fAngle / 180.0f) * M_PI;
 	}
 
-	/**
-	* Get the rotation angle of the sprite.
-	* @param bDegrees Specify true to get the angle in degrees, otherwise returns radians.
-	*/
+	// Get the rotation angle of the sprite.
+	// ~bDegrees Specify true to get the angle in degrees, otherwise returns radians.
 	xfloat GetAngle(xbool bDegrees = false)
 	{
 		return !bDegrees ? m_fAngle : m_fAngle * (180.0f / M_PI);
 	}
 
-	/**
-	* Get the width of the current area or the entire image if there is no active area.
-	*/
+	// Get the width of the current area or the entire image if there is no active area.
 	xint GetAreaWidth()
 	{
 		return m_pArea ? m_pArea->xRect.Width() : GetImageWidth();
 	}
 
-	/**
-	* Get the height of the current area or the entire image if there is no active area.
-	*/
+	// Get the height of the current area or the entire image if there is no active area.
 	xint GetAreaHeight()
 	{
 		return m_pArea ? m_pArea->xRect.Height() : GetImageHeight();
 	}
 
-	/**
-	* Get the centre point of the current area of the sprite.
-	*/
+	// Get the centre point of the current area of the sprite.
 	xpoint GetAreaCentre()
 	{
 		return xpoint(GetAreaWidth() / 2, GetAreaHeight() / 2);
 	}
 
-	/**
-	* Get the screen area for the current area of the sprite.
-	*/
+	// Get the screen area for the current area of the sprite.
 	xrect GetScreenRect()
 	{
 		xpoint xTopLeft = m_xPosition - m_xAnchor;
@@ -503,141 +431,103 @@ public:
 	// Callbacks.
 	typedef xfunction(2)<CAnimatedSprite* /*Sprite*/, const xchar* /*Event*/> t_AnimationEventCallback;
 
-	/**
-	* Constructor.
-	*/
+	// Constructor.
 	CAnimatedSprite(CSpriteMetadata* pMetadata);
 
-	/**
-	* Update the sprite to the current animation frame.
-	*/
+	// Update the sprite to the current animation frame.
 	virtual void Update();
 
-	/**
-	* Render the sprite with all current attributes using the current animation frame.
-	*/
+	// Render the sprite with all current attributes using the current animation frame.
 	virtual void Render();
 
-	/**
-	* Jump to a specific animation frame in the current animation.
-	*/
+	// Jump to a specific animation frame in the current animation.
 	void SetFrame(CSpriteMetadata::CFrame* pFrame);
 
-	/**
-	* Jump to a specific animation frame in the current animation.
-	*/
+	// Jump to a specific animation frame in the current animation.
 	void SetFrame(const xchar* pName)
 	{
 		SetFrame(m_pMetadata->FindFrame(m_pAnimation, pName));
 	}
 
-	/**
-	* Get the currently active animation frame.
-	*/
+	// Get the currently active animation frame.
 	CSpriteMetadata::CFrame* GetFrame()
 	{
 		return m_pFrame;
 	}
 
-	/**
-	* Check if the active animation frame name matches the name specified.
-	*/
+	// Check if the active animation frame name matches the name specified.
 	xbool IsActiveFrame(const xchar* pName)
 	{
 		return m_pFrame && strcmp(m_pFrame->pName, pName) == 0;
 	}
 
-	/**
-	* Set the active animation and reset states and timings to the first animation frame.
-	* @param bPlay Start the animation if true or pause otherwise.
-	*/
+	// Set the active animation and reset states and timings to the first animation frame.
+	// ~bPlay Start the animation if true or pause otherwise.
 	void SetAnimation(CSpriteMetadata::CAnimation* pAnimation, xbool bPlay = false);
 
-	/**
-	* Set the active animation and reset states and timings to the first animation frame.
-	* @param bPlay Start the animation if true or pause otherwise.
-	*/
+	// Set the active animation and reset states and timings to the first animation frame.
+	// ~bPlay Start the animation if true or pause otherwise.
 	void SetAnimation(const xchar* pName, xbool bPlay = false)
 	{
 		SetAnimation(m_pMetadata->FindAnimation(pName), bPlay);
 	}
 
-	/**
-	* Get the currently active animation.
-	*/
+	// Get the currently active animation.
 	CSpriteMetadata::CAnimation* GetAnimation()
 	{
 		return m_pAnimation;
 	}
 
-	/**
-	* Check if the active animation name matches the name specified.
-	*/
+	// Check if the active animation name matches the name specified.
 	xbool IsActiveAnimation(const xchar* pName)
 	{
 		return m_pAnimation && strcmp(m_pAnimation->pName, pName) == 0;
 	}
 
-	/**
-	* Play a specific animation from the first animation frame.
-	*/
+	// Play a specific animation from the first animation frame.
 	void Play(CSpriteMetadata::CAnimation* pAnimation)
 	{
 		SetAnimation(pAnimation, true);
 	}
 
-	/**
-	* Play a specific animation from the first animation frame.
-	*/
+	// Play a specific animation from the first animation frame.
 	void Play(const xchar* pName)
 	{
 		SetAnimation(pName, true);
 	}
 
-	/**
-	* Play the active animation from the first animation frame.
-	*/
+	// Play the active animation from the first animation frame.
 	void Play()
 	{
 		SetAnimation(m_pAnimation, true);
 	}
 
-	/**
-	* Stop the active animation and reset to the first animation frame.
-	*/
+	// Stop the active animation and reset to the first animation frame.
 	void Stop()
 	{
 		SetAnimation(m_pAnimation, false);
 	}
 
-	/**
-	* Pause the active animation keeping all current animation frame states and timings.
-	*/
+	// Pause the active animation keeping all current animation frame states and timings.
 	void Pause()
 	{
 		m_bPlaying = false;
 	}
 
-	/**
-	* Resume the active animation using the last known animation frame states and timings.
-	*/
+	// Resume the active animation using the last known animation frame states and timings.
 	void Resume()
 	{
 		m_bPlaying = true;
 	}
 
-	/**
-	* Check if any active animation is playing.
-	*/
+	// Check if any active animation is playing.
 	xbool IsPlaying()
 	{
 		return m_bPlaying;
 	}
 
-	/**
-	* Set the callback to be executed if any events are specified
-	* @param fpCallback Specify NULL to disable this callback.
-	*/
+	// Set the callback to be executed if any events are specified
+	// ~fpCallback Specify NULL to disable this callback.
 	void SetEventCallback(t_AnimationEventCallback fpCallback)
 	{
 		m_fpEvent = fpCallback;

@@ -48,6 +48,7 @@ void CFadeScreen::Reset()
 {
 	m_iStage = FadeScreenStage_FadeIn;
 	m_iElapsedTime = 0;
+	m_iTotalTime = 0;
 	m_fAlpha = 0.0f;
 }
 
@@ -57,6 +58,7 @@ void CFadeScreen::Reset()
 void CFadeScreen::OnUpdate()
 {
 	m_iElapsedTime += _TIMEDELTA;
+	m_iTotalTime += _TIMEDELTA;
 
 	switch (m_iStage)
 	{

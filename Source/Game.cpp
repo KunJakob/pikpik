@@ -73,7 +73,7 @@ void CGameScreen::LoadMap()
 // =============================================================================
 void CGameScreen::LoadMusic()
 {
-	_FMOD->createStream("Audio\\Level-Test.mp3", FMOD_SOFTWARE, 0, &m_pMusic);
+	_FMOD->createStream("Audio\\Level-Test.mp3", FMOD_SOFTWARE, NULL, &m_pMusic);
 	//_FMOD->playSound(FMOD_CHANNEL_FREE, m_pMusic, false, &m_pChannel);
 }
 

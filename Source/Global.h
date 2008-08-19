@@ -92,6 +92,7 @@
 // Colour manipulations.
 #define COLOURF(COLF)		(xuchar)((COLF) * 255.f)
 #define ARGBF(A, R, G, B)	ARGB(COLOURF(A), COLOURF(R), COLOURF(G), COLOURF(B))
+#define RGBF(R, G, B)		ARGB(255, COLOURF(R), COLOURF(G), COLOURF(B))
 
 // Singletons.
 #define Global				CGlobal::Get()

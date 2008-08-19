@@ -31,6 +31,8 @@ void CLogoScreen::OnActivate()
 
 	m_pImage->SetAnchor(m_pImage->GetAreaCentre());
 	m_pImage->SetPosition(xpoint(_HSWIDTH, _HSHEIGHT));
+
+	_FMOD->createStream("Audio\\Clips\\Logo-SAPIAN.mp3", FMOD_SOFTWARE, NULL, &m_pSound);
 }
 
 // =============================================================================
@@ -39,6 +41,9 @@ void CLogoScreen::OnActivate()
 void CLogoScreen::OnDeactivate()
 {
 	delete m_pImage;
+
+	m_pChannel->stop();
+	m_pSound->release();
 }
 
 // =============================================================================
@@ -47,6 +52,8 @@ void CLogoScreen::OnDeactivate()
 void CLogoScreen::OnWake()
 {
 	CFadeScreen::Reset();
+
+	_FMOD->playSound(FMOD_CHANNEL_FREE, m_pSound, false, &m_pChannel);
 }
 
 // =============================================================================
@@ -71,8 +78,38 @@ void CLogoScreen::OnNotify(xuint iEventType, void* pEventInfo)
 void CLogoScreen::OnUpdate()
 {
 	CFadeScreen::OnUpdate();
-
+	
 	m_pImage->SetAlpha(m_fAlpha);
+
+#define FLASH_START 3200
+#define FLASH_MID 3500
+#define FLASH_END 4200
+#define FLASH_MAX 50
+
+	xuint iTrackTime;
+	m_pChannel->getPosition(&iTrackTime, FMOD_TIMEUNIT_MS);
+
+	if (iTrackTime > FLASH_START)
+	{
+		xuint iColour = 0;
+
+		if (iTrackTime < FLASH_END)
+		{
+			if (iTrackTime < FLASH_MID)
+			{
+				xuint iTimeOffset = iTrackTime - FLASH_START;
+				iColour = XINTPERCENT(iTimeOffset, FLASH_MAX, FLASH_MID - FLASH_START);
+			}
+			else
+			{
+				xuint iTimeOffset = iTrackTime - FLASH_MID;
+				iColour = FLASH_MAX - XINTPERCENT(iTimeOffset, FLASH_MAX, FLASH_END - FLASH_MID);
+			}
+		}
+
+		m_pImage->GetMetadata()->GetSprite()->SetBlendMode(BLEND_COLORADD);
+		m_pImage->GetMetadata()->GetSprite()->SetColor(ARGB(255, iColour, iColour, iColour));
+	}
 }
 
 // =============================================================================
