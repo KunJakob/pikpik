@@ -65,23 +65,36 @@ int main(int iNumArgs, const char* pArgs[])
 	cout << TEXT_HEADER;
 
 	// If we have enough arguments to process the command.
-	if (iNumArgs == 5)
+	if (iNumArgs == 4 || iNumArgs == 5)
 	{
 		const char* pInputFile = pArgs[1];
 		const char* pOutputFile = pArgs[2];
 		const char* pInputKeyFile = pArgs[3];
-		const char* pOutputKeyFile = pArgs[4];
 
-		// Read the key in and hex encode it.
+		// Read the key in, hex encode it and write it out.
+		cout << "  Reading Key: " << pInputKeyFile << "\n";
+
 		string xKey;
 		FileSource(pInputKeyFile, true, new StringSink(xKey));
-		StringSource(xKey, true, new HexEncoder(new FileSink(pOutputKeyFile)));
 
+		if (iNumArgs == 5)
+		{
+			const char* pOutputKeyFile = pArgs[4];
+
+			cout << "  Writing Hex Encoded Key: " << pOutputKeyFile << "\n";
+			
+			StringSource(xKey, true, new HexEncoder(new FileSink(pOutputKeyFile)));
+		}
+		
 		// Read in the specified file.
+		cout << "  Reading Metadata: " << pInputFile << "\n";
+
 		string xMetadata;
 		FileSource(pInputFile, true, new StringSink(xMetadata));
 
 		// Format the metadata to single "space" separation.
+		cout << "  Formatting Metadata" << "\n";
+
 		string xFormattedMetadata;
 
 		bool bSeenWhiteSpace = false;
@@ -108,6 +121,8 @@ int main(int iNumArgs, const char* pArgs[])
 		}
 
 		// Encrypt the metadata and write the output file.
+		cout << "  Writing Encrypted Metadata: " << pOutputFile << "\n";
+
 		byte cIV[AES::BLOCKSIZE];
 
 		CTR_Mode<AES>::Encryption xAES((byte*)xKey.c_str(), xKey.length() / 2, cIV);
@@ -118,7 +133,9 @@ int main(int iNumArgs, const char* pArgs[])
 		//FileSource(pOutputFile, true, new StreamTransformationFilter(xAESD, new FileSink("Decrypted.txt")));
 	}
 
-	// Pause and exit.
+	cout << "  Completed! " << "\n" << "\n";
+
+	// Exit.
 	return 0;
 }
 
