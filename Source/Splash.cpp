@@ -78,21 +78,22 @@ void CLogoScreen::OnNotify(xuint iEventType, void* pEventInfo)
 void CLogoScreen::OnUpdate()
 {
 	CFadeScreen::OnUpdate();
-	
-	m_pImage->SetAlpha(m_fAlpha);
 
+#define FLASH_PRE 600
 #define FLASH_START 3200
 #define FLASH_MID 3400
 #define FLASH_END 4000
-#define FLASH_MAX 40
+#define FLASH_MAX 50
 
 	xuint iTrackTime;
 	m_pChannel->getPosition(&iTrackTime, FMOD_TIMEUNIT_MS);
 
+	m_pImage->SetAlpha((iTrackTime > FLASH_PRE) ? m_fAlpha : 0.f);
+
+	xuint iColour = 0;
+
 	if (iTrackTime > FLASH_START)
 	{
-		xuint iColour = 0;
-
 		if (iTrackTime < FLASH_END)
 		{
 			if (iTrackTime < FLASH_MID)
@@ -106,10 +107,10 @@ void CLogoScreen::OnUpdate()
 				iColour = FLASH_MAX - XINTPERCENT(iTimeOffset, FLASH_MAX, FLASH_END - FLASH_MID);
 			}
 		}
-
-		m_pImage->GetMetadata()->GetSprite()->SetBlendMode(BLEND_COLORADD);
-		m_pImage->GetMetadata()->GetSprite()->SetColor(ARGB(255, iColour, iColour, iColour));
 	}
+
+	m_pImage->GetMetadata()->GetSprite()->SetBlendMode(BLEND_COLORADD);
+	m_pImage->GetMetadata()->GetSprite()->SetColor(ARGB(255, iColour, iColour, iColour));
 }
 
 // =============================================================================
