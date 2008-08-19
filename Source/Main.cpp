@@ -206,25 +206,6 @@ void Application::Initialise()
 	
 	// Execute the first frame update.
 	Update();
-
-	// Generate a public and private key.
-	/*using namespace CryptoPP;
-
-	xstring xSeed;
-	FileSource("../Crypto/Keys/RSA-512-Seed.txt", true, new StringSink(xSeed));
-
-	RandomPool xRandomGenerator;
-	xRandomGenerator.IncorporateEntropy((const byte*)xSeed.c_str(), xSeed.length());
-
-	RSAES_PKCS1v15_Decryptor xPrivateKey(xRandomGenerator, 2048);
-	HexEncoder xPrivateEncoder(new FileSink("../Crypto/Keys/RSA-Hex-2048-Private.txt"));
-	xPrivateKey.DEREncode(xPrivateEncoder);
-	xPrivateEncoder.MessageEnd();
-
-	RSAES_OAEP_SHA_Encryptor xPublicKey(xPrivateKey);
-	HexEncoder xPublicEncoder(new FileSink("../Crypto/Keys/RSA-Hex-2048-Public.txt"));
-	xPublicKey.DEREncode(xPublicEncoder);
-	xPrivateEncoder.MessageEnd();*/
 }
 
 // =============================================================================

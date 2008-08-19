@@ -82,9 +82,9 @@ void CLogoScreen::OnUpdate()
 	m_pImage->SetAlpha(m_fAlpha);
 
 #define FLASH_START 3200
-#define FLASH_MID 3500
-#define FLASH_END 4200
-#define FLASH_MAX 50
+#define FLASH_MID 3400
+#define FLASH_END 4000
+#define FLASH_MAX 40
 
 	xuint iTrackTime;
 	m_pChannel->getPosition(&iTrackTime, FMOD_TIMEUNIT_MS);
