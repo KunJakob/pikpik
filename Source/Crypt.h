@@ -39,6 +39,19 @@
 class CCryptManager
 {
 public:
+	// Singleton instance.
+	static inline CCryptManager& Get() 
+	{
+		static CCryptManager s_Instance;
+		return s_Instance;
+	}
+
+	// Get the application public key.
+	xstring& GetPublicKey();
+
+	// Get the application data encryption key.
+	xstring& GetEncryptionKey();
+
 protected:
 };
 

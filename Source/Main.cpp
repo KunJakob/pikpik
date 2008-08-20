@@ -23,13 +23,10 @@
 #include <Collision.h>
 #include <Player.h>
 #include <Visor.h>
+#include <Crypt.h>
 
-#include <Crypto/rsa.h>
-#include <Crypto/osrng.h>
-#include <Crypto/hex.h>
-#include <Crypto/files.h>
-#include <Crypto/aes.h>
-#include <Crypto/filters.h>
+// Crypto.
+#include <Crypto/cryptlib.h>
 
 //##############################################################################
 
@@ -162,14 +159,14 @@ void Application::Initialise()
 	Global.m_fWorldAlpha = 1.f;
 
 	// Load all relevant metadata.
-	ResourceManager::RegisterMetadata(new CMetadata(".\\Metadata\\Sprites.mta"));
-	ResourceManager::RegisterMetadata(new CMetadata(".\\Metadata\\Font.mta"));
+	ResourceManager::RegisterMetadata(new CMetadata(".\\Metadata\\Sprites.emta", CryptManager.GetEncryptionKey().c_str(), true));
+	ResourceManager::RegisterMetadata(new CMetadata(".\\Metadata\\Font.mta", NULL, true));
 
 	// Initialise the game font.
 	Global.m_pGameFont = new CFont(_FONT("Default"));
 
 	// Load the locale.
-	Global.m_pLocale = new CMetadata(".\\Metadata\\Strings.mta");
+	Global.m_pLocale = new CMetadata(".\\Metadata\\Strings.mta", NULL, true);
 
 	// Add all required modules to the game.
 	XMODULE(&Network);

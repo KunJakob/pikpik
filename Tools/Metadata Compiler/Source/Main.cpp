@@ -10,6 +10,7 @@
 // Standard Lib.
 #include <iostream>
 #include <string>
+#include <time.h>
 
 // Crypto.
 #include <Crypto/cryptlib.h>
@@ -61,6 +62,8 @@ using namespace CryptoPP;
 // =============================================================================
 int main(int iNumArgs, const char* pArgs[])
 {
+	srand((unsigned int)time(NULL));
+
 	// Output the header.
 	cout << TEXT_HEADER;
 
@@ -125,12 +128,11 @@ int main(int iNumArgs, const char* pArgs[])
 
 		byte cIV[AES::BLOCKSIZE];
 
-		CTR_Mode<AES>::Encryption xAES((byte*)xKey.c_str(), xKey.length() / 2, cIV);
-		StringSource(xFormattedMetadata, true, new StreamTransformationFilter(xAES, new FileSink(pOutputFile)));
+		for (int iA = 0; iA < AES::BLOCKSIZE; ++iA)
+			cIV[iA] = 0xF0;
 
-		// Decrypt the file.
-		//CTR_Mode<AES>::Decryption xAESD((byte*)xKey.c_str(), xKey.length() / 2, cIV);
-		//FileSource(pOutputFile, true, new StreamTransformationFilter(xAESD, new FileSink("Decrypted.txt")));
+		CFB_Mode<AES>::Encryption xAES((byte*)xKey.c_str(), xKey.length() / 2, cIV);
+		StringSource(xFormattedMetadata, true, new StreamTransformationFilter(xAES, new FileSink(pOutputFile)));
 	}
 
 	cout << "  Completed! " << "\n" << "\n";

@@ -39,6 +39,13 @@
 class CAudioManager
 {
 public:
+	// Singleton instance.
+	static inline CAudioManager& Get() 
+	{
+		static CAudioManager s_Instance;
+		return s_Instance;
+	}
+
 protected:
 };
 

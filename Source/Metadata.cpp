@@ -10,6 +10,23 @@
 // Local.
 #include <Metadata.h>
 
+// Other.
+#include <Crypto/cryptlib.h>
+#include <Crypto/filters.h>
+#include <Crypto/aes.h>
+#include <Crypto/modes.h>
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                   TYPES
+//
+//##############################################################################
+
+// Namespaces.
+using namespace CryptoPP;
+
 //##############################################################################
 
 //##############################################################################
@@ -19,10 +36,11 @@
 //##############################################################################
 
 // =============================================================================
-// Author: Nat Ryall                                           Date: 29-Jan-2008
+// Nat Ryall                                                         29-Jan-2008
 // =============================================================================
-CMetadata::CMetadata(const xchar* pFilePath, xbool bExecute) : CDataset(NULL, "Metadata", NULL),
-	m_iTask(ST_LoadFile), 
+CMetadata::CMetadata(const xchar* pMetadataFile, const xchar* pEncryptionKey, xbool bProcessImmediately) : CDataset(NULL, "Metadata", NULL),
+	m_iSourceType(MetadataSourceType_Raw),
+	m_iTask(MetadataTask_LoadFile), 
 	m_iPercent(0),
 	m_pError(NULL),
 	m_pFile(NULL),
@@ -30,15 +48,22 @@ CMetadata::CMetadata(const xchar* pFilePath, xbool bExecute) : CDataset(NULL, "M
 	m_iFileSize(0),
 	m_iBytesRead(0),
 	m_pData(NULL),
+	m_pEncryptionKey(NULL),
 	m_iTokenOffset(0),
 	m_iTokenIndex(0),
 	m_pDataset(NULL),
 	m_pProperty(NULL)
 {
-	m_pFile = (xchar*)pFilePath;
+	m_pFile = (xchar*)pMetadataFile;
 	m_pDataset = this;
 
-	if (bExecute)
+	if (pEncryptionKey)
+	{
+		m_iSourceType = MetadataSourceType_Encrypted;
+		m_pEncryptionKey = (xchar*)pEncryptionKey;
+	}
+
+	if (bProcessImmediately)
 	{
 		while (!IsCompleted())
 			Update();
@@ -46,25 +71,29 @@ CMetadata::CMetadata(const xchar* pFilePath, xbool bExecute) : CDataset(NULL, "M
 }
 
 // =============================================================================
-// Author: Nat Ryall                                           Date: 29-Jan-2008
+// Nat Ryall                                                         29-Jan-2008
 // =============================================================================
-void CMetadata::Update(xuint iMaxTime, xuint iChunkSize)
+void CMetadata::Update(xuint iTargetTime, xuint iChunkSize)
 {
-	xuint32 iTimeout = GetTickCount() + iMaxTime;
+	xuint32 iTimeout = GetTickCount() + iTargetTime;
 
 	while (GetTickCount() < iTimeout)
 	{
 		switch (m_iTask)
 		{
-		case ST_LoadFile:
+		case MetadataTask_LoadFile:
 			UpdateLoad(iChunkSize);
 			break;
 
-		case ST_TokeniseData:
+		case MetadataTask_DecryptData:
+			UpdateDecrypt(iChunkSize);
+			break;
+
+		case MetadataTask_TokeniseData:
 			UpdateTokenise();
 			break;
 
-		case ST_ParseTokens:
+		case MetadataTask_ParseTokens:
 			UpdateParse();
 			break;
 
@@ -75,19 +104,19 @@ void CMetadata::Update(xuint iMaxTime, xuint iChunkSize)
 }
 
 // =============================================================================
-// Author: Nat Ryall                                           Date: 29-Jan-2008
+// Nat Ryall                                                         29-Jan-2008
 // =============================================================================
 xuint CMetadata::GetProgress()
 {
 	switch (m_iTask)
 	{
-	case ST_LoadFile:
+	case MetadataTask_LoadFile:
 		return (m_iBytesRead * 100) / m_iFileSize;
 
-	case ST_TokeniseData:
+	case MetadataTask_TokeniseData:
 		return (m_iTokenOffset * 100) / m_iFileSize;
 
-	case ST_ParseTokens:
+	case MetadataTask_ParseTokens:
 		return (m_iTokenIndex * 100) / m_lpTokens.size();
 	}
 
@@ -95,7 +124,7 @@ xuint CMetadata::GetProgress()
 }
 
 // =============================================================================
-// Author: Nat Ryall                                           Date: 29-Jan-2008
+// Nat Ryall                                                         29-Jan-2008
 // =============================================================================
 void CMetadata::UpdateLoad(xuint iChunkSize)
 {
@@ -144,7 +173,10 @@ void CMetadata::UpdateLoad(xuint iChunkSize)
 	// Check if we're finished.
 	if (m_iBytesRead == m_iFileSize)
 	{
-		m_iTask = ST_TokeniseData;
+		if (m_iSourceType == MetadataSourceType_Encrypted)
+			m_iTask = MetadataTask_DecryptData;
+		else
+			m_iTask = MetadataTask_TokeniseData;
 
 		CloseHandle(m_hFile);
 		m_hFile = INVALID_HANDLE_VALUE;
@@ -152,7 +184,27 @@ void CMetadata::UpdateLoad(xuint iChunkSize)
 }
 
 // =============================================================================
-// Author: Nat Ryall                                           Date: 29-Jan-2008
+// Nat Ryall                                                         20-Aug-2008
+// =============================================================================
+void CMetadata::UpdateDecrypt(xuint iChunkSize)
+{
+	byte cIV[AES::BLOCKSIZE];
+
+	for (int iA = 0; iA < AES::BLOCKSIZE; ++iA)
+		cIV[iA] = 0xF0;
+
+	CTR_Mode<AES>::Decryption xAES((byte*)m_pEncryptionKey, strlen(m_pEncryptionKey) / 2, cIV);
+
+	StreamTransformationFilter xDecryptedData(xAES);
+	StringSource xDataDecryptor((byte*)m_pData, m_iFileSize, true, &xDecryptedData);
+
+	xDecryptedData.Get((byte*)m_pData, m_iFileSize);
+
+	m_iTask = MetadataTask_TokeniseData;
+}
+
+// =============================================================================
+// Nat Ryall                                                         29-Jan-2008
 // =============================================================================
 void CMetadata::UpdateTokenise()
 {
@@ -199,11 +251,11 @@ void CMetadata::UpdateTokenise()
 		m_iTokenOffset++;
 
 	if (m_iTokenOffset == m_iFileSize)
-		m_iTask = ST_ParseTokens;
+		m_iTask = MetadataTask_ParseTokens;
 }
 
 // =============================================================================
-// Author: Nat Ryall                                           Date: 29-Jan-2008
+// Nat Ryall                                                         29-Jan-2008
 // =============================================================================
 void CMetadata::UpdateParse()
 {
@@ -248,24 +300,24 @@ void CMetadata::UpdateParse()
 	}
 
 	if (++m_iTokenIndex == m_lpTokens.size())
-		m_iTask = ST_Completed;
+		m_iTask = MetadataTask_Completed;
 }
 
 // =============================================================================
-// Author: Nat Ryall                                           Date: 29-Jan-2008
+// Nat Ryall                                                         29-Jan-2008
 // =============================================================================
 void CMetadata::SetError(const xchar* pError)
 {
 	Cleanup();
 
-	m_iTask = ST_Error;
+	m_iTask = MetadataTask_Error;
 	m_pError = (xchar*)pError;
 
 	XEXCEPTION(pError);
 }
 
 // =============================================================================
-// Author: Nat Ryall                                           Date: 29-Jan-2008
+// Nat Ryall                                                         29-Jan-2008
 // =============================================================================
 void CMetadata::Cleanup()
 {

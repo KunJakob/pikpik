@@ -79,32 +79,32 @@ void CLogoScreen::OnUpdate()
 {
 	CFadeScreen::OnUpdate();
 
-#define FLASH_PRE 600
-#define FLASH_START 3200
-#define FLASH_MID 3400
-#define FLASH_END 4000
-#define FLASH_MAX 50
+	static xuint s_iHideTime	= 600;
+	static xuint s_iFadeStart	= 3200;
+	static xuint s_iFadePeak	= 3400;
+	static xuint s_iFadeEnd		= 3900;
+	static xuint s_iFadePower	= 60;
 
 	xuint iTrackTime;
 	m_pChannel->getPosition(&iTrackTime, FMOD_TIMEUNIT_MS);
 
-	m_pImage->SetAlpha((iTrackTime > FLASH_PRE) ? m_fAlpha : 0.f);
+	m_pImage->SetAlpha((iTrackTime > s_iHideTime) ? m_fAlpha : 0.f);
 
 	xuint iColour = 0;
 
-	if (iTrackTime > FLASH_START)
+	if (iTrackTime > s_iFadeStart)
 	{
-		if (iTrackTime < FLASH_END)
+		if (iTrackTime < s_iFadeEnd)
 		{
-			if (iTrackTime < FLASH_MID)
+			if (iTrackTime < s_iFadePeak)
 			{
-				xuint iTimeOffset = iTrackTime - FLASH_START;
-				iColour = XINTPERCENT(iTimeOffset, FLASH_MAX, FLASH_MID - FLASH_START);
+				xuint iTimeOffset = iTrackTime - s_iFadeStart;
+				iColour = XINTPERCENT(iTimeOffset, s_iFadePower, s_iFadePeak - s_iFadeStart);
 			}
 			else
 			{
-				xuint iTimeOffset = iTrackTime - FLASH_MID;
-				iColour = FLASH_MAX - XINTPERCENT(iTimeOffset, FLASH_MAX, FLASH_END - FLASH_MID);
+				xuint iTimeOffset = iTrackTime - s_iFadePeak;
+				iColour = s_iFadePower - XINTPERCENT(iTimeOffset, s_iFadePower, s_iFadeEnd - s_iFadePeak);
 			}
 		}
 	}
@@ -129,7 +129,6 @@ void CLogoScreen::OnRender()
 // =============================================================================
 void CLogoScreen::OnFadeComplete()
 {
-	//Global.m_iNextScreen = ScreenIndex_WarningScreen;
 	ScreenManager.Set(ScreenIndex_WarningScreen);
 }
 

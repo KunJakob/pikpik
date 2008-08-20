@@ -61,17 +61,18 @@ class CMetadata;
 enum t_MetadataSourceType
 {
 	MetadataSourceType_Raw,
-	MetadataSourceType_SignedEncrypted,
+	MetadataSourceType_Encrypted,
 };
 
 // The metadata processing tasks.
 enum t_MetadataTask
 {
-	ST_LoadFile,            // Loading the contents of the metadata file into memory.
-	ST_TokeniseData,        // Tokenising the metadata data.
-	ST_ParseTokens,         // Building structures from the tokenised data.
-	ST_Completed,           // All tasks have completed.
-	ST_Error,               // Tasks have ceased due to an error.
+	MetadataTask_LoadFile,				// Loading the contents of the metadata file into memory.
+	MetadataTask_DecryptData,			// Decrypting the metadata.
+	MetadataTask_TokeniseData,			// Tokenising the metadata.
+	MetadataTask_ParseTokens,			// Building structures from the tokenised data.
+	MetadataTask_Completed,				// All tasks have completed.
+	MetadataTask_Error,					// Tasks have ceased due to an error.
 };
 
 //##############################################################################
@@ -85,22 +86,15 @@ class CMetadata : public CDataset
 {
 public:
 	// Constructor.
-	// ~pMetadataFile The file path to the raw metadata file.
-	// ~bExecute Specify true to execute the metadata synchronously in the constructor.
-	CMetadata(const xchar* pMetadataFile, xbool bExecute = true);
-
-	// Constructor.
 	// ~pMetadataFile The file path to the signed-encrypted metadata file.
-	// ~pPassword The password used to encrypt the metadata.
-	// ~pSignature The signature of the metadata to compare against.
-	// ~pKey The public key to verify the metadata signature against.
-	// ~bExecute Specify true to execute the metadata synchronously in the constructor.
-	//CMetadata(const xchar* pFilePath, const xchar* pPassword, const xchar* pSignature, const xchar* pKey, xbool bExecute = true);
+	// ~pEncryptionKey The AES key used to encrypt the metadata. Specify NULL if the metadata is not encrypted.
+	// ~bExecute Specify true to process the metadata synchronously in the constructor.
+	CMetadata(const xchar* pMetadataFile, const xchar* pEncryptionKey, xbool bProcessImmediately);
 
 	// Update the metadata processing. This should be called every frame and will run up to iMaxTime milliseconds. Check IsCompleted to see if the metadata is ready to be used.
-	// ~iMaxTime The maximum time, in milliseconds, allowed for the update. This keeps the metadata asychronous and fast.
+	// ~iTargetTime The target time, in milliseconds, allowed for the update. This keeps the metadata asychronous and fast.
 	// ~iChunkSize The number of bytes to read each cycle. This number of bytes will be read in chunks until iMaxTime.
-	void Update(xuint iMaxTime = 20, xuint iChunkSize = 64);
+	void Update(xuint iTargetTime = 20, xuint iChunkSize = 64);
 
 	// Get the current task being executed by the metadata.
 	t_MetadataTask GetCurrentTask()
@@ -120,7 +114,7 @@ public:
 	// Check if the metadata has finished processing all data and is ready to be used.
 	xbool IsCompleted()
 	{
-		return m_iTask == ST_Completed || m_iTask == ST_Error;
+		return m_iTask == MetadataTask_Completed || m_iTask == MetadataTask_Error;
 	}
 
 	// Get a demetadataion of the last error that occured. Valid when GetCurrentTask() == ST_Error.
@@ -133,9 +127,16 @@ protected:
 	// Lists.
 	typedef xvlist<xchar*> t_lpString;
 
-	// Internal update for the metadata tasks.
+	// Load in the file contents.
 	void UpdateLoad(xuint iChunkSize);
+
+	// Decrypt the file contents.
+	void UpdateDecrypt(xuint iChunkSize);
+
+	// Tokenise the metadata.
 	void UpdateTokenise();
+	
+	// Process the metadata into structures.
 	void UpdateParse();
 
 	// Clean up and free resources associated with the metadata.
@@ -147,6 +148,9 @@ protected:
 	/**
 	* System.
 	*/
+
+	// The metadata source type.
+	t_MetadataSourceType m_iSourceType;
 
 	// The current metadata task.
 	t_MetadataTask m_iTask;
@@ -175,6 +179,13 @@ protected:
 
 	// The metadata data.
 	xchar* m_pData;
+
+	/**
+	* Decrypt.
+	*/
+
+	// The encryption key to use to decrypt the metadata.
+	xchar* m_pEncryptionKey;
 
 	/**
 	* Tokenise.
