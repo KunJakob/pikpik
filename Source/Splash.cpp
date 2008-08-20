@@ -82,8 +82,8 @@ void CLogoScreen::OnUpdate()
 	static xuint s_iHideTime	= 600;
 	static xuint s_iFadeStart	= 3200;
 	static xuint s_iFadePeak	= 3400;
-	static xuint s_iFadeEnd		= 3900;
-	static xuint s_iFadePower	= 60;
+	static xuint s_iFadeEnd		= 4000;
+	static xuint s_iFadePower	= 40;
 
 	xuint iTrackTime;
 	m_pChannel->getPosition(&iTrackTime, FMOD_TIMEUNIT_MS);

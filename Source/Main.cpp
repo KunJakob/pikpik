@@ -159,7 +159,7 @@ void Application::Initialise()
 	Global.m_fWorldAlpha = 1.f;
 
 	// Load all relevant metadata.
-	ResourceManager::RegisterMetadata(new CMetadata(".\\Metadata\\Sprites.emta", CryptManager.GetEncryptionKey().c_str(), true));
+	ResourceManager::RegisterMetadata(new CMetadata(".\\Metadata\\Sprites.mta", NULL, true));
 	ResourceManager::RegisterMetadata(new CMetadata(".\\Metadata\\Font.mta", NULL, true));
 
 	// Initialise the game font.
