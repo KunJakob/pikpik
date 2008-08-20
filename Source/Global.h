@@ -67,32 +67,43 @@
 //##############################################################################
 
 // Screen options.
-#define _SWIDTH				800
-#define _SHEIGHT			600
-#define _HSWIDTH			400
-#define _HSHEIGHT			300
-#define _SRECT				xrect(0, 0, _SWIDTH, _SHEIGHT)
+#define _SWIDTH					800
+#define _SHEIGHT				600
+#define _HSWIDTH				400
+#define _HSHEIGHT				300
+#define _SRECT					xrect(0, 0, _SWIDTH, _SHEIGHT)
 
 // Game options.
-#define _GID				"PikPik-1"
-#define _HOSTPORT			20557
-#define _MAXPLAYERS			5
-#define _MAXNAMELEN			15
-#define _MAXNAMECHARS		16
+#define _GID					"PikPik-1"
+#define _HOSTPORT				20557
+#define _MAXPLAYERS				5
+#define _MAXNAMELEN				15
+#define _MAXNAMECHARS			16
 
 // Shortcuts.
-#define _HGE				Application::GetInterface()
-#define _FMOD				Application::GetSoundSystem()
-#define _TERMINATE			Application::Terminate()
-#define _TIMEMS				GetTickCount()
-#define _TIMEDELTA			Application::GetTimeDelta()
-#define _TIMEDELTAF			_HGE->Timer_GetDelta()
-#define _LOCALE(NAME)		Global.m_pLocale->GetProperty(NAME)->GetString()
+#define _HGE					Application::GetInterface()
+#define _FMOD					Application::GetSoundSystem()
+#define _TERMINATE				Application::Terminate()
+#define _TIMEMS					GetTickCount()
+#define _TIMEDELTA				Application::GetTimeDelta()
+#define _TIMEDELTAF				_HGE->Timer_GetDelta()
+#define _LOCALE(NAME)			Global.m_pLocale->GetProperty(NAME)->GetString()
 
 // Colour manipulations.
-#define COLOURF(COLF)		(xuchar)((COLF) * 255.f)
-#define ARGBF(A, R, G, B)	ARGB(COLOURF(A), COLOURF(R), COLOURF(G), COLOURF(B))
-#define RGBF(R, G, B)		ARGB(255, COLOURF(R), COLOURF(G), COLOURF(B))
+#define _ARGB(A, R, G, B)		ARGB(A, R, G, B)
+#define _RGB(R, G, B)			ARGB(255, R, G, B)
+#define _COLF(F)				(xuchar)((F) * 255.f)
+#define _ARGBF(A, R, G, B)		ARGB(_COLF(A), _COLF(R), _COLF(G), _COLF(B))
+#define _RGBF(R, G, B)			ARGB(255, _COLF(R), _COLF(G), _COLF(B))
+
+// Metadata control.
+#if defined(_DEBUG)
+#define _METAEXT				".mta"
+#define _METAKEY				NULL
+#else
+#define _METAEXT				".emta"
+#define _METAKEY				CryptManager.GetEncryptionKey()
+#endif
 
 // Singletons.
 #define Global				CGlobal::Get()

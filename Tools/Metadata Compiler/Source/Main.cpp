@@ -105,6 +105,13 @@ int main(int iNumArgs, const char* pArgs[])
 
 		for (int iA = 0; iA < (int)xMetadata.length(); ++iA)
 		{
+			// Ignore comments.
+			if (xMetadata[iA] == '/' && xMetadata[iA + 1] == '/')
+			{
+				while (iA < (int)xMetadata.length() && xMetadata[iA] != '\n')
+					++iA;
+			}
+
 			if (!bIsQuotes && iswspace(xMetadata[iA]))
 			{
 				if (!bSeenWhiteSpace)
@@ -129,12 +136,19 @@ int main(int iNumArgs, const char* pArgs[])
 		byte cIV[AES::BLOCKSIZE];
 
 		for (int iA = 0; iA < AES::BLOCKSIZE; ++iA)
-			cIV[iA] = 0xF0;
+			cIV[iA] = rand() % 256;
 
 		CFB_Mode<AES>::Encryption xAES((byte*)xKey.c_str(), xKey.length() / 2, cIV);
-		StringSource(xFormattedMetadata, true, new StreamTransformationFilter(xAES, new FileSink(pOutputFile)));
+
+		string xEncryptedMetadata;
+		StringSource(xFormattedMetadata, true, new StreamTransformationFilter(xAES, new StringSink(xEncryptedMetadata)));
+
+		xEncryptedMetadata.insert(0, (const char*)cIV, AES::BLOCKSIZE);
+
+		StringSource(xEncryptedMetadata, true, new FileSink(pOutputFile));
 	}
 
+	// We're finished.
 	cout << "  Completed! " << "\n" << "\n";
 
 	// Exit.

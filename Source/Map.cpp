@@ -14,6 +14,7 @@
 #include <Renderer.h>
 #include <Resource.h>
 #include <Player.h>
+#include <Crypt.h>
 
 //##############################################################################
 
@@ -356,7 +357,7 @@ void CMap::Render()
 		static xpoint s_xCentrePoint = xpoint(24, 24);
 
 		if (m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsGhostWall())
-			MapManager.m_pTiles->GetMetadata()->GetSprite()->SetColor(ARGBF(1.f, m_fChannels[0], m_fChannels[1], m_fChannels[2]));
+			MapManager.m_pTiles->GetMetadata()->GetSprite()->SetColor(_ARGBF(1.f, m_fChannels[0], m_fChannels[1], m_fChannels[2]));
 		else
 			MapManager.m_pTiles->GetMetadata()->GetSprite()->SetColor(0xFFFFFFFF);
 
@@ -431,7 +432,7 @@ CMapBlock* CMap::GetSpawnBlock(t_PlayerType iPlayerType)
 // =============================================================================
 void CMapManager::OnInitialise()
 {
-	m_pMetadata = new CMetadata(".\\Metadata\\Maps.mta", NULL, true);
+	m_pMetadata = new CMetadata(".\\Metadata\\Maps" _METAEXT, _METAKEY, true);
 
 	// Load and initialise all resources.
 	m_pTiles = new CBasicSprite(_SPRITE("Map-Tiles"));

@@ -47,10 +47,10 @@ public:
 	}
 
 	// Get the application public key.
-	xstring& GetPublicKey();
+	const xchar* GetPublicKey();
 
 	// Get the application data encryption key.
-	xstring& GetEncryptionKey();
+	const xchar* GetEncryptionKey();
 
 protected:
 };

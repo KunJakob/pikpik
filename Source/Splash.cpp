@@ -119,7 +119,7 @@ void CLogoScreen::OnUpdate()
 void CLogoScreen::OnRender()
 {
 	xfloat fColour = m_fAlpha * .08f;
-	_HGE->Gfx_Clear(ARGBF(1.f, fColour, fColour, fColour));
+	_HGE->Gfx_Clear(_ARGBF(1.f, fColour, fColour, fColour));
 
 	m_pImage->Render();
 }
@@ -162,7 +162,7 @@ void CWarningScreen::OnNotify(xuint iEventType, void* pEventInfo)
 void CWarningScreen::OnRender()
 {
 	xfloat fColour = m_fAlpha * .08f;
-	_HGE->Gfx_Clear(ARGBF(1.f, fColour, fColour, fColour));
+	_HGE->Gfx_Clear(_ARGBF(1.f, fColour, fColour, fColour));
 
 	static xrect s_xRect(_HSWIDTH - 250, 0, _HSWIDTH + 250, _SHEIGHT);
 

@@ -46,7 +46,7 @@ using namespace CryptoPP;
 // =============================================================================
 // Nat Ryall                                                         20-Aug-2008
 // =============================================================================
-xstring& CCryptManager::GetPublicKey()
+const xchar* CCryptManager::GetPublicKey()
 {
 	// The external key.
 	static xstring s_xHexKey =
@@ -56,15 +56,16 @@ xstring& CCryptManager::GetPublicKey()
 	// Hex decode the key and return it.
 	static xstring s_xKey;
 
-	StringSource(s_xHexKey, true, new HexDecoder(new StringSink(s_xKey)));
+	if (s_xKey.length() == 0)
+		StringSource(s_xHexKey, true, new HexDecoder(new StringSink(s_xKey)));
 
-	return s_xKey;
+	return s_xKey.c_str();
 }
 
 // =============================================================================
 // Nat Ryall                                                         20-Aug-2008
 // =============================================================================
-xstring& CCryptManager::GetEncryptionKey()
+const xchar* CCryptManager::GetEncryptionKey()
 {
 	// The external key.
 	static xstring s_xHexKey =
@@ -74,9 +75,10 @@ xstring& CCryptManager::GetEncryptionKey()
 	// Hex decode the key and return it.
 	static xstring s_xKey;
 
-	StringSource(s_xHexKey, true, new HexDecoder(new StringSink(s_xKey)));
+	if (s_xKey.length() == 0)
+		StringSource(s_xHexKey, true, new HexDecoder(new StringSink(s_xKey)));
 
-	return s_xKey;
+	return s_xKey.c_str();
 }
 
 //##############################################################################

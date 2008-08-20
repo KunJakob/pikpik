@@ -149,7 +149,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 void Application::Initialise()
 {
 	// Seed the random number generator.
-	srand(GetTickCount());
+	srand(_TIMEMS);
 
 	// Initialise global vars.
 	Global.m_bWindowFocused = true;
@@ -159,14 +159,14 @@ void Application::Initialise()
 	Global.m_fWorldAlpha = 1.f;
 
 	// Load all relevant metadata.
-	ResourceManager::RegisterMetadata(new CMetadata(".\\Metadata\\Sprites.mta", NULL, true));
-	ResourceManager::RegisterMetadata(new CMetadata(".\\Metadata\\Font.mta", NULL, true));
+	ResourceManager::RegisterMetadata(new CMetadata(".\\Metadata\\Sprites" _METAEXT, _METAKEY, true));
+	ResourceManager::RegisterMetadata(new CMetadata(".\\Metadata\\Font" _METAEXT, _METAKEY, true));
 
 	// Initialise the game font.
 	Global.m_pGameFont = new CFont(_FONT("Default"));
 
 	// Load the locale.
-	Global.m_pLocale = new CMetadata(".\\Metadata\\Strings.mta", NULL, true);
+	Global.m_pLocale = new CMetadata(".\\Metadata\\Strings" _METAEXT, _METAKEY, true);
 
 	// Add all required modules to the game.
 	XMODULE(&Network);

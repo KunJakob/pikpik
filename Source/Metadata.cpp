@@ -113,6 +113,9 @@ xuint CMetadata::GetProgress()
 	case MetadataTask_LoadFile:
 		return (m_iBytesRead * 100) / m_iFileSize;
 
+	case MetadataTask_DecryptData:
+		return 100;
+
 	case MetadataTask_TokeniseData:
 		return (m_iTokenOffset * 100) / m_iFileSize;
 
@@ -188,18 +191,32 @@ void CMetadata::UpdateLoad(xuint iChunkSize)
 // =============================================================================
 void CMetadata::UpdateDecrypt(xuint iChunkSize)
 {
-	byte cIV[AES::BLOCKSIZE];
+	// The first block of bytes in the file is the IV.
+	xchar* pIV = m_pData;
+	xchar* pEncryptedData = m_pData + AES::BLOCKSIZE;
 
-	for (int iA = 0; iA < AES::BLOCKSIZE; ++iA)
-		cIV[iA] = 0xF0;
+	m_iFileSize -= AES::BLOCKSIZE;
+	m_iBytesRead -= AES::BLOCKSIZE;
 
-	CTR_Mode<AES>::Decryption xAES((byte*)m_pEncryptionKey, strlen(m_pEncryptionKey) / 2, cIV);
+	// Allocate a new buffer for the decrypted file contents.
+	xchar* pDecryptedData = new xchar[m_iFileSize + 1];
+	pDecryptedData[m_iFileSize] = NULL;
 
-	StreamTransformationFilter xDecryptedData(xAES);
-	StringSource xDataDecryptor((byte*)m_pData, m_iFileSize, true, &xDecryptedData);
+	if (!pDecryptedData)
+	{
+		SetError("Failed to allocate decryption buffer.");
+		return;
+	}
 
-	xDecryptedData.Get((byte*)m_pData, m_iFileSize);
+	// Decrypt the contents into the new buffer.
+	CFB_Mode<AES>::Decryption xAES((byte*)m_pEncryptionKey, strlen(m_pEncryptionKey) / 2, (byte*)pIV);
+	StringSource((byte*)pEncryptedData, m_iFileSize, true, new StreamTransformationFilter(xAES, new ArraySink((byte*)pDecryptedData, m_iFileSize)));
 
+	// Start pointing to the decrypted data.
+	delete [] m_pData;
+	m_pData = pDecryptedData;
+
+	// Now we have our decrypted data, start tokenising.
 	m_iTask = MetadataTask_TokeniseData;
 }
 
