@@ -5,6 +5,7 @@ set INPATH="..\Media\Metadata"
 set OUTPATH="..\Media\Metadata"
 set KEYFILE="..\Crypto\Keys\AES-256-Key.txt"
 
+%METACOMP% %INPATH%\Audio.mta %OUTPATH%\Audio.emta %KEYFILE% > nul
 %METACOMP% %INPATH%\Font.mta %OUTPATH%\Font.emta %KEYFILE% > nul
 %METACOMP% %INPATH%\Interface.mta %OUTPATH%\Interface.emta %KEYFILE% > nul
 %METACOMP% %INPATH%\Maps.mta %OUTPATH%\Maps.emta %KEYFILE% > nul

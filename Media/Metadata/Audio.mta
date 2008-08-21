@@ -1,0 +1,25 @@
+.Sound "SAPIAN-Intro"
+{
+	.File "Audio\Clips\Logo-SAPIAN.mp3"
+	.Type "Buffered"
+	.Group "System"
+
+	.Marker "DisplayLogo" 		{ .Time 600  }
+	.Marker "FadeStart" 		{ .Time 3200 }
+	.Marker "FadePeak" 			{ .Time 3400 .Event "Peaked" }
+	.Marker "FadeEnd" 			{ .Time 4000 }
+}
+
+.Sound "Menu-Woosh-01"
+{
+	.File 	"Audio\Effects\Menu-Woosh-01.mp3"
+	.Type 	"Buffered"
+	.Group 	"Effects"
+}
+
+.Sound "Menu-Woosh-02"
+{
+	.File 	"Audio\Effects\Menu-Woosh-02.mp3"
+	.Type 	"Buffered"
+	.Group 	"Effects"
+}
