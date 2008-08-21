@@ -20,6 +20,9 @@
 #include <Crypto/aes.h>
 #include <Crypto/hex.h>
 
+// Other.
+#include <Windows.h>
+
 //##############################################################################
 
 //##############################################################################
@@ -62,7 +65,7 @@ using namespace CryptoPP;
 // =============================================================================
 int main(int iNumArgs, const char* pArgs[])
 {
-	srand((unsigned int)time(NULL));
+	srand(GetTickCount());
 
 	// Output the header.
 	cout << TEXT_HEADER;
