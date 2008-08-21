@@ -17,7 +17,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)Media\"
+			OutputDirectory="$(SolutionDir)Bin\"
 			IntermediateDirectory="$(ProjectDir)$(ConfigurationName)\"
 			ConfigurationType="1"
 			CharacterSet="2"
@@ -64,7 +64,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="$(SolutionDir)HGE\Lib\hge.lib $(SolutionDir)HGE\Lib\hgehelp.lib $(SolutionDir)FMOD\Lib\fmodex_vc.lib $(SolutionDir)Crypto\Lib\cryptsd.lib ws2_32.lib"
-				OutputFile="$(OutDir)\pikpikd.exe"
+				OutputFile="$(OutDir)pikpikd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(SolutionDir)Crypto\Lib"
 				IgnoreDefaultLibraryNames="libc;libcmt"
@@ -99,7 +99,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)Media\"
+			OutputDirectory="$(SolutionDir)Bin\"
 			IntermediateDirectory="$(ProjectDir)$(ConfigurationName)\"
 			ConfigurationType="1"
 			CharacterSet="2"
@@ -144,7 +144,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="$(SolutionDir)HGE\Lib\hge.lib $(SolutionDir)HGE\Lib\hgehelp.lib $(SolutionDir)FMOD\Lib\fmodex_vc.lib $(SolutionDir)Crypto\Lib\crypts.lib ws2_32.lib"
-				OutputFile="$(OutDir)\pikpik.exe"
+				OutputFile="$(OutDir)pikpik.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(SolutionDir)Crypto\Lib"
 				IgnoreDefaultLibraryNames="libc;libcmt"

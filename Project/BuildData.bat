@@ -1,8 +1,8 @@
 @echo off
 
 set METACOMP="..\Tools\Metadata Compiler\Bin\metacomp.exe"
-set INPATH="..\Media\Metadata"
-set OUTPATH="..\Media\Metadata"
+set INPATH="..\Bin\Metadata"
+set OUTPATH="..\Bin\Metadata"
 set KEYFILE="..\Crypto\Keys\AES-256-Key.txt"
 
 %METACOMP% %INPATH%\Audio.mta %OUTPATH%\Audio.emta %KEYFILE% > nul

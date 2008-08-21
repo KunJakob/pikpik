@@ -37,12 +37,54 @@
 //
 //##############################################################################
 
+// Predeclare.
+class CSound;
+
 // The audio groups.
 enum t_AudioGroup
 {
 	AudioGroup_Music,
 	AudioGroup_Effects,
 	AudioGroup_Voice,
+};
+
+// Callbacks.
+typedef xfunction(3)<CSound* /*Sound*/, const xchar* /*MarkerName*/, xuint /*MarkerTime*/> t_MarkerCallback;
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                SOUND MARKER
+//
+//##############################################################################
+class CSoundMarker
+{
+public:
+
+};
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                   SOUND
+//
+//##############################################################################
+class CSound
+{
+public:
+	// Get a marker explicitly by name.
+	//CSoundMarker* GetMarker(const xchar* pName)
+
+	// Determine if an audio marker has expired.
+	xbool IsMarkerExpired(const xchar* pName);
+
+	// Bind a callback to an audio marker.
+	void SetMarkerCallback(const xchar* pName, t_MarkerCallback fpCallback);
+
+protected:
+	//
 };
 
 //##############################################################################
@@ -63,10 +105,10 @@ public:
 	}
 
 	// Set the master volume, this will affect all sound types.
-	//void SetVolume(xfloat fVolume);
+	void SetVolume(xfloat fVolume);
 
 	// Set the volume of a specific audio group.
-	//void SetVolume(t_AudioGroup iGroup, xfloat fVolume);
+	void SetVolume(t_AudioGroup iGroup, xfloat fVolume);
 
 protected:
 };

@@ -309,9 +309,10 @@ void CMenuScreen::SetState(t_MenuState iState)
 			static FMOD::Channel* s_pChannel = NULL;
 
 			if (!s_pSound)
-				_FMOD->createSound("Audio\\Effects\\Menu-Woosh-01.mp3", FMOD_SOFTWARE, NULL, &s_pSound);
+				_FMOD->createSound("Audio\\Effects\\Menu-Woosh-02.mp3", FMOD_SOFTWARE, NULL, &s_pSound);
 
 			_FMOD->playSound(FMOD_CHANNEL_FREE, s_pSound, false, &s_pChannel);
+			s_pChannel->setVolume(0.25f);
 		}
 		break;
 
@@ -330,9 +331,10 @@ void CMenuScreen::SetState(t_MenuState iState)
 			static FMOD::Channel* s_pChannel = NULL;
 
 			if (!s_pSound)
-				_FMOD->createSound("Audio\\Effects\\Menu-Woosh-02.mp3", FMOD_SOFTWARE, NULL, &s_pSound);
+				_FMOD->createSound("Audio\\Effects\\Menu-Woosh-01.mp3", FMOD_SOFTWARE, NULL, &s_pSound);
 
 			_FMOD->playSound(FMOD_CHANNEL_FREE, s_pSound, false, &s_pChannel);
+			s_pChannel->setVolume(0.25f);
 		}
 		break;
 	}
