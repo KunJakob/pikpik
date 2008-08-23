@@ -1,0 +1,12 @@
+.Sound "Logo-Intro"
+{
+	.File "Audio\Clips\Logo-SAPIAN.mp3"
+	.Type "Stream"
+	.Group "System"
+	.Volume 1.0
+	
+	.Marker "Display"	{ .Time 600  }
+	.Marker "FadeStart"	{ .Time 3200 }
+	.Marker "FadePeak"	{ .Time 3400 }
+	.Marker "FadeEnd"	{ .Time 4000 }
+}

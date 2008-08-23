@@ -43,6 +43,7 @@ class CSound;
 // The audio groups.
 enum t_AudioGroup
 {
+	AudioGroup_System,
 	AudioGroup_Music,
 	AudioGroup_Effects,
 	AudioGroup_Voice,

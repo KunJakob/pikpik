@@ -1,7 +1,7 @@
 @echo off
 
-set INPATH=..\..\..\Media\Metadata
-set OUTPATH=..\..\..\Media\Metadata
+set INPATH=..\..\..\Bin\Metadata
+set OUTPATH=..\..\..\Bin\Metadata
 set KEYFILE=..\..\..\Crypto\Keys\AES-256-Key.txt
 
 metacomp %INPATH%\Font.mta %OUTPATH%\Font.emta %KEYFILE%
