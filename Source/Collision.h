@@ -48,6 +48,14 @@ enum t_CollisionType
 	CollisionType_Circle,		// The collision area is a circle.
 };
 
+// The collision layers.
+enum t_CollisionLayer
+{
+	CollisionLayer_All = -1,
+	CollisionLayer_Default = 0,
+	CollisionLayer_Max = 32,
+};
+
 // Lists.
 typedef xlist<CCollidable*> t_CollidableList; 
 
@@ -133,37 +141,26 @@ public:
 	// Constructor.
 	CCollisionManager();
 
+	// Remove all currently managed collidables from the system.
+	void Reset();
+
 	// Check for valid collisions for managed collidables.
 	virtual void OnUpdate();
 
-	// Render collision bounds for debugging purposes.
-	//virtual void OnRender();
-
 	// Add a collidable to the manager. Events will be fired between types automatically once added.
-	void Add(CCollidable* pCollidable);
+	// ~iCollisionLayer The layer to place the collidable on. Only collidables on the same layer will collide. Collidables can be added to multiple layers.
+	void Add(CCollidable* pCollidable, xint iCollisionLayer = CollisionLayer_Default);
 
 	// Remove a collidable from the manager.
-	void Remove(CCollidable* pCollidable);
-
-	// Remove all currently managed collidables from the system.
-	void RemoveAll();
+	// ~iCollisionLayer The layer to remove the collidable from, specify 'CollisionLayer_All' to remove from all layers.
+	void Remove(CCollidable* pCollidable, xint iCollisionLayer = CollisionLayer_All);
 
 	// Check if two collidables are colliding regardless of type.
 	xbool AreColliding(CCollidable* pA, CCollidable* pB);
 
 protected:
 	// The list of collidable objects to be compared against each other.
-	t_CollidableList m_lpCollidables;
-
-	// TODO: Think about adding collision layers "m_lpCollidables[CollisionLayer_Max]".
-	// Collision layers can have the same collision element added to them as another layer but only collisions in each layer are valid.
-
-private:
-	// Draw a box.
-	//void DrawBox(xrect xRect, xuint iColour);
-
-	// Draw a circle.
-	//void DrawCircle(xfloat fX, xfloat fY, xfloat fRadius, xint iSegments, xuint iColour);
+	t_CollidableList m_lpCollidables[CollisionLayer_Max];
 };
 
 //##############################################################################

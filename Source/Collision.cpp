@@ -45,9 +45,10 @@ CCollisionManager::CCollisionManager()
 // =============================================================================
 // Author: Nat Ryall                                           Date: 25-Feb-2008
 // =============================================================================
-void CCollisionManager::RemoveAll()
+void CCollisionManager::Reset()
 {
-	m_lpCollidables.clear();
+	for (xint iA = 0; iA < CollisionLayer_Max; ++iA)
+		m_lpCollidables[iA].clear();
 }
 
 // =============================================================================
@@ -55,21 +56,24 @@ void CCollisionManager::RemoveAll()
 // =============================================================================
 void CCollisionManager::OnUpdate()
 {
-	XEN_LIST_FOREACH(t_CollidableList, ppCollidable, m_lpCollidables)
+	for (xint iA = 0; iA < CollisionLayer_Max; ++iA)
 	{
-		t_CollidableList::iterator ppCollideWith = ppCollidable;
-		ppCollideWith++;
-
-		for (; ppCollideWith != m_lpCollidables.end(); ppCollideWith++)
+		XEN_LIST_FOREACH(t_CollidableList, ppCollidable, m_lpCollidables[iA])
 		{
-			XMASSERT(*ppCollidable != *ppCollideWith, "Collidables should never match.");
+			t_CollidableList::iterator ppCollideWith = ppCollidable;
+			ppCollideWith++;
 
-			if ((*ppCollidable)->IsCollidable(*ppCollideWith) && (*ppCollideWith)->IsCollidable(*ppCollidable))
+			for (; ppCollideWith != m_lpCollidables[iA].end(); ppCollideWith++)
 			{
-				if (AreColliding(*ppCollidable, *ppCollideWith))
+				XMASSERT(*ppCollidable != *ppCollideWith, "Collidables should never match.");
+
+				if ((*ppCollidable)->IsCollidable(*ppCollideWith) && (*ppCollideWith)->IsCollidable(*ppCollidable))
 				{
-					(*ppCollidable)->OnCollision(*ppCollideWith);
-					(*ppCollideWith)->OnCollision(*ppCollidable);
+					if (AreColliding(*ppCollidable, *ppCollideWith))
+					{
+						(*ppCollidable)->OnCollision(*ppCollideWith);
+						(*ppCollideWith)->OnCollision(*ppCollidable);
+					}
 				}
 			}
 		}
@@ -77,57 +81,29 @@ void CCollisionManager::OnUpdate()
 }
 
 // =============================================================================
-// Nat Ryall                                                         07-Aug-2008
-// =============================================================================
-/*void CCollisionManager::OnRender()
-{
-	if (m_bDebugRender)
-	{
-		XEN_LIST_FOREACH(t_CollidableList, ppCollidable, m_lpCollidables)
-		{
-			switch ((*ppCollidable)->GetCollisionType())
-			{
-			case CollisionType_Point:
-				{
-					xpoint xPoint = (*ppCollidable)->GetCollisionPoint() - m_xOffset;
-					_HGE->Gfx_RenderLine((xfloat)xPoint.iX, (xfloat)xPoint.iY, (xfloat)xPoint.iX + 1.f, (xfloat)xPoint.iY + 1.f);
-				}
-				break;
-
-			case CollisionType_Rect:
-				{
-					xrect xRect = (*ppCollidable)->GetCollisionRect() - m_xOffset;
-					DrawBox(xRect, 0xFFFFFFFF);
-				}
-				break;
-
-			case CollisionType_Circle:
-				{
-					xcircle xCircle = (*ppCollidable)->GetCollisionCircle();
-					xCircle -= m_xOffset;
-
-					DrawCircle((xfloat)xCircle.iX, (xfloat)xCircle.iY, (xfloat)xCircle.iRadius, 16, 0xFFFFFFFF);
-				}
-				break;
-			}
-		}
-	}
-}*/
-
-// =============================================================================
 // Author: Nat Ryall                                           Date: 25-Feb-2008
 // =============================================================================
-void CCollisionManager::Add(CCollidable* pCollidable)
+void CCollisionManager::Add(CCollidable* pCollidable, xint iCollisionLayer)
 {
-	m_lpCollidables.push_back(pCollidable);
+	XASSERT(iCollisionLayer > CollisionLayer_All && iCollisionLayer < CollisionLayer_Max);
+
+	m_lpCollidables[iCollisionLayer].push_back(pCollidable);
 }
 
 // =============================================================================
 // Author: Nat Ryall                                           Date: 25-Feb-2008
 // =============================================================================
-void CCollisionManager::Remove(CCollidable* pCollidable)
+void CCollisionManager::Remove(CCollidable* pCollidable, xint iCollisionLayer)
 {
-	m_lpCollidables.remove(pCollidable);
+	XASSERT(iCollisionLayer >= CollisionLayer_All && iCollisionLayer < CollisionLayer_Max);
+
+	if (iCollisionLayer == CollisionLayer_All)
+	{
+		for (xint iA = 0; iA < CollisionLayer_Max; ++iA)
+			m_lpCollidables[iA].remove(pCollidable);
+	}
+	else
+		m_lpCollidables[iCollisionLayer].remove(pCollidable);
 }
 
 // =============================================================================
@@ -176,44 +152,5 @@ xbool CCollisionManager::AreColliding(CCollidable* pA, CCollidable* pB)
 
 	return false;
 }
-
-// =============================================================================
-// Nat Ryall                                                         06-Aug-2008
-// =============================================================================
-/*void CCollisionManager::DrawBox(xrect xRect, xuint iColour)
-{
-	_HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iTop, iColour);
-	_HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iBottom, iColour);
-	_HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iBottom, iColour);
-	_HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iTop, iColour);
-}*/
-
-// =============================================================================
-// Nat Ryall                                                         07-Aug-2008
-// =============================================================================
-/*void CCollisionManager::DrawCircle(xfloat fX, xfloat fY, xfloat fRadius, xint iSegments, xuint iColour)
-{
-	xfloat fPerAngle;
-	xfloat fA;
-	xfloat fLeft;
-	xfloat fRight;
-	xfloat fTop;
-	xfloat fBottom;
-
-	fPerAngle = (2.f * M_PI) / (xfloat)iSegments;
-
-	fRight = fRadius;
-	fBottom = 0.f;
-
-	for(fA = 0.f; fA <= ((2.f * M_PI) + fPerAngle); fA += fPerAngle) 
-	{
-		fLeft = fRight;
-		fTop = fBottom;
-		fRight = fRadius * cos(fA);
-		fBottom = fRadius * sin(fA);
-
-		_HGE->Gfx_RenderLine(fLeft + fX, fTop + fY, fRight + fX, fBottom + fY, iColour);
-	}
-}*/
 
 //##############################################################################

@@ -36,13 +36,10 @@
 // =============================================================================
 void CGameScreen::OnActivate()
 {
-#if defined(_DEBUG)
-	//RenderManager::SetRenderCallback(LayerIndex_Player, xbind(this, &CGameScreen::_RenderCollidables));
-	//Need AddRenderCallback();
-#endif
-
 	Global.m_fWorldAlpha = 1.f;
 	Global.m_fMusicEnergy = 0.f;
+
+	Interface.SetCursorVisible(false);
 
 	LoadMap();
 	LoadMusic();
@@ -53,8 +50,6 @@ void CGameScreen::OnActivate()
 	
 	RenderManager.SetRenderCallback(LayerIndex_Map, xbind(this, &CGameScreen::WorldTransform));
 	RenderManager.SetRenderCallback(LayerIndex_Player, xbind(this, &CGameScreen::WorldTransform));
-
-	Interface.SetCursorVisible(false);
 
 	m_pMinimap = new CMinimap(Global.m_pActiveMap);
 	RenderManager.Add(LayerIndex_Radar, m_pMinimap);
@@ -73,7 +68,7 @@ void CGameScreen::LoadMap()
 // =============================================================================
 void CGameScreen::LoadMusic()
 {
-	_FMOD->createStream("Audio\\Level-Test.mp3", FMOD_SOFTWARE, NULL, &m_pMusic);
+	//_FMOD->createStream("Audio\\Level-Test.mp3", FMOD_SOFTWARE, NULL, &m_pMusic);
 	//_FMOD->playSound(FMOD_CHANNEL_FREE, m_pMusic, false, &m_pChannel);
 }
 
@@ -113,12 +108,12 @@ void CGameScreen::OnDeactivate()
 {
 	delete m_pMinimap;
 
-	m_pMusic->release();
+	//m_pMusic->release();
 
 	RenderManager.Reset();
-	Interface.SetCursorVisible(true);
+	CollisionManager.Reset();
 
-	CollisionManager.RemoveAll();
+	Interface.SetCursorVisible(true);
 }
 
 // =============================================================================
