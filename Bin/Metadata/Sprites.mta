@@ -102,101 +102,17 @@
 
 .Sprite "Cursor-Main"
 {
-	.File "Surfaces\Test-Cursor.png"
+	.File "Surfaces\Cursor-Default.png"
 }
 
 .Sprite "Cursor-Write"
 {
-	.File "Surfaces\Test-WriteCursor.png"
+	.File "Surfaces\Cursor-Write.png"
 }
 
 .Sprite "Cursor-Click"
 {
 	.File "Surfaces\Cursor-Click.png"
-}
-
-.Sprite "Test-Window"
-{
-	.File "Surfaces\Test-Dialog.png"
-	
-	.Area "TopLeft"			{ .Size 0  0  3  17 }
-	.Area "TopCentre"		{ .Size 3  0  58 17 }
-	.Area "TopRight"		{ .Size 61 0  3  17 }
-	.Area "MiddleLeft"		{ .Size 0  17 3  58 }
-	.Area "MiddleCentre"	{ .Size 3  17 58 58 }
-	.Area "MiddleRight"		{ .Size 61 17 3  58 }
-	.Area "BottomLeft"		{ .Size 0  75 3  3  }
-	.Area "BottomCentre"	{ .Size 3  75 58 3  }
-	.Area "BottomRight"		{ .Size 61 75 3  3  }
-}
-
-.Sprite "Test-Group"
-{
-	.File "Surfaces\Test-Group.png"
-	
-	.Area "TopLeft"			{ .Rect 0  0  7  7  }
-	.Area "TopCentre"		{ .Rect 7  0  35 7  }
-	.Area "TopRight"		{ .Rect 35 0  42 7  }
-	.Area "MiddleLeft"		{ .Rect 0  7  7  35 }
-	.Area "MiddleCentre"	{ .Rect 7  7  35 35 }
-	.Area "MiddleRight"		{ .Rect 35 7  42 35 }
-	.Area "BottomLeft"		{ .Rect 0  35 7  42 }
-	.Area "BottomCentre"	{ .Rect 7  35 35 42 }
-	.Area "BottomRight"		{ .Rect 35 35 42 42 }
-}
-
-.Sprite "Test-Button"
-{
-	.File "Surfaces\Test-Button.png"
-	
-	.Area "NormalLeft"		{ .Size 0   0 4   20 }
-	.Area "NormalCentre"	{ .Size 4   0 100 20 }
-	.Area "NormalRight"		{ .Size 104 0 4   20 }
-	.Area "OverLeft"		{ .Size 108 0 4   20 }
-	.Area "OverCentre"		{ .Size 112 0 100 20 }
-	.Area "OverRight"		{ .Size 212 0 4   20 }
-	.Area "DownLeft"		{ .Size 216 0 4   20 }
-	.Area "DownCentre"		{ .Size 220 0 100 20 }
-	.Area "DownRight"		{ .Size 320 0 4   20 }
-}
-
-.Sprite "Test-Input"
-{
-	.File "Surfaces\Test-InputBox.png"
-	
-	.Area "Left"			{ .Size 0  0 3  20 }
-	.Area "Centre"			{ .Size 1  0 62 20 }
-	.Area "Right"			{ .Size 61 0 3  20 }
-}
-
-.Sprite "Test-Check"
-{
-	.File "Surfaces\Test-CheckBox.png"
-	
-	.Area "Normal"			{ .Tile 0 13 13 }
-	.Area "Over"			{ .Tile 1 13 13 }
-	.Area "Down"			{ .Tile 2 13 13 }
-	.Area "Check"			{ .Tile 3 13 13 }
-}
-
-.Sprite "Test-Radio"
-{
-	.File "Surfaces\Test-RadioButton.png"
-	
-	.Area "Normal"			{ .Tile 0 13 13 }
-	.Area "Over"			{ .Tile 1 13 13 }
-	.Area "Down"			{ .Tile 2 13 13 }
-	.Area "Check"			{ .Tile 3 13 13 }
-}
-
-.Sprite "Test-Progress"
-{
-	.File "Surfaces\Test-Progress.png"
-	
-	.Area "Left"			{ .Size 0  0 4  17 }
-	.Area "Centre"			{ .Size 4  0 44 17 }
-	.Area "Right"			{ .Size 92 0 4  17 }
-	.Area "Progress"		{ .Size 48 0 44 17 }
 }
 
 .Sprite "Menu-Input"

@@ -46,8 +46,8 @@
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderThrough="$(SolutionDir)Source\Global.h"
-				PrecompiledHeaderFile="$(IntDir)Global.pch"
+				PrecompiledHeaderThrough=""
+				PrecompiledHeaderFile=""
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
@@ -64,7 +64,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="$(SolutionDir)HGE\Lib\hge.lib $(SolutionDir)HGE\Lib\hgehelp.lib $(SolutionDir)FMOD\Lib\fmodex_vc.lib $(SolutionDir)Crypto\Lib\cryptsd.lib ws2_32.lib"
-				OutputFile="$(OutDir)pikpikd.exe"
+				OutputFile="$(OutDir)pikpik_debug.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(SolutionDir)Crypto\Lib"
 				IgnoreDefaultLibraryNames="libc;libcmt"
@@ -95,6 +95,9 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Building data..."
+				CommandLine="$(ProjectDir)BuildData.bat"
+				ExcludedFromBuild="true"
 			/>
 		</Configuration>
 		<Configuration
@@ -123,14 +126,91 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="$(SolutionDir);$(SolutionDir)Source"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;_RELEASE;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderThrough="$(SolutionDir)Source\Global.h"
-				PrecompiledHeaderFile="$(IntDir)Global.pch"
+				PrecompiledHeaderThrough=""
+				PrecompiledHeaderFile=""
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="$(SolutionDir)HGE\Lib\hge.lib $(SolutionDir)HGE\Lib\hgehelp.lib $(SolutionDir)FMOD\Lib\fmodex_vc.lib $(SolutionDir)Crypto\Lib\crypts.lib ws2_32.lib"
+				OutputFile="$(OutDir)pikpik_release.exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="$(SolutionDir)Crypto\Lib"
+				IgnoreDefaultLibraryNames="libc;libcmt"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				Description="Building data..."
+				CommandLine="$(ProjectDir)BuildData.bat"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Retail|Win32"
+			OutputDirectory="$(SolutionDir)Bin\"
+			IntermediateDirectory="$(ProjectDir)$(ConfigurationName)\"
+			ConfigurationType="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				WholeProgramOptimization="true"
+				AdditionalIncludeDirectories="$(SolutionDir);$(SolutionDir)Source"
+				PreprocessorDefinitions="WIN32;_RETAIL;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
+				RuntimeLibrary="2"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -148,10 +228,10 @@
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(SolutionDir)Crypto\Lib"
 				IgnoreDefaultLibraryNames="libc;libcmt"
-				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 			/>
 			<Tool

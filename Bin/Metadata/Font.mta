@@ -4,24 +4,6 @@
 	.Spacing 1.25
 }
 
-.Font "Test-Font"
-{
-	.File "Font\Arial_11.fnt"
-	.Colour 0 0 0
-}
-
-.Font "Test-WindowFont"
-{
-	.File "Font\Arial_11.fnt"
-	.Colour 255 255 255
-}
-
-.Font "Test-GroupFont"
-{
-	.File "Font\Arial_11.fnt"
-	.Colour 0 70 213
-}
-
 .Font "Menu-Default"
 {
 	.File "Font\ShowcardGothic_36.fnt"

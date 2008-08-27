@@ -112,6 +112,8 @@ void ResourceManager::RegisterMetadata(CMetadata* pMetadata)
 // =============================================================================
 CResourceFile* ResourceManager::CreateResourceFile(t_ResourceType iType, const xchar* pFile)
 {
+	XMASSERT(GetFileAttributes(pFile) != INVALID_FILE_ATTRIBUTES, XFORMAT("Could not find file: %s", pFile));
+
 	XEN_LIST_FOREACH(t_ResourceFileList, ppResourceFile, s_lpResourceFiles[iType])
 	{
 		if (strcmp((*ppResourceFile)->pFile, pFile) == 0)
