@@ -74,8 +74,8 @@ CSpriteMetadata::CSpriteMetadata(CDataset* pDataset) : CResourceMetadata(Resourc
 		CAnimation* pAnimation = new CAnimation;
 		m_lpAnimations.push_back(pAnimation);
 
-		pAnimation->pName = pAnimationDataset->GetName();
-		pAnimation->iAnimationTime = 0;
+		pAnimation->m_pName = pAnimationDataset->GetName();
+		pAnimation->m_iAnimationTime = 0;
 
 		xuint iAnimationDelay = 0;
 
@@ -88,36 +88,36 @@ CSpriteMetadata::CSpriteMetadata(CDataset* pDataset) : CResourceMetadata(Resourc
 		_DATASET_FOREACH(pFrameDataset, pAnimationDataset, "Frame", NULL)
 		{
 			CFrame* pFrame = new CFrame;
-			pAnimation->lpFrames.push_back(pFrame);
+			pAnimation->m_lpFrames.push_back(pFrame);
 
-			pFrame->pName = NULL;
-			pFrame->iDelay = iAnimationDelay;
-			pFrame->pEvent = NULL;
-			pFrame->pNextFrame = NULL;
+			pFrame->m_pName = NULL;
+			pFrame->m_iDelay = iAnimationDelay;
+			pFrame->m_pEvent = NULL;
+			pFrame->m_pNextFrame = NULL;
 
 			if (pFrameDataset->GetName())
-				pFrame->pName = pFrameDataset->GetName();
+				pFrame->m_pName = pFrameDataset->GetName();
 
-			pFrame->pArea = FindArea(pFrameDataset->GetProperty("Area")->GetString());
+			pFrame->m_pArea = FindArea(pFrameDataset->GetProperty("Area")->GetString());
 
 			if (_PROPERTY_EXISTS(pAnimationDataset, "Delay"))
-				pFrame->iDelay = (xuint)_PROPERTY->GetInt();
+				pFrame->m_iDelay = (xuint)_PROPERTY->GetInt();
 
 			if (_PROPERTY_EXISTS(pFrameDataset, "Event"))
-				pFrame->pEvent = _PROPERTY->GetString();
+				pFrame->m_pEvent = _PROPERTY->GetString();
 
-			if (pPrevFrame && pPrevFrame->pNextFrame == NULL)
-				pPrevFrame->pNextFrame = pFrame;
+			if (pPrevFrame && pPrevFrame->m_pNextFrame == NULL)
+				pPrevFrame->m_pNextFrame = pFrame;
 
-			pFrame->pNextFrame = NULL;
+			pFrame->m_pNextFrame = NULL;
 			pPrevFrame = pFrame;
 
 			if (_PROPERTY_EXISTS(pFrameDataset, "Loop"))
-				pFrame->pNextFrame = pAnimation->lpFrames.front();
+				pFrame->m_pNextFrame = pAnimation->m_lpFrames.front();
 			else if (_PROPERTY_EXISTS(pFrameDataset, "Goto"))
-				pFrame->pNextFrame = FindFrame(pAnimation, _PROPERTY->GetString());
+				pFrame->m_pNextFrame = FindFrame(pAnimation, _PROPERTY->GetString());
 
-			pAnimation->iAnimationTime += pFrame->iDelay;
+			pAnimation->m_iAnimationTime += pFrame->m_iDelay;
 		}
 	}
 }
@@ -133,7 +133,7 @@ CSpriteMetadata::~CSpriteMetadata()
 
 	while (m_lpAnimations.size())
 	{
-		XEN_LIST_ERASE_ALL(m_lpAnimations.front()->lpFrames);
+		XEN_LIST_ERASE_ALL(m_lpAnimations.front()->m_lpFrames);
 		m_lpAnimations.pop_front();
 	}
 }
@@ -157,9 +157,9 @@ CSpriteMetadata::CArea* CSpriteMetadata::FindArea(const xchar* pName)
 // =============================================================================
 CSpriteMetadata::CFrame* CSpriteMetadata::FindFrame(CAnimation* pAnimation, const xchar* pName)
 {
-	XEN_LIST_FOREACH(t_FrameList, ppFrame, pAnimation->lpFrames)
+	XEN_LIST_FOREACH(t_FrameList, ppFrame, pAnimation->m_lpFrames)
 	{
-		if (strcmp((*ppFrame)->pName, pName) == 0)
+		if (strcmp((*ppFrame)->m_pName, pName) == 0)
 			return *ppFrame;
 	}
 
@@ -173,7 +173,7 @@ CSpriteMetadata::CAnimation* CSpriteMetadata::FindAnimation(const xchar* pName)
 {
 	XEN_LIST_FOREACH(t_AnimationList, ppAnimation, m_lpAnimations)
 	{
-		if (strcmp((*ppAnimation)->pName, pName) == 0)
+		if (strcmp((*ppAnimation)->m_pName, pName) == 0)
 			return *ppAnimation;
 	}
 
@@ -291,15 +291,15 @@ void CAnimatedSprite::Update()
 {
 	if (m_bPlaying)
 	{
-		if (m_pFrame->iDelay)
+		if (m_pFrame->m_iDelay)
 			m_iFrameTimer += _TIMEDELTA;
 
-		while (m_iFrameTimer >= m_pFrame->iDelay)
+		while (m_iFrameTimer >= m_pFrame->m_iDelay)
 		{
-			if (m_pFrame->pNextFrame)
+			if (m_pFrame->m_pNextFrame)
 			{
-				m_iFrameTimer -= m_pFrame->iDelay;
-				SetFrame(m_pFrame->pNextFrame);
+				m_iFrameTimer -= m_pFrame->m_iDelay;
+				SetFrame(m_pFrame->m_pNextFrame);
 			}
 			else
 			{
@@ -324,10 +324,10 @@ void CAnimatedSprite::Render()
 void CAnimatedSprite::SetFrame(CSpriteMetadata::CFrame* pFrame)
 {
 	m_pFrame = pFrame;
-	m_pArea = m_pFrame->pArea;
+	m_pArea = m_pFrame->m_pArea;
 
-	if (m_pFrame->pEvent && m_fpEvent)
-		m_fpEvent(this, m_pFrame->pEvent);
+	if (m_pFrame->m_pEvent && m_fpEvent)
+		m_fpEvent(this, m_pFrame->m_pEvent);
 }
 
 // =============================================================================
@@ -339,7 +339,7 @@ void CAnimatedSprite::SetAnimation(CSpriteMetadata::CAnimation* pAnimation, xboo
 	m_iFrameTimer = 0;
 
 	m_pAnimation = pAnimation;
-	SetFrame(pAnimation->lpFrames.front());
+	SetFrame(pAnimation->m_lpFrames.front());
 }
 
 //##############################################################################

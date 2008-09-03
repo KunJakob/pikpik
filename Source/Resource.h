@@ -104,10 +104,10 @@ public:
 	virtual ~CResourceMetadata() {}
 
 	// The resource type.
-	t_ResourceType iType;
+	t_ResourceType m_iType;
 
 	// The resource name.
-	const xchar* pName;
+	const xchar* m_pName;
 
 protected:
 	/**

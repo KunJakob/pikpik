@@ -127,19 +127,19 @@ public:
 	{
 	public:
 		// The named identifier for the frame.
-		const xchar* pName;
+		const xchar* m_pName;
 
 		// The area to render for the animation frame.
-		CArea* pArea;			
+		CArea* m_pArea;			
 
 		// The amount of time to hold the animation frame.
-		xuint iDelay;
+		xuint m_iDelay;
 
 		// The event string for this frame. This is NULL unless an event is set.
-		const xchar* pEvent;
+		const xchar* m_pEvent;
 
 		// The next frame in the animation sequence. If this is NULL, the animation stops here.
-		CFrame* pNextFrame;
+		CFrame* m_pNextFrame;
 	};
 
 	/**
@@ -149,13 +149,13 @@ public:
 	{
 	public:
 		// The named identifier of the animation.
-		const xchar* pName;
+		const xchar* m_pName;
 
 		// The total animation time for all frames.
-		xuint iAnimationTime;
+		xuint m_iAnimationTime;
 
 		// A list of frames used in the animation.
-		t_FrameList lpFrames;
+		t_FrameList m_lpFrames;
 	};
 
 	// The animations available in the sprite.
@@ -457,7 +457,7 @@ public:
 	// Check if the active animation frame name matches the name specified.
 	xbool IsActiveFrame(const xchar* pName)
 	{
-		return m_pFrame && strcmp(m_pFrame->pName, pName) == 0;
+		return m_pFrame && strcmp(m_pFrame->m_pName, pName) == 0;
 	}
 
 	// Set the active animation and reset states and timings to the first animation frame.
@@ -480,7 +480,7 @@ public:
 	// Check if the active animation name matches the name specified.
 	xbool IsActiveAnimation(const xchar* pName)
 	{
-		return m_pAnimation && strcmp(m_pAnimation->pName, pName) == 0;
+		return m_pAnimation && strcmp(m_pAnimation->m_pName, pName) == 0;
 	}
 
 	// Play a specific animation from the first animation frame.

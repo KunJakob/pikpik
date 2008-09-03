@@ -72,8 +72,8 @@ CResourceFile::CResourceFile(t_ResourceType iResourceType, const xchar* pResourc
 // Nat Ryall                                                         22-Apr-2008
 // =============================================================================
 CResourceMetadata::CResourceMetadata(t_ResourceType iResourceType, CDataset* pDataset) :
-	iType(iResourceType),
-	pName(pDataset->GetName())
+	m_iType(iResourceType),
+	m_pName(pDataset->GetName())
 {
 }
 
@@ -172,7 +172,7 @@ CResourceMetadata* ResourceManager::FindResource(t_ResourceType iType, const xch
 {
 	XEN_LIST_FOREACH(t_ResourceMetadataList, ppResource, s_lpResourceMetadata[iType])
 	{
-		if (strcmp((*ppResource)->pName, pName) == 0)
+		if (strcmp((*ppResource)->m_pName, pName) == 0)
 			return *ppResource;
 	}
 

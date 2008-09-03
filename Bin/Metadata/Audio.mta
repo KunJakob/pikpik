@@ -13,7 +13,3 @@
 	.Marker "FadePeak"	{ .Time 3400 }
 	.Marker "FadeEnd"	{ .Time 4000 }
 }
-
-// CAudioFile: Holds the audio object (either in memory or ready for streaming) and allows marker lookups as well as channel creation.
-// CBasicSound: Holds the current channel.
-// CSound

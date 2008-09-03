@@ -564,7 +564,7 @@ void CGhost::SetState(t_PlayerState iState)
 	case PlayerState_Warp:
 		{
 			m_pEyes->SetArea(XFORMAT("F%d", m_iTransitionDir + 1));
-			m_iMoveTime = m_pSprite->GetAnimation()->iAnimationTime;
+			m_iMoveTime = m_pSprite->GetAnimation()->m_iAnimationTime;
 
 			if (m_pCurrentBlock->m_iTileType == TileType_Entrance || (m_pTargetBlock && m_pTargetBlock->m_iTileType == TileType_Entrance))
 				m_iMoveTime *= 3;
