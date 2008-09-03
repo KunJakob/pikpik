@@ -1,8 +1,11 @@
+//
+// Audio Groups: 0 = System, 1 = Music, 2 = Effects, 3 = Voice
+//
 .Sound "Logo-Intro"
 {
 	.File "Audio\Clips\Logo-SAPIAN.mp3"
 	.Type "Stream"
-	.Group "System"
+	.Group 0
 	.Volume 1.0
 	
 	.Marker "Display"	{ .Time 600  }
@@ -10,3 +13,7 @@
 	.Marker "FadePeak"	{ .Time 3400 }
 	.Marker "FadeEnd"	{ .Time 4000 }
 }
+
+// CAudioFile: Holds the audio object (either in memory or ready for streaming) and allows marker lookups as well as channel creation.
+// CBasicSound: Holds the current channel.
+// CSound

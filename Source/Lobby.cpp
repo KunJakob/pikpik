@@ -766,14 +766,14 @@ void CSessionBox::OnRender()
 	m_pTitleFont->Render
 	(
 		m_pSession->m_sTitle.c_str(), 
-		m_pSprite->GetMetadata()->FindArea("Title")->xRect + GetPosition(), 
+		m_pSprite->GetMetadata()->FindArea("Title")->m_xRect + GetPosition(), 
 		HGETEXT_CENTER | HGETEXT_MIDDLE
 	);
 
 	m_pInfoFont->Render
 	(
 		XFORMAT("%d Playing", m_pSession->m_iUsedSlots), 
-		m_pSprite->GetMetadata()->FindArea("Info")->xRect + GetPosition(), 
+		m_pSprite->GetMetadata()->FindArea("Info")->m_xRect + GetPosition(), 
 		HGETEXT_CENTER | HGETEXT_MIDDLE
 	);
 }

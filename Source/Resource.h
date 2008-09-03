@@ -42,6 +42,7 @@ enum t_ResourceType
 {
 	ResourceType_Sprite,
 	ResourceType_Font,
+	ResourceType_Sound,
 	/*MAX*/ResourceType_Max,
 };
 
@@ -65,16 +66,16 @@ public:
 	virtual ~CResourceFile() {}
 
 	// The resource type.
-	t_ResourceType iType;
+	t_ResourceType m_iType;
 
 	// The resource object.
-	void* pResource;
+	void* m_pResource;
 
 	// The resource file name.
-	const xchar* pFile;
+	const xchar* m_pFile;
 
 	// The resource reference count.
-	xuint iReferenceCount;
+	xuint m_iReferenceCount;
 
 protected:
 	/**

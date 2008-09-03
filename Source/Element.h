@@ -105,13 +105,13 @@ public:
 	// Get the width including all borders.
 	virtual xint GetWidth()
 	{
-		return m_pArea ? m_pArea->xRect.Width() : m_pSprite->GetImageWidth();
+		return m_pArea ? m_pArea->m_xRect.Width() : m_pSprite->GetImageWidth();
 	}
 
 	// Get the height including all borders.
 	virtual xint GetHeight()
 	{
-		return m_pArea ? m_pArea->xRect.Height() : m_pSprite->GetImageHeight();
+		return m_pArea ? m_pArea->m_xRect.Height() : m_pSprite->GetImageHeight();
 	}
 
 protected:

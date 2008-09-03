@@ -2033,6 +2033,10 @@
 			Name="Metadata"
 			>
 			<File
+				RelativePath="..\Bin\Metadata\Audio.mta"
+				>
+			</File>
+			<File
 				RelativePath="..\Media\Metadata\Font.mta"
 				>
 			</File>

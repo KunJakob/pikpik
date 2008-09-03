@@ -34,7 +34,7 @@
 //
 //##############################################################################
 
-// Find a specific sprite metadata using the resource manager.
+// Find a sprite resource.
 #define _SPRITE(NAME) ((CSpriteMetadata*)ResourceManager::FindResource(ResourceType_Sprite, NAME))
 
 //##############################################################################
@@ -56,7 +56,7 @@ public:
 	// Get the sprite object.
 	hgeSprite* GetResource()
 	{
-		return (hgeSprite*)pResource;
+		return (hgeSprite*)m_pResource;
 	}
 };
 
@@ -89,7 +89,7 @@ public:
 	// Get the sprite object.
 	hgeSprite* GetSprite()
 	{
-		return pFile->GetResource();
+		return m_pFile->GetResource();
 	}
 
 	// Find an area by name.
@@ -101,28 +101,27 @@ public:
 	// Find an animation by name.
 	CAnimation* FindAnimation(const xchar* pName);
 
-public:
 	// The sprite file used for rendering.
-	CSpriteFile* pFile;
+	CSpriteFile* m_pFile;
 
 	/**
-	// Specifies an area within a surface.
+	* Specifies an area within a surface.
 	*/
 	class CArea
 	{
 	public:
 		// The name of the area to reference with.
-		const xchar* pName;
+		const xchar* m_pName;
 
 		// Rect defining the pixels on the image to render.
-		xrect xRect;
+		xrect m_xRect;
 	};
 
 	// The list of areas specified for the surface.
-	t_AreaList lpAreas;
+	t_AreaList m_lpAreas;
 
 	/**
-	// Describes a single frame of an animation.
+	* Describes a single frame of an animation.
 	*/
 	class CFrame
 	{
@@ -144,7 +143,7 @@ public:
 	};
 
 	/**
-	// Describes an animation of frames using the specified surface.
+	* Describes an animation of frames using the specified surface.
 	*/
 	class CAnimation
 	{
@@ -160,7 +159,7 @@ public:
 	};
 
 	// The animations available in the sprite.
-	t_AnimationList lpAnimations;			
+	t_AnimationList m_lpAnimations;			
 };
 
 //##############################################################################
@@ -379,13 +378,13 @@ public:
 	// Get the width of the current area or the entire image if there is no active area.
 	xint GetAreaWidth()
 	{
-		return m_pArea ? m_pArea->xRect.Width() : GetImageWidth();
+		return m_pArea ? m_pArea->m_xRect.Width() : GetImageWidth();
 	}
 
 	// Get the height of the current area or the entire image if there is no active area.
 	xint GetAreaHeight()
 	{
-		return m_pArea ? m_pArea->xRect.Height() : GetImageHeight();
+		return m_pArea ? m_pArea->m_xRect.Height() : GetImageHeight();
 	}
 
 	// Get the centre point of the current area of the sprite.

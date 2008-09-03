@@ -86,7 +86,7 @@ public:
 	// Get the height of the button.
 	virtual xint GetHeight()
 	{
-		return m_pC[m_iButtonState]->xRect.Height();
+		return m_pC[m_iButtonState]->m_xRect.Height();
 	}
 
 	// Set the button text label.
@@ -187,7 +187,7 @@ public:
 	// Get the height of the button.
 	virtual xint GetHeight()
 	{
-		return m_pC->xRect.Height();
+		return m_pC->m_xRect.Height();
 	}
 
 	// Specify if the input should be masked.
@@ -288,7 +288,7 @@ public:
 	// Get the height of the button.
 	virtual xint GetHeight()
 	{
-		return m_pC->xRect.Height();
+		return m_pC->m_xRect.Height();
 	}
 
 	// Set the progress percentage in the range range 0 to 1.
@@ -489,15 +489,15 @@ public:
 	virtual xint GetWidth()
 	{
 		if (m_pFont && m_xText.length())
-			return m_pBox[m_iCheckState]->xRect.Width() + (m_pBox[m_iCheckState]->xRect.Width() / 2) + m_pFont->GetStringWidth(GetText());
+			return m_pBox[m_iCheckState]->m_xRect.Width() + (m_pBox[m_iCheckState]->m_xRect.Width() / 2) + m_pFont->GetStringWidth(GetText());
 		else
-			return m_pBox[m_iCheckState]->xRect.Width();
+			return m_pBox[m_iCheckState]->m_xRect.Width();
 	}
 
 	// Get the height of the element.
 	virtual xint GetHeight()
 	{
-		return m_pBox[m_iCheckState]->xRect.Height();
+		return m_pBox[m_iCheckState]->m_xRect.Height();
 	}
 
 	// Set the text string to render.

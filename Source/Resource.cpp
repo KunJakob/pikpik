@@ -15,6 +15,7 @@
 #include <Dataset.h>
 #include <Sprite.h>
 #include <Font.h>
+#include <Audio.h>
 
 //##############################################################################
 
@@ -52,10 +53,10 @@ static t_ResourceMetadataList s_lpResourceMetadata[ResourceType_Max];
 // Nat Ryall                                                         22-Apr-2008
 // =============================================================================
 CResourceFile::CResourceFile(t_ResourceType iResourceType, const xchar* pResourceFile) :
-	iType(iResourceType),
-	pResource(NULL),
-	pFile(pResourceFile),
-	iReferenceCount(1)
+	m_iType(iResourceType),
+	m_pResource(NULL),
+	m_pFile(pResourceFile),
+	m_iReferenceCount(1)
 {
 }
 
@@ -105,6 +106,9 @@ void ResourceManager::RegisterMetadata(CMetadata* pMetadata)
 
 	_DATASET_FOREACH(pDataset, pMetadata, "Font", NULL)
 		s_lpResourceMetadata[ResourceType_Font].push_back(new CFontMetadata(pDataset));
+
+	_DATASET_FOREACH(pDataset, pMetadata, "Sound", NULL)
+		s_lpResourceMetadata[ResourceType_Sound].push_back(new CSoundMetadata(pDataset));
 }
 
 // =============================================================================
@@ -116,9 +120,9 @@ CResourceFile* ResourceManager::CreateResourceFile(t_ResourceType iType, const x
 
 	XEN_LIST_FOREACH(t_ResourceFileList, ppResourceFile, s_lpResourceFiles[iType])
 	{
-		if (strcmp((*ppResourceFile)->pFile, pFile) == 0)
+		if (strcmp((*ppResourceFile)->m_pFile, pFile) == 0)
 		{
-			(*ppResourceFile)->iReferenceCount++;
+			(*ppResourceFile)->m_iReferenceCount++;
 			return *ppResourceFile;
 		}
 	}
@@ -134,6 +138,10 @@ CResourceFile* ResourceManager::CreateResourceFile(t_ResourceType iType, const x
 	case ResourceType_Font:
 		pResourceFile = new CFontFile(pFile);
 		break;
+
+	case ResourceType_Sound:
+		pResourceFile = new CSoundFile(pFile);
+		break;
 	}
 
 	if (pResourceFile)
@@ -147,11 +155,11 @@ CResourceFile* ResourceManager::CreateResourceFile(t_ResourceType iType, const x
 // =============================================================================
 void ResourceManager::ReleaseResourceFile(CResourceFile* pFile)
 {
-	XEN_LIST_FOREACH(t_ResourceFileList, ppResourceFile, s_lpResourceFiles[pFile->iType])
+	XEN_LIST_FOREACH(t_ResourceFileList, ppResourceFile, s_lpResourceFiles[pFile->m_iType])
 	{
 		if (*ppResourceFile == pFile)
 		{
-			if (--pFile->iReferenceCount == 0)
+			if (--pFile->m_iReferenceCount == 0)
 				delete pFile;
 		}
 	}

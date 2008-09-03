@@ -367,7 +367,7 @@ void CMap::Render()
 		(
 			m_xBlocks[iA].GetScreenPosition() - m_xOffset, 
 			s_xCentrePoint, 
-			MapManager.m_pTileAreas[iTileType]->xRect,
+			MapManager.m_pTileAreas[iTileType]->m_xRect,
 			m_xBlocks[iA].m_fVisibility * Global.m_fWorldAlpha, 
 			(m_xBlocks[iA].m_fAngle / 180.0f) * M_PI
 		);

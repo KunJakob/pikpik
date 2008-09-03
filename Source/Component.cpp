@@ -96,7 +96,7 @@ CButtonComponent::CButtonComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* 
 	m_pC[ButtonState_Down]			= pMetaSprite->FindArea("DownCentre"); 
 	m_pR[ButtonState_Down]			= pMetaSprite->FindArea("DownRight");
 
-	m_xFrameSize = xrect(m_pL[0]->xRect.Width(), 0, m_pR[0]->xRect.Width(), 0);
+	m_xFrameSize = xrect(m_pL[0]->m_xRect.Width(), 0, m_pR[0]->m_xRect.Width(), 0);
 
 	if (pMetaFont)
 		m_pFont = new CFont(pMetaFont);
@@ -116,7 +116,7 @@ CButtonComponent::~CButtonComponent()
 // =============================================================================
 void CButtonComponent::OnRender()
 {
-	CRowElement::OnRender(m_pL[m_iButtonState]->xRect, m_pC[m_iButtonState]->xRect, m_pR[m_iButtonState]->xRect);
+	CRowElement::OnRender(m_pL[m_iButtonState]->m_xRect, m_pC[m_iButtonState]->m_xRect, m_pR[m_iButtonState]->m_xRect);
 
 	if (m_pFont)
 		m_pFont->Render(m_xText.c_str(), xrect(0, 0, GetSize()) + GetPosition(), HGETEXT_CENTER | HGETEXT_MIDDLE);
@@ -143,7 +143,7 @@ CInputComponent::CInputComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pM
 	m_pC = pMetaSprite->FindArea("Centre"); 
 	m_pR = pMetaSprite->FindArea("Right");
 
-	m_xFrameSize = xrect(m_pL->xRect.Width(), 0, m_pR->xRect.Width(), 0);
+	m_xFrameSize = xrect(m_pL->m_xRect.Width(), 0, m_pR->m_xRect.Width(), 0);
 
 	m_pFont = new CFont(pMetaFont);
 }
@@ -171,7 +171,7 @@ void CInputComponent::OnUpdate()
 void CInputComponent::OnRender()
 {
 	// Render the element area.
-	CRowElement::OnRender(m_pL->xRect, m_pC->xRect, m_pR->xRect);
+	CRowElement::OnRender(m_pL->m_xRect, m_pC->m_xRect, m_pR->m_xRect);
 
 	// Get the render text and render text offset.
 	xstring xRenderText = m_xText;
@@ -212,7 +212,7 @@ void CInputComponent::OnMouseDown(xpoint xPosition)
 		for (xint iA = 0; iA < (xint)m_xText.length(); ++iA)
 		{
 			xCheckString += m_bMasked ? '*' : m_xText[iA];
-			iWidth = m_pFont->GetStringWidth(xCheckString.c_str()) + m_pL->xRect.Width();
+			iWidth = m_pFont->GetStringWidth(xCheckString.c_str()) + m_pL->m_xRect.Width();
 
 			if (iWidth > iTarget)
 				break;
@@ -288,7 +288,7 @@ CProgressComponent::CProgressComponent(CSpriteMetadata* pMetaSprite) : CRowEleme
 
 	m_pProgress = pMetaSprite->FindArea("Progress");
 
-	m_xFrameSize = xrect(m_pL->xRect.Width(), 0, m_pR->xRect.Width(), 0);
+	m_xFrameSize = xrect(m_pL->m_xRect.Width(), 0, m_pR->m_xRect.Width(), 0);
 }
 
 // =============================================================================
@@ -303,10 +303,10 @@ CProgressComponent::~CProgressComponent()
 // =============================================================================
 void CProgressComponent::OnRender()
 {
-	CRowElement::OnRender(m_pL->xRect, m_pC->xRect, m_pR->xRect);
+	CRowElement::OnRender(m_pL->m_xRect, m_pC->m_xRect, m_pR->m_xRect);
 
 	if (m_fProgress)
-		m_pSprite->RenderTiled(GetPosition() + xpoint(m_xFrameSize.iLeft, 0), xpoint((xint)((xfloat)m_iWidth * m_fProgress), 0), m_pProgress->xRect);
+		m_pSprite->RenderTiled(GetPosition() + xpoint(m_xFrameSize.iLeft, 0), xpoint((xint)((xfloat)m_iWidth * m_fProgress), 0), m_pProgress->m_xRect);
 }
 
 //##############################################################################
@@ -337,10 +337,10 @@ CWindowComponent::CWindowComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* 
 
 	m_xFrameSize = xrect
 		(
-		m_pML->xRect.Width(),
-		m_pTC->xRect.Height(),
-		m_pMR->xRect.Width(),
-		m_pBC->xRect.Height()
+		m_pML->m_xRect.Width(),
+		m_pTC->m_xRect.Height(),
+		m_pMR->m_xRect.Width(),
+		m_pBC->m_xRect.Height()
 		);
 
 	if (pMetaFont)
@@ -362,7 +362,7 @@ CWindowComponent::~CWindowComponent()
 void CWindowComponent::OnRender()
 {
 	// Render the container.
-	CContainerElement::OnRender(m_pTL->xRect, m_pTC->xRect, m_pTR->xRect, m_pML->xRect, m_pMC->xRect, m_pMR->xRect, m_pBL->xRect, m_pBC->xRect, m_pBR->xRect);
+	CContainerElement::OnRender(m_pTL->m_xRect, m_pTC->m_xRect, m_pTR->m_xRect, m_pML->m_xRect, m_pMC->m_xRect, m_pMR->m_xRect, m_pBL->m_xRect, m_pBC->m_xRect, m_pBR->m_xRect);
 
 	// Render the window title.
 	if (m_pFont)
@@ -395,10 +395,10 @@ CGroupComponent::CGroupComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pM
 
 	m_xFrameSize = xrect
 	(
-		m_pML->xRect.Width(),
-		m_pTC->xRect.Height(),
-		m_pMR->xRect.Width(),
-		m_pBC->xRect.Height()
+		m_pML->m_xRect.Width(),
+		m_pTC->m_xRect.Height(),
+		m_pMR->m_xRect.Width(),
+		m_pBC->m_xRect.Height()
 	);
 
 	if (pMetaFont)
@@ -422,7 +422,7 @@ void CGroupComponent::OnRender()
 	bool bTitle = m_pFont && m_xTitle.length();
 
 	// Render the container.
-	CContainerElement::OnRender(m_pTL->xRect, bTitle ? xrect() : m_pTC->xRect, m_pTR->xRect, m_pML->xRect, m_pMC->xRect, m_pMR->xRect, m_pBL->xRect, m_pBC->xRect, m_pBR->xRect);
+	CContainerElement::OnRender(m_pTL->m_xRect, bTitle ? xrect() : m_pTC->m_xRect, m_pTR->m_xRect, m_pML->m_xRect, m_pMC->m_xRect, m_pMR->m_xRect, m_pBL->m_xRect, m_pBC->m_xRect, m_pBR->m_xRect);
 
 	// Render the window title.
 	if (bTitle)
@@ -431,7 +431,7 @@ void CGroupComponent::OnRender()
 		xint iTitleHeight = max(m_xFrameSize.Height(), m_pFont->GetFontHeight()) / 2;
 
 		m_pFont->Render(m_xTitle.c_str(), GetPosition() + xpoint(m_xFrameSize.iLeft + 2, -iTitleHeight), HGETEXT_LEFT);
-		m_pSprite->RenderTiled(GetPosition() + xpoint(m_xFrameSize.iLeft + iTitleWidth, 0), xpoint(m_iWidth - iTitleWidth, 0), m_pTC->xRect);
+		m_pSprite->RenderTiled(GetPosition() + xpoint(m_xFrameSize.iLeft + iTitleWidth, 0), xpoint(m_iWidth - iTitleWidth, 0), m_pTC->m_xRect);
 	}
 }
 
@@ -483,11 +483,11 @@ CCheckComponent::~CCheckComponent()
 // =============================================================================
 void CCheckComponent::OnRender()
 {
-	xrect xArea = m_pBox[m_iCheckState]->xRect;
+	xrect xArea = m_pBox[m_iCheckState]->m_xRect;
 	CCheckElement::OnRender(xArea);
 
 	if (m_bChecked)
-		CCheckElement::OnRender(m_pCheck->xRect);
+		CCheckElement::OnRender(m_pCheck->m_xRect);
 
 	if (m_pFont)
 	{		

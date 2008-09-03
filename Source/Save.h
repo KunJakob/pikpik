@@ -27,17 +27,7 @@
 //##############################################################################
 
 // Shortcuts.
-#define SaveManager CSaveManager::Get()
-
-//##############################################################################
-
-//##############################################################################
-//
-//                                   TYPES
-//
-//##############################################################################
-
-
+//#define SaveManager CSaveManager::Get()
 
 //##############################################################################
 
@@ -46,7 +36,7 @@
 //                                SAVE MANAGER
 //
 //##############################################################################
-class CSaveManager
+/*class CSaveManager
 {
 public:
 	// Singleton instance.
@@ -96,17 +86,6 @@ public:
 	void Load(const xchar* pFileName);
 
 protected:
-	// Lists.
-	typedef xhash<xstring, xbool> t_BooleanHash;
-	typedef xhash<xstring, xint> t_IntegerHash;
-	typedef xhash<xstring, xfloat> t_FloatHash;
-	typedef xhash<xstring, xstring> t_StringHash;
-
-	// The list of key-value pairs.
-	t_BooleanHash m_lpBooleans;
-	t_IntegerHash m_lpIntegers;
-	t_FloatHash m_lpFloats;
-	t_StringHash m_lpStringHash;
-};
+};*/
 
 //##############################################################################

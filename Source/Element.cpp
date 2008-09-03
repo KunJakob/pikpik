@@ -79,7 +79,7 @@ CImageElement::~CImageElement()
 void CImageElement::OnRender()
 {
 	if (m_pArea)
-		m_pSprite->Render(GetPosition(), m_pArea->xRect);
+		m_pSprite->Render(GetPosition(), m_pArea->m_xRect);
 	else
 		m_pSprite->Render(GetPosition());
 }

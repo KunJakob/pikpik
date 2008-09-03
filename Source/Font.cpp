@@ -23,7 +23,7 @@
 // =============================================================================
 CFontFile::CFontFile(const xchar* pFile) : CResourceFile(ResourceType_Font, pFile)
 {
-	pResource = new hgeFont(pFile);
+	m_pResource = new hgeFont(pFile);
 }
 
 // =============================================================================
@@ -48,35 +48,35 @@ CFontFile::~CFontFile()
 CFontMetadata::CFontMetadata(CDataset* pDataset) : CResourceMetadata(ResourceType_Font, pDataset)
 {
 	// File.
-	pFile = (CFontFile*)ResourceManager::CreateResourceFile(ResourceType_Font, pDataset->GetProperty("File")->GetString());
+	m_pFile = (CFontFile*)ResourceManager::CreateResourceFile(ResourceType_Font, pDataset->GetProperty("File")->GetString());
 
 	// Info.
-	fScale = 1.f;
-	iColour = 0xFFFFFFFF;
-	fSpacing = 1.f;
-	fTracking = 0.f;
-	xShadowOffset = xpoint();
-	iShadowColour = 0xFF000000;
+	m_fScale = 1.f;
+	m_iColour = 0xFFFFFFFF;
+	m_fSpacing = 1.f;
+	m_fTracking = 0.f;
+	m_xShadowOffset = xpoint();
+	m_iShadowColour = 0xFF000000;
 
 	if (_PROPERTY_EXISTS(pDataset, "Scale"))
-		fScale = _PROPERTY->GetFloat();
+		m_fScale = _PROPERTY->GetFloat();
 
 	if (_PROPERTY_EXISTS(pDataset, "Colour"))
-		iColour = ARGB(255, _PROPERTY->GetInt(0), _PROPERTY->GetInt(1), _PROPERTY->GetInt(2));
+		m_iColour = ARGB(255, _PROPERTY->GetInt(0), _PROPERTY->GetInt(1), _PROPERTY->GetInt(2));
 
 	if (_PROPERTY_EXISTS(pDataset, "Spacing"))
-		fSpacing = _PROPERTY->GetFloat();
+		m_fSpacing = _PROPERTY->GetFloat();
 
 	if (_PROPERTY_EXISTS(pDataset, "Tracking"))
-		fTracking = _PROPERTY->GetFloat();
+		m_fTracking = _PROPERTY->GetFloat();
 
 	if (CDataset* pShadowDataset = pDataset->GetDataset("Shadow"))
 	{
 		if (_PROPERTY_EXISTS(pShadowDataset, "Offset"))
-			xShadowOffset = _PROPERTY->GetPoint();
+			m_xShadowOffset = _PROPERTY->GetPoint();
 
 		if (_PROPERTY_EXISTS(pShadowDataset, "Colour"))
-			iShadowColour = ARGB(255, _PROPERTY->GetInt(0), _PROPERTY->GetInt(1), _PROPERTY->GetInt(2));
+			m_iShadowColour = ARGB(255, _PROPERTY->GetInt(0), _PROPERTY->GetInt(1), _PROPERTY->GetInt(2));
 	}
 }
 
@@ -85,7 +85,7 @@ CFontMetadata::CFontMetadata(CDataset* pDataset) : CResourceMetadata(ResourceTyp
 // =============================================================================
 CFontMetadata::~CFontMetadata()
 {
-	ResourceManager::ReleaseResourceFile(pFile);
+	ResourceManager::ReleaseResourceFile(m_pFile);
 }
 
 //##############################################################################
@@ -103,19 +103,19 @@ void CFont::Render(const xchar* pString, xpoint xPosition, xuint iAlign, xfloat 
 {
 	hgeFont* pFont = m_pMetadata->GetFont();
 
-	pFont->SetScale(m_pMetadata->fScale);
-	pFont->SetSpacing(m_pMetadata->fSpacing);
-	pFont->SetTracking(m_pMetadata->fTracking);
+	pFont->SetScale(m_pMetadata->m_fScale);
+	pFont->SetSpacing(m_pMetadata->m_fSpacing);
+	pFont->SetTracking(m_pMetadata->m_fTracking);
 
-	if (!m_pMetadata->xShadowOffset.IsZero())
+	if (!m_pMetadata->m_xShadowOffset.IsZero())
 	{
-		xpoint xShadowPosition = xPosition + m_pMetadata->xShadowOffset;
+		xpoint xShadowPosition = xPosition + m_pMetadata->m_xShadowOffset;
 
-		pFont->SetColor(SETA(m_pMetadata->iShadowColour, (xchar)(fAlpha * 255.f)));
+		pFont->SetColor(SETA(m_pMetadata->m_iShadowColour, (xchar)(fAlpha * 255.f)));
 		pFont->Render((xfloat)xShadowPosition.iX, (xfloat)xShadowPosition.iY, iAlign, pString);
 	}
 
-	pFont->SetColor(SETA(m_pMetadata->iColour, (xchar)(fAlpha * 255.f)));
+	pFont->SetColor(SETA(m_pMetadata->m_iColour, (xchar)(fAlpha * 255.f)));
 	pFont->Render((xfloat)xPosition.iX, (xfloat)xPosition.iY, iAlign, pString);
 }
 
@@ -126,19 +126,19 @@ void CFont::Render(const xchar* pString, xrect xRect, xuint iAlign, xfloat fAlph
 {
 	hgeFont* pFont = m_pMetadata->GetFont();
 
-	pFont->SetScale(m_pMetadata->fScale);
-	pFont->SetSpacing(m_pMetadata->fSpacing);
-	pFont->SetTracking(m_pMetadata->fTracking);
+	pFont->SetScale(m_pMetadata->m_fScale);
+	pFont->SetSpacing(m_pMetadata->m_fSpacing);
+	pFont->SetTracking(m_pMetadata->m_fTracking);
 
-	if (!m_pMetadata->xShadowOffset.IsZero())
+	if (!m_pMetadata->m_xShadowOffset.IsZero())
 	{
-		xrect xShadowRect = xRect + m_pMetadata->xShadowOffset;
+		xrect xShadowRect = xRect + m_pMetadata->m_xShadowOffset;
 
-		pFont->SetColor(SETA(m_pMetadata->iShadowColour, (xchar)(fAlpha * 255.f)));
+		pFont->SetColor(SETA(m_pMetadata->m_iShadowColour, (xchar)(fAlpha * 255.f)));
 		pFont->printfb((xfloat)xShadowRect.iLeft, (xfloat)xShadowRect.iTop, (xfloat)xShadowRect.Width(), (xfloat)xShadowRect.Height(), iAlign, pString);
 	}
 
-	pFont->SetColor(SETA(m_pMetadata->iColour, (xchar)(fAlpha * 255.f)));
+	pFont->SetColor(SETA(m_pMetadata->m_iColour, (xchar)(fAlpha * 255.f)));
 	pFont->printfb((xfloat)xRect.iLeft, (xfloat)xRect.iTop, (xfloat)xRect.Width(), (xfloat)xRect.Height(), iAlign, pString);
 }
 

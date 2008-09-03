@@ -24,7 +24,7 @@
 CSpriteFile::CSpriteFile(const xchar* pFile) : CResourceFile(ResourceType_Sprite, pFile)
 {
 	HTEXTURE hTexture = _HGE->Texture_Load(pFile);
-	pResource = new hgeSprite(hTexture, 0.0f, 0.0f, (float)_HGE->Texture_GetWidth(hTexture), (float)_HGE->Texture_GetHeight(hTexture));
+	m_pResource = new hgeSprite(hTexture, 0.0f, 0.0f, (float)_HGE->Texture_GetWidth(hTexture), (float)_HGE->Texture_GetHeight(hTexture));
 }
 
 // =============================================================================
@@ -50,29 +50,29 @@ CSpriteFile::~CSpriteFile()
 CSpriteMetadata::CSpriteMetadata(CDataset* pDataset) : CResourceMetadata(ResourceType_Sprite, pDataset)
 {
 	// File.
-	pFile = (CSpriteFile*)ResourceManager::CreateResourceFile(ResourceType_Sprite, pDataset->GetProperty("File")->GetString());
+	m_pFile = (CSpriteFile*)ResourceManager::CreateResourceFile(ResourceType_Sprite, pDataset->GetProperty("File")->GetString());
 
 	// Areas.
 	_DATASET_FOREACH(pAreaDataset, pDataset, "Area", NULL)
 	{
 		CArea* pArea = new CArea;
-		lpAreas.push_back(pArea);
+		m_lpAreas.push_back(pArea);
 
-		pArea->pName = pAreaDataset->GetName();
+		pArea->m_pName = pAreaDataset->GetName();
 
 		if (_PROPERTY_EXISTS(pAreaDataset, "Rect"))
-			pArea->xRect = _PROPERTY->GetRect();
+			pArea->m_xRect = _PROPERTY->GetRect();
 		else if (_PROPERTY_EXISTS(pAreaDataset, "Size"))
-			pArea->xRect = xrect(_PROPERTY->GetPoint(0), _PROPERTY->GetPoint(0) + _PROPERTY->GetPoint(1));
+			pArea->m_xRect = xrect(_PROPERTY->GetPoint(0), _PROPERTY->GetPoint(0) + _PROPERTY->GetPoint(1));
 		else if (_PROPERTY_EXISTS(pAreaDataset, "Tile"))
-			pArea->xRect = xrect(_PROPERTY->GetInt(0) * _PROPERTY->GetInt(1), 0, (_PROPERTY->GetInt(0) + 1) * _PROPERTY->GetInt(1), _PROPERTY->GetInt(2));
+			pArea->m_xRect = xrect(_PROPERTY->GetInt(0) * _PROPERTY->GetInt(1), 0, (_PROPERTY->GetInt(0) + 1) * _PROPERTY->GetInt(1), _PROPERTY->GetInt(2));
 	}
 
 	// Animations.
 	_DATASET_FOREACH(pAnimationDataset, pDataset, "Animation", NULL)
 	{
 		CAnimation* pAnimation = new CAnimation;
-		lpAnimations.push_back(pAnimation);
+		m_lpAnimations.push_back(pAnimation);
 
 		pAnimation->pName = pAnimationDataset->GetName();
 		pAnimation->iAnimationTime = 0;
@@ -127,14 +127,14 @@ CSpriteMetadata::CSpriteMetadata(CDataset* pDataset) : CResourceMetadata(Resourc
 // =============================================================================
 CSpriteMetadata::~CSpriteMetadata()
 {
-	ResourceManager::ReleaseResourceFile(pFile);
+	ResourceManager::ReleaseResourceFile(m_pFile);
 
-	XEN_LIST_ERASE_ALL(lpAreas);
+	XEN_LIST_ERASE_ALL(m_lpAreas);
 
-	while (lpAnimations.size())
+	while (m_lpAnimations.size())
 	{
-		XEN_LIST_ERASE_ALL(lpAnimations.front()->lpFrames);
-		lpAnimations.pop_front();
+		XEN_LIST_ERASE_ALL(m_lpAnimations.front()->lpFrames);
+		m_lpAnimations.pop_front();
 	}
 }
 
@@ -143,9 +143,9 @@ CSpriteMetadata::~CSpriteMetadata()
 // =============================================================================
 CSpriteMetadata::CArea* CSpriteMetadata::FindArea(const xchar* pName)
 {
-	XEN_LIST_FOREACH(t_AreaList, ppArea, lpAreas)
+	XEN_LIST_FOREACH(t_AreaList, ppArea, m_lpAreas)
 	{
-		if (strcmp((*ppArea)->pName, pName) == 0)
+		if (strcmp((*ppArea)->m_pName, pName) == 0)
 			return *ppArea;
 	}
 
@@ -171,7 +171,7 @@ CSpriteMetadata::CFrame* CSpriteMetadata::FindFrame(CAnimation* pAnimation, cons
 // =============================================================================
 CSpriteMetadata::CAnimation* CSpriteMetadata::FindAnimation(const xchar* pName)
 {
-	XEN_LIST_FOREACH(t_AnimationList, ppAnimation, lpAnimations)
+	XEN_LIST_FOREACH(t_AnimationList, ppAnimation, m_lpAnimations)
 	{
 		if (strcmp((*ppAnimation)->pName, pName) == 0)
 			return *ppAnimation;
@@ -261,7 +261,7 @@ CSprite::CSprite(CSpriteMetadata* pMetadata) : CBasicSprite(pMetadata), CRendera
 // =============================================================================
 void CSprite::Render()
 {
-	CBasicSprite::Render(m_xPosition, m_xAnchor, m_pArea ? m_pArea->xRect : GetImageRect(), m_fAlpha, m_fAngle);
+	CBasicSprite::Render(m_xPosition, m_xAnchor, m_pArea ? m_pArea->m_xRect : GetImageRect(), m_fAlpha, m_fAngle);
 }
 
 //##############################################################################
