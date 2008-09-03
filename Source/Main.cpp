@@ -161,12 +161,13 @@ void Application::Initialise()
 	// Load all relevant metadata.
 	ResourceManager::RegisterMetadata(new CMetadata(".\\Metadata\\Sprites" _METAEXT, _METAKEY, true));
 	ResourceManager::RegisterMetadata(new CMetadata(".\\Metadata\\Font" _METAEXT, _METAKEY, true));
-
-	// Initialise the game font.
-	Global.m_pGameFont = new CFont(_FONT("Default"));
+	ResourceManager::RegisterMetadata(new CMetadata(".\\Metadata\\Audio" _METAEXT, _METAKEY, true));
 
 	// Load the locale.
 	Global.m_pLocale = new CMetadata(".\\Metadata\\Strings" _METAEXT, _METAKEY, true);
+
+	// Initialise the game font.
+	Global.m_pGameFont = new CFont(_FONT("Default"));
 
 	// Add all required modules to the game.
 	XMODULE(&Network);

@@ -82,7 +82,7 @@ void CMenuLink::RePosition(xuint iElementIndex, xuint iNumElements)
 void CMenuScreen::OnLoad()
 {
 	// Initialise the render resources.
-	m_pBackground = new CBackgroundImage("Menu-Background");
+	m_pBackground = new CBackgroundImage("Missing");
 
 	m_pMenuDefault = _FONT("Menu-Default");
 	m_pMenuHighlight = _FONT("Menu-Highlighted");
@@ -98,8 +98,8 @@ void CMenuScreen::OnLoad()
 	CMenuLink* pLinkList[] = 
 	{
 		// Main.
-		new CMenuLink(MenuGroup_Main,		m_pMenuHighlight,	_LOCALE("Menu_Online"),			xbind(this, &CMenuScreen::Callback_ShowOnlineMenu)),
-		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Offline"),		xbind(this, &CMenuScreen::Callback_ShowLevelsMenu)),
+		new CMenuLink(MenuGroup_Main,		m_pMenuHighlight,	_LOCALE("Menu_Offline"),		xbind(this, &CMenuScreen::Callback_ShowLevelsMenu)),
+		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Online"),			xbind(this, &CMenuScreen::Callback_ShowOnlineMenu)),
 		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Tutorial"),		NULL),
 		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Options"),		NULL),
 		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Credits"),		NULL),
