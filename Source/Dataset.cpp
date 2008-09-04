@@ -40,7 +40,7 @@ xuint CDataset::GetDatasetCount(const xchar* pType)
 
 		XEN_LIST_FOREACH(t_DatasetList, ppDataset, m_lpDatasets)
 		{
-			if (strcmp((*ppDataset)->GetType(), pType) == 0)
+			if (String::IsMatch((*ppDataset)->GetType(), pType))
 				++iCount;
 		}
 
@@ -69,9 +69,9 @@ CDataset* CDataset::GetDataset(CDataset* pPrev, const xchar* pType, const xchar*
 
 	for (; ppDataset < m_lpDatasets.end(); ppDataset++)
 	{
-		if (strcmp((*ppDataset)->GetType(), pType) == 0)
+		if (String::IsMatch((*ppDataset)->GetType(), pType))
 		{
-			if (!pName || ((*ppDataset)->GetName() && strcmp((*ppDataset)->GetName(), pName) == 0))
+			if (!pName || ((*ppDataset)->GetName() && String::IsMatch((*ppDataset)->GetName(), pName)))
 				return *ppDataset;
 		}
 	}
@@ -92,7 +92,7 @@ xuint CDataset::GetPropertyCount(const xchar* pType)
 
 		XEN_LIST_FOREACH(t_PropertyList, ppProperty, m_lpProperties)
 		{
-			if (strcmp((*ppProperty)->GetType(), pType) == 0)
+			if (String::IsMatch((*ppProperty)->GetType(), pType))
 				++iCount;
 		}
 
@@ -121,7 +121,7 @@ CProperty* CDataset::GetProperty(CProperty* pPrev, const xchar* pType)
 
 	for (; ppProperty < m_lpProperties.end(); ppProperty++)
 	{
-		if (strcmp((*ppProperty)->GetType(), pType) == 0)
+		if (String::IsMatch((*ppProperty)->GetType(), pType))
 			return *ppProperty;
 	}
 

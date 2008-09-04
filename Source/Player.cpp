@@ -377,7 +377,7 @@ void CPlayer::BehaviourWander()
 // =============================================================================
 void CPlayer::OnAnimationEvent(CAnimatedSprite* pSprite, const xchar* pEvent)
 {
-	if (strcmp(pEvent, "Eat") == 0)
+	if (String::IsMatch(pEvent, "Eat"))
 	{
 		if (m_pTargetBlock && m_pTargetBlock->IsEdible())
 			m_pTargetBlock->Eat();

@@ -490,7 +490,7 @@ CMap* CMapManager::GetMap(const xchar* pID)
 
 	XEN_LIST_FOREACH(t_MapList, ppMap, m_lpMaps)
 	{
-		if (strcmp(pID, (*ppMap)->GetID()) == 0)
+		if (String::IsMatch(pID, (*ppMap)->GetID()))
 			return *ppMap;
 	}
 

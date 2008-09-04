@@ -209,7 +209,7 @@ void CMetadata::UpdateDecrypt(xuint iChunkSize)
 	}
 
 	// Decrypt the contents into the new buffer.
-	CFB_Mode<AES>::Decryption xAES((byte*)m_pEncryptionKey, strlen(m_pEncryptionKey) / 2, (byte*)pIV);
+	CFB_Mode<AES>::Decryption xAES((byte*)m_pEncryptionKey, String::Length(m_pEncryptionKey) / 2, (byte*)pIV);
 	StringSource((byte*)pEncryptedData, m_iFileSize, true, new StreamTransformationFilter(xAES, new ArraySink((byte*)pDecryptedData, m_iFileSize)));
 
 	// Start pointing to the decrypted data.

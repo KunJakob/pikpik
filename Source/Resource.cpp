@@ -120,7 +120,7 @@ CResourceFile* ResourceManager::CreateResourceFile(t_ResourceType iType, const x
 
 	XEN_LIST_FOREACH(t_ResourceFileList, ppResourceFile, s_lpResourceFiles[iType])
 	{
-		if (strcmp((*ppResourceFile)->m_pFile, pFile) == 0)
+		if (String::IsMatch((*ppResourceFile)->m_pFile, pFile))
 		{
 			(*ppResourceFile)->m_iReferenceCount++;
 			return *ppResourceFile;
@@ -172,7 +172,7 @@ CResourceMetadata* ResourceManager::FindResource(t_ResourceType iType, const xch
 {
 	XEN_LIST_FOREACH(t_ResourceMetadataList, ppResource, s_lpResourceMetadata[iType])
 	{
-		if (strcmp((*ppResource)->m_pName, pName) == 0)
+		if (String::IsMatch((*ppResource)->m_pName, pName))
 			return *ppResource;
 	}
 

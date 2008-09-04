@@ -119,18 +119,18 @@ t_MatchResultError CMatchResult::ProcessResult(const xchar* pResult)
 	m_lpPairs.clear();
 
 	// Make sure the header checks out so that we know we have a valid result.
-	if (pResult && strncmp(pResult, MATCH_RESULT_HEADER, strlen(MATCH_RESULT_HEADER)) == 0)
+	if (pResult && String::IsMatch(pResult, MATCH_RESULT_HEADER, String::Length(MATCH_RESULT_HEADER)))
 	{
-		pResult += strlen(MATCH_RESULT_HEADER);
+		pResult += String::Length(MATCH_RESULT_HEADER);
 
 		// Copy the result string into internal memory so that we can manipulate it.
 		xchar* pLocalResult = NULL;
-		xint iResultLen = (xint)strlen(pResult);
+		xint iResultLen = String::Length(pResult);
 
 		if (iResultLen)
 		{
 			pLocalResult = new xchar[++iResultLen];
-			strcpy_s(pLocalResult, iResultLen, pResult);
+			String::Copy(pResult, pLocalResult, iResultLen);
 		}
 		else
 			return MatchResultError_InvalidHeader;
@@ -148,7 +148,7 @@ t_MatchResultError CMatchResult::ProcessResult(const xchar* pResult)
 			*pValue = 0;
 			++pValue;
 
-			if (strlen(pToken) && strlen(pValue))
+			if (String::Length(pToken) && String::Length(pValue))
 				m_lpPairs[pToken] = pValue;
 
 			pToken = strtok_s(NULL, s_pSeparators, &pContext);
@@ -585,7 +585,7 @@ void CMatch::ProcessError(t_MatchResultError iError)
 xstring CMatch::GenerateSessionID()
 {
 	static const xchar* s_pChars = "0123456789ABCDEF";
-	static const xint s_iNumChars = (xint)strlen(s_pChars);
+	static const xint s_iNumChars = String::Length(s_pChars);
 
 	xstring sSessionID = "";
 

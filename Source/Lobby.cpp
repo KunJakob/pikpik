@@ -371,7 +371,7 @@ void CLobbyScreen::InitialiseNetwork()
 	Network.SetGamerCard(&m_xGamerCard, sizeof(CNetworkGamerCard));
 
 	// Initialise the verification info.
-	Network.SetVerificationInfo(_GID, (xint)strlen(_GID) + 1);
+	Network.SetVerificationInfo(_GID, String::Length(_GID) + 1);
 
 	// Bind the stream type callbacks.
 	Network.BindReceiveCallback(NetworkStreamType_StartGame, xbind(this, &CLobbyScreen::OnReceiveStartGame));
@@ -521,7 +521,7 @@ void CLobbyScreen::OnCloseSessionCompleted(t_MatchResultError iError, CSession* 
 // =============================================================================
 xbool CLobbyScreen::OnVerifyPeer(CNetworkPeer* pPeer, void* pData, xint iDataLength)
 {
-	return iDataLength && pData && strcmp(_GID, (const xchar*)pData) == 0 && m_iState == LobbyState_Lobby;
+	return iDataLength && pData && String::IsMatch(_GID, (const xchar*)pData) && m_iState == LobbyState_Lobby;
 }
 
 // =============================================================================

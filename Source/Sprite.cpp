@@ -145,7 +145,7 @@ CSpriteMetadata::CArea* CSpriteMetadata::FindArea(const xchar* pName)
 {
 	XEN_LIST_FOREACH(t_AreaList, ppArea, m_lpAreas)
 	{
-		if (strcmp((*ppArea)->m_pName, pName) == 0)
+		if (String::IsMatch((*ppArea)->m_pName, pName))
 			return *ppArea;
 	}
 
@@ -159,7 +159,7 @@ CSpriteMetadata::CFrame* CSpriteMetadata::FindFrame(CAnimation* pAnimation, cons
 {
 	XEN_LIST_FOREACH(t_FrameList, ppFrame, pAnimation->m_lpFrames)
 	{
-		if (strcmp((*ppFrame)->m_pName, pName) == 0)
+		if (String::IsMatch((*ppFrame)->m_pName, pName))
 			return *ppFrame;
 	}
 
@@ -173,7 +173,7 @@ CSpriteMetadata::CAnimation* CSpriteMetadata::FindAnimation(const xchar* pName)
 {
 	XEN_LIST_FOREACH(t_AnimationList, ppAnimation, m_lpAnimations)
 	{
-		if (strcmp((*ppAnimation)->m_pName, pName) == 0)
+		if (String::IsMatch((*ppAnimation)->m_pName, pName))
 			return *ppAnimation;
 	}
 

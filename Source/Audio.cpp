@@ -30,10 +30,31 @@
 // =============================================================================
 // Nat Ryall                                                         03-Sep-2008
 // =============================================================================
-CSoundFile::CSoundFile(const xchar* pFile/*, t_SoundType iType*/) : CResourceFile(ResourceType_Sound, pFile)
-	//m_iType(iType)
+CSoundFile::CSoundFile(const xchar* pFile) : CResourceFile(ResourceType_Sound, pFile)
 {
-	_FMOD->createSound(pFile, FMOD_SOFTWARE | FMOD_CREATECOMPRESSEDSAMPLE, NULL, (FMOD::Sound**)&m_pResource);
+	// Load compressed files into memory without decompressing. Determine this by extension.
+	static const xchar* s_pCompressedTypes[] = { "mp3", "ogg" };
+	static const xint s_iCompressedTypesCount = sizeof(s_pCompressedTypes) / sizeof(xchar*);
+
+	FMOD_MODE iCreationMode = FMOD_CREATESAMPLE;
+	xint iPathLen = String::Length(pFile);
+
+	if (iPathLen >= 3)
+	{
+		const xchar* pExtension = &pFile[iPathLen - 3];
+
+		for (int iA = 0; iA < s_iCompressedTypesCount; ++iA)
+		{
+			if (String::IsCaselessMatch(s_pCompressedTypes[iA], pExtension))
+			{
+				iCreationMode = FMOD_CREATECOMPRESSEDSAMPLE;
+				break;
+			}
+		}
+	}
+
+	// Create the sound.
+	_FMOD->createSound(pFile, FMOD_SOFTWARE | iCreationMode, NULL, (FMOD::Sound**)&m_pResource);
 }
 
 // =============================================================================

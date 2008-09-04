@@ -457,7 +457,7 @@ public:
 	// Check if the active animation frame name matches the name specified.
 	xbool IsActiveFrame(const xchar* pName)
 	{
-		return m_pFrame && strcmp(m_pFrame->m_pName, pName) == 0;
+		return m_pFrame && String::IsMatch(m_pFrame->m_pName, pName);
 	}
 
 	// Set the active animation and reset states and timings to the first animation frame.
@@ -480,7 +480,7 @@ public:
 	// Check if the active animation name matches the name specified.
 	xbool IsActiveAnimation(const xchar* pName)
 	{
-		return m_pAnimation && strcmp(m_pAnimation->m_pName, pName) == 0;
+		return m_pAnimation && String::IsMatch(m_pAnimation->m_pName, pName);
 	}
 
 	// Play a specific animation from the first animation frame.

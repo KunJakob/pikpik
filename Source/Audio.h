@@ -48,12 +48,12 @@
 class CSound;
 
 // The audio type.
-/*enum t_SoundType
+enum t_SoundType
 {
 	SoundType_Sample			= FMOD_CREATESAMPLE,			// The sound is loaded into memory and decompressed.
 	SoundType_CompressedSample	= FMOD_CREATECOMPRESSEDSAMPLE,	// The sound is loaded into memory but remains compressed.
 	SoundType_Stream			= FMOD_CREATESTREAM,			// The sound is streamed in from a file. Can only have one active channel.
-};*/
+};
 
 // The audio groups.
 enum t_SoundGroup
@@ -75,7 +75,7 @@ class CSoundFile : public CResourceFile
 {
 public:
 	// Constructor: Initialise the file.
-	CSoundFile(const xchar* pFile/*, t_SoundType iType*/);
+	CSoundFile(const xchar* pFile);
 
 	// Destructor: Clean up the file memory.
 	virtual ~CSoundFile();
@@ -86,9 +86,8 @@ public:
 		return (FMOD::Sound*)m_pResource;
 	}
 
-protected:
 	// The sound type for the file.
-	//t_SoundType m_iType;
+	t_SoundType m_iType;
 };
 
 //##############################################################################

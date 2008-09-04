@@ -47,7 +47,7 @@ xfloat CProperty::GetFloat(xuint iIndex)
 // =============================================================================
 xbool CProperty::GetBool(xuint iIndex)
 {
-	return (strcmp(GetString(iIndex), "false") == 0 || strcmp(GetString(iIndex), "0")) ? false : true;
+	return (String::IsMatch(GetString(iIndex), "false") || String::IsMatch(GetString(iIndex), "0")) ? false : true;
 }
 
 // =============================================================================
