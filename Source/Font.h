@@ -22,7 +22,7 @@
 //##############################################################################
 
 // Find a specific sprite metadata using the resource manager.
-#define _FONT(NAME) ((CFontMetadata*)ResourceManager::FindResource(ResourceType_Font, NAME))
+#define _FONT(NAME) ((CFontMetadata*)ResourceManager::GetResourceMetadata(ResourceType_Font, NAME))
 
 //##############################################################################
 

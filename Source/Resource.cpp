@@ -21,30 +21,6 @@
 
 //##############################################################################
 //
-//                                   TYPES
-//
-//##############################################################################
-
-// Lists.
-typedef xlist<CResourceFile*> t_ResourceFileList;
-typedef xlist<CResourceMetadata*> t_ResourceMetadataList;
-
-//##############################################################################
-
-//##############################################################################
-//
-//                                   STATIC
-//
-//##############################################################################
-
-// Lists.
-static t_ResourceFileList s_lpResourceFiles[ResourceType_Max];
-static t_ResourceMetadataList s_lpResourceMetadata[ResourceType_Max];
-
-//##############################################################################
-
-//##############################################################################
-//
 //                               RESOURCE FILE
 //
 //##############################################################################
@@ -88,9 +64,17 @@ CResourceMetadata::CResourceMetadata(t_ResourceType iResourceType, CDataset* pDa
 // =============================================================================
 // Nat Ryall                                                         22-Apr-2008
 // =============================================================================
-void ResourceManager::Reset()
+void CResourceManager::OnDeinitialise()
 {
-	for (xuint iA = 0; iA < ResourceType_Max; ++iA)
+	Clear();
+}
+
+// =============================================================================
+// Nat Ryall                                                         04-Sep-2008
+// =============================================================================
+void CResourceManager::Clear()
+{
+	for (xint iA = 0; iA < ResourceType_Max; ++iA)
 	{
 		XEN_LIST_ERASE_ALL(s_lpResourceMetadata[iA]);
 	}
@@ -99,7 +83,7 @@ void ResourceManager::Reset()
 // =============================================================================
 // Nat Ryall                                                         22-Apr-2008
 // =============================================================================
-void ResourceManager::RegisterMetadata(CMetadata* pMetadata)
+void CResourceManager::Load(CMetadata* pMetadata)
 {
 	_DATASET_FOREACH(pDataset, pMetadata, "Sprite", NULL)
 		s_lpResourceMetadata[ResourceType_Sprite].push_back(new CSpriteMetadata(pDataset));
@@ -112,21 +96,39 @@ void ResourceManager::RegisterMetadata(CMetadata* pMetadata)
 }
 
 // =============================================================================
+// Nat Ryall                                                         04-Sep-2008
+// =============================================================================
+void CResourceManager::Unload(CMetadata* pMetadata)
+{
+	XMASSERT(false, "Unload is unavailable.");
+}
+
+// =============================================================================
 // Nat Ryall                                                         22-Apr-2008
 // =============================================================================
-CResourceFile* ResourceManager::CreateResourceFile(t_ResourceType iType, const xchar* pFile)
+CResourceFile* CResourceManager::CreateResourceFile(t_ResourceType iType, const xchar* pFile)
 {
 	XMASSERT(GetFileAttributes(pFile) != INVALID_FILE_ATTRIBUTES, XFORMAT("Could not find file: %s", pFile));
 
-	XEN_LIST_FOREACH(t_ResourceFileList, ppResourceFile, s_lpResourceFiles[iType])
+	// If we are allowed to re-use resources, check for an existing resource file we can use.
+	static const xbool s_bRecycleResources[ResourceType_Max] = 
+	{ 
+		/*ResourceType_Sprite*/ true, /*ResourceType_Font*/ true, /*ResourceType_Sound*/ false,	
+	};
+
+	if (s_bRecycleResources[iType])
 	{
-		if (String::IsMatch((*ppResourceFile)->m_pFile, pFile))
+		XEN_LIST_FOREACH(t_ResourceFileList, ppResourceFile, s_lpResourceFiles[iType])
 		{
-			(*ppResourceFile)->m_iReferenceCount++;
-			return *ppResourceFile;
+			if (String::IsMatch((*ppResourceFile)->m_pFile, pFile))
+			{
+				(*ppResourceFile)->m_iReferenceCount++;
+				return *ppResourceFile;
+			}
 		}
 	}
 
+	// Otherwise, create a new resource instance.
 	CResourceFile* pResourceFile = NULL;
 
 	switch (iType)
@@ -153,14 +155,19 @@ CResourceFile* ResourceManager::CreateResourceFile(t_ResourceType iType, const x
 // =============================================================================
 // Nat Ryall                                                         22-Apr-2008
 // =============================================================================
-void ResourceManager::ReleaseResourceFile(CResourceFile* pFile)
+void CResourceManager::ReleaseResourceFile(CResourceFile* pFile)
 {
 	XEN_LIST_FOREACH(t_ResourceFileList, ppResourceFile, s_lpResourceFiles[pFile->m_iType])
 	{
 		if (*ppResourceFile == pFile)
 		{
 			if (--pFile->m_iReferenceCount == 0)
+			{
+				s_lpResourceFiles[pFile->m_iType].erase(ppResourceFile);
 				delete pFile;
+
+				break;
+			}
 		}
 	}
 }
@@ -168,13 +175,15 @@ void ResourceManager::ReleaseResourceFile(CResourceFile* pFile)
 // =============================================================================
 // Nat Ryall                                                         22-Apr-2008
 // =============================================================================
-CResourceMetadata* ResourceManager::FindResource(t_ResourceType iType, const xchar* pName)
+CResourceMetadata* CResourceManager::GetResourceMetadata(t_ResourceType iType, const xchar* pName)
 {
 	XEN_LIST_FOREACH(t_ResourceMetadataList, ppResource, s_lpResourceMetadata[iType])
 	{
 		if (String::IsMatch((*ppResource)->m_pName, pName))
 			return *ppResource;
 	}
+
+	XMASSERT(false, XFORMAT("Could not find the resource metadata '%s'.", pName));
 
 	return NULL;
 }

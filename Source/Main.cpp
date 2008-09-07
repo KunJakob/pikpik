@@ -120,14 +120,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				XLOG(xException.what());
 			}
 
-			s_pInterface->System_Shutdown();
-
 			Application::Deinitialise();
 		}
 
 		s_pSoundSystem->release();
 		s_pSoundSystem = NULL;
 	}
+
+	s_pInterface->System_Shutdown();
 
 	s_pInterface->Release();
 	s_pInterface = NULL;
@@ -159,9 +159,9 @@ void Application::Initialise()
 	Global.m_fWorldAlpha = 1.f;
 
 	// Load all relevant metadata.
-	ResourceManager::RegisterMetadata(new CMetadata(".\\Metadata\\Sprites" _METAEXT, _METAKEY, true));
-	ResourceManager::RegisterMetadata(new CMetadata(".\\Metadata\\Font" _METAEXT, _METAKEY, true));
-	ResourceManager::RegisterMetadata(new CMetadata(".\\Metadata\\Audio" _METAEXT, _METAKEY, true));
+	ResourceManager.Load(new CMetadata(".\\Metadata\\Sprites" _METAEXT, _METAKEY, true));
+	ResourceManager.Load(new CMetadata(".\\Metadata\\Font" _METAEXT, _METAKEY, true));
+	ResourceManager.Load(new CMetadata(".\\Metadata\\Audio" _METAEXT, _METAKEY, true));
 
 	// Load the locale.
 	Global.m_pLocale = new CMetadata(".\\Metadata\\Strings" _METAEXT, _METAKEY, true);
@@ -177,6 +177,7 @@ void Application::Initialise()
 	XMODULE(&CollisionManager);
 	XMODULE(&RenderManager);
 	XMODULE(&Interface);
+	XMODULE(&ResourceManager);
 
 	// Initialise all modules.
 	ModuleManager.Initialise();

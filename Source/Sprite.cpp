@@ -134,6 +134,8 @@ CSpriteMetadata::~CSpriteMetadata()
 	while (m_lpAnimations.size())
 	{
 		XEN_LIST_ERASE_ALL(m_lpAnimations.front()->m_lpFrames);
+
+		delete m_lpAnimations.front();
 		m_lpAnimations.pop_front();
 	}
 }

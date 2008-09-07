@@ -153,9 +153,6 @@ void CMenuScreen::OnLoad()
 // =============================================================================
 void CMenuScreen::OnUnload()
 {
-	delete m_pMenuDefault;
-	delete m_pMenuHighlight; 
-
 	delete m_pBackground;
 }
 

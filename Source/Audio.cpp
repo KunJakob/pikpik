@@ -55,6 +55,9 @@ CSoundFile::CSoundFile(const xchar* pFile) : CResourceFile(ResourceType_Sound, p
 
 	// Create the sound.
 	_FMOD->createSound(pFile, FMOD_SOFTWARE | iCreationMode, NULL, (FMOD::Sound**)&m_pResource);
+
+	// Save the sound type we used.
+	m_iSoundType = (t_SoundType)iCreationMode;
 }
 
 // =============================================================================
@@ -78,24 +81,31 @@ CSoundFile::~CSoundFile()
 // =============================================================================
 CSoundMetadata::CSoundMetadata(CDataset* pDataset) : CResourceMetadata(ResourceType_Sound, pDataset)
 {
-	/*// Areas.
-	_DATASET_FOREACH(pAreaDataset, pDataset, "Area", NULL)
-	{
-		CArea* pArea = new CArea;
-		m_lpAreas.push_back(pArea);
-
-		pArea->m_pName = pAreaDataset->GetName();
-
-		if (_PROPERTY_EXISTS(pAreaDataset, "Rect"))
-			pArea->m_xRect = _PROPERTY->GetRect();
-		else if (_PROPERTY_EXISTS(pAreaDataset, "Size"))
-			pArea->m_xRect = xrect(_PROPERTY->GetPoint(0), _PROPERTY->GetPoint(0) + _PROPERTY->GetPoint(1));
-		else if (_PROPERTY_EXISTS(pAreaDataset, "Tile"))
-			pArea->m_xRect = xrect(_PROPERTY->GetInt(0) * _PROPERTY->GetInt(1), 0, (_PROPERTY->GetInt(0) + 1) * _PROPERTY->GetInt(1), _PROPERTY->GetInt(2));
-	}*/
-
 	// File.
 	m_pFile = (CSoundFile*)ResourceManager::CreateResourceFile(ResourceType_Sound, pDataset->GetProperty("File")->GetString());
+
+	// Info.
+	m_iGroup = SoundGroup_Unknown;
+	m_fVolume = 1.f;
+
+	if (_PROPERTY_EXISTS(pDataset, "Group"))
+		m_iGroup = (t_SoundGroup)_PROPERTY->GetInt();
+
+	if (_PROPERTY_EXISTS(pDataset, "Volume"))
+		m_fVolume = _PROPERTY->GetFloat();
+
+	// Markers.
+	_DATASET_FOREACH(pMarkerDataset, pDataset, "Marker", NULL)
+	{
+		CMarker* pMarker = new CMarker;
+		m_lpMarkers.push_back(pMarker);
+
+		pMarker->m_pName = pMarkerDataset->GetName();
+		pMarker->m_iTime = 0;
+
+		if (_PROPERTY_EXISTS(pMarkerDataset, "Time"))
+			pMarker->m_iTime = _PROPERTY->GetInt();
+	}
 }
 
 // =============================================================================
@@ -104,6 +114,22 @@ CSoundMetadata::CSoundMetadata(CDataset* pDataset) : CResourceMetadata(ResourceT
 CSoundMetadata::~CSoundMetadata()
 {
 	ResourceManager::ReleaseResourceFile(m_pFile);
+
+	XEN_LIST_ERASE_ALL(m_lpMarkers);
+}
+
+// =============================================================================
+// Nat Ryall                                                         04-Sep-2008
+// =============================================================================
+CSoundMetadata::CMarker* CSoundMetadata::FindMarker(const xchar* pName)
+{
+	XEN_LIST_FOREACH(t_MarkerList, ppMarker, m_lpMarkers)
+	{
+		if (String::IsMatch((*ppMarker)->m_pName, pName))
+			return *ppMarker;
+	}
+
+	return NULL;
 }
 
 //##############################################################################

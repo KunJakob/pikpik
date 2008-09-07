@@ -34,7 +34,7 @@
 #define SoundManager CSoundManager::Get()
 
 // Find a sound resource.
-#define _SOUND(NAME) ((CSoundMetadata*)ResourceManager::FindResource(ResourceType_Sound, NAME))
+#define _SOUND(NAME) ((CSoundMetadata*)ResourceManager::GetResourceMetadata(ResourceType_Sound, NAME))
 
 //##############################################################################
 
@@ -58,6 +58,7 @@ enum t_SoundType
 // The audio groups.
 enum t_SoundGroup
 {
+	SoundGroup_Unknown = -1,	// The group was not specified.
 	SoundGroup_System,			// System non-modifiable sounds (protected).
 	SoundGroup_Music,			// Background music tracks.
 	SoundGroup_Effects,			// Short effect sounds and audio clips.
@@ -87,7 +88,7 @@ public:
 	}
 
 	// The sound type for the file.
-	t_SoundType m_iType;
+	t_SoundType m_iSoundType;
 };
 
 //##############################################################################
@@ -100,6 +101,12 @@ public:
 class CSoundMetadata : public CResourceMetadata
 {
 public:
+	// Predeclare.
+	class CMarker;
+
+	// Types.
+	typedef xlist<CMarker*> t_MarkerList;
+
 	// Initialise the metadata.
 	CSoundMetadata(CDataset* pDataset);
 
@@ -112,22 +119,33 @@ public:
 		return m_pFile->GetResource();
 	}
 
-protected:
+	// Find a marker by name.
+	CMarker* FindMarker(const xchar* pName);
+
 	// The sound file.
 	CSoundFile* m_pFile;
-};
 
-//##############################################################################
+	// The sound group.
+	t_SoundGroup m_iGroup;
 
-//##############################################################################
-//
-//                                SOUND MARKER
-//
-//##############################################################################
-class CSoundMarker
-{
-public:
+	// The sound volume.
+	xfloat m_fVolume;
 
+	/**
+	* Specifies a timed marker in the sound.
+	*/
+	class CMarker
+	{
+	public:
+		// The name of the marker.
+		const xchar* m_pName;
+
+		// The sound time, in milliseconds, that the marker is set to.
+		xint m_iTime;
+	};
+
+	// The list of markers associated with this sound.
+	t_MarkerList m_lpMarkers;
 };
 
 //##############################################################################

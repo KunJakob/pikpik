@@ -2037,23 +2037,23 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Media\Metadata\Font.mta"
+				RelativePath="..\Bin\Metadata\Font.mta"
 				>
 			</File>
 			<File
-				RelativePath="..\Media\Metadata\Interface.mta"
+				RelativePath="..\Bin\Metadata\Interface.mta"
 				>
 			</File>
 			<File
-				RelativePath="..\Media\Metadata\Maps.mta"
+				RelativePath="..\Bin\Metadata\Maps.mta"
 				>
 			</File>
 			<File
-				RelativePath="..\Media\Metadata\Sprites.mta"
+				RelativePath="..\Bin\Metadata\Sprites.mta"
 				>
 			</File>
 			<File
-				RelativePath="..\Media\Metadata\Strings.mta"
+				RelativePath="..\Bin\Metadata\Strings.mta"
 				>
 			</File>
 		</Filter>

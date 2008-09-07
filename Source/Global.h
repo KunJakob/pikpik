@@ -97,7 +97,7 @@
 #define _RGBF(R, G, B)			ARGB(255, _COLF(R), _COLF(G), _COLF(B))
 
 // Metadata control.
-#if defined(XDEBUG)
+#if XDEBUG
 #define _METAEXT				".mta"
 #define _METAKEY				NULL
 #else

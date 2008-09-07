@@ -6,9 +6,9 @@
 * @date 22/04/2008 (Original: 18/02/2008)
 * 
 * The resource manager is designed to simplify the import of constant object 
-* values through the use of metadata. Resources will internally share the same
-* file data if more than one request is made on a specific file meaning data is 
-* never duplicated.
+* values through the use of metadata. Resources can internally share the same
+* file data if more than one request is made on a specific file meaning data
+* can be recycled.
 *
 * Copyright © SAPIAN
 */
@@ -24,6 +24,17 @@
 
 // Other.
 #include <Metadata.h>
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                   MACROS
+//
+//##############################################################################
+
+// Shortcuts.
+#define ResourceManager CResourceManager::Get()
 
 //##############################################################################
 
@@ -123,34 +134,48 @@ protected:
 //                              RESOURCE MANAGER
 //
 //##############################################################################
-namespace ResourceManager
+class CResourceManager : public CModule
 {
-	/**
-	* Deregister all metadata and in doing so, remove all existing resources.
-	*/
-	void Reset();
+public:
+	// Singleton instance.
+	static inline CResourceManager& Get() 
+	{
+		static CResourceManager s_Instance;
+		return s_Instance;
+	}
 
-	/**
-	* Register a metadata file with the system and parse all valid, managed 
-	* resources described within the data.
-	*/
-	void RegisterMetadata(CMetadata* pMetadata);
+	// Deregister all metadata and in doing so, remove all existing resources.
+	virtual void OnDeinitialise();
 
-	/**
-	* Create a resource file with the specified type and file.
-	*/
+	// Free all resources in the system.
+	void Clear();
+
+	// Load all resources specified within a metadata file.
+	void Load(CMetadata* pMetadata);
+
+	// Unload all resources specified within a metadata file.
+	void Unload(CMetadata* pMetadata);
+
+	// Create a resource file with the specified type and file.
 	CResourceFile* CreateResourceFile(t_ResourceType iType, const xchar* pFile);
 
-	/**
-	* Release a resource file and destroy it if there are no remaining references.
-	*/
+	// Release a resource file and destroy it if there are no remaining references.
 	void ReleaseResourceFile(CResourceFile* pFile);
 
-	/**
-	* Find the metadata for a managed resource with the specified type and name.
-	* @return The resource metadata or NULL if not found.
-	*/
-	CResourceMetadata* FindResource(t_ResourceType iType, const xchar* pName);
-}
+	// Find the metadata for a managed resource with the specified type and name.
+	// ~return The resource metadata or NULL if not found.
+	CResourceMetadata* GetResourceMetadata(t_ResourceType iType, const xchar* pName);
+
+protected:
+	// Lists.
+	typedef xlist<CResourceFile*> t_ResourceFileList;
+	typedef xlist<CResourceMetadata*> t_ResourceMetadataList;
+
+	// The categorised lists of managed resource files.
+	static t_ResourceFileList s_lpResourceFiles[ResourceType_Max];
+
+	// The categorised lists of managed metadata.
+	static t_ResourceMetadataList s_lpResourceMetadata[ResourceType_Max];
+};
 
 //##############################################################################
