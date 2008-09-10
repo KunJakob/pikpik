@@ -76,7 +76,7 @@ void CResourceManager::Clear()
 {
 	for (xint iA = 0; iA < ResourceType_Max; ++iA)
 	{
-		XEN_LIST_ERASE_ALL(s_lpResourceMetadata[iA]);
+		XEN_LIST_ERASE_ALL(m_lpResourceMetadata[iA]);
 	}
 }
 
@@ -86,13 +86,13 @@ void CResourceManager::Clear()
 void CResourceManager::Load(CMetadata* pMetadata)
 {
 	_DATASET_FOREACH(pDataset, pMetadata, "Sprite", NULL)
-		s_lpResourceMetadata[ResourceType_Sprite].push_back(new CSpriteMetadata(pDataset));
+		m_lpResourceMetadata[ResourceType_Sprite].push_back(new CSpriteMetadata(pDataset));
 
 	_DATASET_FOREACH(pDataset, pMetadata, "Font", NULL)
-		s_lpResourceMetadata[ResourceType_Font].push_back(new CFontMetadata(pDataset));
+		m_lpResourceMetadata[ResourceType_Font].push_back(new CFontMetadata(pDataset));
 
 	_DATASET_FOREACH(pDataset, pMetadata, "Sound", NULL)
-		s_lpResourceMetadata[ResourceType_Sound].push_back(new CSoundMetadata(pDataset));
+		m_lpResourceMetadata[ResourceType_Sound].push_back(new CSoundMetadata(pDataset));
 }
 
 // =============================================================================
@@ -100,7 +100,7 @@ void CResourceManager::Load(CMetadata* pMetadata)
 // =============================================================================
 void CResourceManager::Unload(CMetadata* pMetadata)
 {
-	XMASSERT(false, "Unload is unavailable.");
+	XMASSERT(false, "This feature is not yet implemented.");
 }
 
 // =============================================================================
@@ -118,7 +118,7 @@ CResourceFile* CResourceManager::CreateResourceFile(t_ResourceType iType, const 
 
 	if (s_bRecycleResources[iType])
 	{
-		XEN_LIST_FOREACH(t_ResourceFileList, ppResourceFile, s_lpResourceFiles[iType])
+		XEN_LIST_FOREACH(t_ResourceFileList, ppResourceFile, m_lpResourceFiles[iType])
 		{
 			if (String::IsMatch((*ppResourceFile)->m_pFile, pFile))
 			{
@@ -147,7 +147,7 @@ CResourceFile* CResourceManager::CreateResourceFile(t_ResourceType iType, const 
 	}
 
 	if (pResourceFile)
-		s_lpResourceFiles[iType].push_back(pResourceFile);
+		m_lpResourceFiles[iType].push_back(pResourceFile);
 
 	return pResourceFile;
 }
@@ -157,13 +157,13 @@ CResourceFile* CResourceManager::CreateResourceFile(t_ResourceType iType, const 
 // =============================================================================
 void CResourceManager::ReleaseResourceFile(CResourceFile* pFile)
 {
-	XEN_LIST_FOREACH(t_ResourceFileList, ppResourceFile, s_lpResourceFiles[pFile->m_iType])
+	XEN_LIST_FOREACH(t_ResourceFileList, ppResourceFile, m_lpResourceFiles[pFile->m_iType])
 	{
 		if (*ppResourceFile == pFile)
 		{
 			if (--pFile->m_iReferenceCount == 0)
 			{
-				s_lpResourceFiles[pFile->m_iType].erase(ppResourceFile);
+				m_lpResourceFiles[pFile->m_iType].erase(ppResourceFile);
 				delete pFile;
 
 				break;
@@ -177,7 +177,7 @@ void CResourceManager::ReleaseResourceFile(CResourceFile* pFile)
 // =============================================================================
 CResourceMetadata* CResourceManager::GetResourceMetadata(t_ResourceType iType, const xchar* pName)
 {
-	XEN_LIST_FOREACH(t_ResourceMetadataList, ppResource, s_lpResourceMetadata[iType])
+	XEN_LIST_FOREACH(t_ResourceMetadataList, ppResource, m_lpResourceMetadata[iType])
 	{
 		if (String::IsMatch((*ppResource)->m_pName, pName))
 			return *ppResource;

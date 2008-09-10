@@ -34,7 +34,7 @@
 #define SoundManager CSoundManager::Get()
 
 // Find a sound resource.
-#define _SOUND(NAME) ((CSoundMetadata*)ResourceManager::GetResourceMetadata(ResourceType_Sound, NAME))
+#define _SOUND(NAME) ((CSoundMetadata*)ResourceManager.GetResourceMetadata(ResourceType_Sound, NAME))
 
 //##############################################################################
 

@@ -35,7 +35,7 @@
 //##############################################################################
 
 // Find a sprite resource.
-#define _SPRITE(NAME) ((CSpriteMetadata*)ResourceManager::GetResourceMetadata(ResourceType_Sprite, NAME))
+#define _SPRITE(NAME) ((CSpriteMetadata*)ResourceManager.GetResourceMetadata(ResourceType_Sprite, NAME))
 
 //##############################################################################
 

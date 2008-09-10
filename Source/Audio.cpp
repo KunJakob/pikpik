@@ -82,7 +82,7 @@ CSoundFile::~CSoundFile()
 CSoundMetadata::CSoundMetadata(CDataset* pDataset) : CResourceMetadata(ResourceType_Sound, pDataset)
 {
 	// File.
-	m_pFile = (CSoundFile*)ResourceManager::CreateResourceFile(ResourceType_Sound, pDataset->GetProperty("File")->GetString());
+	m_pFile = (CSoundFile*)ResourceManager.CreateResourceFile(ResourceType_Sound, pDataset->GetProperty("File")->GetString());
 
 	// Info.
 	m_iGroup = SoundGroup_Unknown;
@@ -113,7 +113,7 @@ CSoundMetadata::CSoundMetadata(CDataset* pDataset) : CResourceMetadata(ResourceT
 // =============================================================================
 CSoundMetadata::~CSoundMetadata()
 {
-	ResourceManager::ReleaseResourceFile(m_pFile);
+	ResourceManager.ReleaseResourceFile(m_pFile);
 
 	XEN_LIST_ERASE_ALL(m_lpMarkers);
 }

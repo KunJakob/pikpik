@@ -432,7 +432,7 @@ CMapBlock* CMap::GetSpawnBlock(t_PlayerType iPlayerType)
 // =============================================================================
 void CMapManager::OnInitialise()
 {
-	m_pMetadata = new CMetadata(".\\Metadata\\Maps" _METAEXT, _METAKEY, true);
+	m_pMetadata = _METADATA("Maps");
 
 	// Load and initialise all resources.
 	m_pTiles = new CBasicSprite(_SPRITE("Map-Tiles"));

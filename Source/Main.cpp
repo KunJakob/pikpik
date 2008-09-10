@@ -159,12 +159,12 @@ void Application::Initialise()
 	Global.m_fWorldAlpha = 1.f;
 
 	// Load all relevant metadata.
-	ResourceManager.Load(new CMetadata(".\\Metadata\\Sprites" _METAEXT, _METAKEY, true));
-	ResourceManager.Load(new CMetadata(".\\Metadata\\Font" _METAEXT, _METAKEY, true));
-	ResourceManager.Load(new CMetadata(".\\Metadata\\Audio" _METAEXT, _METAKEY, true));
+	ResourceManager.Load(_METADATA("Sprites"));
+	ResourceManager.Load(_METADATA("Font"));
+	ResourceManager.Load(_METADATA("Audio"));
 
 	// Load the locale.
-	Global.m_pLocale = new CMetadata(".\\Metadata\\Strings" _METAEXT, _METAKEY, true);
+	Global.m_pLocale = _METADATA("Strings");
 
 	// Initialise the game font.
 	Global.m_pGameFont = new CFont(_FONT("Default"));

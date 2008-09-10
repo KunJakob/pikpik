@@ -172,10 +172,10 @@ protected:
 	typedef xlist<CResourceMetadata*> t_ResourceMetadataList;
 
 	// The categorised lists of managed resource files.
-	static t_ResourceFileList s_lpResourceFiles[ResourceType_Max];
+	t_ResourceFileList m_lpResourceFiles[ResourceType_Max];
 
 	// The categorised lists of managed metadata.
-	static t_ResourceMetadataList s_lpResourceMetadata[ResourceType_Max];
+	t_ResourceMetadataList m_lpResourceMetadata[ResourceType_Max];
 };
 
 //##############################################################################

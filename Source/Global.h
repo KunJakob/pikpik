@@ -98,11 +98,9 @@
 
 // Metadata control.
 #if XDEBUG
-#define _METAEXT				".mta"
-#define _METAKEY				NULL
+#define _METADATA(FNAME)		new CMetadata(".\\Metadata\\" FNAME ".mta", NULL, true)
 #else
-#define _METAEXT				".emta"
-#define _METAKEY				CryptManager.GetEncryptionKey()
+#define _METADATA(FNAME)		new CMetadata(".\\Metadata\\" FNAME ".emta", CryptManager.GetEncryptionKey(), true)
 #endif
 
 // Singletons.

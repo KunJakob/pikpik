@@ -48,7 +48,7 @@ CFontFile::~CFontFile()
 CFontMetadata::CFontMetadata(CDataset* pDataset) : CResourceMetadata(ResourceType_Font, pDataset)
 {
 	// File.
-	m_pFile = (CFontFile*)ResourceManager::CreateResourceFile(ResourceType_Font, pDataset->GetProperty("File")->GetString());
+	m_pFile = (CFontFile*)ResourceManager.CreateResourceFile(ResourceType_Font, pDataset->GetProperty("File")->GetString());
 
 	// Info.
 	m_fScale = 1.f;
@@ -85,7 +85,7 @@ CFontMetadata::CFontMetadata(CDataset* pDataset) : CResourceMetadata(ResourceTyp
 // =============================================================================
 CFontMetadata::~CFontMetadata()
 {
-	ResourceManager::ReleaseResourceFile(m_pFile);
+	ResourceManager.ReleaseResourceFile(m_pFile);
 }
 
 //##############################################################################
