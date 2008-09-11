@@ -82,7 +82,7 @@
 
 // Shortcuts.
 #define _HGE					Application::GetInterface()
-#define _FMOD					Application::GetSoundSystem()
+#define _FMOD					SoundManager.GetSoundSystem()
 #define _TERMINATE				Application::Terminate()
 #define _TIMEMS					GetTickCount()
 #define _TIMEDELTA				Application::GetTimeDelta()
@@ -104,7 +104,7 @@
 #endif
 
 // Singletons.
-#define Global				CGlobal::Get()
+#define Global					CGlobal::Get()
 
 //##############################################################################
 

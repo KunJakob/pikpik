@@ -17,7 +17,7 @@
 #include <Global.h>
 
 // Local.
-#include <Audio.h>
+#include <Sound.h>
 
 //##############################################################################
 
@@ -140,5 +140,51 @@ CSoundMetadata::CMarker* CSoundMetadata::FindMarker(const xchar* pName)
 //
 //##############################################################################
 
+// =============================================================================
+// Nat Ryall                                                         11-Sep-2008
+// =============================================================================
+CSoundManager::CSoundManager() :
+	m_pSoundSystem(NULL)
+{
+}
+
+// =============================================================================
+// Nat Ryall                                                         11-Sep-2008
+// =============================================================================
+void CSoundManager::OnInitialise()
+{
+	if (FMOD::System_Create(&m_pSoundSystem) == FMOD_OK)
+	{
+		if (m_pSoundSystem->init(32, FMOD_INIT_NORMAL, NULL) != FMOD_OK)
+		{
+			m_pSoundSystem->release();
+			m_pSoundSystem = NULL;
+		}
+	}
+	else
+		m_pSoundSystem = NULL;
+}
+
+// =============================================================================
+// Nat Ryall                                                         11-Sep-2008
+// =============================================================================
+void CSoundManager::OnDeinitialise()
+{
+	if (m_pSoundSystem)
+	{
+		m_pSoundSystem->release();
+		m_pSoundSystem = NULL;
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         11-Sep-2008
+// =============================================================================
+void CSoundManager::OnUpdate()
+{
+	m_pSoundSystem->update();
+}
 
 //##############################################################################
+
+

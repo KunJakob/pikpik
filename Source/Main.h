@@ -57,10 +57,10 @@ namespace Application
 	void Deinitialise();
 
 	// The game update callback.
-	xbool Update();
+	xbool OnUpdate();
 
 	// The game render callback.
-	xbool Render();
+	xbool OnRender();
 
 	// The focus was lost from the application.
 	xbool OnBlur();
@@ -76,9 +76,6 @@ namespace Application
 
 	// Get the current time delta in milliseconds.
 	xuint GetTimeDelta();
-
-	// Get the sound interface.
-	FMOD::System* GetSoundSystem();
 }
 
 //##############################################################################

@@ -24,6 +24,7 @@
 #include <Player.h>
 #include <Visor.h>
 #include <Crypt.h>
+#include <Sound.h>
 
 // Crypto.
 #include <Crypto/cryptlib.h>
@@ -50,9 +51,6 @@ typedef xlist<CScreen*> t_ScreenList;
 // HGE.
 static HGE* s_pInterface = NULL;
 
-// Sound.
-static FMOD::System* s_pSoundSystem = NULL;
-
 // Flow Control.
 static xbool s_bTerminate = false;
 
@@ -77,8 +75,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 	s_pInterface = hgeCreate(HGE_VERSION);
 
-	s_pInterface->System_SetState(HGE_FRAMEFUNC, &Application::Update);
-	s_pInterface->System_SetState(HGE_RENDERFUNC, &Application::Render);
+	s_pInterface->System_SetState(HGE_FRAMEFUNC, &Application::OnUpdate);
+	s_pInterface->System_SetState(HGE_RENDERFUNC, &Application::OnRender);
 	s_pInterface->System_SetState(HGE_FOCUSLOSTFUNC, &Application::OnBlur);
 	s_pInterface->System_SetState(HGE_FOCUSGAINFUNC, &Application::OnFocus);
 	s_pInterface->System_SetState(HGE_TITLE, "PikPik");
@@ -91,40 +89,32 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	s_pInterface->System_SetState(HGE_FPS, 60);
 	s_pInterface->System_SetState(HGE_DONTSUSPEND, true);
 
-	if (FMOD::System_Create(&s_pSoundSystem) == FMOD_OK)
+	if (s_pInterface->System_Initiate())
 	{
-		FMOD_RESULT eSoundResult = s_pSoundSystem->init(32, FMOD_INIT_NORMAL, NULL);
+		HWND hWindow = s_pInterface->System_GetState(HGE_HWND);
 
-		if (eSoundResult == FMOD_OK && s_pInterface->System_Initiate())
+		try
 		{
-			HWND hWindow = s_pInterface->System_GetState(HGE_HWND);
+			Application::Initialise();
 
-			try
-			{
-				Application::Initialise();
+			s_pInterface->System_Start();
+		}
+		catch (Xen::CException xException)
+		{
+			_TERMINATE;
 
-				s_pInterface->System_Start();
-			}
-			catch (Xen::CException xException)
-			{
-				_TERMINATE;
+			MessageBox(hWindow, xException.GetDetailedMessage().c_str(), "Application Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
+			XLOG(xException.GetDetailedMessage().c_str());
+		}
+		catch (CryptoPP::Exception xException)
+		{
+			_TERMINATE;
 
-				MessageBox(hWindow, xException.GetDetailedMessage().c_str(), "Application Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
-				XLOG(xException.GetDetailedMessage().c_str());
-			}
-			catch (CryptoPP::Exception xException)
-			{
-				_TERMINATE;
-
-				MessageBox(hWindow, xException.what(), "Cryptographic Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
-				XLOG(xException.what());
-			}
-
-			Application::Deinitialise();
+			MessageBox(hWindow, xException.what(), "Cryptographic Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
+			XLOG(xException.what());
 		}
 
-		s_pSoundSystem->release();
-		s_pSoundSystem = NULL;
+		Application::Deinitialise();
 	}
 
 	s_pInterface->System_Shutdown();
@@ -172,6 +162,7 @@ void Application::Initialise()
 	// Add all required modules to the game.
 	XMODULE(&Network);
 	XMODULE(&Match);
+	XMODULE(&SoundManager);
 	XMODULE(&MapManager);
 	XMODULE(&ScreenManager);
 	XMODULE(&CollisionManager);
@@ -204,7 +195,7 @@ void Application::Initialise()
 	Global.m_lpPlayers.push_back(new CGhost(0xFFF040F0));
 	
 	// Execute the first frame update.
-	Update();
+	OnUpdate();
 }
 
 // =============================================================================
@@ -234,13 +225,11 @@ void Application::Deinitialise()
 // =============================================================================
 // Nat Ryall                                                         23-Mar-2008
 // =============================================================================
-xbool Application::Update()
+xbool Application::OnUpdate()
 {
 	if (!s_bTerminate)
 	{
 		s_iTimeDelta = (xuint)(_TIMEDELTAF * 1000.f);
-
-		s_pSoundSystem->update();
 
 		ModuleManager.Update();
 
@@ -256,7 +245,7 @@ xbool Application::Update()
 // =============================================================================
 // Nat Ryall                                                         23-Mar-2008
 // =============================================================================
-xbool Application::Render()
+xbool Application::OnRender()
 {
 	if (!s_bTerminate)
 	{
@@ -312,14 +301,6 @@ HGE* Application::GetInterface()
 xuint Application::GetTimeDelta()
 {
 	return s_iTimeDelta;
-}
-
-// =============================================================================
-// Nat Ryall                                                          2-Jun-2008
-// =============================================================================
-FMOD::System* Application::GetSoundSystem()
-{
-	return s_pSoundSystem;
 }
 
 //##############################################################################

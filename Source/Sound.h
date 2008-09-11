@@ -175,7 +175,7 @@ protected:
 //                               SOUND MANAGER
 //
 //##############################################################################
-class CSoundManager
+class CSoundManager : public CModule
 {
 public:
 	// Singleton instance.
@@ -185,6 +185,24 @@ public:
 		return s_Instance;
 	}
 
+	// Constructor.
+	CSoundManager();
+
+	// Initialise the module.
+	virtual void OnInitialise();
+
+	// Deinitialise the module.
+	virtual void OnDeinitialise();
+
+	// Update the module.
+	virtual void OnUpdate();
+
+	// Get the sound interface.
+	inline FMOD::System* GetSoundSystem()
+	{
+		return m_pSoundSystem;
+	}
+
 	// Set the master volume, this will affect all sound types.
 	void SetVolume(xfloat fVolume);
 
@@ -192,6 +210,8 @@ public:
 	void SetVolume(t_SoundGroup iGroup, xfloat fVolume);
 
 protected:
+	// The FMOD sound interface.
+	FMOD::System* m_pSoundSystem;
 };
 
 //##############################################################################
