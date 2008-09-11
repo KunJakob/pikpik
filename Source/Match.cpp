@@ -201,7 +201,7 @@ xint CMatchResult::GetInt(const xchar* pKey)
 // =============================================================================
 // Nat Ryall                                                         30-Jun-2008
 // =============================================================================
-CMatch::CMatch() :
+CMatchManager::CMatchManager() :
 	m_pTCP(NULL),
 	m_pHTTP(NULL),
 	m_iOperation(MatchOperation_None),
@@ -217,7 +217,7 @@ CMatch::CMatch() :
 // =============================================================================
 // Nat Ryall                                                         30-Jun-2008
 // =============================================================================
-CMatch::~CMatch()
+CMatchManager::~CMatchManager()
 {
 	OnDeinitialise();
 }
@@ -225,7 +225,7 @@ CMatch::~CMatch()
 // =============================================================================
 // Nat Ryall                                                         30-Jun-2008
 // =============================================================================
-void CMatch::OnInitialise()
+void CMatchManager::OnInitialise()
 {
 	if (!m_pTCP)
 	{
@@ -239,7 +239,7 @@ void CMatch::OnInitialise()
 // =============================================================================
 // Nat Ryall                                                         30-Jun-2008
 // =============================================================================
-void CMatch::OnDeinitialise()
+void CMatchManager::OnDeinitialise()
 {
 	if (m_pHTTP)
 	{
@@ -262,7 +262,7 @@ void CMatch::OnDeinitialise()
 // =============================================================================
 // Nat Ryall                                                         02-Jul-2008
 // =============================================================================
-void CMatch::OnUpdate()
+void CMatchManager::OnUpdate()
 {
 	if (IsBusy())
 	{
@@ -312,7 +312,7 @@ void CMatch::OnUpdate()
 // =============================================================================
 // Nat Ryall                                                         02-Jul-2008
 // =============================================================================
-xbool CMatch::ListSessions(t_OnListSessionsCompleted fpCallback)
+xbool CMatchManager::ListSessions(t_OnListSessionsCompleted fpCallback)
 {
 	XMASSERT(!IsBusy(), "An operation is already processing.");
 	XMASSERT(fpCallback, "A callback must be specified for this operation.");
@@ -343,7 +343,7 @@ xbool CMatch::ListSessions(t_OnListSessionsCompleted fpCallback)
 // =============================================================================
 // Nat Ryall                                                         02-Jul-2008
 // =============================================================================
-CSession* CMatch::CreateSession(xint iTotalSlots, const xchar* pTitle, t_OnCreateSessionCompleted fpCallback)
+CSession* CMatchManager::CreateSession(xint iTotalSlots, const xchar* pTitle, t_OnCreateSessionCompleted fpCallback)
 {
 	XMASSERT(!IsBusy(), "An operation is already processing.");
 
@@ -386,7 +386,7 @@ CSession* CMatch::CreateSession(xint iTotalSlots, const xchar* pTitle, t_OnCreat
 // =============================================================================
 // Nat Ryall                                                         03-Jul-2008
 // =============================================================================
-xbool CMatch::PingSession(CSession* pSession, t_OnPingSessionCompleted fpCallback)
+xbool CMatchManager::PingSession(CSession* pSession, t_OnPingSessionCompleted fpCallback)
 {
 	XMASSERT(!IsBusy(), "An operation is already processing.");
 
@@ -417,7 +417,7 @@ xbool CMatch::PingSession(CSession* pSession, t_OnPingSessionCompleted fpCallbac
 // =============================================================================
 // Nat Ryall                                                         02-Jul-2008
 // =============================================================================
-xbool CMatch::UpdateSession(CSession* pSession, t_OnUpdateSessionCompleted fpCallback)
+xbool CMatchManager::UpdateSession(CSession* pSession, t_OnUpdateSessionCompleted fpCallback)
 {
 	XMASSERT(!IsBusy(), "An operation is already processing.");
 
@@ -451,7 +451,7 @@ xbool CMatch::UpdateSession(CSession* pSession, t_OnUpdateSessionCompleted fpCal
 // =============================================================================
 // Nat Ryall                                                         02-Jul-2008
 // =============================================================================
-xbool CMatch::CloseSession(CSession* pSession, t_OnCloseSessionCompleted fpCallback)
+xbool CMatchManager::CloseSession(CSession* pSession, t_OnCloseSessionCompleted fpCallback)
 {
 	XMASSERT(!IsBusy(), "An operation is already processing.");
 
@@ -484,7 +484,7 @@ xbool CMatch::CloseSession(CSession* pSession, t_OnCloseSessionCompleted fpCallb
 // =============================================================================
 // Nat Ryall                                                         08-Jul-2008
 // =============================================================================
-void CMatch::ProcessResult(RakNet::RakString* pResult)
+void CMatchManager::ProcessResult(RakNet::RakString* pResult)
 {
 	CMatchResult xResult;
 
@@ -573,7 +573,7 @@ void CMatch::ProcessResult(RakNet::RakString* pResult)
 // =============================================================================
 // Nat Ryall                                                         09-Jul-2008
 // =============================================================================
-void CMatch::ProcessError(t_MatchResultError iError)
+void CMatchManager::ProcessError(t_MatchResultError iError)
 {
 	RakNet::RakString sError = XFORMAT("%serror=%d", MATCH_RESULT_HEADER, iError);
 	ProcessResult(&sError);
@@ -582,7 +582,7 @@ void CMatch::ProcessError(t_MatchResultError iError)
 // =============================================================================
 // Nat Ryall                                                         02-Jul-2008
 // =============================================================================
-xstring CMatch::GenerateSessionID()
+xstring CMatchManager::GenerateSessionID()
 {
 	static const xchar* s_pChars = "0123456789ABCDEF";
 	static const xint s_iNumChars = String::Length(s_pChars);

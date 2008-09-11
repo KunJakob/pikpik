@@ -88,11 +88,11 @@ void CMenuScreen::OnLoad()
 	m_pMenuHighlight = _FONT("Menu-Highlighted");
 
 	// Initialise interface.
-	Interface.SetCursor(_SPRITE("Cursor-Main"));
-	Interface.SetCursor(ElementType_Button, _SPRITE("Cursor-Click"));
-	Interface.SetCursor(ElementType_Input, _SPRITE("Cursor-Write"));
-	Interface.SetCursor(ElementType_MenuLink, _SPRITE("Cursor-Click"));
-	Interface.SetCursor(ElementType_SessionBox, _SPRITE("Cursor-Click"));
+	InterfaceManager.SetCursor(_SPRITE("Cursor-Main"));
+	InterfaceManager.SetCursor(ElementType_Button, _SPRITE("Cursor-Click"));
+	InterfaceManager.SetCursor(ElementType_Input, _SPRITE("Cursor-Write"));
+	InterfaceManager.SetCursor(ElementType_MenuLink, _SPRITE("Cursor-Click"));
+	InterfaceManager.SetCursor(ElementType_SessionBox, _SPRITE("Cursor-Click"));
 
 	// Initialise the menu links.
 	CMenuLink* pLinkList[] = 
@@ -501,7 +501,7 @@ void CMenuScreen::Callback_CreatePrivate()
 // =============================================================================
 void CMenuScreen::Callback_StartGame()
 {
-	CMenuLink* pLink = (CMenuLink*)Interface.GetActiveElement();
+	CMenuLink* pLink = (CMenuLink*)InterfaceManager.GetActiveElement();
 
 	Global.m_pActiveMap = MapManager.GetMap(pLink->m_iElementIndex);
 	Global.m_pActiveMap->Load();

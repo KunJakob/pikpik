@@ -33,8 +33,8 @@
 //##############################################################################
 
 // Shortcuts.
-#define Interface CInterface::Get()
-#define InterfaceScreen CInterface::Get().GetScreen()
+#define InterfaceManager CInterfaceManager::Get()
+#define InterfaceScreen CInterfaceManager::Get().GetScreen()
 
 //##############################################################################
 
@@ -80,24 +80,24 @@ typedef xlist<CInterfaceElement*> t_ElementList;
 //                             INTERFACE MANAGER
 //
 //##############################################################################
-class CInterface : public CModule
+class CInterfaceManager : public CModule
 {
 public:
 	// Friend.
 	friend CInterfaceElement;
 
 	// Singleton instance.
-	static inline CInterface& Get() 
+	static inline CInterfaceManager& Get() 
 	{
-		static CInterface s_Instance;
+		static CInterfaceManager s_Instance;
 		return s_Instance;
 	}
 
 	// Initialise the interface manager.
-	CInterface();
+	CInterfaceManager();
 
 	// Deinitialise the interface manager.
-	~CInterface();
+	~CInterfaceManager();
 
 	// Reset the settings to defaults and clear all elements.
 	void Reset();
@@ -260,7 +260,7 @@ class CInterfaceElement
 {
 public:
 	// Friend.
-	friend CInterface;
+	friend CInterfaceManager;
 
 	// Virtual destructor to ensure proper cleanup of all child classes.
 	virtual ~CInterfaceElement();

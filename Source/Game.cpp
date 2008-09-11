@@ -39,7 +39,7 @@ void CGameScreen::OnActivate()
 	Global.m_fWorldAlpha = 1.f;
 	Global.m_fMusicEnergy = 0.f;
 
-	Interface.SetCursorVisible(false);
+	InterfaceManager.SetCursorVisible(false);
 
 	LoadMap();
 	LoadMusic();
@@ -78,7 +78,7 @@ void CGameScreen::LoadMusic()
 void CGameScreen::InitialisePlayers()
 {
 	// This is temporary until the character select screen is implemented (offline only).
-	if (!Network.IsRunning())
+	if (!NetworkManager.IsRunning())
 	{
 		Global.ResetActivePlayers();
 		Global.m_pLocalPlayer = Global.m_lpActivePlayers.front();
@@ -113,7 +113,7 @@ void CGameScreen::OnDeactivate()
 	RenderManager.Reset();
 	CollisionManager.Reset();
 
-	Interface.SetCursorVisible(true);
+	InterfaceManager.SetCursorVisible(true);
 }
 
 // =============================================================================

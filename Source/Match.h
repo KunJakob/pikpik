@@ -27,7 +27,7 @@
 //##############################################################################
 
 // Singleton accessor.
-#define Match CMatch::Get()
+#define MatchManager CMatchManager::Get()
 
 // The matchmaking query encoding type.
 #define MATCH_ENCODING_TYPE "application/x-www-form-urlencoded"
@@ -171,7 +171,7 @@ protected:
 //                                   MATCH
 //
 //##############################################################################
-class CMatch : public CModule
+class CMatchManager : public CModule
 {
 public:
 	// Callbacks.
@@ -182,17 +182,17 @@ public:
 	typedef xfunction(2)<t_MatchResultError /*Error*/, CSession* /*Session*/> t_OnCloseSessionCompleted;
 
 	// Singleton instance.
-	static inline CMatch& Get() 
+	static inline CMatchManager& Get() 
 	{
-		static CMatch s_Instance;
+		static CMatchManager s_Instance;
 		return s_Instance;
 	}
 
 	// Constructor.
-	CMatch();
+	CMatchManager();
 
 	// Destructor.
-	virtual ~CMatch();
+	virtual ~CMatchManager();
 
 	// Initialise the matchmaking service.
 	virtual void OnInitialise();
@@ -277,7 +277,7 @@ class CSession
 {
 public:
 	// Friends.
-	friend class CMatch;
+	friend class CMatchManager;
 
 	// Constructor.
 	CSession();

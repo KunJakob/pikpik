@@ -242,7 +242,7 @@ void CPlayer::Move(t_PlayerDirection iDirection)
 	}
 
 	// Network.
-	if (Network.IsRunning())
+	if (NetworkManager.IsRunning())
 	{
 		if (m_iLogicType == PlayerLogicType_Local || m_iLogicType == PlayerLogicType_AI)
 		{
@@ -252,7 +252,7 @@ void CPlayer::Move(t_PlayerDirection iDirection)
 			xStream.Write((xuint8)m_iIndex);
 			xStream.Write((xuint8)iDirection);
 
-			Network.Broadcast(NULL, NetworkStreamType_PlayerUpdate, &xStream, HIGH_PRIORITY, RELIABLE_ORDERED);
+			NetworkManager.Broadcast(NULL, NetworkStreamType_PlayerUpdate, &xStream, HIGH_PRIORITY, RELIABLE_ORDERED);
 		}
 	}
 }

@@ -320,6 +320,12 @@ protected:
 	// The total number of pellets eaten.
 	xint m_iPelletsEaten;
 
+	// The tiles used for rendering the map.
+	CBasicSprite* m_pTiles;
+
+	// The areas of each map tile.
+	CSpriteMetadata::CArea* m_pTileAreas[TileType_Max];
+
 	// The processed map data.
 	CMapBlock* m_xBlocks;
 
@@ -378,13 +384,7 @@ protected:
 	// The map metadata.
 	CMetadata* m_pMetadata;
 
-	// The tiles used for rendering the map.
-	CBasicSprite* m_pTiles;
-
-	// The areas of each map tile.
-	CSpriteMetadata::CArea* m_pTileAreas[TileType_Max];
-
-	// The list of map descriptions.
+	// The list of available maps.
 	t_MapList m_lpMaps;
 };
 

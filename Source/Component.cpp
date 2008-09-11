@@ -185,7 +185,7 @@ void CInputComponent::OnRender()
 	m_pFont->Render(xRenderText.c_str(), GetPosition() + xTextOffset, HGETEXT_LEFT);
 
 	// Render the cursor if we're focused.
-	if (Interface.IsFocusedElement(this) && m_iFlashTimer < 500)
+	if (InterfaceManager.IsFocusedElement(this) && m_iFlashTimer < 500)
 	{
 		xRenderText = xRenderText.substr(0, m_iCharOffset);
 
@@ -551,7 +551,7 @@ void CRadioComponent::OnMouseUp(xpoint xPosition)
 // =============================================================================
 CRadioComponent* CRadioComponent::GetChecked(xint iRadioGroup)
 {
-	XEN_LIST_FOREACH(t_ElementList, ppElement, Interface.GetElementList())
+	XEN_LIST_FOREACH(t_ElementList, ppElement, InterfaceManager.GetElementList())
 	{
 		if ((*ppElement)->GetType() == ElementType_Radio)
 		{

@@ -21,7 +21,7 @@
 // =============================================================================
 // Nat Ryall                                                          1-May-2008
 // =============================================================================
-CInterface::CInterface() :
+CInterfaceManager::CInterfaceManager() :
 	m_pScreen(NULL),
 	m_bCursorVisible(true),
 	m_pActiveElement(NULL),
@@ -36,7 +36,7 @@ CInterface::CInterface() :
 // =============================================================================
 // Nat Ryall                                                          1-May-2008
 // =============================================================================
-CInterface::~CInterface()
+CInterfaceManager::~CInterfaceManager()
 {
 	delete m_pScreen;
 
@@ -50,7 +50,7 @@ CInterface::~CInterface()
 // =============================================================================
 // Nat Ryall                                                          2-May-2008
 // =============================================================================
-void CInterface::Reset()
+void CInterfaceManager::Reset()
 {
 	m_pActiveElement = NULL;
 	m_pFocusedElement = NULL;
@@ -64,7 +64,7 @@ void CInterface::Reset()
 // =============================================================================
 // Nat Ryall                                                          1-May-2008
 // =============================================================================
-void CInterface::OnUpdate()
+void CInterfaceManager::OnUpdate()
 {
 	m_xLastMousePos = m_xMousePos;
 
@@ -115,7 +115,7 @@ void CInterface::OnUpdate()
 // =============================================================================
 // Nat Ryall                                                          1-May-2008
 // =============================================================================
-void CInterface::OnRender()
+void CInterfaceManager::OnRender()
 {
 	RenderElement(m_pScreen);
 
@@ -164,7 +164,7 @@ void CInterface::OnRender()
 // =============================================================================
 // Nat Ryall                                                         20-Jul-2008
 // =============================================================================
-void CInterface::RenderBox(xrect xRect, xuint iColour)
+void CInterfaceManager::RenderBox(xrect xRect, xuint iColour)
 {
 	hgeQuad xQuad;
 	memset(&xQuad, 0, sizeof(hgeQuad));
@@ -186,7 +186,7 @@ void CInterface::RenderBox(xrect xRect, xuint iColour)
 // =============================================================================
 // Nat Ryall                                                         06-Aug-2008
 // =============================================================================
-void CInterface::RenderBoxBorder(xrect xRect, xuint iColour)
+void CInterfaceManager::RenderBoxBorder(xrect xRect, xuint iColour)
 {
 	_HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iTop, iColour);
 	_HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iBottom, iColour);
@@ -197,7 +197,7 @@ void CInterface::RenderBoxBorder(xrect xRect, xuint iColour)
 // =============================================================================
 // Nat Ryall                                                          3-May-2008
 // =============================================================================
-void CInterface::SetCursor(t_ElementType iType, CSpriteMetadata* pMetadata)
+void CInterfaceManager::SetCursor(t_ElementType iType, CSpriteMetadata* pMetadata)
 {
 	if (m_pCursor[iType])
 		delete m_pCursor[iType];
@@ -208,7 +208,7 @@ void CInterface::SetCursor(t_ElementType iType, CSpriteMetadata* pMetadata)
 // =============================================================================
 // Nat Ryall                                                          2-May-2008
 // =============================================================================
-void CInterface::SetFocus(CInterfaceElement* pElement)
+void CInterfaceManager::SetFocus(CInterfaceElement* pElement)
 {
 	if (m_pFocusedElement != pElement)
 	{
@@ -223,7 +223,7 @@ void CInterface::SetFocus(CInterfaceElement* pElement)
 // =============================================================================
 // Nat Ryall                                                          2-May-2008
 // =============================================================================
-xbool CInterface::IsMouseOver(CInterfaceElement* pElement)
+xbool CInterfaceManager::IsMouseOver(CInterfaceElement* pElement)
 {
 	return Math::Intersect(m_xMousePos, pElement->GetArea());
 }
@@ -231,7 +231,7 @@ xbool CInterface::IsMouseOver(CInterfaceElement* pElement)
 // =============================================================================
 // Nat Ryall                                                          1-May-2008
 // =============================================================================
-void CInterface::UpdateElement(CInterfaceElement* pElement)
+void CInterfaceManager::UpdateElement(CInterfaceElement* pElement)
 {
 	if (pElement->IsEnabled())
 	{
@@ -276,7 +276,7 @@ void CInterface::UpdateElement(CInterfaceElement* pElement)
 // =============================================================================
 // Nat Ryall                                                          1-May-2008
 // =============================================================================
-void CInterface::RenderElement(CInterfaceElement* pElement)
+void CInterfaceManager::RenderElement(CInterfaceElement* pElement)
 {
 	if (pElement->IsVisible())
 	{
@@ -290,7 +290,7 @@ void CInterface::RenderElement(CInterfaceElement* pElement)
 // =============================================================================
 // Nat Ryall                                                         09-Jun-2008
 // =============================================================================
-void CInterface::DeregisterElement(CInterfaceElement* pElement)
+void CInterfaceManager::DeregisterElement(CInterfaceElement* pElement)
 {
 	if (CInterfaceElement* pParent = pElement->m_pParent)
 		pParent->Detach(pElement);
@@ -345,7 +345,7 @@ void CInterfaceElement::Attach(CInterfaceElement* pElement)
 
 	m_lpChildElements.push_back(pElement);
 
-	Interface.RegisterElement(this);
+	InterfaceManager.RegisterElement(this);
 }
 
 // =============================================================================
@@ -357,13 +357,13 @@ void CInterfaceElement::Detach(CInterfaceElement* pElement)
 
 	XEN_LIST_REMOVE(t_ElementList, m_lpChildElements, pElement);
 
-	if (pElement == Interface.m_pActiveElement)
-		Interface.m_pActiveElement = NULL;
+	if (pElement == InterfaceManager.m_pActiveElement)
+		InterfaceManager.m_pActiveElement = NULL;
 
-	if (pElement == Interface.m_pFocusedElement)
-		Interface.m_pFocusedElement = NULL;
+	if (pElement == InterfaceManager.m_pFocusedElement)
+		InterfaceManager.m_pFocusedElement = NULL;
 
-	Interface.DeregisterElement(this);
+	InterfaceManager.DeregisterElement(this);
 }
 
 // =============================================================================

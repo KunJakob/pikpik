@@ -137,8 +137,10 @@ CMap::CMap(CDataset* pDataset) : CRenderable(RenderableType_Map),
 	m_pDataset(pDataset),
 	m_bLoaded(false),
 	m_iPelletsEaten(0),
+	m_pTiles(NULL),
 	m_xBlocks(NULL)
 {
+	// Load the rest of the map properties.
 	m_pID = pDataset->GetName();
 	m_pName = pDataset->GetProperty("Name")->GetString();
 
@@ -156,6 +158,8 @@ CMap::CMap(CDataset* pDataset) : CRenderable(RenderableType_Map),
 // =============================================================================
 CMap::~CMap()
 {
+	if (m_bLoaded)
+		Unload();
 }
 
 // =============================================================================
@@ -165,6 +169,24 @@ void CMap::Load()
 {
 	if (!m_bLoaded)
 	{
+		// Load and initialise all resources.
+		m_pTiles = new CBasicSprite(_SPRITE(m_pDataset->GetProperty("Tiles")->GetString()));
+
+		m_pTileAreas[TileType_Blank]			= m_pTiles->GetMetadata()->FindArea("Blank");
+		m_pTileAreas[TileType_Pellet]			= m_pTiles->GetMetadata()->FindArea("Pellet");
+		m_pTileAreas[TileType_Power]			= m_pTiles->GetMetadata()->FindArea("Power");
+		m_pTileAreas[TileType_Eaten]			= m_pTiles->GetMetadata()->FindArea("Eaten");
+		m_pTileAreas[TileType_Solo]				= m_pTiles->GetMetadata()->FindArea("Solo");
+		m_pTileAreas[TileType_Tunnel]			= m_pTiles->GetMetadata()->FindArea("Tunnel");
+		m_pTileAreas[TileType_Cap]				= m_pTiles->GetMetadata()->FindArea("Cap");
+		m_pTileAreas[TileType_Corner]			= m_pTiles->GetMetadata()->FindArea("Corner");
+		m_pTileAreas[TileType_Junction]			= m_pTiles->GetMetadata()->FindArea("Junction");
+		m_pTileAreas[TileType_Intersection]		= m_pTiles->GetMetadata()->FindArea("Intersection");
+		m_pTileAreas[TileType_Entrance]			= m_pTiles->GetMetadata()->FindArea("Entrance");
+		m_pTileAreas[TileType_Base]				= m_pTiles->GetMetadata()->FindArea("Base");
+
+		m_pTiles->GetMetadata()->GetSprite()->SetBlendMode(BLEND_COLORMUL | BLEND_ALPHABLEND);
+
 		// Allocate the map block memory.
 		m_xBlocks = new CMapBlock[m_iBlockCount];
 
@@ -258,6 +280,8 @@ void CMap::Unload()
 {
 	if (m_bLoaded)
 	{
+		delete m_pTiles;
+
 		delete[] m_xBlocks;
 		m_xBlocks = NULL;
 
@@ -357,17 +381,17 @@ void CMap::Render()
 		static xpoint s_xCentrePoint = xpoint(24, 24);
 
 		if (m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsGhostWall())
-			MapManager.m_pTiles->GetMetadata()->GetSprite()->SetColor(_ARGBF(1.f, m_fChannels[0], m_fChannels[1], m_fChannels[2]));
+			m_pTiles->GetMetadata()->GetSprite()->SetColor(_ARGBF(1.f, m_fChannels[0], m_fChannels[1], m_fChannels[2]));
 		else
-			MapManager.m_pTiles->GetMetadata()->GetSprite()->SetColor(0xFFFFFFFF);
+			m_pTiles->GetMetadata()->GetSprite()->SetColor(0xFFFFFFFF);
 
 		t_TileType iTileType = m_xBlocks[iA].m_bEaten ? TileType_Eaten : m_xBlocks[iA].m_iTileType;
 
-		MapManager.m_pTiles->Render
+		m_pTiles->Render
 		(
 			m_xBlocks[iA].GetScreenPosition() - m_xOffset, 
 			s_xCentrePoint, 
-			MapManager.m_pTileAreas[iTileType]->m_xRect,
+			m_pTileAreas[iTileType]->m_xRect,
 			m_xBlocks[iA].m_fVisibility * Global.m_fWorldAlpha, 
 			(m_xBlocks[iA].m_fAngle / 180.0f) * M_PI
 		);
@@ -434,24 +458,6 @@ void CMapManager::OnInitialise()
 {
 	m_pMetadata = _METADATA("Maps");
 
-	// Load and initialise all resources.
-	m_pTiles = new CBasicSprite(_SPRITE("Map-Tiles"));
-
-	m_pTileAreas[TileType_Blank]			= m_pTiles->GetMetadata()->FindArea("Blank");
-	m_pTileAreas[TileType_Pellet]			= m_pTiles->GetMetadata()->FindArea("Pellet");
-	m_pTileAreas[TileType_Power]			= m_pTiles->GetMetadata()->FindArea("Power");
-	m_pTileAreas[TileType_Eaten]			= m_pTiles->GetMetadata()->FindArea("Eaten");
-	m_pTileAreas[TileType_Solo]				= m_pTiles->GetMetadata()->FindArea("Solo");
-	m_pTileAreas[TileType_Tunnel]			= m_pTiles->GetMetadata()->FindArea("Tunnel");
-	m_pTileAreas[TileType_Cap]				= m_pTiles->GetMetadata()->FindArea("Cap");
-	m_pTileAreas[TileType_Corner]			= m_pTiles->GetMetadata()->FindArea("Corner");
-	m_pTileAreas[TileType_Junction]			= m_pTiles->GetMetadata()->FindArea("Junction");
-	m_pTileAreas[TileType_Intersection]		= m_pTiles->GetMetadata()->FindArea("Intersection");
-	m_pTileAreas[TileType_Entrance]			= m_pTiles->GetMetadata()->FindArea("Entrance");
-	m_pTileAreas[TileType_Base]				= m_pTiles->GetMetadata()->FindArea("Base");
-
-	m_pTiles->GetMetadata()->GetSprite()->SetBlendMode(BLEND_COLORMUL | BLEND_ALPHABLEND);
-
 	// Create a map instance for each map in metadata.
 	_DATASET_FOREACH(pDataset, m_pMetadata, "Map", NULL)
 		m_lpMaps.push_back(new CMap(pDataset));
@@ -463,7 +469,6 @@ void CMapManager::OnInitialise()
 void CMapManager::OnDeinitialise()
 {
 	delete m_pMetadata;
-	delete m_pTiles;
 
 	XEN_LIST_ERASE_ALL(m_lpMaps);
 }

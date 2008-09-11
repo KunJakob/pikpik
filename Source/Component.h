@@ -111,7 +111,7 @@ protected:
 	// Triggered when the mouse enters this element.
 	virtual void OnMouseEnter() 
 	{
-		m_iButtonState = Interface.IsMouseDown() ? ButtonState_Down : ButtonState_Over;
+		m_iButtonState = InterfaceManager.IsMouseDown() ? ButtonState_Down : ButtonState_Over;
 	}
 
 	// Triggered when the mouse leaves this element.
@@ -132,7 +132,7 @@ protected:
 		m_iButtonState = ButtonState_Over;
 
 		if (m_fpOnClickCallback)
-			m_fpOnClickCallback(this, Interface.GetMousePosition() - GetPosition());
+			m_fpOnClickCallback(this, InterfaceManager.GetMousePosition() - GetPosition());
 	}
 
 	// The button states.
@@ -522,7 +522,7 @@ protected:
 	// Triggered when the mouse enters the element.
 	virtual void OnMouseEnter() 
 	{
-		m_iCheckState = Interface.IsMouseDown() ? CheckState_Down : CheckState_Over;
+		m_iCheckState = InterfaceManager.IsMouseDown() ? CheckState_Down : CheckState_Over;
 	}
 
 	// Triggered when the mouse leaves the element.

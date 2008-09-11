@@ -148,6 +148,20 @@ void Application::Initialise()
 	Global.m_fMusicEnergy = 0.f;
 	Global.m_fWorldAlpha = 1.f;
 
+	// Add all required modules to the game.
+	XMODULE(&SoundManager);
+	XMODULE(&ResourceManager);
+	XMODULE(&NetworkManager);
+	XMODULE(&MatchManager);
+	XMODULE(&MapManager);
+	XMODULE(&ScreenManager);
+	XMODULE(&CollisionManager);
+	XMODULE(&InterfaceManager);
+	XMODULE(&RenderManager);
+	
+	// Initialise all modules.
+	ModuleManager.Initialise();
+
 	// Load all relevant metadata.
 	ResourceManager.Load(_METADATA("Sprites"));
 	ResourceManager.Load(_METADATA("Font"));
@@ -158,20 +172,6 @@ void Application::Initialise()
 
 	// Initialise the game font.
 	Global.m_pGameFont = new CFont(_FONT("Default"));
-
-	// Add all required modules to the game.
-	XMODULE(&Network);
-	XMODULE(&Match);
-	XMODULE(&SoundManager);
-	XMODULE(&MapManager);
-	XMODULE(&ScreenManager);
-	XMODULE(&CollisionManager);
-	XMODULE(&RenderManager);
-	XMODULE(&Interface);
-	XMODULE(&ResourceManager);
-
-	// Initialise all modules.
-	ModuleManager.Initialise();
 
 	// Create all the screen instances.
 	s_lpScreens.push_back(new CLogoScreen);

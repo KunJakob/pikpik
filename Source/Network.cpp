@@ -21,7 +21,7 @@
 // =============================================================================
 // Nat Ryall                                                         08-Jun-2008
 // =============================================================================
-CNetwork::CNetwork()
+CNetworkManager::CNetworkManager()
 {
 	m_pInterface = NULL;
 
@@ -31,7 +31,7 @@ CNetwork::CNetwork()
 // =============================================================================
 // Nat Ryall                                                         08-Jun-2008
 // =============================================================================
-void CNetwork::Reset()
+void CNetworkManager::Reset()
 {
 	XASSERT(!m_pInterface);
 
@@ -74,7 +74,7 @@ void CNetwork::Reset()
 // =============================================================================
 // Nat Ryall                                                         04-Aug-2008
 // =============================================================================
-void CNetwork::OnInitialise()
+void CNetworkManager::OnInitialise()
 {
 	Reset();
 }
@@ -82,7 +82,7 @@ void CNetwork::OnInitialise()
 // =============================================================================
 // Nat Ryall                                                         08-Jun-2008
 // =============================================================================
-void CNetwork::OnUpdate()
+void CNetworkManager::OnUpdate()
 {
 	if (m_bStopPending)
 		Stop();
@@ -207,7 +207,7 @@ void CNetwork::OnUpdate()
 // =============================================================================
 // Nat Ryall                                                         18-Jun-2008
 // =============================================================================
-void CNetwork::BindReceiveCallback(xuchar cType, t_fpStreamReceived fpCallback)
+void CNetworkManager::BindReceiveCallback(xuchar cType, t_fpStreamReceived fpCallback)
 {
 	XMASSERT(cType < 256, "The type index cannot exceed 256.");
 
@@ -218,7 +218,7 @@ void CNetwork::BindReceiveCallback(xuchar cType, t_fpStreamReceived fpCallback)
 // =============================================================================
 // Nat Ryall                                                         18-Jun-2008
 // =============================================================================
-void CNetwork::UnbindReceiveCallback(xuchar cType)
+void CNetworkManager::UnbindReceiveCallback(xuchar cType)
 {
 	BindReceiveCallback(cType, NULL);
 }
@@ -226,7 +226,7 @@ void CNetwork::UnbindReceiveCallback(xuchar cType)
 // =============================================================================
 // Nat Ryall                                                         18-Jun-2008
 // =============================================================================
-xbool CNetwork::Send(CNetworkPeer* pTo, xint iStreamType, BitStream* pStream, PacketPriority iPriority, PacketReliability iReliability, xchar iChannel)
+xbool CNetworkManager::Send(CNetworkPeer* pTo, xint iStreamType, BitStream* pStream, PacketPriority iPriority, PacketReliability iReliability, xchar iChannel)
 {
 	XMASSERT(iChannel >= 2 && iChannel <= 31, "Channel index out of bounds.");
 	XMASSERT(m_pLocalPeer && m_pLocalPeer->m_bVerified, "The local peer is invalid or not yet initialised.");
@@ -266,7 +266,7 @@ xbool CNetwork::Send(CNetworkPeer* pTo, xint iStreamType, BitStream* pStream, Pa
 // =============================================================================
 // Nat Ryall                                                         18-Jun-2008
 // =============================================================================
-xbool CNetwork::Broadcast(CNetworkPeer* pIgnore, xint iStreamType, BitStream* pStream, PacketPriority iPriority, PacketReliability iReliability, xchar iChannel)
+xbool CNetworkManager::Broadcast(CNetworkPeer* pIgnore, xint iStreamType, BitStream* pStream, PacketPriority iPriority, PacketReliability iReliability, xchar iChannel)
 {
 	XMASSERT(iChannel >= 2 && iChannel <= 31, "Channel index out of bounds.");
 	XMASSERT(m_pLocalPeer && m_pLocalPeer->m_bVerified, "The local peer is invalid or not yet initialised.");
@@ -300,7 +300,7 @@ xbool CNetwork::Broadcast(CNetworkPeer* pIgnore, xint iStreamType, BitStream* pS
 // =============================================================================
 // Nat Ryall                                                         05-Aug-2008
 // =============================================================================
-BitStream* CNetwork::CreateStream(xint iStreamType, xint iFrom, BitStream* pStream)
+BitStream* CNetworkManager::CreateStream(xint iStreamType, xint iFrom, BitStream* pStream)
 {
 	BitStream* pFinalStream = new BitStream();
 
@@ -317,7 +317,7 @@ BitStream* CNetwork::CreateStream(xint iStreamType, xint iFrom, BitStream* pStre
 // =============================================================================
 // Nat Ryall                                                         05-Aug-2008
 // =============================================================================
-BitStream* CNetwork::CreateRoutedStream(xint iStreamType, xint iFrom, xint iTo, xint iPriority, xint iReliability, xint iChannel, xbool bBroadcast, BitStream* pStream)
+BitStream* CNetworkManager::CreateRoutedStream(xint iStreamType, xint iFrom, xint iTo, xint iPriority, xint iReliability, xint iChannel, xbool bBroadcast, BitStream* pStream)
 {
 	BitStream* pFinalStream = new BitStream();
 
@@ -339,7 +339,7 @@ BitStream* CNetwork::CreateRoutedStream(xint iStreamType, xint iFrom, xint iTo, 
 // =============================================================================
 // Nat Ryall                                                         08-Jun-2008
 // =============================================================================
-void CNetwork::StartHost(xint iMaxPeers, xint iPort, void* pData, xint iDataSize)
+void CNetworkManager::StartHost(xint iMaxPeers, xint iPort, void* pData, xint iDataSize)
 {
 	XASSERT(!m_pInterface);
 	XASSERT(iMaxPeers < NETWORK_PEER_INVALID_ID);
@@ -388,7 +388,7 @@ void CNetwork::StartHost(xint iMaxPeers, xint iPort, void* pData, xint iDataSize
 // =============================================================================
 // Nat Ryall                                                         08-Jun-2008
 // =============================================================================
-void CNetwork::StartClient(const xchar* pHostAddress, xint iHostPort, void* pData, xint iDataSize)
+void CNetworkManager::StartClient(const xchar* pHostAddress, xint iHostPort, void* pData, xint iDataSize)
 {
 	XASSERT(!m_pInterface);
 
@@ -418,7 +418,7 @@ void CNetwork::StartClient(const xchar* pHostAddress, xint iHostPort, void* pDat
 // =============================================================================
 // Nat Ryall                                                         08-Jun-2008
 // =============================================================================
-void CNetwork::Stop()
+void CNetworkManager::Stop()
 {
 	XASSERT(m_pInterface);
 
@@ -443,7 +443,7 @@ void CNetwork::Stop()
 // =============================================================================
 // Nat Ryall                                                         13-Jun-2008
 // =============================================================================
-void CNetwork::Kick(SystemAddress& xAddress)
+void CNetworkManager::Kick(SystemAddress& xAddress)
 {
 	if (m_pInterface)
 		m_pInterface->CloseConnection(xAddress, true);
@@ -452,7 +452,7 @@ void CNetwork::Kick(SystemAddress& xAddress)
 // =============================================================================
 // Nat Ryall                                                         18-Jul-2008
 // =============================================================================
-xint CNetwork::GetLastPing()
+xint CNetworkManager::GetLastPing()
 {
 	if (m_bHosting || !m_pHostPeer)
 		return -1;
@@ -463,7 +463,7 @@ xint CNetwork::GetLastPing()
 // =============================================================================
 // Nat Ryall                                                         13-Jun-2008
 // =============================================================================
-xint CNetwork::GetUniquePeerID()
+xint CNetworkManager::GetUniquePeerID()
 {
 	while (FindPeer(m_iLastPeerID) != NULL) 
 	{
@@ -477,7 +477,7 @@ xint CNetwork::GetUniquePeerID()
 // =============================================================================
 // Nat Ryall                                                         09-Jun-2008
 // =============================================================================
-CNetworkPeer* CNetwork::CreatePeer()
+CNetworkPeer* CNetworkManager::CreatePeer()
 {
 	CNetworkPeer* pPeer = new CNetworkPeer();
 
@@ -498,7 +498,7 @@ CNetworkPeer* CNetwork::CreatePeer()
 // =============================================================================
 // Nat Ryall                                                         19-Jul-2008
 // =============================================================================
-void CNetwork::DestroyPeer(CNetworkPeer* pPeer)
+void CNetworkManager::DestroyPeer(CNetworkPeer* pPeer)
 {
 	if (pPeer)
 	{	
@@ -523,7 +523,7 @@ void CNetwork::DestroyPeer(CNetworkPeer* pPeer)
 // =============================================================================
 // Nat Ryall                                                         19-Jul-2008
 // =============================================================================
-void CNetwork::DestroyPeers()
+void CNetworkManager::DestroyPeers()
 {
 	while (m_lpPeers.size()) 
 		DestroyPeer(m_lpPeers.front());
@@ -532,7 +532,7 @@ void CNetwork::DestroyPeers()
 // =============================================================================
 // Nat Ryall                                                         30-Jul-2008
 // =============================================================================
-void CNetwork::SortPeers()
+void CNetworkManager::SortPeers()
 {
 	m_lpPeers.sort(&OnComparePeers);
 	m_lpVerifiedPeers.sort(&OnComparePeers);
@@ -541,7 +541,7 @@ void CNetwork::SortPeers()
 // =============================================================================
 // Nat Ryall                                                         31-Jul-2008
 // =============================================================================
-xbool CNetwork::OnComparePeers(const CNetworkPeer* pA, const CNetworkPeer* pB)
+xbool CNetworkManager::OnComparePeers(const CNetworkPeer* pA, const CNetworkPeer* pB)
 {
 	return pA->m_iID < pB->m_iID;
 }
@@ -549,7 +549,7 @@ xbool CNetwork::OnComparePeers(const CNetworkPeer* pA, const CNetworkPeer* pB)
 // =============================================================================
 // Nat Ryall                                                         09-Jun-2008
 // =============================================================================
-CNetworkPeer* CNetwork::FindPeer(SystemAddress& xAddress)
+CNetworkPeer* CNetworkManager::FindPeer(SystemAddress& xAddress)
 {
 	XEN_LIST_FOREACH(t_NetworkPeerList, ppPeer, m_lpPeers)
 	{
@@ -563,7 +563,7 @@ CNetworkPeer* CNetwork::FindPeer(SystemAddress& xAddress)
 // =============================================================================
 // Nat Ryall                                                         09-Jun-2008
 // =============================================================================
-CNetworkPeer* CNetwork::FindPeer(xint iPeerID)
+CNetworkPeer* CNetworkManager::FindPeer(xint iPeerID)
 {
 	XEN_LIST_FOREACH(t_NetworkPeerList, ppPeer, m_lpPeers)
 	{
@@ -577,7 +577,7 @@ CNetworkPeer* CNetwork::FindPeer(xint iPeerID)
 // =============================================================================
 // Nat Ryall                                                         09-Jun-2008
 // =============================================================================
-void CNetwork::OnProcessHostNotification(xchar cIdentifier, Packet* pPacket, xuchar* pData, xint iDataSize)
+void CNetworkManager::OnProcessHostNotification(xchar cIdentifier, Packet* pPacket, xuchar* pData, xint iDataSize)
 {
 	BitStream xInStream(pData, iDataSize, false);
 
@@ -809,7 +809,7 @@ void CNetwork::OnProcessHostNotification(xchar cIdentifier, Packet* pPacket, xuc
 // =============================================================================
 // Nat Ryall                                                         09-Jun-2008
 // =============================================================================
-void CNetwork::OnProcessClientNotification(xchar cIdentifier, Packet* pPacket, xuchar* pData, xint iDataSize)
+void CNetworkManager::OnProcessClientNotification(xchar cIdentifier, Packet* pPacket, xuchar* pData, xint iDataSize)
 {
 	BitStream xInStream(pData, iDataSize, false);
 
@@ -961,7 +961,7 @@ void CNetwork::OnProcessClientNotification(xchar cIdentifier, Packet* pPacket, x
 // =============================================================================
 // Nat Ryall                                                         13-Jun-2008
 // =============================================================================
-void CNetwork::OnProcessPacket(Packet* pPacket, BitStream* pStream)
+void CNetworkManager::OnProcessPacket(Packet* pPacket, BitStream* pStream)
 {
 	xuint8 iStreamType;
 	xuint8 iFrom;

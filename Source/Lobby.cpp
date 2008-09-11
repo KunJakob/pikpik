@@ -138,8 +138,8 @@ void CLobbyScreen::OnUpdate()
 
 	case LobbyState_Closing:
 		{
-			if (!Match.IsBusy() && m_pSession)
-				Match.CloseSession(m_pSession, xbind(this, &CLobbyScreen::OnCloseSessionCompleted));
+			if (!MatchManager.IsBusy() && m_pSession)
+				MatchManager.CloseSession(m_pSession, xbind(this, &CLobbyScreen::OnCloseSessionCompleted));
 		}
 		break;
 	}
@@ -167,19 +167,19 @@ void CLobbyScreen::OnRender()
 // =============================================================================
 void CLobbyScreen::UpdateLobby()
 {
-	if (Network.IsHosting())
+	if (NetworkManager.IsHosting())
 	{
 		// Ping the matchmaking service on set intervals to keep the session alive.
-		if (m_pSession && !Match.IsBusy() && m_xPingTimer.IsExpired())
+		if (m_pSession && !MatchManager.IsBusy() && m_xPingTimer.IsExpired())
 		{
-			Match.PingSession(m_pSession, NULL);
+			MatchManager.PingSession(m_pSession, NULL);
 			m_xPingTimer.ExpireAfter(MATCH_PING_INTERVAL);
 		}
 
 		// Start the game when ENTER is pressed (debug).
-		if (_HGE->Input_KeyUp(HGEK_ENTER) && Network.IsEveryoneVerified())
+		if (_HGE->Input_KeyUp(HGEK_ENTER) && NetworkManager.IsEveryoneVerified())
 		{
-			Network.Broadcast(NULL, NetworkStreamType_StartGame, NULL, HIGH_PRIORITY, RELIABLE_ORDERED);
+			NetworkManager.Broadcast(NULL, NetworkStreamType_StartGame, NULL, HIGH_PRIORITY, RELIABLE_ORDERED);
 			StartGame();
 		}
 	}
@@ -192,7 +192,7 @@ void CLobbyScreen::RenderLobby()
 {
 	xint iPeerOffset = 0;
 
-	XEN_LIST_FOREACH(t_NetworkPeerList, ppPeer, Network.GetVerifiedPeers())
+	XEN_LIST_FOREACH(t_NetworkPeerList, ppPeer, NetworkManager.GetVerifiedPeers())
 	{
 		CNetworkGamerCard* pCard = GetGamerCard(*ppPeer);
 		
@@ -200,7 +200,7 @@ void CLobbyScreen::RenderLobby()
 		iPeerOffset += 40;
 	}
 
-	Global.m_pGameFont->Render(XFORMAT("%d", Network.GetLastPing()), xpoint(2, 0), HGETEXT_LEFT);
+	Global.m_pGameFont->Render(XFORMAT("%d", NetworkManager.GetLastPing()), xpoint(2, 0), HGETEXT_LEFT);
 }
 
 // =============================================================================
@@ -218,7 +218,7 @@ void CLobbyScreen::Start(t_LobbyStartMode iStartMode)
 	case LobbyStartMode_JoinPublic:
 		{
 			SetState(LobbyState_Searching);
-			Match.ListSessions(xbind(this, &CLobbyScreen::OnListSessionsCompleted));
+			MatchManager.ListSessions(xbind(this, &CLobbyScreen::OnListSessionsCompleted));
 		}
 		break;
 
@@ -231,7 +231,7 @@ void CLobbyScreen::Start(t_LobbyStartMode iStartMode)
 	case LobbyStartMode_CreatePublic:
 		{
 			SetState(LobbyState_Creating);
-			m_pSession = Match.CreateSession(4, "PikPik Beta Server", xbind(this, &CLobbyScreen::OnCreateSessionCompleted));
+			m_pSession = MatchManager.CreateSession(4, "PikPik Beta Server", xbind(this, &CLobbyScreen::OnCreateSessionCompleted));
 		}
 		break;
 
@@ -251,10 +251,10 @@ void CLobbyScreen::Start(t_LobbyStartMode iStartMode)
 // =============================================================================
 void CLobbyScreen::Stop()
 {
-	if (Network.IsRunning())
+	if (NetworkManager.IsRunning())
 	{
 		SetState(LobbyState_Leaving);
-		Network.RequestStop();
+		NetworkManager.RequestStop();
 	}
 	else
 		OnNetworkStop();
@@ -368,24 +368,24 @@ void CLobbyScreen::InitialiseNetwork()
 	strcpy_s(m_xGamerCard.m_cNickname, _MAXNAMELEN, s_pNames[rand() % 20]);
 	m_xGamerCard.m_iSeed = rand() % 4096;
 
-	Network.SetGamerCard(&m_xGamerCard, sizeof(CNetworkGamerCard));
+	NetworkManager.SetGamerCard(&m_xGamerCard, sizeof(CNetworkGamerCard));
 
 	// Initialise the verification info.
-	Network.SetVerificationInfo(_GID, String::Length(_GID) + 1);
+	NetworkManager.SetVerificationInfo(_GID, String::Length(_GID) + 1);
 
 	// Bind the stream type callbacks.
-	Network.BindReceiveCallback(NetworkStreamType_StartGame, xbind(this, &CLobbyScreen::OnReceiveStartGame));
-	Network.BindReceiveCallback(NetworkStreamType_PlayerUpdate, &CPlayer::OnReceivePlayerUpdate);
+	NetworkManager.BindReceiveCallback(NetworkStreamType_StartGame, xbind(this, &CLobbyScreen::OnReceiveStartGame));
+	NetworkManager.BindReceiveCallback(NetworkStreamType_PlayerUpdate, &CPlayer::OnReceivePlayerUpdate);
 
 	// Bind all event callbacks.
-	Network.m_xCallbacks.m_fpNetworkStarted = xbind(this, &CLobbyScreen::OnNetworkStart);
-	Network.m_xCallbacks.m_fpNetworkStopped = xbind(this, &CLobbyScreen::OnNetworkStop);
-	Network.m_xCallbacks.m_fpConnectionCompleted = xbind(this, &CLobbyScreen::OnConnectionCompleted);
-	Network.m_xCallbacks.m_fpConnectionLost = xbind(this, &CLobbyScreen::OnConnectionLost);
-	Network.m_xCallbacks.m_fpVerifyPeer = xbind(this, &CLobbyScreen::OnVerifyPeer);
-	Network.m_xCallbacks.m_fpVerificationCompleted = xbind(this, &CLobbyScreen::OnConnectionVerified);
-	Network.m_xCallbacks.m_fpPeerJoined = xbind(this, &CLobbyScreen::OnPeerJoined);
-	Network.m_xCallbacks.m_fpPeerLeaving = xbind(this, &CLobbyScreen::OnPeerLeaving);
+	NetworkManager.m_xCallbacks.m_fpNetworkStarted = xbind(this, &CLobbyScreen::OnNetworkStart);
+	NetworkManager.m_xCallbacks.m_fpNetworkStopped = xbind(this, &CLobbyScreen::OnNetworkStop);
+	NetworkManager.m_xCallbacks.m_fpConnectionCompleted = xbind(this, &CLobbyScreen::OnConnectionCompleted);
+	NetworkManager.m_xCallbacks.m_fpConnectionLost = xbind(this, &CLobbyScreen::OnConnectionLost);
+	NetworkManager.m_xCallbacks.m_fpVerifyPeer = xbind(this, &CLobbyScreen::OnVerifyPeer);
+	NetworkManager.m_xCallbacks.m_fpVerificationCompleted = xbind(this, &CLobbyScreen::OnConnectionVerified);
+	NetworkManager.m_xCallbacks.m_fpPeerJoined = xbind(this, &CLobbyScreen::OnPeerJoined);
+	NetworkManager.m_xCallbacks.m_fpPeerLeaving = xbind(this, &CLobbyScreen::OnPeerLeaving);
 }
 
 // =============================================================================
@@ -393,11 +393,11 @@ void CLobbyScreen::InitialiseNetwork()
 // =============================================================================
 void CLobbyScreen::CreateLobby()
 {
-	Network.Reset();
+	NetworkManager.Reset();
 
 	InitialiseNetwork();
 
-	Network.StartHost(4, _HOSTPORT);
+	NetworkManager.StartHost(4, _HOSTPORT);
 
 	SetState(LobbyState_Lobby);
 }
@@ -407,11 +407,11 @@ void CLobbyScreen::CreateLobby()
 // =============================================================================
 void CLobbyScreen::JoinLobby(const xchar* pHostAddress)
 {
-	Network.Reset();
+	NetworkManager.Reset();
 
 	InitialiseNetwork();
 
-	Network.StartClient(pHostAddress, _HOSTPORT);
+	NetworkManager.StartClient(pHostAddress, _HOSTPORT);
 
 	SetState(LobbyState_Connecting);
 }
@@ -427,7 +427,7 @@ void CLobbyScreen::StartGame()
 	Global.m_pActiveMap = MapManager.GetMap("M009");
 	Global.m_pActiveMap->Load();
 
-	srand(GetGamerCard(Network.GetVerifiedPeers().front())->m_iSeed);
+	srand(GetGamerCard(NetworkManager.GetVerifiedPeers().front())->m_iSeed);
 
 	Global.ResetActivePlayers();
 	
@@ -435,13 +435,13 @@ void CLobbyScreen::StartGame()
 	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
 	{
 		CPlayer* pPlayer = *ppPlayer;
-		pPlayer->SetLogicType(Network.GetLocalPeer()->m_bHost ? PlayerLogicType_AI : PlayerLogicType_Remote);
+		pPlayer->SetLogicType(NetworkManager.GetLocalPeer()->m_bHost ? PlayerLogicType_AI : PlayerLogicType_Remote);
 	}
 
 	// Setup all network players.
 	xint iPlayerIndex = 0;
 
-	XEN_LIST_FOREACH(t_NetworkPeerList, ppPeer, Network.GetVerifiedPeers())
+	XEN_LIST_FOREACH(t_NetworkPeerList, ppPeer, NetworkManager.GetVerifiedPeers())
 	{
 		CNetworkPeer* pPeer = *ppPeer;
 		CNetworkPeerInfo* pInfo = GetPeerInfo(pPeer);
@@ -530,7 +530,7 @@ xbool CLobbyScreen::OnVerifyPeer(CNetworkPeer* pPeer, void* pData, xint iDataLen
 void CLobbyScreen::OnNetworkStart()
 {
 #if !defined(_RELEASE)
-	Network.GetInterface()->ApplyNetworkSimulator(XKB(56), 80, 40);
+	NetworkManager.GetInterface()->ApplyNetworkSimulator(XKB(56), 80, 40);
 #endif
 }
 
@@ -542,7 +542,7 @@ void CLobbyScreen::OnNetworkStop()
 	if (m_iState != LobbyState_None)
 	{
 		// If we have a session still open, close that and return here later.
-		if (Network.IsHosting() && m_pSession)
+		if (NetworkManager.IsHosting() && m_pSession)
 		{
 			if (m_iState != LobbyState_Closing)
 				SetState(LobbyState_Closing);
@@ -598,7 +598,7 @@ void CLobbyScreen::OnPeerJoined(CNetworkPeer* pPeer)
 
 	pPeer->m_pData = pInfo;
 
-	Network.SortPeers();
+	NetworkManager.SortPeers();
 }
 
 // =============================================================================
@@ -611,7 +611,7 @@ void CLobbyScreen::OnPeerLeaving(CNetworkPeer* pPeer)
 	CNetworkPeerInfo* pInfo = GetPeerInfo(pPeer);
 
 	if (m_iState == LobbyState_Game)
-		pInfo->m_pPlayer->SetLogicType(Network.IsHosting() ? PlayerLogicType_AI : PlayerLogicType_Remote);
+		pInfo->m_pPlayer->SetLogicType(NetworkManager.IsHosting() ? PlayerLogicType_AI : PlayerLogicType_Remote);
 
 	if (pInfo)
 		delete pInfo;

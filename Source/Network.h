@@ -22,7 +22,7 @@
 //##############################################################################
 
 // Shortcuts.
-#define Network CNetwork::Get()
+#define NetworkManager CNetworkManager::Get()
 
 // The maximum ID for network peers is invalid.
 #define NETWORK_PEER_INVALID_ID 0xFF
@@ -88,18 +88,18 @@ public:
 //                                   NETWORK
 //
 //##############################################################################
-class CNetwork : public CModule
+class CNetworkManager : public CModule
 {
 public:
 	// Singleton instance.
-	static inline CNetwork& Get() 
+	static inline CNetworkManager& Get() 
 	{
-		static CNetwork s_Instance;
+		static CNetworkManager s_Instance;
 		return s_Instance;
 	}
 
 	// Constructor.
-	CNetwork();
+	CNetworkManager();
 
 	// Reset the system variables.
 	void Reset();
