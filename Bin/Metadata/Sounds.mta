@@ -1,0 +1,14 @@
+//
+// Audio Groups: 0 = System, 1 = Music, 2 = Effects, 3 = Voice
+//
+.Sound "Logo-Intro"
+{
+	.File "Sound\Clips\Logo-SAPIAN.mp3"
+	.Group 0
+	.Volume 1.0
+	
+	.Marker "Display"	{ .Time 600  }
+	.Marker "FadeStart"	{ .Time 3200 }
+	.Marker "FadePeak"	{ .Time 3400 }
+	.Marker "FadeEnd"	{ .Time 4000 }
+}

@@ -164,8 +164,8 @@ void Application::Initialise()
 
 	// Load all relevant metadata.
 	ResourceManager.Load(_METADATA("Sprites"));
-	ResourceManager.Load(_METADATA("Font"));
-	ResourceManager.Load(_METADATA("Audio"));
+	ResourceManager.Load(_METADATA("Fonts"));
+	ResourceManager.Load(_METADATA("Sounds"));
 
 	// Load the locale.
 	Global.m_pLocale = _METADATA("Strings");

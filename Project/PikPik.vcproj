@@ -2033,19 +2033,15 @@
 			Name="Metadata"
 			>
 			<File
-				RelativePath="..\Bin\Metadata\Audio.mta"
-				>
-			</File>
-			<File
-				RelativePath="..\Bin\Metadata\Font.mta"
-				>
-			</File>
-			<File
-				RelativePath="..\Bin\Metadata\Interface.mta"
+				RelativePath="..\Bin\Metadata\Fonts.mta"
 				>
 			</File>
 			<File
 				RelativePath="..\Bin\Metadata\Maps.mta"
+				>
+			</File>
+			<File
+				RelativePath="..\Bin\Metadata\Sounds.mta"
 				>
 			</File>
 			<File

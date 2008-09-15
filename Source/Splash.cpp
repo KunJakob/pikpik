@@ -33,7 +33,7 @@ void CLogoScreen::OnActivate()
 	m_pImage->SetAnchor(m_pImage->GetAreaCentre());
 	m_pImage->SetPosition(xpoint(_HSWIDTH, _HSHEIGHT));
 
-	_FMOD->createStream("Audio\\Clips\\Logo-SAPIAN.mp3", FMOD_SOFTWARE, NULL, &m_pSound);
+	_FMOD->createStream("Sound\\Clips\\Logo-SAPIAN.mp3", FMOD_SOFTWARE, NULL, &m_pSound);
 }
 
 // =============================================================================
