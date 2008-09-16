@@ -63,7 +63,7 @@ CMenuLink::CMenuLink(xuint iGroupIndex, CFontMetadata* pFont, const xchar* pText
 void CMenuLink::RePosition(xuint iElementIndex, xuint iNumElements)
 {
 	m_iElementIndex = iElementIndex;
-	m_xLinkPosition = xpoint(_HSWIDTH - (GetWidth() / 2), _HSHEIGHT - (iNumElements * (GetHeight() / 2)) + iElementIndex * (GetHeight() + 5));
+	m_xLinkPosition = xpoint(_HSWIDTH - (GetWidth() / 2), _HSHEIGHT - (iNumElements * (GetHeight() / 2)) + iElementIndex * (GetHeight() + 10));
 
 	SetPosition(m_xLinkPosition);
 }

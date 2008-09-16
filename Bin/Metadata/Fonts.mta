@@ -6,13 +6,13 @@
 
 .Font "Menu-Default"
 {
-	.File "Font\ShowcardGothic_36.fnt"
+	.File "Font\Bambino_36.fnt"
 	.Shadow { .Offset 2 2 }
 }
 
 .Font "Menu-Highlighted"
 {
-	.File "Font\ShowcardGothic_36.fnt"
+	.File "Font\Bambino_36.fnt"
 	.Colour 255 224 128
 	
 	.Shadow 
@@ -24,7 +24,7 @@
 
 .Font "Lobby-Title"
 {
-	.File "Font\ShowcardGothic_36.fnt"
+	.File "Font\Bambino_36.fnt"
 	.Colour 228 217 191
 	
 	.Shadow 
@@ -35,7 +35,7 @@
 
 .Font "Lobby-Peer"
 {
-	.File "Font\ShowcardGothic_36.fnt"
+	.File "Font\Bambino_36.fnt"
 	
 	.Shadow 
 	{
