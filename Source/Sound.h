@@ -141,7 +141,7 @@ public:
 		const xchar* m_pName;
 
 		// The sound time, in milliseconds, that the marker is set to.
-		xint m_iTime;
+		xuint m_iTime;
 	};
 
 	// The list of markers associated with this sound.
@@ -158,14 +158,85 @@ public:
 class CSound
 {
 public:
-	// Get a marker explicitly by name.
-	//CSoundMarker* GetMarker(const xchar* pName)
+	// Constructor.
+	CSound(CSoundMetadata* pMetadata);
+
+	// Destructor.
+	virtual ~CSound();
+
+	// Play the sound specified in the metadata.
+	// ~pName Play the sound from the specified marker of from the current offset if NULL.
+	void Play(const xchar* pName = NULL);
+	
+	// Pause the sound at its current position.
+	void Pause()
+	{
+		m_pChannel->setPaused(true);
+	}
+
+	// Resume the sound from the current offset.
+	void Resume()
+	{
+		m_pChannel->setPaused(false);
+	}
+
+	// Stop the sound from playing and reset the play offset.
+	void Stop();
+
+	// Check if the sound is currently playing.
+	inline xbool IsPlaying()
+	{
+		xbool bPlaying = false;
+
+		if (m_pChannel)
+			m_pChannel->isPlaying(&bPlaying);
+
+		return bPlaying;
+	}
+
+	// Get the sound offset position in milliseconds.
+	inline xuint GetTime()
+	{
+		xuint iTrackTime = 0;
+
+		if (m_pChannel)
+			m_pChannel->getPosition(&iTrackTime, FMOD_TIMEUNIT_MS);
+
+		return iTrackTime;
+	}
+
+	// Set the sound offset position in milliseconds.
+	inline void SetTime(xuint iTime)
+	{
+		if (m_pChannel)
+			m_pChannel->setPosition(iTime, FMOD_TIMEUNIT_MS);
+	}
+
+	// Get the time from the specified marker.
+	xuint GetMarkerTime(const xchar* pName);
 
 	// Determine if an audio marker has expired.
+	// ~pName The name of the marker to check against.
 	xbool IsMarkerExpired(const xchar* pName);
 
+	// Get the sound metadata structure. This is for advanced use only.
+	inline CSoundMetadata* GetMetadata()
+	{
+		return m_pMetadata;
+	}
+
+	// Get the channel for this sound for direct manipulation.
+	inline FMOD::Channel* GetChannel()
+	{
+		return m_pChannel;
+	}
+
 protected:
-	//
+	// The sound metadata.
+	CSoundMetadata* m_pMetadata;
+
+	// The active channel for this sound.
+	FMOD::Channel* m_pChannel;
 };
 
 //##############################################################################

@@ -104,7 +104,7 @@ CSoundMetadata::CSoundMetadata(CDataset* pDataset) : CResourceMetadata(ResourceT
 		pMarker->m_iTime = 0;
 
 		if (_PROPERTY_EXISTS(pMarkerDataset, "Time"))
-			pMarker->m_iTime = _PROPERTY->GetInt();
+			pMarker->m_iTime = (xuint)_PROPERTY->GetInt();
 	}
 }
 
@@ -130,6 +130,77 @@ CSoundMetadata::CMarker* CSoundMetadata::FindMarker(const xchar* pName)
 	}
 
 	return NULL;
+}
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                   SOUND
+//
+//##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                         16-Sep-2008
+// =============================================================================
+CSound::CSound(CSoundMetadata* pMetadata) : 
+	m_pMetadata(pMetadata),
+	m_pChannel(NULL)
+{
+}
+
+// =============================================================================
+// Nat Ryall                                                         16-Sep-2008
+// =============================================================================
+CSound::~CSound()
+{
+	Stop();
+}
+
+// =============================================================================
+// Nat Ryall                                                         16-Sep-2008
+// =============================================================================
+void CSound::Play(const xchar* pName)
+{
+	// If the channel exists already, free it.
+	Stop();
+
+	// Start the sound playing.
+	_FMOD->playSound(FMOD_CHANNEL_FREE, m_pMetadata->GetSound(), false, &m_pChannel);
+}
+
+// =============================================================================
+// Nat Ryall                                                         16-Sep-2008
+// =============================================================================
+void CSound::Stop()
+{
+	if (m_pChannel)
+	{
+		m_pChannel->stop();
+		m_pChannel = NULL;
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         16-Sep-2008
+// =============================================================================
+xuint CSound::GetMarkerTime(const xchar* pName)
+{
+	if (CSoundMetadata::CMarker* pMarker = m_pMetadata->FindMarker(pName))
+		return pMarker->m_iTime;
+
+	return 0;
+}
+
+// =============================================================================
+// Nat Ryall                                                         16-Sep-2008
+// =============================================================================
+xbool CSound::IsMarkerExpired(const xchar* pName)
+{
+	if (CSoundMetadata::CMarker* pMarker = m_pMetadata->FindMarker(pName))
+		return (GetTime() > pMarker->m_iTime);
+
+	return true;
 }
 
 //##############################################################################
@@ -186,5 +257,3 @@ void CSoundManager::OnUpdate()
 }
 
 //##############################################################################
-
-

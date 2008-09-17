@@ -33,7 +33,7 @@ void CLogoScreen::OnActivate()
 	m_pImage->SetAnchor(m_pImage->GetAreaCentre());
 	m_pImage->SetPosition(xpoint(_HSWIDTH, _HSHEIGHT));
 
-	_FMOD->createStream("Sound\\Clips\\Logo-SAPIAN.mp3", FMOD_SOFTWARE, NULL, &m_pSound);
+	m_pSound = new CSound(_SOUND("Logo-Intro"));
 }
 
 // =============================================================================
@@ -42,9 +42,7 @@ void CLogoScreen::OnActivate()
 void CLogoScreen::OnDeactivate()
 {
 	delete m_pImage;
-
-	m_pChannel->stop();
-	m_pSound->release();
+	delete m_pSound;
 }
 
 // =============================================================================
@@ -54,7 +52,7 @@ void CLogoScreen::OnWake()
 {
 	CFadeScreen::Reset();
 
-	_FMOD->playSound(FMOD_CHANNEL_FREE, m_pSound, false, &m_pChannel);
+	m_pSound->Play();
 }
 
 // =============================================================================
@@ -80,18 +78,16 @@ void CLogoScreen::OnUpdate()
 {
 	CFadeScreen::OnUpdate();
 
-	static xuint s_iHideTime	= 600;
-	static xuint s_iFadeStart	= 3200;
-	static xuint s_iFadePeak	= 3400;
-	static xuint s_iFadeEnd		= 4000;
+	static xuint s_iHideTime	= m_pSound->GetMarkerTime("Display");
+	static xuint s_iFadeStart	= m_pSound->GetMarkerTime("FadeStart");
+	static xuint s_iFadePeak	= m_pSound->GetMarkerTime("FadePeak");
+	static xuint s_iFadeEnd		= m_pSound->GetMarkerTime("FadeEnd");
 	static xuint s_iFadePower	= 40;
 
-	xuint iTrackTime;
-	m_pChannel->getPosition(&iTrackTime, FMOD_TIMEUNIT_MS);
+	xuint iTrackTime = m_pSound->GetTime();
+	xuint iColour = 0;
 
 	m_pImage->SetAlpha((iTrackTime > s_iHideTime) ? m_fAlpha : 0.f);
-
-	xuint iColour = 0;
 
 	if (iTrackTime > s_iFadeStart)
 	{

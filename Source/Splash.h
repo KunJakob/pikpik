@@ -14,6 +14,7 @@
 #include <Resource.h>
 #include <Sprite.h>
 #include <Map.h>
+#include <Sound.h>
 
 //##############################################################################
 
@@ -57,8 +58,7 @@ protected:
 	CSprite* m_pImage;
 
 	// The logo sound clip.
-	FMOD::Sound* m_pSound;
-	FMOD::Channel* m_pChannel;
+	CSound* m_pSound;
 };
 
 //##############################################################################
