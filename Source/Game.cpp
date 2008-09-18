@@ -48,9 +48,6 @@ void CGameScreen::OnActivate()
 
 	RenderManager.Add(LayerIndex_Background, &m_xBackground);
 
-	//RenderManager.SetRenderCallback(LayerIndex_Map, xbind(this, &CGameScreen::WorldTransform));
-	//RenderManager.SetRenderCallback(LayerIndex_Player, xbind(this, &CGameScreen::WorldTransform));
-
 	m_pMinimap = new CMinimap(Global.m_pActiveMap);
 	RenderManager.Add(LayerIndex_Radar, m_pMinimap);
 }
@@ -162,17 +159,10 @@ void CGameScreen::OnUpdate()
 	}
 
 	// Calculate the music energy using spectrum analysis.
-	CalculateMusicEnergy(m_pChannel);
+	Global.m_fMusicEnergy = 0.f;
 
 	// Generate the minimap.
 	m_pMinimap->Generate(MinimapElement_Walls | MinimapElement_GhostWalls | MinimapElement_GhostBase | MinimapElement_Ghost | MinimapElement_Pacman);
-
-	// Set the transformations.
-	//xpoint xOffset = Global.m_pLocalPlayer->GetSprite()->GetPosition() - xpoint(_HSWIDTH, _HSHEIGHT);
-	//xOffset = xpoint(0, 0);
-
-	//RenderManager.SetTransformation(LayerIndex_Map, xpoint(0, 0));
-	//RenderManager.SetTransformation(LayerIndex_Player, xpoint());
 }
 
 // =============================================================================
@@ -180,70 +170,11 @@ void CGameScreen::OnUpdate()
 // =============================================================================
 void CGameScreen::OnRender()
 {
-}
+	// Set the transformations.
+	xpoint xOffset = (Global.m_pLocalPlayer->GetSprite()->GetPosition() - xpoint(_HSWIDTH, _HSHEIGHT)) * -1;
 
-// =============================================================================
-// Nat Ryall                                                          3-Jun-2008
-// =============================================================================
-void CGameScreen::CalculateMusicEnergy(FMOD::Channel* pChannel)
-{
-	/*const static xint s_iIterations = 2048;
-	const static xint s_iSearch = 8;
-
-	xfloat fSpectrum[2][s_iIterations];
-
-	pChannel->getSpectrum(fSpectrum[0], s_iIterations, 0, FMOD_DSP_FFT_WINDOW_HANNING);
-	pChannel->getSpectrum(fSpectrum[1], s_iIterations, 1, FMOD_DSP_FFT_WINDOW_HANNING);
-
-	xfloat fStrength[s_iSearch];
-
-	for (xint iA = 0; iA < s_iSearch; ++iA)
-		fStrength[iA] = fSpectrum[0][iA] + fSpectrum[1][iA];
-
-	xfloat fAverageStrength = 0.f;
-
-	for (xint iA = 4; iA < s_iSearch; ++iA)
-		fAverageStrength += fStrength[iA];
-
-	fAverageStrength /= 4.f;
-
-	Global.m_fMusicEnergy = fAverageStrength * 0.1f;*/
-
-	Global.m_fMusicEnergy = 0.f;
-}
-
-// =============================================================================
-// Nat Ryall                                                         14-Apr-2008
-// =============================================================================
-void CGameScreen::WorldTransform(CRenderable* pRenderable)
-{
-	/*xpoint xOffset = Global.m_pLocalPlayer->GetSprite()->GetPosition() - xpoint(_HSWIDTH, _HSHEIGHT);
-
-	switch (pRenderable->GetRenderableType())
-	{
-	case RenderableType_Map:
-		{
-			CMap* pMap = (CMap*)pRenderable;
-			pMap->SetOffset(xOffset);
-			pMap->Render();
-		}
-		break;
-
-	case RenderableType_Player:
-		{
-			CPlayer* pPlayer = (CPlayer*)pRenderable;
-
-			xpoint xPosition = pPlayer->GetSprite()->GetPosition();
-
-			pPlayer->GetSprite()->SetPosition(xPosition - xOffset);
-			pPlayer->Render();
-			pPlayer->GetSprite()->SetPosition(xPosition);
-		}
-		break;
-
-	default:
-		pRenderable->Render();
-	}*/
+	RenderManager.SetTransformation(LayerIndex_Map, xOffset);
+	RenderManager.SetTransformation(LayerIndex_Player, xOffset);
 }
 
 //##############################################################################

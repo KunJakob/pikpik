@@ -103,9 +103,6 @@ public:
 	// The positional transformation.
 	xpoint m_xPosition;
 
-	// The centre point transformation.
-	xpoint m_xCentre;
-
 	// The rotational transformation (in degrees).
 	xfloat m_fRotation;
 
@@ -192,7 +189,7 @@ public:
 	void SetRenderCallback(xuint iLayer, t_RenderCallback fpCallback);
 
 	// Set the transformation for a specific layer. The transformation will be applied to all renderables on the layer.
-	void SetTransformation(xuint iLayer, xpoint xPosition = xpoint(), xpoint xCentre = xpoint(), xfloat fRotation = 0.f, xfloat fHorizontalScale = 1.f, xfloat fVerticalScale = 1.f);
+	void SetTransformation(xuint iLayer, xpoint xPosition = xpoint(), xfloat fRotation = 0.f, xfloat fHorizontalScale = 1.f, xfloat fVerticalScale = 1.f);
 
 	// Get the currently applied transformation params for a specific layer.
 	CRenderTransformation& GetTransformation(xuint iLayer);

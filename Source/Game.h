@@ -91,12 +91,6 @@ protected:
 	CMinimap* m_pMinimap;
 
 private:
-	// Calculate the music energy from the specified channel.
-	void CalculateMusicEnergy(FMOD::Channel* pChannel);
-
-	// Transform all players/objects and the world by the current offset to centre the player to the screen.
-	void WorldTransform(CRenderable* pRenderable);
-
 };
 
 //##############################################################################

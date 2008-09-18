@@ -390,8 +390,8 @@ void CMap::Render()
 			m_xBlocks[iA].GetScreenPosition(), 
 			s_xCentrePoint, 
 			m_pTileAreas[iTileType]->m_xRect,
-			1.f,//m_xBlocks[iA].m_fVisibility * Global.m_fWorldAlpha, 
-			0.f//(m_xBlocks[iA].m_fAngle / 180.0f) * M_PI
+			m_xBlocks[iA].m_fVisibility, 
+			(m_xBlocks[iA].m_fAngle / 180.0f) * M_PI
 		);
 	}
 }
