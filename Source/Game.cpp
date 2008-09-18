@@ -47,9 +47,9 @@ void CGameScreen::OnActivate()
 	InitialisePlayers();
 
 	RenderManager.Add(LayerIndex_Background, &m_xBackground);
-	
-	RenderManager.SetRenderCallback(LayerIndex_Map, xbind(this, &CGameScreen::WorldTransform));
-	RenderManager.SetRenderCallback(LayerIndex_Player, xbind(this, &CGameScreen::WorldTransform));
+
+	//RenderManager.SetRenderCallback(LayerIndex_Map, xbind(this, &CGameScreen::WorldTransform));
+	//RenderManager.SetRenderCallback(LayerIndex_Player, xbind(this, &CGameScreen::WorldTransform));
 
 	m_pMinimap = new CMinimap(Global.m_pActiveMap);
 	RenderManager.Add(LayerIndex_Radar, m_pMinimap);
@@ -86,9 +86,9 @@ void CGameScreen::InitialisePlayers()
 		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
 		{
 			CPlayer* pPlayer = *ppPlayer;
-			
+
 			pPlayer->SetLogicType(PlayerLogicType_AI);
-		
+
 			if (pPlayer->GetType() == PlayerType_Pacman)
 				CollisionManager.Add((CPacman*)pPlayer);
 			else if (pPlayer->GetType() == PlayerType_Ghost)
@@ -161,13 +161,18 @@ void CGameScreen::OnUpdate()
 		Global.m_pLocalPlayer->SetLogicType(iLogicType);
 	}
 
-	// Calculate the map offset.
-	m_xOffset = Global.m_pLocalPlayer->GetSprite()->GetPosition() - xpoint(_HSWIDTH, _HSHEIGHT);
-
 	// Calculate the music energy using spectrum analysis.
 	CalculateMusicEnergy(m_pChannel);
 
+	// Generate the minimap.
 	m_pMinimap->Generate(MinimapElement_Walls | MinimapElement_GhostWalls | MinimapElement_GhostBase | MinimapElement_Ghost | MinimapElement_Pacman);
+
+	// Set the transformations.
+	//xpoint xOffset = Global.m_pLocalPlayer->GetSprite()->GetPosition() - xpoint(_HSWIDTH, _HSHEIGHT);
+	//xOffset = xpoint(0, 0);
+
+	//RenderManager.SetTransformation(LayerIndex_Map, xpoint(0, 0));
+	//RenderManager.SetTransformation(LayerIndex_Player, xpoint());
 }
 
 // =============================================================================
@@ -182,7 +187,7 @@ void CGameScreen::OnRender()
 // =============================================================================
 void CGameScreen::CalculateMusicEnergy(FMOD::Channel* pChannel)
 {
-	const static xint s_iIterations = 2048;
+	/*const static xint s_iIterations = 2048;
 	const static xint s_iSearch = 8;
 
 	xfloat fSpectrum[2][s_iIterations];
@@ -202,7 +207,9 @@ void CGameScreen::CalculateMusicEnergy(FMOD::Channel* pChannel)
 
 	fAverageStrength /= 4.f;
 
-	Global.m_fMusicEnergy = fAverageStrength * 0.1f;
+	Global.m_fMusicEnergy = fAverageStrength * 0.1f;*/
+
+	Global.m_fMusicEnergy = 0.f;
 }
 
 // =============================================================================
@@ -210,7 +217,7 @@ void CGameScreen::CalculateMusicEnergy(FMOD::Channel* pChannel)
 // =============================================================================
 void CGameScreen::WorldTransform(CRenderable* pRenderable)
 {
-	xpoint xOffset = Global.m_pLocalPlayer->GetSprite()->GetPosition() - xpoint(_HSWIDTH, _HSHEIGHT);
+	/*xpoint xOffset = Global.m_pLocalPlayer->GetSprite()->GetPosition() - xpoint(_HSWIDTH, _HSHEIGHT);
 
 	switch (pRenderable->GetRenderableType())
 	{
@@ -236,14 +243,7 @@ void CGameScreen::WorldTransform(CRenderable* pRenderable)
 
 	default:
 		pRenderable->Render();
-	}
-}
-
-// =============================================================================
-// Nat Ryall                                                         28-Jul-2008
-// =============================================================================
-void CGameScreen::_RenderCollidables(CRenderable* pRenderable)
-{
+	}*/
 }
 
 //##############################################################################

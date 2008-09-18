@@ -177,7 +177,6 @@ void CWarningScreen::OnRender()
 // =============================================================================
 void CWarningScreen::OnFadeComplete()
 {
-	//Global.m_iNextScreen = ScreenIndex_MenuScreen;
 	ScreenManager.Set(ScreenIndex_MenuScreen);
 }
 

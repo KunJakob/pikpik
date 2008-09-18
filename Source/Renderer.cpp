@@ -14,7 +14,44 @@
 
 //##############################################################################
 //
-//                                 DEFINITION
+//                           RENDER TRANSFORMATION
+//
+//##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                         18-Sep-2008
+// =============================================================================
+void CRenderTransformation::Reset()
+{
+	m_xPosition = xpoint();
+	m_xCentre = xpoint();
+	m_fRotation = 0.f;
+	m_fHorizontalScale = 1.f;
+	m_fVerticalScale = 1.f;
+}
+
+// =============================================================================
+// Nat Ryall                                                         18-Sep-2008
+// =============================================================================
+void CRenderTransformation::Apply()
+{
+	_HGE->Gfx_SetTransform
+	(
+		0.f,
+		0.f,
+		100.f,
+		100.f,
+		0.f,
+		1.f,
+		1.f
+	);
+}
+
+//##############################################################################
+
+//##############################################################################
+//
+//                               RENDER MANAGER
 //
 //##############################################################################
 
@@ -53,6 +90,8 @@ void CRenderManager::OnRender()
 
 		XEN_LIST_FOREACH(t_RenderableList, ppRenderable, m_xLayers[iA].m_lpRenderables)
 		{
+			m_xLayers[iA].m_xTransformation.Apply();
+
 			if (m_xLayers[iA].m_fpRenderCallback)
 				m_xLayers[iA].m_fpRenderCallback(*ppRenderable);
 			else
@@ -72,6 +111,7 @@ void CRenderManager::Reset()
 		m_xLayers[iA].m_bEnabled = true;
 		m_xLayers[iA].m_fpRenderCallback = NULL;
 		m_xLayers[iA].m_lpRenderables.clear();
+		m_xLayers[iA].m_xTransformation.Reset();
 	}
 }
 
@@ -127,6 +167,29 @@ void CRenderManager::SetRenderCallback(xuint iLayer, t_RenderCallback fpCallback
 {
 	XMASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
 	m_xLayers[iLayer].m_fpRenderCallback = fpCallback;
+}
+
+// =============================================================================
+// Nat Ryall                                                         18-Sep-2008
+// =============================================================================
+void CRenderManager::SetTransformation(xuint iLayer, xpoint xPosition, xpoint xCentre, xfloat fRotation, xfloat fHorizontalScale, xfloat fVerticalScale)
+{
+	XMASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
+
+	m_xLayers[iLayer].m_xTransformation.m_xPosition = xPosition;
+	m_xLayers[iLayer].m_xTransformation.m_xCentre = xCentre;
+	m_xLayers[iLayer].m_xTransformation.m_fRotation = fRotation;
+	m_xLayers[iLayer].m_xTransformation.m_fHorizontalScale = fHorizontalScale;
+	m_xLayers[iLayer].m_xTransformation.m_fVerticalScale = fVerticalScale;
+}
+
+// =============================================================================
+// Nat Ryall                                                         18-Sep-2008
+// =============================================================================
+CRenderTransformation& CRenderManager::GetTransformation(xuint iLayer)
+{
+	XMASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
+	return m_xLayers[iLayer].m_xTransformation;
 }
 
 //##############################################################################

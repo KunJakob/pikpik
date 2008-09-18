@@ -88,7 +88,39 @@ protected:
 
 //##############################################################################
 //
-//                                   LAYER
+//                           RENDER TRANSFORMATION
+//
+//##############################################################################
+class CRenderTransformation
+{
+public:
+	// Reset the transformation to nothing.
+	void Reset();
+
+	// Apply the current transformation.
+	void Apply();
+
+	// The positional transformation.
+	xpoint m_xPosition;
+
+	// The centre point transformation.
+	xpoint m_xCentre;
+
+	// The rotational transformation (in degrees).
+	xfloat m_fRotation;
+
+	// The horizontal scaling transformation.
+	xfloat m_fHorizontalScale;
+
+	// The vertical scaling transformation.
+	xfloat m_fVerticalScale;
+};
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                RENDER LAYER
 //
 //##############################################################################
 class CRenderLayer
@@ -105,13 +137,16 @@ public:
 
 	// The renderable list for this layer.
 	t_RenderableList m_lpRenderables;
+
+	// The render layer transformation.
+	CRenderTransformation m_xTransformation;
 };
 
 //##############################################################################
 
 //##############################################################################
 //
-//                                 DECLARATION
+//                               RENDER MANAGER
 //
 //##############################################################################
 class CRenderManager : public CModule
@@ -155,6 +190,12 @@ public:
 	// Specify a function to override the render process for each renderable on a specific layer.
 	// ~note Renderables must have Render() called within the override for the object to appear.
 	void SetRenderCallback(xuint iLayer, t_RenderCallback fpCallback);
+
+	// Set the transformation for a specific layer. The transformation will be applied to all renderables on the layer.
+	void SetTransformation(xuint iLayer, xpoint xPosition = xpoint(), xpoint xCentre = xpoint(), xfloat fRotation = 0.f, xfloat fHorizontalScale = 1.f, xfloat fVerticalScale = 1.f);
+
+	// Get the currently applied transformation params for a specific layer.
+	CRenderTransformation& GetTransformation(xuint iLayer);
 
 protected:
 	// The renderable list.

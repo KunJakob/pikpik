@@ -96,8 +96,6 @@ static const t_BlockType s_iBlockTypeLookup[TileType_Max] =
 // =============================================================================
 void CMapBlock::Update()
 {
-	//if (m_bEaten && xTimer.IsExpired())
-	//	m_bEaten = false;
 }
 
 // =============================================================================
@@ -322,8 +320,8 @@ void CMap::Update()
 		}
 	}
 
-	//for (xint iA = 0; iA < m_iBlockCount; ++iA)
-	//	m_xBlocks[iA].Update();
+	for (xint iA = 0; iA < m_iBlockCount; ++iA)
+		m_xBlocks[iA].Update();
 }
 
 // =============================================================================
@@ -354,7 +352,7 @@ void CMap::AddVisiblePaths(CMapBlock* pBase, xfloat fVisibility)
 void CMap::Render()
 {
 	// Blend the colours based on the music energy.
-	const static xfloat s_fMinColour = 0.2f;
+	/*const static xfloat s_fMinColour = 0.2f;
 	const static xfloat s_fMaxColour = 1.0f;
 
 	for (xint iA = 0; iA < 3; ++iA)
@@ -373,7 +371,7 @@ void CMap::Render()
 		}
 
 		m_fChannels[iA] = Math::Clamp(m_fChannels[iA], s_fMinColour, s_fMaxColour);
-	}
+	}*/
 
 	// Draw the map.
 	for (xint iA = 0; iA < m_iBlockCount; ++iA)
@@ -389,11 +387,11 @@ void CMap::Render()
 
 		m_pTiles->Render
 		(
-			m_xBlocks[iA].GetScreenPosition() - m_xOffset, 
+			m_xBlocks[iA].GetScreenPosition(), 
 			s_xCentrePoint, 
 			m_pTileAreas[iTileType]->m_xRect,
-			m_xBlocks[iA].m_fVisibility * Global.m_fWorldAlpha, 
-			(m_xBlocks[iA].m_fAngle / 180.0f) * M_PI
+			1.f,//m_xBlocks[iA].m_fVisibility * Global.m_fWorldAlpha, 
+			0.f//(m_xBlocks[iA].m_fAngle / 180.0f) * M_PI
 		);
 	}
 }

@@ -97,8 +97,6 @@ private:
 	// Transform all players/objects and the world by the current offset to centre the player to the screen.
 	void WorldTransform(CRenderable* pRenderable);
 
-	// (DEBUG) OnRender collidable objects.
-	void _RenderCollidables(CRenderable* pRenderable);
 };
 
 //##############################################################################
