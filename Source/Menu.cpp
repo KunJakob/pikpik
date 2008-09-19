@@ -253,7 +253,7 @@ void CMenuScreen::UpdateTransition(xbool bTransitionIn)
 		if (pMenuLink->m_xStartTimer.IsExpired())
 		{
 			// Perform the transition in for each link as it expires.
-			xint iOffset = XINTPERCENT(pMenuLink->m_iTransitionTime, MENU_TRANSITION_DISTANCE, MENU_TRANSITION_TIME);
+			xint iOffset = XINTPERCENT(pMenuLink->m_iTransitionTime, MENU_TRANSITION_TIME, MENU_TRANSITION_DISTANCE);
 			xint iDirectionalOffset = bTransitionIn ? MENU_TRANSITION_DISTANCE - iOffset : iOffset;
 
 			pMenuLink->m_iTransitionTime = Math::Clamp<xuint>(pMenuLink->m_iTransitionTime + _TIMEDELTA, 0, MENU_TRANSITION_TIME);

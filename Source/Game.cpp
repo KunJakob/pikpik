@@ -36,13 +36,12 @@
 // =============================================================================
 void CGameScreen::OnActivate()
 {
-	Global.m_fWorldAlpha = 1.f;
+	Global.m_fScreenAlpha = 1.f;
 	Global.m_fMusicEnergy = 0.f;
 
 	InterfaceManager.SetCursorVisible(false);
 
 	LoadMap();
-	LoadMusic();
 
 	InitialisePlayers();
 
@@ -58,15 +57,6 @@ void CGameScreen::OnActivate()
 void CGameScreen::LoadMap()
 {
 	RenderManager.Add(LayerIndex_Map, Global.m_pActiveMap);
-}
-
-// =============================================================================
-// Nat Ryall                                                         15-Jul-2008
-// =============================================================================
-void CGameScreen::LoadMusic()
-{
-	//_FMOD->createStream("Audio\\Level-Test.mp3", FMOD_SOFTWARE, NULL, &m_pMusic);
-	//_FMOD->playSound(FMOD_CHANNEL_FREE, m_pMusic, false, &m_pChannel);
 }
 
 // =============================================================================
@@ -138,7 +128,7 @@ void CGameScreen::OnUpdate()
 					ppPlayer++;
 
 				Global.m_pLocalPlayer = *ppPlayer;
-				Global.m_fWorldAlpha = 1.f;
+				Global.m_fScreenAlpha = 1.f;
 
 				break;
 			}

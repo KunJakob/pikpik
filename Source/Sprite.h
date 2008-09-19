@@ -365,14 +365,14 @@ public:
 	// ~bDegrees Specify true if the angle is in degrees, otherwise use radians.
 	void SetAngle(xfloat fAngle, xbool bDegrees = false)
 	{
-		m_fAngle = !bDegrees ? fAngle : (fAngle / 180.0f) * M_PI;
+		m_fAngle = !bDegrees ? fAngle : Math::Radians(fAngle);
 	}
 
 	// Get the rotation angle of the sprite.
 	// ~bDegrees Specify true to get the angle in degrees, otherwise returns radians.
 	xfloat GetAngle(xbool bDegrees = false)
 	{
-		return !bDegrees ? m_fAngle : m_fAngle * (180.0f / M_PI);
+		return !bDegrees ? m_fAngle : Math::Degrees(m_fAngle);
 	}
 
 	// Get the width of the current area or the entire image if there is no active area.

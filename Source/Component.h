@@ -361,7 +361,7 @@ protected:
 	// Triggered when the left mouse-button is pressed within the element area.
 	virtual void OnMouseDown(xpoint xPosition) 
 	{
-		if (m_bMoveable && Math::Intersect(xPosition, xrect(m_xFrameSize.iLeft, 0, GetInnerWidth(), m_xFrameSize.iTop) + GetPosition()))
+		if (m_bMoveable && Math::IsIntersecting(xPosition, xrect(m_xFrameSize.iLeft, 0, GetInnerWidth(), m_xFrameSize.iTop) + GetPosition()))
 			m_bDragging = true;
 	}
 

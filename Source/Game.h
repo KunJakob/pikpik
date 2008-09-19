@@ -66,9 +66,6 @@ protected:
 	// OnActivate the currently active map.
 	void LoadMap();
 
-	// OnActivate the game music track.
-	void LoadMusic();
-
 	// Initialise all players in the game.
 	void InitialisePlayers();
 
@@ -89,8 +86,6 @@ protected:
 
 	// The game's minimap.
 	CMinimap* m_pMinimap;
-
-private:
 };
 
 //##############################################################################

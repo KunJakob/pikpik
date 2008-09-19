@@ -235,6 +235,9 @@ public:
 	// The current focus status of the game window.
 	xbool m_bWindowFocused;
 
+	// The overall screen alpha.
+	xfloat m_fScreenAlpha;
+
 	// The global game font.
 	CFont* m_pGameFont;
 
@@ -255,9 +258,6 @@ public:
 
 	// The music spectrum energy to determine how fast colours transition.
 	xfloat m_fMusicEnergy;
-
-	// The map overall alpha.
-	xfloat m_fWorldAlpha;
 };
 
 //##############################################################################

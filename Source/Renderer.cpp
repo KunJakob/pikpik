@@ -192,4 +192,38 @@ CRenderTransformation& CRenderManager::GetTransformation(xuint iLayer)
 	return m_xLayers[iLayer].m_xTransformation;
 }
 
+// =============================================================================
+// Nat Ryall                                                         19-Sep-2008
+// =============================================================================
+void CRenderManager::RenderBox(xbool bFilled, xrect xRect, xuint iColour)
+{
+	if (bFilled)
+	{
+		hgeQuad xQuad;
+		memset(&xQuad, 0, sizeof(hgeQuad));
+
+		xQuad.blend = BLEND_DEFAULT;
+
+		xQuad.v[0].x = (xfloat)xRect.iLeft;
+		xQuad.v[0].y = (xfloat)xRect.iTop;
+		xQuad.v[1].x = (xfloat)xRect.iRight;
+		xQuad.v[1].y = (xfloat)xRect.iTop;
+		xQuad.v[3].x = (xfloat)xRect.iLeft;
+		xQuad.v[3].y = (xfloat)xRect.iBottom;
+		xQuad.v[2].x = (xfloat)xRect.iRight;
+		xQuad.v[2].y = (xfloat)xRect.iBottom;
+
+		xQuad.v[0].col = xQuad.v[1].col = xQuad.v[2].col = xQuad.v[3].col = iColour;
+
+		_HGE->Gfx_RenderQuad(&xQuad);
+	}
+	else
+	{
+		_HGE->Gfx_RenderLine((xfloat)xRect.iLeft, (xfloat)xRect.iTop, (xfloat)xRect.iRight, (xfloat)xRect.iTop, iColour);
+		_HGE->Gfx_RenderLine((xfloat)xRect.iRight, (xfloat)xRect.iTop, (xfloat)xRect.iRight, (xfloat)xRect.iBottom, iColour);
+		_HGE->Gfx_RenderLine((xfloat)xRect.iRight, (xfloat)xRect.iBottom, (xfloat)xRect.iLeft, (xfloat)xRect.iBottom, iColour);
+		_HGE->Gfx_RenderLine((xfloat)xRect.iLeft, (xfloat)xRect.iBottom, (xfloat)xRect.iLeft, (xfloat)xRect.iTop, iColour);
+	}
+}
+
 //##############################################################################

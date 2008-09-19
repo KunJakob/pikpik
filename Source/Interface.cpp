@@ -10,6 +10,9 @@
 // Local.
 #include <Interface.h>
 
+// Other.
+#include <Renderer.h>
+
 //##############################################################################
 
 //##############################################################################
@@ -125,9 +128,9 @@ void CInterfaceManager::OnRender()
 		if (m_pActiveElement)
 		{
 			xrect xRect = m_pActiveElement->GetArea();
-			xuint iColour = ARGB(255, 32, 32, 32);
+			xuint iColour = ARGB(128, 32, 32, 32);
 
-			RenderBox(xRect, iColour);
+			RenderManager.RenderBox(true, xRect, iColour);
 		}
 
 		if (m_pFocusedElement)
@@ -135,7 +138,7 @@ void CInterfaceManager::OnRender()
 			xrect xRect = m_pFocusedElement->GetFocusArea() + xrect(2, 2, -1, -1);
 			xuint iColour = ARGB(255, 255, 0, 0);
 
-			RenderBoxBorder(xRect, iColour);
+			RenderManager.RenderBox(false, xRect, iColour);
 		}
 	}
 
@@ -159,39 +162,6 @@ void CInterfaceManager::OnRender()
 
 		pCursor->Render(m_xMousePos);
 	}
-}
-
-// =============================================================================
-// Nat Ryall                                                         20-Jul-2008
-// =============================================================================
-void CInterfaceManager::RenderBox(xrect xRect, xuint iColour)
-{
-	hgeQuad xQuad;
-	memset(&xQuad, 0, sizeof(hgeQuad));
-
-	xQuad.v[0].x = (float)xRect.iLeft;
-	xQuad.v[0].y = (float)xRect.iTop;
-	xQuad.v[1].x = (float)xRect.iRight;
-	xQuad.v[1].y = (float)xRect.iTop;
-	xQuad.v[3].x = (float)xRect.iLeft;
-	xQuad.v[3].y = (float)xRect.iBottom;
-	xQuad.v[2].x = (float)xRect.iRight;
-	xQuad.v[2].y = (float)xRect.iBottom;
-
-	xQuad.v[0].col = xQuad.v[1].col = xQuad.v[2].col = xQuad.v[3].col = iColour;
-
-	_HGE->Gfx_RenderQuad(&xQuad);
-}
-
-// =============================================================================
-// Nat Ryall                                                         06-Aug-2008
-// =============================================================================
-void CInterfaceManager::RenderBoxBorder(xrect xRect, xuint iColour)
-{
-	_HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iTop, iColour);
-	_HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iTop, (float)xRect.iRight, (float)xRect.iBottom, iColour);
-	_HGE->Gfx_RenderLine((float)xRect.iRight, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iBottom, iColour);
-	_HGE->Gfx_RenderLine((float)xRect.iLeft, (float)xRect.iBottom, (float)xRect.iLeft, (float)xRect.iTop, iColour);
 }
 
 // =============================================================================
@@ -225,7 +195,7 @@ void CInterfaceManager::SetFocus(CInterfaceElement* pElement)
 // =============================================================================
 xbool CInterfaceManager::IsMouseOver(CInterfaceElement* pElement)
 {
-	return Math::Intersect(m_xMousePos, pElement->GetArea());
+	return Math::IsIntersecting(m_xMousePos, pElement->GetArea());
 }
 
 // =============================================================================
@@ -241,7 +211,7 @@ void CInterfaceManager::UpdateElement(CInterfaceElement* pElement)
 
 		if (pElement->IsVisible())
 		{
-			if (Math::Intersect(m_xMousePos, pElement->GetArea()))
+			if (Math::IsIntersecting(m_xMousePos, pElement->GetArea()))
 			{
 				// If we are the first element intersecting, we become the active element.
 				if (!m_bFoundActive)

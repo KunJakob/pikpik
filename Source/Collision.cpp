@@ -120,9 +120,9 @@ xbool CCollisionManager::AreColliding(CCollidable* pA, CCollidable* pB)
 		{
 			switch (pB->GetCollisionType())
 			{
-			case CollisionType_Point:	return Math::Intersect(pA->GetCollisionPoint(), pB->GetCollisionPoint());
-			case CollisionType_Rect:	return Math::Intersect(pA->GetCollisionPoint(), pB->GetCollisionRect());
-			case CollisionType_Circle:	return Math::Intersect(pA->GetCollisionPoint(), pB->GetCollisionCircle());
+			case CollisionType_Point:	return Math::IsIntersecting(pA->GetCollisionPoint(), pB->GetCollisionPoint());
+			case CollisionType_Rect:	return Math::IsIntersecting(pA->GetCollisionPoint(), pB->GetCollisionRect());
+			case CollisionType_Circle:	return Math::IsIntersecting(pA->GetCollisionPoint(), pB->GetCollisionCircle());
 			}
 		}
 		break;
@@ -131,9 +131,9 @@ xbool CCollisionManager::AreColliding(CCollidable* pA, CCollidable* pB)
 		{
 			switch (pB->GetCollisionType())
 			{
-			case CollisionType_Point:	return Math::Intersect(pB->GetCollisionPoint(), pA->GetCollisionRect());
-			case CollisionType_Rect:	return Math::Intersect(pA->GetCollisionRect(), pB->GetCollisionRect());
-			case CollisionType_Circle:	return Math::Intersect(pA->GetCollisionRect(), pB->GetCollisionCircle());
+			case CollisionType_Point:	return Math::IsIntersecting(pB->GetCollisionPoint(), pA->GetCollisionRect());
+			case CollisionType_Rect:	return Math::IsIntersecting(pA->GetCollisionRect(), pB->GetCollisionRect());
+			case CollisionType_Circle:	return Math::IsIntersecting(pA->GetCollisionRect(), pB->GetCollisionCircle());
 			}
 		}
 		break;
@@ -142,9 +142,9 @@ xbool CCollisionManager::AreColliding(CCollidable* pA, CCollidable* pB)
 		{
 			switch (pB->GetCollisionType())
 			{
-			case CollisionType_Point:	return Math::Intersect(pB->GetCollisionPoint(), pA->GetCollisionCircle());
-			case CollisionType_Rect:	return Math::Intersect(pB->GetCollisionRect(), pA->GetCollisionCircle());
-			case CollisionType_Circle:	return Math::Intersect(pA->GetCollisionCircle(), pB->GetCollisionCircle());
+			case CollisionType_Point:	return Math::IsIntersecting(pB->GetCollisionPoint(), pA->GetCollisionCircle());
+			case CollisionType_Rect:	return Math::IsIntersecting(pB->GetCollisionRect(), pA->GetCollisionCircle());
+			case CollisionType_Circle:	return Math::IsIntersecting(pA->GetCollisionCircle(), pB->GetCollisionCircle());
 			}
 		}
 		break;

@@ -96,12 +96,12 @@ void CLogoScreen::OnUpdate()
 			if (iTrackTime < s_iFadePeak)
 			{
 				xuint iTimeOffset = iTrackTime - s_iFadeStart;
-				iColour = XINTPERCENT(iTimeOffset, s_iFadePower, s_iFadePeak - s_iFadeStart);
+				iColour = XINTPERCENT(iTimeOffset, s_iFadePeak - s_iFadeStart, s_iFadePower);
 			}
 			else
 			{
 				xuint iTimeOffset = iTrackTime - s_iFadePeak;
-				iColour = s_iFadePower - XINTPERCENT(iTimeOffset, s_iFadePower, s_iFadeEnd - s_iFadePeak);
+				iColour = s_iFadePower - XINTPERCENT(iTimeOffset, s_iFadeEnd - s_iFadePeak, s_iFadePower);
 			}
 		}
 	}

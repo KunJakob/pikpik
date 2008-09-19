@@ -194,6 +194,10 @@ public:
 	// Get the currently applied transformation params for a specific layer.
 	CRenderTransformation& GetTransformation(xuint iLayer);
 
+	// Render a box to the specified rect dimensions.
+	// ~bFilled Specifies if the box should be filled or just a border.
+	void RenderBox(xbool bFilled, xrect xRect, xuint iColour);
+
 protected:
 	// The renderable list.
 	CRenderLayer m_xLayers[RENDERER_MAXLAYERS];

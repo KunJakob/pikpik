@@ -391,7 +391,7 @@ void CMap::Render()
 			s_xCentrePoint, 
 			m_pTileAreas[iTileType]->m_xRect,
 			m_xBlocks[iA].m_fVisibility, 
-			(m_xBlocks[iA].m_fAngle / 180.0f) * M_PI
+			Math::Radians(m_xBlocks[iA].m_fAngle)
 		);
 	}
 }

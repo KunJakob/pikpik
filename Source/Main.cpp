@@ -143,10 +143,10 @@ void Application::Initialise()
 
 	// Initialise global vars.
 	Global.m_bWindowFocused = true;
+	Global.m_fScreenAlpha = 1.f;
 	Global.m_pActiveMap = NULL;
 	Global.m_pLocalPlayer = NULL;
 	Global.m_fMusicEnergy = 0.f;
-	Global.m_fWorldAlpha = 1.f;
 
 	// Add all required modules to the game.
 	XMODULE(&SoundManager);
@@ -252,6 +252,12 @@ xbool Application::OnRender()
 		s_pInterface->Gfx_BeginScene();
 
 		ModuleManager.Render();
+
+		if (Global.m_fScreenAlpha != 1.f)
+		{
+			xfloat fAlpha = (1.f - Math::Clamp(Global.m_fScreenAlpha, 0.f, 1.f)) * 255.f;
+			RenderManager.RenderBox(true, xrect(0, 0, _SWIDTH, _SHEIGHT), _ARGB((xuchar)fAlpha, 0, 0, 0));
+		}
 
 		s_pInterface->Gfx_EndScene();
 	}
