@@ -1,0 +1,41 @@
+.Window "Window-Password"
+{
+	// .Size		W H
+	// .InnerSize	W H
+
+	.Sprite			"Interface-Window"
+	.Title			"Password View"
+	.Position		10 10
+
+	.AutoSize
+	{
+		.Padding	10 8 10 8
+		.Spacing	8
+	}
+
+	.InputBox "InputBox-Password"
+	{
+		.Sprite		"Interface-InputBox"
+		.Text		"passwd"
+		.Font		"Font-InputBox"
+		.Masked		true
+		.Width		100
+	}
+
+	.CheckBox "CheckBox-Hide"
+	{
+		.Sprite		"Interface-CheckBox"
+		.Label		"$Input_String" // $$ = '$', $ = Locale
+		.Font		"Font-Default"
+		.Checked	true
+	}
+
+	.Button "Button-Close"
+	{
+		.Sprite		"Interface-Button"
+		.Label		"Close"
+		.Font		"Interface-Default"
+		.Enabled	false
+		.Width		100
+	}
+}

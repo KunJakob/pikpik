@@ -2037,6 +2037,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Bin\Metadata\Interface.mta"
+				>
+			</File>
+			<File
 				RelativePath="..\Bin\Metadata\Maps.mta"
 				>
 			</File>
