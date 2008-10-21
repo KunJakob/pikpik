@@ -24,6 +24,75 @@
 #include <Font.h>
 
 //##############################################################################
+
+//##############################################################################
+//
+//                                   MACROS
+//
+//##############################################################################
+
+// Shortcuts.
+#define ComponentFactory CComponentFactory::Get()
+
+//##############################################################################
+
+//##############################################################################
+//
+//                                   TYPES
+//
+//##############################################################################
+
+// Predeclare.
+class CLabelComponent;
+class CHyperlinkComponent;
+class CImageComponent;
+class CButtonComponent;
+class CInputComponent;
+class CProgressComponent;
+class CWindowComponent;
+class CGroupComponent;
+class CListComponent;
+class CCheckComponent;
+class CRadioComponent;
+
+//##############################################################################
+
+//##############################################################################
+//
+//                             COMPONENT FACTORY
+//
+//##############################################################################
+class CComponentFactory 
+{
+public:
+	// Singleton instance.
+	static inline CComponentFactory& Get() 
+	{
+		static CComponentFactory s_Instance;
+		return s_Instance;
+	}
+
+	//
+	void RegisterMetadata(CMetadata* pMetadata);
+	void DeregisterMetadata(CMetadata* pMetadata);
+
+	//
+	CLabelComponent* CreateLabelComponent(const char* pName);
+	CHyperlinkComponent* CreateHyperlinkComponent(const char* pName);
+	CImageComponent* CreateImageComponent(const char* pName);
+	CButtonComponent* CreateButtonComponent(const char* pName);
+	CInputComponent* CreateInputComponent(const char* pName);
+	CProgressComponent* CreateProgressComponent(const char* pName);
+	CWindowComponent* CreateWindowComponent(const char* pName, xbool bCreateChildren = true);
+	CGroupComponent* CreateGroupComponent(const char* pName, xbool bCreateChildren = true);
+	CListComponent* CreateListComponent(const char* pName);
+	CCheckComponent* CreateCheckComponent(const char* pName);
+	CRadioComponent* CreateRadioComponent(const char* pName);
+};
+
+//##############################################################################
+
+//##############################################################################
 //
 //                                   LABEL
 //
