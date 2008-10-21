@@ -342,10 +342,10 @@ protected:
 	t_MessageDisplayMode m_iMode;
 
 	// The "accept" text link.
-	CTextLink* m_pAcceptLink;
+	CHyperlinkComponent* m_pAcceptLink;
 
 	// The "cancel" text link.
-	CTextLink* m_pCancelLink;
+	CHyperlinkComponent* m_pCancelLink;
 };
 
 //##############################################################################

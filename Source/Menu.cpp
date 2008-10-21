@@ -50,7 +50,7 @@
 // =============================================================================
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
-CMenuLink::CMenuLink(xuint iGroupIndex, CFontMetadata* pFont, const xchar* pText, t_fpLinkSelectedCallback fpCallback) : CTextLink(pFont, pText, fpCallback),
+CMenuLink::CMenuLink(xuint iGroupIndex, CFontMetadata* pFont, const xchar* pText, t_fpLinkSelectedCallback fpCallback) : CHyperlinkComponent(pFont, pText, fpCallback),
 	m_iGroupIndex(iGroupIndex),
 	m_iElementIndex(0)
 {

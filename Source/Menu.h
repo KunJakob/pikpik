@@ -71,7 +71,7 @@ typedef xlist<CMenuLink*> t_MenuLinkList;
 //##############################################################################
 
 // Text link element.
-class CMenuLink : public CTextLink
+class CMenuLink : public CHyperlinkComponent
 {
 public:
 	// Friends.

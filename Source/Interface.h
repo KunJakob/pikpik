@@ -199,9 +199,6 @@ protected:
 	// Deregister an element from the system. This is done automatically when the element is destructed.
 	void DeregisterElement(CInterfaceElement* pElement);
 
-	// Safely remove an active element from the interface system.
-	void UnlinkElement(CInterfaceElement* pElement);
-
 	// Recursive function called on each element. Called in reverse render order.
 	void UpdateElement(CInterfaceElement* pElement);
 

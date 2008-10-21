@@ -45,6 +45,40 @@ public:
 
 //##############################################################################
 //
+//                             HYPERLINK COMPONENT
+//
+//##############################################################################
+class CHyperlinkComponent : public CLabelElement
+{
+public:
+	// Callbacks.
+	typedef xfunction(0)<> t_fpLinkSelectedCallback;
+
+	// Constructor.
+	CHyperlinkComponent(CFontMetadata* pFont, const xchar* pText, t_fpLinkSelectedCallback fpCallback = NULL);
+
+	// Destructor.
+	virtual ~CHyperlinkComponent() {}
+
+	// Render the element.
+	virtual void OnRender();
+
+protected:
+	// Called when the mouse is released when the element is active.
+	virtual void OnMouseUp(xpoint xPosition)
+	{
+		if (m_fpLinkSelectedCallback)
+			m_fpLinkSelectedCallback();
+	}
+
+	// The link callback.
+	t_fpLinkSelectedCallback m_fpLinkSelectedCallback;
+};
+
+//##############################################################################
+
+//##############################################################################
+//
 //                                   IMAGE
 //
 //##############################################################################
@@ -597,55 +631,6 @@ protected:
 
 	// The radio component group.
 	xint m_iRadioGroup;
-};
-
-//##############################################################################
-
-//##############################################################################
-//
-//                                  TEXT LINK
-//
-//##############################################################################
-class CTextLink : public CInterfaceElement
-{
-public:
-	// Callbacks.
-	typedef xfunction(0)<> t_fpLinkSelectedCallback;
-
-	// Constructor.
-	CTextLink(CFontMetadata* pFont, const xchar* pText, t_fpLinkSelectedCallback fpCallback = NULL);
-
-	// Destructor.
-	virtual ~CTextLink();
-
-	// Render the element.
-	virtual void OnRender();
-
-	// Get the element width in pixels.
-	virtual xint GetWidth()
-	{
-		return m_pText->GetStringWidth();
-	}
-
-	// Get the element height in pixels.
-	virtual xint GetHeight()
-	{
-		return m_pText->GetFontHeight();
-	}
-
-protected:
-	// Called when the mouse is released when the element is active.
-	virtual void OnMouseUp(xpoint xPosition)
-	{
-		if (m_fpLinkSelectedCallback)
-			m_fpLinkSelectedCallback();
-	}
-
-	// The text to render for the link.
-	CText* m_pText;
-
-	// The link callback.
-	t_fpLinkSelectedCallback m_fpLinkSelectedCallback;
 };
 
 //##############################################################################
