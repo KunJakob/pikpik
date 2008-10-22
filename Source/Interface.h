@@ -51,27 +51,33 @@ class CScreenElement;
 // The types of interface elements.
 enum t_ElementType
 {
+	// Core Elements.
 	ElementType_Unknown,
 	ElementType_Screen,
 	ElementType_Label,
+	ElementType_Hyperlink,
 	ElementType_Image,
 	ElementType_Button,
 	ElementType_Input,
 	ElementType_Progress,
+	ElementType_Container,
 	ElementType_Window,
 	ElementType_Group,
 	ElementType_List,
 	ElementType_Check,
 	ElementType_Radio,
 	ElementType_Scroll,
-	ElementType_TextLink,
+	
+	// Custom Elements.
 	ElementType_MenuLink,
 	ElementType_SessionBox,
-	/*MAX*/ElementType_Max,
+
+	// Max.
+	ElementType_Max,
 };
 
 // Lists.
-typedef xlist<CInterfaceElement*> t_ElementList;
+typedef xlist<CInterfaceElement*> t_InterfaceElementList;
 
 //##############################################################################
 
@@ -102,6 +108,9 @@ public:
 	// Reset the settings to defaults and clear all elements.
 	void Reset();
 
+	// Called when an event is fired.
+	virtual xbool OnEvent(xint iEventType, void* pEventInfo);
+
 	// Called to update and fire events for elements.
 	virtual void OnUpdate();
 
@@ -115,7 +124,7 @@ public:
 	}
 
 	// Get a list of all existing elements.
-	inline t_ElementList& GetElementList()
+	inline t_InterfaceElementList& GetElementList()
 	{
 		return m_lpElements;
 	}
@@ -227,7 +236,7 @@ protected:
 	CInterfaceElement* m_pFocusedElement;
 
 	// A list of pointers to all existing elements.
-	t_ElementList m_lpElements;
+	t_InterfaceElementList m_lpElements;
 
 	// A list of metadata objects containing interface information.
 	t_MetadataList m_lpMetadata;
@@ -310,7 +319,7 @@ public:
 		return xpoint(GetWidth(), GetHeight());
 	}
 
-	// Get the element area for collision and event purposes.
+	// Get the element screen area for collision and event purposes.
 	inline xrect GetArea()
 	{
 		return xrect(GetPosition(), GetPosition() + GetSize());
@@ -347,10 +356,10 @@ public:
 	}
 
 	// Attach a child element to this element.
-	void Attach(CInterfaceElement* pElement);
+	virtual void Attach(CInterfaceElement* pElement);
 
 	// Detach a specific child element from this element.
-	void Detach(CInterfaceElement* pElement);
+	virtual void Detach(CInterfaceElement* pElement);
 
 	// Detach all child elements from this element.
 	void DetachAll();
@@ -417,7 +426,7 @@ protected:
 	xbool m_bEnabled;
 
 	// A list of child elements.
-	t_ElementList m_lpChildElements;
+	t_InterfaceElementList m_lpChildElements;
 
 private:
 	// The screen position of the element.

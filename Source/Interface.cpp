@@ -61,7 +61,24 @@ void CInterfaceManager::Reset()
 	m_pScreen->DetachAll();
 
 	for (xint iA = 0; iA < ElementType_Max; ++iA)
-		m_pCursor[iA] = NULL;
+	{
+		if (m_pCursor[iA])
+		{
+			delete m_pCursor[iA];
+			m_pCursor[iA] = NULL;
+		}
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         22-Oct-2008
+// =============================================================================
+xbool CInterfaceManager::OnEvent(xint iEventType, void* pEventInfo)
+{
+	// TODO:
+	// Process an event instead of polling.
+
+	return false;
 }
 
 // =============================================================================
@@ -206,7 +223,7 @@ void CInterfaceManager::UpdateElement(CInterfaceElement* pElement)
 	if (pElement->IsEnabled())
 	{
 		// Iterate through all children in reverse-render order.
-		XEN_LIST_FOREACH_R(t_ElementList, ppElement, pElement->m_lpChildElements)
+		XEN_LIST_FOREACH_R(t_InterfaceElementList, ppElement, pElement->m_lpChildElements)
 			UpdateElement(*ppElement);
 
 		if (pElement->IsVisible())
@@ -252,7 +269,7 @@ void CInterfaceManager::RenderElement(CInterfaceElement* pElement)
 	{
 		pElement->OnRender();
 
-		XEN_LIST_FOREACH(t_ElementList, ppElement, pElement->m_lpChildElements)
+		XEN_LIST_FOREACH(t_InterfaceElementList, ppElement, pElement->m_lpChildElements)
 			RenderElement(*ppElement);
 	}
 }
@@ -265,7 +282,7 @@ void CInterfaceManager::DeregisterElement(CInterfaceElement* pElement)
 	if (CInterfaceElement* pParent = pElement->m_pParent)
 		pParent->Detach(pElement);
 
-	XEN_LIST_REMOVE(t_ElementList, m_lpElements, pElement);
+	XEN_LIST_REMOVE(t_InterfaceElementList, m_lpElements, pElement);
 }
 
 //##############################################################################
@@ -302,7 +319,7 @@ void CInterfaceElement::Move(xpoint xOffset)
 {
 	m_xPosition += xOffset;
 
-	XEN_LIST_FOREACH(t_ElementList, ppElement, m_lpChildElements)
+	XEN_LIST_FOREACH(t_InterfaceElementList, ppElement, m_lpChildElements)
 		(*ppElement)->Move(xOffset);
 }
 
@@ -325,7 +342,7 @@ void CInterfaceElement::Detach(CInterfaceElement* pElement)
 {
 	pElement->m_pParent = NULL;
 
-	XEN_LIST_REMOVE(t_ElementList, m_lpChildElements, pElement);
+	XEN_LIST_REMOVE(t_InterfaceElementList, m_lpChildElements, pElement);
 
 	if (pElement == InterfaceManager.m_pActiveElement)
 		InterfaceManager.m_pActiveElement = NULL;
@@ -350,7 +367,7 @@ void CInterfaceElement::DetachAll()
 // =============================================================================
 xbool CInterfaceElement::IsAttached(CInterfaceElement* pElement)
 {
-	XEN_LIST_FOREACH(t_ElementList, ppElement, m_lpChildElements)
+	XEN_LIST_FOREACH(t_InterfaceElementList, ppElement, m_lpChildElements)
 	{
 		if (pElement == *ppElement)
 			return true;
@@ -366,7 +383,7 @@ void CInterfaceElement::ToFront()
 {
 	if (m_pParent)
 	{
-		XEN_LIST_REMOVE(t_ElementList, m_pParent->m_lpChildElements, this);
+		XEN_LIST_REMOVE(t_InterfaceElementList, m_pParent->m_lpChildElements, this);
 		m_pParent->m_lpChildElements.push_back(this);
 	}
 }

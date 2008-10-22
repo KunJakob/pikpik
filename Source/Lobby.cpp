@@ -126,7 +126,7 @@ void CLobbyScreen::OnUpdate()
 	if (_HGE->Input_KeyUp(HGEK_ESCAPE))
 		Stop();
 
-	UpdateParent();
+	Parent_OnUpdate();
 
 	switch (m_iState)
 	{
@@ -150,7 +150,7 @@ void CLobbyScreen::OnUpdate()
 // =============================================================================
 void CLobbyScreen::OnRender()
 {
-	RenderParent();
+	Parent_OnRender();
 
 	switch (m_iState)
 	{

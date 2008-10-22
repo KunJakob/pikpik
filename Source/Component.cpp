@@ -44,14 +44,14 @@ void CLabelComponent::OnRender()
 
 //##############################################################################
 //
-//                             HYPERLINK COMPONENT
+//                                  HYPERLINK
 //
 //##############################################################################
 
 // =============================================================================
 // Nat Ryall                                                         10-Jul-2008
 // =============================================================================
-CHyperlinkComponent::CHyperlinkComponent(CFontMetadata* pFont, const xchar* pText, t_fpLinkSelectedCallback fpCallback) : CLabelElement(ElementType_MenuLink, pFont),
+CHyperlinkComponent::CHyperlinkComponent(CFontMetadata* pFont, const xchar* pText, t_fpLinkSelectedCallback fpCallback) : CLabelElement(ElementType_Hyperlink, pFont),
 	m_fpLinkSelectedCallback(fpCallback)
 {
 	SetText(pText);
@@ -62,7 +62,7 @@ CHyperlinkComponent::CHyperlinkComponent(CFontMetadata* pFont, const xchar* pTex
 // =============================================================================
 void CHyperlinkComponent::OnRender()
 {
-	CLabelElement::OnRender();
+	CLabelElement::Render();
 }
 
 //##############################################################################
@@ -92,7 +92,7 @@ CImageComponent::~CImageComponent()
 // =============================================================================
 void CImageComponent::OnRender()
 {
-	CImageElement::OnRender();
+	CImageElement::Render();
 }
 
 //##############################################################################
@@ -141,7 +141,7 @@ CButtonComponent::~CButtonComponent()
 // =============================================================================
 void CButtonComponent::OnRender()
 {
-	CRowElement::OnRender(m_pL[m_iButtonState]->m_xRect, m_pC[m_iButtonState]->m_xRect, m_pR[m_iButtonState]->m_xRect);
+	CRowElement::Render(m_pL[m_iButtonState]->m_xRect, m_pC[m_iButtonState]->m_xRect, m_pR[m_iButtonState]->m_xRect);
 
 	if (m_pFont)
 		m_pFont->Render(m_xText.c_str(), xrect(0, 0, GetSize()) + GetPosition(), HGETEXT_CENTER | HGETEXT_MIDDLE);
@@ -196,7 +196,7 @@ void CInputComponent::OnUpdate()
 void CInputComponent::OnRender()
 {
 	// Render the element area.
-	CRowElement::OnRender(m_pL->m_xRect, m_pC->m_xRect, m_pR->m_xRect);
+	CRowElement::Render(m_pL->m_xRect, m_pC->m_xRect, m_pR->m_xRect);
 
 	// Get the render text and render text offset.
 	xstring xRenderText = m_xText;
@@ -328,7 +328,7 @@ CProgressComponent::~CProgressComponent()
 // =============================================================================
 void CProgressComponent::OnRender()
 {
-	CRowElement::OnRender(m_pL->m_xRect, m_pC->m_xRect, m_pR->m_xRect);
+	CRowElement::Render(m_pL->m_xRect, m_pC->m_xRect, m_pR->m_xRect);
 
 	if (m_fProgress)
 		m_pSprite->RenderTiled(GetPosition() + xpoint(m_xFrameSize.iLeft, 0), xpoint((xint)((xfloat)m_iWidth * m_fProgress), 0), m_pProgress->m_xRect);
@@ -361,12 +361,12 @@ CWindowComponent::CWindowComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* 
 	m_pBR = pMetaSprite->FindArea("BottomRight");
 
 	m_xFrameSize = xrect
-		(
+	(
 		m_pML->m_xRect.Width(),
 		m_pTC->m_xRect.Height(),
 		m_pMR->m_xRect.Width(),
 		m_pBC->m_xRect.Height()
-		);
+	);
 
 	if (pMetaFont)
 		m_pFont = new CFont(pMetaFont);
@@ -387,7 +387,7 @@ CWindowComponent::~CWindowComponent()
 void CWindowComponent::OnRender()
 {
 	// Render the container.
-	CContainerElement::OnRender(m_pTL->m_xRect, m_pTC->m_xRect, m_pTR->m_xRect, m_pML->m_xRect, m_pMC->m_xRect, m_pMR->m_xRect, m_pBL->m_xRect, m_pBC->m_xRect, m_pBR->m_xRect);
+	CContainerElement::Render(m_pTL->m_xRect, m_pTC->m_xRect, m_pTR->m_xRect, m_pML->m_xRect, m_pMC->m_xRect, m_pMR->m_xRect, m_pBL->m_xRect, m_pBC->m_xRect, m_pBR->m_xRect);
 
 	// Render the window title.
 	if (m_pFont)
@@ -447,7 +447,7 @@ void CGroupComponent::OnRender()
 	bool bTitle = m_pFont && m_xTitle.length();
 
 	// Render the container.
-	CContainerElement::OnRender(m_pTL->m_xRect, bTitle ? xrect() : m_pTC->m_xRect, m_pTR->m_xRect, m_pML->m_xRect, m_pMC->m_xRect, m_pMR->m_xRect, m_pBL->m_xRect, m_pBC->m_xRect, m_pBR->m_xRect);
+	CContainerElement::Render(m_pTL->m_xRect, bTitle ? xrect() : m_pTC->m_xRect, m_pTR->m_xRect, m_pML->m_xRect, m_pMC->m_xRect, m_pMR->m_xRect, m_pBL->m_xRect, m_pBC->m_xRect, m_pBR->m_xRect);
 
 	// Render the window title.
 	if (bTitle)
@@ -509,10 +509,10 @@ CCheckComponent::~CCheckComponent()
 void CCheckComponent::OnRender()
 {
 	xrect xArea = m_pBox[m_iCheckState]->m_xRect;
-	CCheckElement::OnRender(xArea);
+	CCheckElement::Render(xArea);
 
 	if (m_bChecked)
-		CCheckElement::OnRender(m_pCheck->m_xRect);
+		CCheckElement::Render(m_pCheck->m_xRect);
 
 	if (m_pFont)
 	{		
@@ -576,7 +576,7 @@ void CRadioComponent::OnMouseUp(xpoint xPosition)
 // =============================================================================
 CRadioComponent* CRadioComponent::GetChecked(xint iRadioGroup)
 {
-	XEN_LIST_FOREACH(t_ElementList, ppElement, InterfaceManager.GetElementList())
+	XEN_LIST_FOREACH(t_InterfaceElementList, ppElement, InterfaceManager.GetElementList())
 	{
 		if ((*ppElement)->GetType() == ElementType_Radio)
 		{

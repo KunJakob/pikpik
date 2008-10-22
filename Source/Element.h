@@ -77,7 +77,7 @@ protected:
 	CLabelElement(t_ElementType iElementType, CFontMetadata* pFont);
 
 	// Render the text string using the current font.
-	void OnRender();
+	void Render();
 
 	// The element font.
 	CFont* m_pFont;
@@ -119,7 +119,7 @@ protected:
 	CImageElement(t_ElementType iElementType, CSpriteMetadata* pSprite, CSpriteMetadata::CArea* pArea = NULL);
 
 	// Render the image element using the current area.
-	void OnRender();
+	void Render();
 
 	// The element sprite.
 	CBasicSprite* m_pSprite;
@@ -185,7 +185,7 @@ protected:
 	CRowElement(t_ElementType iElementType, CSpriteMetadata* pSprite);
 
 	// Render a control at the current position and current size using the specified rects for each tile.
-	void OnRender(xrect& xLeft, xrect& xCentre, xrect& xRight);
+	void Render(xrect& xLeft, xrect& xCentre, xrect& xRight);
 
 	// The element sprite.
 	CBasicSprite* m_pSprite;
@@ -209,6 +209,12 @@ class CContainerElement : public CRowElement
 public:
 	// Virtual destructor to ensure proper cleanup of all child classes.
 	virtual ~CContainerElement();
+
+	// Attach an element to the container and resize if necessary.
+	virtual void Attach(CInterfaceElement* pElement);
+
+	// Detach an element from the container and resize if necessary.
+	virtual void Detach(CInterfaceElement* pElement);
 
 	// Get the width including all borders.
 	virtual xint GetWidth()
@@ -290,15 +296,60 @@ public:
 		return m_xFrameSize;
 	}
 
+	// Resize the container to contain all the child elements completely.
+	void Resize();
+
+	// Enable/disable the auto-sizing mechanism for the container.
+	void SetAutoSizeEnabled(xbool bEnabled);
+
+	// Check if auto-sizing is enabled.
+	inline xbool IsAutoSizeEnabled()
+	{
+		return m_bAutoSize;
+	}
+
+	// Set the auto-sizing element inner padding.
+	inline void SetElementPadding(xrect xElementPadding) 
+	{ 
+		m_xElementPadding = xElementPadding; 
+	}
+
+	// Get the auto-sizing element inner padding.
+	inline xrect GetElementPadding() 
+	{ 
+		return m_xElementPadding; 
+	}
+
+	// Set the auto-sizing element spacing.
+	inline void SetElementSpacing(xint iElementSpacing) 
+	{ 
+		m_iElementSpacing = iElementSpacing; 
+	}
+
+	// Get the auto-sizing element spacing.
+	inline xint GetElementSpacing() 
+	{ 
+		return m_iElementSpacing; 
+	}
+
 protected:
 	// Internal constructor to prevent instantiation of this class.
 	CContainerElement(t_ElementType iElementType, CSpriteMetadata* pSprite);
 
 	// Render a window at the current position and current size using the specified rects for each tile.
-	void OnRender(xrect& xTL, xrect& xTC, xrect& xTR, xrect& xML, xrect& xMC, xrect& xMR, xrect& xBL, xrect& xBC, xrect& xBR);
+	void Render(xrect& xTL, xrect& xTC, xrect& xTR, xrect& xML, xrect& xMC, xrect& xMR, xrect& xBL, xrect& xBC, xrect& xBR);
 
 	// The height, in pixels, of the inner container.
 	xint m_iHeight;
+
+	// Determines if the container should auto-size when elements are attached and detached.
+	xbool m_bAutoSize;
+
+	// Specifies the inner padding for elements when auto-size is enabled.
+	xrect m_xElementPadding;
+
+	// Specifies the vertical spacing between elements when auto-size is enabled.
+	xint m_iElementSpacing;
 };
 
 //##############################################################################
@@ -337,7 +388,7 @@ protected:
 	CCheckElement(t_ElementType iElementType, CSpriteMetadata* pSprite);
 
 	// Render the element at the current position using the specified rect area.
-	void OnRender(xrect& xArea);
+	void Render(xrect& xArea);
 
 	// The element sprite.
 	CBasicSprite* m_pSprite;

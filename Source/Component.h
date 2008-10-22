@@ -38,62 +38,6 @@
 
 //##############################################################################
 //
-//                                   TYPES
-//
-//##############################################################################
-
-// Predeclare.
-class CLabelComponent;
-class CHyperlinkComponent;
-class CImageComponent;
-class CButtonComponent;
-class CInputComponent;
-class CProgressComponent;
-class CWindowComponent;
-class CGroupComponent;
-class CListComponent;
-class CCheckComponent;
-class CRadioComponent;
-
-//##############################################################################
-
-//##############################################################################
-//
-//                             COMPONENT FACTORY
-//
-//##############################################################################
-class CComponentFactory 
-{
-public:
-	// Singleton instance.
-	static inline CComponentFactory& Get() 
-	{
-		static CComponentFactory s_Instance;
-		return s_Instance;
-	}
-
-	//
-	void RegisterMetadata(CMetadata* pMetadata);
-	void DeregisterMetadata(CMetadata* pMetadata);
-
-	//
-	CLabelComponent* CreateLabelComponent(const char* pName);
-	CHyperlinkComponent* CreateHyperlinkComponent(const char* pName);
-	CImageComponent* CreateImageComponent(const char* pName);
-	CButtonComponent* CreateButtonComponent(const char* pName);
-	CInputComponent* CreateInputComponent(const char* pName);
-	CProgressComponent* CreateProgressComponent(const char* pName);
-	CWindowComponent* CreateWindowComponent(const char* pName, xbool bCreateChildren = true);
-	CGroupComponent* CreateGroupComponent(const char* pName, xbool bCreateChildren = true);
-	CListComponent* CreateListComponent(const char* pName);
-	CCheckComponent* CreateCheckComponent(const char* pName);
-	CRadioComponent* CreateRadioComponent(const char* pName);
-};
-
-//##############################################################################
-
-//##############################################################################
-//
 //                                   LABEL
 //
 //##############################################################################
@@ -114,7 +58,7 @@ public:
 
 //##############################################################################
 //
-//                             HYPERLINK COMPONENT
+//                                  HYPERLINK
 //
 //##############################################################################
 class CHyperlinkComponent : public CLabelElement
@@ -700,6 +644,45 @@ protected:
 
 	// The radio component group.
 	xint m_iRadioGroup;
+};
+
+//##############################################################################
+
+//##############################################################################
+//
+//                             COMPONENT FACTORY
+//
+//##############################################################################
+class CComponentFactory 
+{
+public:
+	// Singleton instance.
+	static inline CComponentFactory& Get() 
+	{
+		static CComponentFactory s_Instance;
+		return s_Instance;
+	}
+
+	//
+	/*
+	void RegisterMetadata(CMetadata* pMetadata);
+	void DeregisterMetadata(CMetadata* pMetadata);
+	*/
+
+	//
+	/*
+	CLabelComponent* CreateLabelComponent(const char* pName);
+	CHyperlinkComponent* CreateHyperlinkComponent(const char* pName);
+	CImageComponent* CreateImageComponent(const char* pName);
+	CButtonComponent* CreateButtonComponent(const char* pName);
+	CInputComponent* CreateInputComponent(const char* pName);
+	CProgressComponent* CreateProgressComponent(const char* pName);
+	CWindowComponent* CreateWindowComponent(const char* pName, xbool bCreateChildren = true);
+	CGroupComponent* CreateGroupComponent(const char* pName, xbool bCreateChildren = true);
+	CListComponent* CreateListComponent(const char* pName);
+	CCheckComponent* CreateCheckComponent(const char* pName);
+	CRadioComponent* CreateRadioComponent(const char* pName);
+	*/
 };
 
 //##############################################################################

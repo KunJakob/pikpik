@@ -42,7 +42,7 @@ CLabelElement::~CLabelElement()
 // =============================================================================
 // Nat Ryall                                                         13-May-2008
 // =============================================================================
-void CLabelElement::OnRender()
+void CLabelElement::Render()
 {
 	m_pFont->Render(m_xText.c_str(), GetPosition(), m_iAlignment);
 }
@@ -76,7 +76,7 @@ CImageElement::~CImageElement()
 // =============================================================================
 // Nat Ryall                                                         13-May-2008
 // =============================================================================
-void CImageElement::OnRender()
+void CImageElement::Render()
 {
 	if (m_pArea)
 		m_pSprite->Render(GetPosition(), m_pArea->m_xRect);
@@ -113,7 +113,7 @@ CRowElement::~CRowElement()
 // =============================================================================
 // Nat Ryall                                                         11-May-2008
 // =============================================================================
-void CRowElement::OnRender(xrect& xLeft, xrect& xCentre, xrect& xRight)
+void CRowElement::Render(xrect& xLeft, xrect& xCentre, xrect& xRight)
 {
 	m_pSprite->Render(GetPosition(), xLeft);
 	m_pSprite->Render(GetPosition() + xpoint(m_xFrameSize.iLeft + m_iWidth, 0), xRight);
@@ -132,7 +132,9 @@ void CRowElement::OnRender(xrect& xLeft, xrect& xCentre, xrect& xRight)
 // Nat Ryall                                                          9-May-2008
 // =============================================================================
 CContainerElement::CContainerElement(t_ElementType iElementType, CSpriteMetadata* pSprite) : CRowElement(iElementType, pSprite),
-	m_iHeight(0)
+	m_iHeight(0),
+	m_bAutoSize(false),
+	m_iElementSpacing(0)
 {
 }
 
@@ -144,9 +146,31 @@ CContainerElement::~CContainerElement()
 }
 
 // =============================================================================
+// Nat Ryall                                                         22-Oct-2008
+// =============================================================================
+void CContainerElement::Attach(CInterfaceElement* pElement)
+{
+	CInterfaceElement::Attach(pElement);
+
+	if (m_bAutoSize)
+		Resize();
+}
+
+// =============================================================================
+// Nat Ryall                                                         22-Oct-2008
+// =============================================================================
+void CContainerElement::Detach(CInterfaceElement* pElement)
+{
+	CInterfaceElement::Detach(pElement);
+
+	if (m_bAutoSize)
+		Resize();
+}
+
+// =============================================================================
 // Nat Ryall                                                         11-May-2008
 // =============================================================================
-void CContainerElement::OnRender(xrect& xTL, xrect& xTC, xrect& xTR, xrect& xML, xrect& xMC, xrect& xMR, xrect& xBL, xrect& xBC, xrect& xBR)
+void CContainerElement::Render(xrect& xTL, xrect& xTC, xrect& xTR, xrect& xML, xrect& xMC, xrect& xMR, xrect& xBL, xrect& xBC, xrect& xBR)
 {
 	xpoint xPosition = GetPosition();
 
@@ -168,6 +192,46 @@ void CContainerElement::OnRender(xrect& xTL, xrect& xTC, xrect& xTR, xrect& xML,
 	m_pSprite->Render(xPosition, xBL);
 	m_pSprite->RenderTiled(xPosition + xpoint(m_xFrameSize.iLeft, 0), xpoint(m_iWidth, 0), xBC);
 	m_pSprite->Render(xPosition + xpoint(m_xFrameSize.iLeft + m_iWidth, 0), xBR);
+}
+
+// =============================================================================
+// Nat Ryall                                                         22-Oct-2008
+// =============================================================================
+void CContainerElement::Resize()
+{
+	xint iContainerHeight = 0;
+	xint iContainerWidth = 0;
+
+	XEN_LIST_FOREACH(t_InterfaceElementList, ppElement, m_lpChildElements)
+	{
+		CInterfaceElement* pElement = *ppElement;
+
+		// Re-position the element.
+		pElement->SetPosition(GetInnerPosition() + m_xElementPadding.TopLeft() + xpoint(0, iContainerHeight));
+
+		// Determine the width of the container based on the element area and increase the offset.
+		xrect xArea = pElement->GetArea();
+
+		iContainerWidth = Math::Max(iContainerWidth, xArea.Width());
+		iContainerHeight += m_iElementSpacing + xArea.Height();
+	}
+
+	// Resize the container to the size of the elements.
+	if (iContainerHeight != 0)
+		iContainerHeight -= m_iElementSpacing;
+
+	SetInnerSize(iContainerWidth + m_xElementPadding.iLeft + m_xElementPadding.iRight, iContainerHeight + m_xElementPadding.iTop + m_xElementPadding.iBottom);
+}
+
+// =============================================================================
+// Nat Ryall                                                         22-Oct-2008
+// =============================================================================
+void CContainerElement::SetAutoSizeEnabled(xbool bEnabled)
+{
+	m_bAutoSize = bEnabled;
+
+	if (m_bAutoSize)
+		Resize();
 }
 
 //##############################################################################
@@ -199,7 +263,7 @@ CCheckElement::~CCheckElement()
 // =============================================================================
 // Nat Ryall                                                         13-May-2008
 // =============================================================================
-void CCheckElement::OnRender(xrect& xArea)
+void CCheckElement::Render(xrect& xArea)
 {
 	m_pSprite->Render(GetPosition(), xArea);
 }

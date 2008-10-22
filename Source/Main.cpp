@@ -154,9 +154,9 @@ void Application::Initialise()
 	XMODULE(&NetworkManager);
 	XMODULE(&MatchManager);
 	XMODULE(&MapManager);
+	XMODULE(&InterfaceManager);
 	XMODULE(&ScreenManager);
 	XMODULE(&CollisionManager);
-	XMODULE(&InterfaceManager);
 	XMODULE(&RenderManager);
 	
 	// Initialise all modules.
@@ -231,12 +231,12 @@ xbool Application::OnUpdate()
 	{
 		s_iTimeDelta = (xuint)(_TIMEDELTAF * 1000.f);
 
-		ModuleManager.Update();
-
 		hgeInputEvent hgEvent;
 
 		while (s_pInterface->Input_GetEvent(&hgEvent))
-			ScreenManager.Event(hgEvent.type, &hgEvent);
+			ModuleManager.Event(hgEvent.type, &hgEvent);
+
+		ModuleManager.Update();
 	}
 
 	return s_bTerminate;
