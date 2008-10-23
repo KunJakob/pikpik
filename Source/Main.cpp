@@ -154,8 +154,8 @@ void Application::Initialise()
 	XMODULE(&NetworkManager);
 	XMODULE(&MatchManager);
 	XMODULE(&MapManager);
-	XMODULE(&InterfaceManager);
 	XMODULE(&ScreenManager);
+	XMODULE(&InterfaceManager);
 	XMODULE(&CollisionManager);
 	XMODULE(&RenderManager);
 	

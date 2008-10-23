@@ -58,7 +58,7 @@ void CLogoScreen::OnWake()
 // =============================================================================
 // Nat Ryall                                                          6-Apr-2008
 // =============================================================================
-void CLogoScreen::OnNotify(xuint iEventType, void* pEventInfo)
+xbool CLogoScreen::OnEvent(xint iEventType, void* pEventInfo)
 {
 	switch (iEventType)
 	{
@@ -66,9 +66,12 @@ void CLogoScreen::OnNotify(xuint iEventType, void* pEventInfo)
 	case INPUT_KEYUP:
 		{
 			OnFadeComplete();
+			return true;
 		}
 		break;
 	}
+
+	return false;
 }
 
 // =============================================================================
@@ -140,7 +143,7 @@ void CLogoScreen::OnFadeComplete()
 // =============================================================================
 // Nat Ryall                                                          6-Apr-2008
 // =============================================================================
-void CWarningScreen::OnNotify(xuint iEventType, void* pEventInfo)
+xbool CWarningScreen::OnEvent(xint iEventType, void* pEventInfo)
 {
 	switch (iEventType)
 	{
@@ -148,9 +151,12 @@ void CWarningScreen::OnNotify(xuint iEventType, void* pEventInfo)
 	case INPUT_KEYUP:
 		{
 			OnFadeComplete();
+			return true;
 		}
 		break;
 	}
+
+	return false;
 }
 
 // =============================================================================

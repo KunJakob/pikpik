@@ -28,10 +28,10 @@
 //                                   MACROS
 //
 //##############################################################################
-#define _PROPERTY \
+#define _PROPERTY_VALUE \
 		_pProperty
 
-#define _DATASET \
+#define _DATASET_VALUE \
 		_pDataset
 
 #define _PROPERTY_FOREACH(ITER, DATASET, NAME) \
@@ -41,10 +41,10 @@
 		for (CDataset* ITER = NULL; ITER = DATASET->GetDataset(ITER, TYPE, NAME);)
 
 #define _PROPERTY_EXISTS(DATASET, PROPERTYNAME) \
-		CProperty* _PROPERTY = DATASET->GetProperty(PROPERTYNAME)
+		CProperty* _PROPERTY_VALUE = DATASET->GetProperty(PROPERTYNAME)
 
 #define _DATASET_EXISTS(DATASET, DATASETNAME) \
-		CDataset* _DATASET = DATASET->GetDataset(DATASETNAME)
+		CDataset* _DATASET_VALUE = DATASET->GetDataset(DATASETNAME)
 
 //##############################################################################
 

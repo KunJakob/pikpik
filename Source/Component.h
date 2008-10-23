@@ -34,6 +34,11 @@
 // Shortcuts.
 #define ComponentFactory CComponentFactory::Get()
 
+// Allow the use of CreateWindow.
+#if defined(CreateWindow)
+	#undef CreateWindow
+#endif
+
 //##############################################################################
 
 //##############################################################################
@@ -65,10 +70,10 @@ class CHyperlinkComponent : public CLabelElement
 {
 public:
 	// Callbacks.
-	typedef xfunction(0)<> t_fpLinkSelectedCallback;
+	typedef xfunction(0)<> t_OnClickCallback;
 
 	// Constructor.
-	CHyperlinkComponent(CFontMetadata* pFont, const xchar* pText, t_fpLinkSelectedCallback fpCallback = NULL);
+	CHyperlinkComponent(CFontMetadata* pFont);
 
 	// Destructor.
 	virtual ~CHyperlinkComponent() {}
@@ -76,16 +81,22 @@ public:
 	// Render the element.
 	virtual void OnRender();
 
+	// Set the callback to execute if the hyperlink is clicked.
+	void SetClickCallback(t_OnClickCallback fpCallback)
+	{
+		m_fpOnClickCallback = fpCallback;
+	}
+
 protected:
 	// Called when the mouse is released when the element is active.
 	virtual void OnMouseUp(xpoint xPosition)
 	{
-		if (m_fpLinkSelectedCallback)
-			m_fpLinkSelectedCallback();
+		if (m_fpOnClickCallback)
+			m_fpOnClickCallback();
 	}
 
 	// The link callback.
-	t_fpLinkSelectedCallback m_fpLinkSelectedCallback;
+	t_OnClickCallback m_fpOnClickCallback;
 };
 
 //##############################################################################
@@ -115,7 +126,7 @@ public:
 //                                   BUTTON
 //
 //##############################################################################
-class CButtonComponent : public CRowElement
+class CButtonComponent : public CStripElement
 {
 public:
 	// Callbacks.
@@ -216,7 +227,7 @@ protected:
 //                                  TEXT BOX
 //
 //##############################################################################
-class CInputComponent : public CRowElement
+class CInputComponent : public CStripElement
 {
 public:
 	// Initialise the component.
@@ -320,7 +331,7 @@ protected:
 //                                PROGRESS BAR
 //
 //##############################################################################
-class CProgressComponent : public CRowElement
+class CProgressComponent : public CStripElement
 {
 public:
 	// Initialise the component.
@@ -663,26 +674,71 @@ public:
 		return s_Instance;
 	}
 
-	//
-	/*
-	void RegisterMetadata(CMetadata* pMetadata);
-	void DeregisterMetadata(CMetadata* pMetadata);
-	*/
+	// Register a metadata file with the system for later use.
+	//void RegisterMetadata(CMetadata* pMetadata);
 
-	//
-	/*
-	CLabelComponent* CreateLabelComponent(const char* pName);
-	CHyperlinkComponent* CreateHyperlinkComponent(const char* pName);
-	CImageComponent* CreateImageComponent(const char* pName);
-	CButtonComponent* CreateButtonComponent(const char* pName);
-	CInputComponent* CreateInputComponent(const char* pName);
-	CProgressComponent* CreateProgressComponent(const char* pName);
-	CWindowComponent* CreateWindowComponent(const char* pName, xbool bCreateChildren = true);
-	CGroupComponent* CreateGroupComponent(const char* pName, xbool bCreateChildren = true);
-	CListComponent* CreateListComponent(const char* pName);
-	CCheckComponent* CreateCheckComponent(const char* pName);
-	CRadioComponent* CreateRadioComponent(const char* pName);
-	*/
+	// Remove a metadata file from the system.
+	//void DeregisterMetadata(CMetadata* pMetadata);
+
+	// Creates a new window from metadata and also instantiates all child elements.
+	CWindowComponent* CreateWindow(CMetadata* pMetadata, const char* pName);
+
+protected:
+	// Get the basic properties that are valid for all components.
+	void GetBasicProperties(CInterfaceElement* pElement, CDataset* pDataset);
+
+	// Get the generic properties for label elements.
+	void GetLabelProperties(CLabelElement* pElement, CDataset* pDataset);
+
+	// Get the generic properties for image elements.
+	void GetImageProperties(CImageElement* pElement, CDataset* pDataset);
+
+	// Get the generic properties for strip elements.
+	void GetStripProperties(CStripElement* pElement, CDataset* pDataset);
+
+	// Get the generic properties for container elements.
+	void GetContainerProperties(CContainerElement* pElement, CDataset* pDataset);
+
+	// Get the generic properties for check elements.
+	void GetCheckProperties(CCheckElement* pElement, CDataset* pDataset);
+
+	// Create and attach any child elements to the specified element.
+	void AttachChildren(CInterfaceElement* pElement, CDataset* pDataset);
+
+	// Create a label component from metadata.
+	CLabelComponent* CreateLabel(CDataset* pDataset);
+
+	// Create a hyperlink component from metadata.
+	CHyperlinkComponent* CreateHyperlink(CDataset* pDataset);
+
+	// Create a image component from metadata.
+	CImageComponent* CreateImage(CDataset* pDataset);
+
+	// Create a button component from metadata.
+	CButtonComponent* CreateButton(CDataset* pDataset);
+
+	// Create a input component from metadata.
+	CInputComponent* CreateInput(CDataset* pDataset);
+
+	// Create a progress component from metadata.
+	CProgressComponent* CreateProgress(CDataset* pDataset);
+
+	// Create a window component from metadata.
+	CWindowComponent* CreateWindow(CDataset* pDataset);
+
+	// Create a group component from metadata.
+	CGroupComponent* CreateGroup(CDataset* pDataset);
+
+	// Create a list component from metadata.
+	CListComponent* CreateList(CDataset* pDataset);
+
+	// Create a check component from metadata.
+	CCheckComponent* CreateCheck(CDataset* pDataset);
+
+	// Create a radio component from metadata.
+	CRadioComponent* CreateRadio(CDataset* pDataset);
 };
 
 //##############################################################################
+
+//

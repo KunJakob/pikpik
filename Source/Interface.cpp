@@ -332,7 +332,7 @@ void CInterfaceElement::Attach(CInterfaceElement* pElement)
 
 	m_lpChildElements.push_back(pElement);
 
-	InterfaceManager.RegisterElement(this);
+	InterfaceManager.RegisterElement(pElement);
 }
 
 // =============================================================================
@@ -350,7 +350,7 @@ void CInterfaceElement::Detach(CInterfaceElement* pElement)
 	if (pElement == InterfaceManager.m_pFocusedElement)
 		InterfaceManager.m_pFocusedElement = NULL;
 
-	InterfaceManager.DeregisterElement(this);
+	InterfaceManager.DeregisterElement(pElement);
 }
 
 // =============================================================================

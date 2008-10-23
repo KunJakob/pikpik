@@ -229,6 +229,9 @@ public:
 		return s_Instance;
 	}
 
+	// Convert a locale variable string to it's locale counterpart or return the original string otherwise.
+	const xchar* TranslateLocale(const xchar* pString);
+
 	// Determine the list of players for the active map and position them.
 	void ResetActivePlayers();
 

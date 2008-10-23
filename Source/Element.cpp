@@ -88,14 +88,14 @@ void CImageElement::Render()
 
 //##############################################################################
 //
-//                                 ROW ELEMENT
+//                                STRIP ELEMENT
 //
 //##############################################################################
 
 // =============================================================================
 // Nat Ryall                                                          9-May-2008
 // =============================================================================
-CRowElement::CRowElement(t_ElementType iElementType, CSpriteMetadata* pSprite) : CInterfaceElement(iElementType),
+CStripElement::CStripElement(t_ElementType iElementType, CSpriteMetadata* pSprite) : CInterfaceElement(iElementType),
 	m_pSprite(NULL),
 	m_iWidth(0)
 {
@@ -105,7 +105,7 @@ CRowElement::CRowElement(t_ElementType iElementType, CSpriteMetadata* pSprite) :
 // =============================================================================
 // Nat Ryall                                                          9-May-2008
 // =============================================================================
-CRowElement::~CRowElement()
+CStripElement::~CStripElement()
 {
 	delete m_pSprite;
 }
@@ -113,7 +113,7 @@ CRowElement::~CRowElement()
 // =============================================================================
 // Nat Ryall                                                         11-May-2008
 // =============================================================================
-void CRowElement::Render(xrect& xLeft, xrect& xCentre, xrect& xRight)
+void CStripElement::Render(xrect& xLeft, xrect& xCentre, xrect& xRight)
 {
 	m_pSprite->Render(GetPosition(), xLeft);
 	m_pSprite->Render(GetPosition() + xpoint(m_xFrameSize.iLeft + m_iWidth, 0), xRight);
@@ -131,9 +131,8 @@ void CRowElement::Render(xrect& xLeft, xrect& xCentre, xrect& xRight)
 // =============================================================================
 // Nat Ryall                                                          9-May-2008
 // =============================================================================
-CContainerElement::CContainerElement(t_ElementType iElementType, CSpriteMetadata* pSprite) : CRowElement(iElementType, pSprite),
+CContainerElement::CContainerElement(t_ElementType iElementType, CSpriteMetadata* pSprite) : CStripElement(iElementType, pSprite),
 	m_iHeight(0),
-	m_bAutoSize(false),
 	m_iElementSpacing(0)
 {
 }
@@ -143,28 +142,6 @@ CContainerElement::CContainerElement(t_ElementType iElementType, CSpriteMetadata
 // =============================================================================
 CContainerElement::~CContainerElement()
 {
-}
-
-// =============================================================================
-// Nat Ryall                                                         22-Oct-2008
-// =============================================================================
-void CContainerElement::Attach(CInterfaceElement* pElement)
-{
-	CInterfaceElement::Attach(pElement);
-
-	if (m_bAutoSize)
-		Resize();
-}
-
-// =============================================================================
-// Nat Ryall                                                         22-Oct-2008
-// =============================================================================
-void CContainerElement::Detach(CInterfaceElement* pElement)
-{
-	CInterfaceElement::Detach(pElement);
-
-	if (m_bAutoSize)
-		Resize();
 }
 
 // =============================================================================
@@ -197,7 +174,7 @@ void CContainerElement::Render(xrect& xTL, xrect& xTC, xrect& xTR, xrect& xML, x
 // =============================================================================
 // Nat Ryall                                                         22-Oct-2008
 // =============================================================================
-void CContainerElement::Resize()
+void CContainerElement::ArrangeChildren()
 {
 	xint iContainerHeight = 0;
 	xint iContainerWidth = 0;
@@ -221,17 +198,6 @@ void CContainerElement::Resize()
 		iContainerHeight -= m_iElementSpacing;
 
 	SetInnerSize(iContainerWidth + m_xElementPadding.iLeft + m_xElementPadding.iRight, iContainerHeight + m_xElementPadding.iTop + m_xElementPadding.iBottom);
-}
-
-// =============================================================================
-// Nat Ryall                                                         22-Oct-2008
-// =============================================================================
-void CContainerElement::SetAutoSizeEnabled(xbool bEnabled)
-{
-	m_bAutoSize = bEnabled;
-
-	if (m_bAutoSize)
-		Resize();
 }
 
 //##############################################################################

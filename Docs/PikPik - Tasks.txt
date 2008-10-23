@@ -11,3 +11,7 @@
 - Credits screen.
   - Scrolling images and text.
 - Voice chat.
+
+- Currently widgets and game interface elements conflict. We need interface layers when "Attach" is called on the screen.
+
+- The render system is all over the place. The rendering for EVERYTHING should be centeralised through the render system so that layers and transformations can be used. Nothing should be allowed to self-render outside of this.

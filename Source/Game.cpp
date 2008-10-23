@@ -168,3 +168,5 @@ void CGameScreen::OnRender()
 }
 
 //##############################################################################
+
+// Fix the renderer. Remove Render from the Module and require that all "renderable" modules be added to the renderer.

@@ -1,41 +1,122 @@
 .Window "Window-Password"
 {
-	// .Size		W H
-	// .InnerSize	W H
-
-	.Sprite			"Interface-Window"
+	.Sprite			"Test-Window"
+	.Font			"Test-WindowFont"
 	.Title			"Password View"
 	.Position		10 10
+	.Moveable		true
 
-	.AutoSize
+	.AutoArrange
 	{
-		.Padding	10 8 10 8
+		.Padding	10 12 10 12
 		.Spacing	8
 	}
-
-	.InputBox "InputBox-Password"
+	
+	.Group "Group-Radio"
 	{
-		.Sprite		"Interface-InputBox"
-		.Text		"passwd"
-		.Font		"Font-InputBox"
-		.Masked		true
-		.Width		100
+		.Sprite			"Test-Group"
+		.Font			"Test-GroupFont"
+		.Title			"Radio Buttons"
+		
+		.AutoArrange
+		{
+			.Padding	10 8 10 8
+			.Spacing	8
+		}
+		
+		.Radio "RadioBox-1"
+		{
+			.Sprite		"Test-Radio"
+			.Font		"Test-Font"
+			.Text		"Option A"
+			.Group		1
+			.Checked	true
+		}
+		
+		.Radio "RadioBox-2"
+		{
+			.Sprite		"Test-Radio"
+			.Font		"Test-Font"
+			.Text		"Option B"
+			.Group		1
+		}
+			
+		.Radio "RadioBox-3"
+		{
+			.Sprite		"Test-Radio"
+			.Font		"Test-Font"
+			.Text		"Option C"
+			.Group		1
+		}
+		
+		.Radio "RadioBox-4"
+		{
+			.Sprite		"Test-Radio"
+			.Font		"Test-Font"
+			.Text		"Option X"
+			.Group		2
+		}
+			
+		.Radio "RadioBox-5"
+		{
+			.Sprite		"Test-Radio"
+			.Font		"Test-Font"
+			.Text		"Option Y"
+			.Group		2
+			.Checked	true
+		}
 	}
 
-	.CheckBox "CheckBox-Hide"
+	.Group "Group-Password"
 	{
-		.Sprite		"Interface-CheckBox"
-		.Label		"$Input_String" // $$ = '$', $ = Locale
-		.Font		"Font-Default"
-		.Checked	true
+		.Sprite			"Test-Group"
+		.Font			"Test-GroupFont"
+		.Title			"Password"
+		
+		.AutoArrange
+		{
+			.Padding	10 8 10 8
+			.Spacing	8
+		}
+		
+		.Input "InputBox-Username"
+		{
+			.Sprite		"Test-Input"
+			.Font		"Test-Font"
+			.Text		"Krakken"
+			.Width		100
+		}
+	
+		.Input "InputBox-Password"
+		{
+			.Sprite		"Test-Input"
+			.Font		"Test-Font"
+			.Text		"passwd"
+			.Masked		true
+			.Width		100
+		}
+
+		.Check "CheckBox-Hide"
+		{
+			.Sprite		"Test-Check"
+			.Font		"Test-Font"
+			.Text		"&Input_String"
+			.Checked	true
+		}
 	}
 
 	.Button "Button-Close"
 	{
-		.Sprite		"Interface-Button"
-		.Label		"Close"
-		.Font		"Interface-Default"
-		.Enabled	false
+		.Sprite		"Test-Button"
+		.Font		"Test-Font"
+		.Text		"Close"
+		.Width		100
+	}
+	
+	.Progress "Progress-123"
+	{
+		.Sprite		"Test-Progress"
+		.Progress	0.75
 		.Width		100
 	}
 }

@@ -132,14 +132,14 @@ protected:
 
 //##############################################################################
 //
-//                                 ROW ELEMENT
+//                                STRIP ELEMENT
 //
 //##############################################################################
-class CRowElement : public CInterfaceElement
+class CStripElement : public CInterfaceElement
 {
 public:
 	// Virtual destructor to ensure proper cleanup of all child classes.
-	virtual ~CRowElement();
+	virtual ~CStripElement();
 
 	// Get the width including all borders.
 	inline virtual xint GetWidth()
@@ -182,7 +182,7 @@ public:
 
 protected:
 	// Internal constructor to prevent instantiation of this class.
-	CRowElement(t_ElementType iElementType, CSpriteMetadata* pSprite);
+	CStripElement(t_ElementType iElementType, CSpriteMetadata* pSprite);
 
 	// Render a control at the current position and current size using the specified rects for each tile.
 	void Render(xrect& xLeft, xrect& xCentre, xrect& xRight);
@@ -204,17 +204,11 @@ protected:
 //                             CONTAINER ELEMENT
 //
 //##############################################################################
-class CContainerElement : public CRowElement
+class CContainerElement : public CStripElement
 {
 public:
 	// Virtual destructor to ensure proper cleanup of all child classes.
 	virtual ~CContainerElement();
-
-	// Attach an element to the container and resize if necessary.
-	virtual void Attach(CInterfaceElement* pElement);
-
-	// Detach an element from the container and resize if necessary.
-	virtual void Detach(CInterfaceElement* pElement);
 
 	// Get the width including all borders.
 	virtual xint GetWidth()
@@ -277,11 +271,23 @@ public:
 		SetHeight(iHeight);
 	}
 
+	// Set the width and height using a border inclusive size.
+	inline void SetSize(xpoint xSize)
+	{
+		SetSize(xSize.iX, xSize.iY);
+	}
+
 	// Set the inner width and height using a border exclusive size.
 	inline void SetInnerSize(xint iWidth, xint iHeight)
 	{
 		SetInnerWidth(iWidth);
 		SetInnerHeight(iHeight);
+	}
+
+	// Set the inner width and height using a border exclusive size.
+	inline void SetInnerSize(xpoint xSize)
+	{
+		SetInnerSize(xSize.iX, xSize.iY);
 	}
 
 	// Get the screen rect for the inner, focus area.
@@ -297,16 +303,7 @@ public:
 	}
 
 	// Resize the container to contain all the child elements completely.
-	void Resize();
-
-	// Enable/disable the auto-sizing mechanism for the container.
-	void SetAutoSizeEnabled(xbool bEnabled);
-
-	// Check if auto-sizing is enabled.
-	inline xbool IsAutoSizeEnabled()
-	{
-		return m_bAutoSize;
-	}
+	void ArrangeChildren();
 
 	// Set the auto-sizing element inner padding.
 	inline void SetElementPadding(xrect xElementPadding) 
@@ -341,9 +338,6 @@ protected:
 
 	// The height, in pixels, of the inner container.
 	xint m_iHeight;
-
-	// Determines if the container should auto-size when elements are attached and detached.
-	xbool m_bAutoSize;
 
 	// Specifies the inner padding for elements when auto-size is enabled.
 	xrect m_xElementPadding;

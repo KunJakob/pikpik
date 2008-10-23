@@ -20,6 +20,25 @@
 //##############################################################################
 
 // =============================================================================
+// Nat Ryall                                                         23-Oct-2008
+// =============================================================================
+const xchar* CGlobal::TranslateLocale(const xchar* pString)
+{
+	// Check if we have a locale string: "&NAME". 
+	if (pString && String::Length(pString) > 1 && pString[0] == '&')
+	{
+		// If we see "&&" it means we want to use '&'.
+		if (pString[1] == '&')
+			return &pString[1];
+		
+		return _LOCALE(&pString[1]);
+	}
+
+	// We should just return the string otherwise.
+	return pString;
+}
+
+// =============================================================================
 // Nat Ryall                                                         30-Jul-2008
 // =============================================================================
 void CGlobal::ResetActivePlayers()

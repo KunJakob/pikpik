@@ -42,7 +42,7 @@ public:
 	virtual void OnWake();
 
 	// Called when a game-specific event is executed when active.
-	virtual void OnNotify(xuint iEventType, void* pEventInfo);
+	virtual xbool OnEvent(xint iEventType, void* pEventInfo);
 
 	// Called each frame to update the screen when active.
 	virtual void OnUpdate();
@@ -78,7 +78,7 @@ public:
 	virtual ~CWarningScreen() {}
 
 	// Called when a game-specific event is executed when active.
-	virtual void OnNotify(xuint iEventType, void* pEventInfo);
+	virtual xbool OnEvent(xint iEventType, void* pEventInfo);
 
 	// Called each frame to render the screen when active.
 	virtual void OnRender();

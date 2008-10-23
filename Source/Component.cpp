@@ -51,10 +51,9 @@ void CLabelComponent::OnRender()
 // =============================================================================
 // Nat Ryall                                                         10-Jul-2008
 // =============================================================================
-CHyperlinkComponent::CHyperlinkComponent(CFontMetadata* pFont, const xchar* pText, t_fpLinkSelectedCallback fpCallback) : CLabelElement(ElementType_Hyperlink, pFont),
-	m_fpLinkSelectedCallback(fpCallback)
+CHyperlinkComponent::CHyperlinkComponent(CFontMetadata* pFont) : CLabelElement(ElementType_Hyperlink, pFont),
+	m_fpOnClickCallback(NULL)
 {
-	SetText(pText);
 }
 
 // =============================================================================
@@ -106,7 +105,7 @@ void CImageComponent::OnRender()
 // =============================================================================
 // Nat Ryall                                                         11-May-2008
 // =============================================================================
-CButtonComponent::CButtonComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont) : CRowElement(ElementType_Button, pMetaSprite),
+CButtonComponent::CButtonComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont) : CStripElement(ElementType_Button, pMetaSprite),
 	m_iButtonState(ButtonState_Normal),
 	m_pFont(NULL),
 	m_fpOnClickCallback(NULL)
@@ -141,7 +140,7 @@ CButtonComponent::~CButtonComponent()
 // =============================================================================
 void CButtonComponent::OnRender()
 {
-	CRowElement::Render(m_pL[m_iButtonState]->m_xRect, m_pC[m_iButtonState]->m_xRect, m_pR[m_iButtonState]->m_xRect);
+	CStripElement::Render(m_pL[m_iButtonState]->m_xRect, m_pC[m_iButtonState]->m_xRect, m_pR[m_iButtonState]->m_xRect);
 
 	if (m_pFont)
 		m_pFont->Render(m_xText.c_str(), xrect(0, 0, GetSize()) + GetPosition(), HGETEXT_CENTER | HGETEXT_MIDDLE);
@@ -158,7 +157,7 @@ void CButtonComponent::OnRender()
 // =============================================================================
 // Nat Ryall                                                         12-May-2008
 // =============================================================================
-CInputComponent::CInputComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont) : CRowElement(ElementType_Input, pMetaSprite),
+CInputComponent::CInputComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont) : CStripElement(ElementType_Input, pMetaSprite),
 	m_bMasked(false),
 	m_iCharLimit(32),
 	m_iCharOffset(0),
@@ -196,7 +195,7 @@ void CInputComponent::OnUpdate()
 void CInputComponent::OnRender()
 {
 	// Render the element area.
-	CRowElement::Render(m_pL->m_xRect, m_pC->m_xRect, m_pR->m_xRect);
+	CStripElement::Render(m_pL->m_xRect, m_pC->m_xRect, m_pR->m_xRect);
 
 	// Get the render text and render text offset.
 	xstring xRenderText = m_xText;
@@ -304,7 +303,7 @@ void CInputComponent::OnKeyChar(xchar cChar)
 // =============================================================================
 // Nat Ryall                                                         13-May-2008
 // =============================================================================
-CProgressComponent::CProgressComponent(CSpriteMetadata* pMetaSprite) : CRowElement(ElementType_Progress, pMetaSprite),
+CProgressComponent::CProgressComponent(CSpriteMetadata* pMetaSprite) : CStripElement(ElementType_Progress, pMetaSprite),
 	m_fProgress(0.f)
 {
 	m_pL = pMetaSprite->FindArea("Left");
@@ -328,7 +327,7 @@ CProgressComponent::~CProgressComponent()
 // =============================================================================
 void CProgressComponent::OnRender()
 {
-	CRowElement::Render(m_pL->m_xRect, m_pC->m_xRect, m_pR->m_xRect);
+	CStripElement::Render(m_pL->m_xRect, m_pC->m_xRect, m_pR->m_xRect);
 
 	if (m_fProgress)
 		m_pSprite->RenderTiled(GetPosition() + xpoint(m_xFrameSize.iLeft, 0), xpoint((xint)((xfloat)m_iWidth * m_fProgress), 0), m_pProgress->m_xRect);
@@ -509,6 +508,7 @@ CCheckComponent::~CCheckComponent()
 void CCheckComponent::OnRender()
 {
 	xrect xArea = m_pBox[m_iCheckState]->m_xRect;
+
 	CCheckElement::Render(xArea);
 
 	if (m_bChecked)
@@ -588,6 +588,388 @@ CRadioComponent* CRadioComponent::GetChecked(xint iRadioGroup)
 	}
 
 	return NULL;
+}
+
+//##############################################################################
+
+//##############################################################################
+//
+//                             COMPONENT FACTORY
+//
+//##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                         23-Oct-2008
+// =============================================================================
+CWindowComponent* CComponentFactory::CreateWindow(CMetadata* pMetadata, const char* pName)
+{
+	CDataset* pDataset = pMetadata->GetDataset("Window", pName);
+	
+	if (pDataset)
+		return CreateWindow(pDataset);
+
+	return NULL;
+}
+
+// =============================================================================
+// Nat Ryall                                                         23-Oct-2008
+// =============================================================================
+void CComponentFactory::GetBasicProperties(CInterfaceElement* pElement, CDataset* pDataset)
+{
+	if (_PROPERTY_EXISTS(pDataset, "Enabled"))
+		pElement->SetEnabled(_PROPERTY_VALUE->GetBool());
+
+	if (_PROPERTY_EXISTS(pDataset, "Visible"))
+		pElement->SetVisible(_PROPERTY_VALUE->GetBool());
+
+	if (_PROPERTY_EXISTS(pDataset, "Position"))
+		pElement->SetPosition(_PROPERTY_VALUE->GetPoint());
+}
+
+// =============================================================================
+// Nat Ryall                                                         23-Oct-2008
+// =============================================================================
+void CComponentFactory::GetLabelProperties(CLabelElement* pElement, CDataset* pDataset)
+{
+	if (_PROPERTY_EXISTS(pDataset, "Text"))
+		pElement->SetText(Global.TranslateLocale(_PROPERTY_VALUE->GetString()));
+
+	if (_PROPERTY_EXISTS(pDataset, "Alignment"))
+	{
+		if (String::IsMatch(_PROPERTY_VALUE->GetString(), "Left"))
+			pElement->SetAlignment(HGETEXT_LEFT);
+
+		else if (String::IsMatch(_PROPERTY_VALUE->GetString(), "Centre"))
+			pElement->SetAlignment(HGETEXT_CENTER);
+
+		else if (String::IsMatch(_PROPERTY_VALUE->GetString(), "Right"))
+			pElement->SetAlignment(HGETEXT_RIGHT);
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         23-Oct-2008
+// =============================================================================
+void CComponentFactory::GetImageProperties(CImageElement* pElement, CDataset* pDataset)
+{
+}
+
+// =============================================================================
+// Nat Ryall                                                         23-Oct-2008
+// =============================================================================
+void CComponentFactory::GetStripProperties(CStripElement* pElement, CDataset* pDataset)
+{
+	if (_PROPERTY_EXISTS(pDataset, "Width"))
+		pElement->SetWidth(_PROPERTY_VALUE->GetInt());
+
+	else if (_PROPERTY_EXISTS(pDataset, "InnerWidth"))
+		pElement->SetInnerWidth(_PROPERTY_VALUE->GetInt());
+}
+
+// =============================================================================
+// Nat Ryall                                                         23-Oct-2008
+// =============================================================================
+void CComponentFactory::GetContainerProperties(CContainerElement* pElement, CDataset* pDataset)
+{
+	if (_DATASET_EXISTS(pDataset, "AutoArrange"))
+	{
+		pElement->SetElementPadding(_DATASET_VALUE->GetProperty("Padding")->GetRect());
+		pElement->SetElementSpacing(_DATASET_VALUE->GetProperty("Spacing")->GetInt());
+
+		pElement->ArrangeChildren();
+	}
+	else
+	{
+		if (_PROPERTY_EXISTS(pDataset, "Size"))
+			pElement->SetSize(_PROPERTY_VALUE->GetPoint());
+
+		else if (_PROPERTY_EXISTS(pDataset, "InnerSize"))
+			pElement->SetInnerSize(_PROPERTY_VALUE->GetPoint());
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         23-Oct-2008
+// =============================================================================
+void CComponentFactory::GetCheckProperties(CCheckElement* pElement, CDataset* pDataset)
+{
+	if (_PROPERTY_EXISTS(pDataset, "Checked"))
+		pElement->SetChecked(_PROPERTY_VALUE->GetBool());
+}
+
+// =============================================================================
+// Nat Ryall                                                         23-Oct-2008
+// =============================================================================
+void CComponentFactory::AttachChildren(CInterfaceElement* pElement, CDataset* pDataset)
+{
+	for (xuint iA = 0; iA < pDataset->GetDatasetCount(); ++iA)
+	{
+		CDataset* pWorkingDataset = pDataset->GetDataset(iA);
+		const xchar* pType = pWorkingDataset->GetType();
+
+		if (String::IsMatch(pType, "Label"))
+			pElement->Attach(CreateLabel(pWorkingDataset));
+
+		else if (String::IsMatch(pType, "Hyperlink"))
+			pElement->Attach(CreateHyperlink(pWorkingDataset));
+
+		else if (String::IsMatch(pType, "Image"))
+			pElement->Attach(CreateImage(pWorkingDataset));
+
+		else if (String::IsMatch(pType, "Button"))
+			pElement->Attach(CreateButton(pWorkingDataset));
+
+		else if (String::IsMatch(pType, "Input"))
+			pElement->Attach(CreateInput(pWorkingDataset));
+
+		else if (String::IsMatch(pType, "Progress"))
+			pElement->Attach(CreateProgress(pWorkingDataset));
+
+		else if (String::IsMatch(pType, "Window"))
+			pElement->Attach(CreateWindow(pWorkingDataset));
+
+		else if (String::IsMatch(pType, "Group"))
+			pElement->Attach(CreateGroup(pWorkingDataset));
+
+		else if (String::IsMatch(pType, "Check"))
+			pElement->Attach(CreateCheck(pWorkingDataset));
+
+		else if (String::IsMatch(pType, "Radio"))
+			pElement->Attach(CreateRadio(pWorkingDataset));
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         23-Oct-2008
+// =============================================================================
+CLabelComponent* CComponentFactory::CreateLabel(CDataset* pDataset)
+{
+	XASSERT(pDataset->GetProperty("Font"));
+
+	CFontMetadata* pFont = _FONT(pDataset->GetProperty("Font")->GetString());
+
+	CLabelComponent* pLabel = new CLabelComponent(pFont);
+
+	GetBasicProperties(pLabel, pDataset);
+	GetLabelProperties(pLabel, pDataset);
+
+	return pLabel;
+}
+
+// =============================================================================
+// Nat Ryall                                                         23-Oct-2008
+// =============================================================================
+CHyperlinkComponent* CComponentFactory::CreateHyperlink(CDataset* pDataset)
+{
+	XASSERT(pDataset->GetProperty("Font"));
+
+	CFontMetadata* pFont = _FONT(pDataset->GetProperty("Font")->GetString());
+
+	CHyperlinkComponent* pLabel = new CHyperlinkComponent(pFont);
+
+	GetBasicProperties(pLabel, pDataset);
+	GetLabelProperties(pLabel, pDataset);
+
+	return pLabel;
+}
+
+// =============================================================================
+// Nat Ryall                                                         23-Oct-2008
+// =============================================================================
+CImageComponent* CComponentFactory::CreateImage(CDataset* pDataset)
+{
+	XASSERT(pDataset->GetProperty("Sprite"));
+
+	CSpriteMetadata* pSprite = _SPRITE(pDataset->GetProperty("Sprite")->GetString());
+
+	CImageComponent* pImage = new CImageComponent(pSprite);
+
+	GetBasicProperties(pImage, pDataset);
+	GetImageProperties(pImage, pDataset);
+
+	return pImage;
+}
+
+// =============================================================================
+// Nat Ryall                                                         23-Oct-2008
+// =============================================================================
+CButtonComponent* CComponentFactory::CreateButton(CDataset* pDataset)
+{
+	XASSERT(pDataset->GetProperty("Sprite"));
+	XASSERT(pDataset->GetProperty("Font"));
+
+	CSpriteMetadata* pSprite = _SPRITE(pDataset->GetProperty("Sprite")->GetString());
+	CFontMetadata* pFont = _FONT(pDataset->GetProperty("Font")->GetString());
+
+	CButtonComponent* pButton = new CButtonComponent(pSprite, pFont);
+
+	GetBasicProperties(pButton, pDataset);
+
+	if (_PROPERTY_EXISTS(pDataset, "Text"))
+		pButton->SetText(Global.TranslateLocale(_PROPERTY_VALUE->GetString()));
+
+	GetStripProperties(pButton, pDataset);
+
+	return pButton;
+}
+
+// =============================================================================
+// Nat Ryall                                                         23-Oct-2008
+// =============================================================================
+CInputComponent* CComponentFactory::CreateInput(CDataset* pDataset)
+{
+	XASSERT(pDataset->GetProperty("Sprite"));
+	XASSERT(pDataset->GetProperty("Font"));
+
+	CSpriteMetadata* pSprite = _SPRITE(pDataset->GetProperty("Sprite")->GetString());
+	CFontMetadata* pFont = _FONT(pDataset->GetProperty("Font")->GetString());
+
+	CInputComponent* pInput = new CInputComponent(pSprite, pFont);
+
+	GetBasicProperties(pInput, pDataset);
+
+	if (_PROPERTY_EXISTS(pDataset, "Text"))
+		pInput->SetText(Global.TranslateLocale(_PROPERTY_VALUE->GetString()));
+
+	if (_PROPERTY_EXISTS(pDataset, "Masked"))
+		pInput->SetMasked(_PROPERTY_VALUE->GetBool());
+
+	if (_PROPERTY_EXISTS(pDataset, "Limit"))
+		pInput->SetCharacterLimit(_PROPERTY_VALUE->GetInt());
+
+	GetStripProperties(pInput, pDataset);
+
+	return pInput;
+}
+
+// =============================================================================
+// Nat Ryall                                                         23-Oct-2008
+// =============================================================================
+CProgressComponent* CComponentFactory::CreateProgress(CDataset* pDataset)
+{
+	XASSERT(pDataset->GetProperty("Sprite"));
+
+	CSpriteMetadata* pSprite = _SPRITE(pDataset->GetProperty("Sprite")->GetString());
+
+	CProgressComponent* pProgress = new CProgressComponent(pSprite);
+
+	GetBasicProperties(pProgress, pDataset);
+
+	if (_PROPERTY_EXISTS(pDataset, "Progress"))
+		pProgress->SetProgress(_PROPERTY_VALUE->GetFloat());
+
+	GetStripProperties(pProgress, pDataset);
+
+	return pProgress;
+}
+
+// =============================================================================
+// Nat Ryall                                                         23-Oct-2008
+// =============================================================================
+CWindowComponent* CComponentFactory::CreateWindow(CDataset* pDataset)
+{
+	XASSERT(pDataset->GetProperty("Sprite"));
+	XASSERT(pDataset->GetProperty("Font"));
+
+	CSpriteMetadata* pSprite = _SPRITE(pDataset->GetProperty("Sprite")->GetString());
+	CFontMetadata* pFont = _FONT(pDataset->GetProperty("Font")->GetString());
+
+	CWindowComponent* pWindow = new CWindowComponent(pSprite, pFont);
+
+	GetBasicProperties(pWindow, pDataset);
+
+	if (_PROPERTY_EXISTS(pDataset, "Title"))
+		pWindow->SetTitle(Global.TranslateLocale(_PROPERTY_VALUE->GetString()));
+
+	if (_PROPERTY_EXISTS(pDataset, "Moveable"))
+		pWindow->SetMoveable(_PROPERTY_VALUE->GetBool());
+
+	AttachChildren(pWindow, pDataset);
+
+	GetContainerProperties(pWindow, pDataset);
+
+	return pWindow;
+}
+
+// =============================================================================
+// Nat Ryall                                                         23-Oct-2008
+// =============================================================================
+CGroupComponent* CComponentFactory::CreateGroup(CDataset* pDataset)
+{
+	XASSERT(pDataset->GetProperty("Sprite"));
+	XASSERT(pDataset->GetProperty("Font"));
+
+	CSpriteMetadata* pSprite = _SPRITE(pDataset->GetProperty("Sprite")->GetString());
+	CFontMetadata* pFont = _FONT(pDataset->GetProperty("Font")->GetString());
+
+	CGroupComponent* pGroup = new CGroupComponent(pSprite, pFont);
+
+	GetBasicProperties(pGroup, pDataset);
+
+	if (_PROPERTY_EXISTS(pDataset, "Title"))
+		pGroup->SetTitle(Global.TranslateLocale(_PROPERTY_VALUE->GetString()));
+
+	AttachChildren(pGroup, pDataset);
+
+	GetContainerProperties(pGroup, pDataset);
+
+	return pGroup;
+}
+
+// =============================================================================
+// Nat Ryall                                                         23-Oct-2008
+// =============================================================================
+CListComponent* CComponentFactory::CreateList(CDataset* pDataset)
+{
+	return NULL;
+}
+
+// =============================================================================
+// Nat Ryall                                                         23-Oct-2008
+// =============================================================================
+CCheckComponent* CComponentFactory::CreateCheck(CDataset* pDataset)
+{
+	XASSERT(pDataset->GetProperty("Sprite"));
+	XASSERT(pDataset->GetProperty("Font"));
+
+	CSpriteMetadata* pSprite = _SPRITE(pDataset->GetProperty("Sprite")->GetString());
+	CFontMetadata* pFont = _FONT(pDataset->GetProperty("Font")->GetString());
+
+	CCheckComponent* pCheck = new CCheckComponent(pSprite, pFont);
+
+	GetBasicProperties(pCheck, pDataset);
+
+	if (_PROPERTY_EXISTS(pDataset, "Text"))
+		pCheck->SetText(Global.TranslateLocale(_PROPERTY_VALUE->GetString()));
+
+	GetCheckProperties(pCheck, pDataset);
+
+	return pCheck;
+}
+
+// =============================================================================
+// Nat Ryall                                                         23-Oct-2008
+// =============================================================================
+CRadioComponent* CComponentFactory::CreateRadio(CDataset* pDataset)
+{
+	XASSERT(pDataset->GetProperty("Group"));
+	XASSERT(pDataset->GetProperty("Sprite"));
+	XASSERT(pDataset->GetProperty("Font"));
+
+	xint iGroup = pDataset->GetProperty("Group")->GetInt();
+	CSpriteMetadata* pSprite = _SPRITE(pDataset->GetProperty("Sprite")->GetString());
+	CFontMetadata* pFont = _FONT(pDataset->GetProperty("Font")->GetString());
+
+	CRadioComponent* pRadio = new CRadioComponent(iGroup, pSprite, pFont);
+
+	GetBasicProperties(pRadio, pDataset);
+	
+	if (_PROPERTY_EXISTS(pDataset, "Text"))
+		pRadio->SetText(Global.TranslateLocale(_PROPERTY_VALUE->GetString()));
+
+	GetCheckProperties(pRadio, pDataset);
+
+	return pRadio;
 }
 
 //##############################################################################

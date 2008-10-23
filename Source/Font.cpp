@@ -59,24 +59,24 @@ CFontMetadata::CFontMetadata(CDataset* pDataset) : CResourceMetadata(ResourceTyp
 	m_iShadowColour = 0xFF000000;
 
 	if (_PROPERTY_EXISTS(pDataset, "Scale"))
-		m_fScale = _PROPERTY->GetFloat();
+		m_fScale = _PROPERTY_VALUE->GetFloat();
 
 	if (_PROPERTY_EXISTS(pDataset, "Colour"))
-		m_iColour = ARGB(255, _PROPERTY->GetInt(0), _PROPERTY->GetInt(1), _PROPERTY->GetInt(2));
+		m_iColour = ARGB(255, _PROPERTY_VALUE->GetInt(0), _PROPERTY_VALUE->GetInt(1), _PROPERTY_VALUE->GetInt(2));
 
 	if (_PROPERTY_EXISTS(pDataset, "Spacing"))
-		m_fSpacing = _PROPERTY->GetFloat();
+		m_fSpacing = _PROPERTY_VALUE->GetFloat();
 
 	if (_PROPERTY_EXISTS(pDataset, "Tracking"))
-		m_fTracking = _PROPERTY->GetFloat();
+		m_fTracking = _PROPERTY_VALUE->GetFloat();
 
 	if (CDataset* pShadowDataset = pDataset->GetDataset("Shadow"))
 	{
 		if (_PROPERTY_EXISTS(pShadowDataset, "Offset"))
-			m_xShadowOffset = _PROPERTY->GetPoint();
+			m_xShadowOffset = _PROPERTY_VALUE->GetPoint();
 
 		if (_PROPERTY_EXISTS(pShadowDataset, "Colour"))
-			m_iShadowColour = ARGB(255, _PROPERTY->GetInt(0), _PROPERTY->GetInt(1), _PROPERTY->GetInt(2));
+			m_iShadowColour = ARGB(255, _PROPERTY_VALUE->GetInt(0), _PROPERTY_VALUE->GetInt(1), _PROPERTY_VALUE->GetInt(2));
 	}
 }
 

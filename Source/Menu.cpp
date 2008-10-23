@@ -50,11 +50,14 @@
 // =============================================================================
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
-CMenuLink::CMenuLink(xuint iGroupIndex, CFontMetadata* pFont, const xchar* pText, t_fpLinkSelectedCallback fpCallback) : CHyperlinkComponent(pFont, pText, fpCallback),
+CMenuLink::CMenuLink(xuint iGroupIndex, CFontMetadata* pFont, const xchar* pText, t_OnClickCallback fpCallback) : CHyperlinkComponent(pFont),
 	m_iGroupIndex(iGroupIndex),
 	m_iElementIndex(0)
 {
 	m_iType = ElementType_MenuLink;
+	m_fpOnClickCallback = fpCallback;
+
+	SetText(pText);
 }
 
 // =============================================================================
@@ -146,6 +149,10 @@ void CMenuScreen::OnLoad()
 
 	pMenuLink->RePosition(MapManager.GetMapCount(), MapManager.GetMapCount() + 1);
 	m_lpMenuLinks[MenuGroup_Levels].push_back(pMenuLink);
+
+	// Test: Interface factory.
+	CWindowComponent* pWindow = ComponentFactory.CreateWindow(_METADATA("Interface"), "Window-Password");
+	InterfaceScreen.Attach(pWindow);
 }
 
 // =============================================================================
@@ -288,7 +295,7 @@ void CMenuScreen::SetState(t_MenuState iState)
 	{
 	case MenuState_None:
 		{
-			InterfaceScreen->SetEnabled(true);
+			InterfaceScreen.SetEnabled(true);
 
 			m_iLastMenuGroup = m_iMenuGroup;
 			m_iMenuGroup = MenuGroup_None;
@@ -299,20 +306,20 @@ void CMenuScreen::SetState(t_MenuState iState)
 
 	case MenuState_TransitionIn:
 		{
-			InterfaceScreen->SetEnabled(false);
+			InterfaceScreen.SetEnabled(false);
 			InitTransition(true);
 		}
 		break;
 
 	case MenuState_Idle:
 		{
-			InterfaceScreen->SetEnabled(true);
+			InterfaceScreen.SetEnabled(true);
 		}
 		break;
 
 	case MenuState_TransitionOut:
 		{
-			InterfaceScreen->SetEnabled(false);
+			InterfaceScreen.SetEnabled(false);
 			InitTransition(false);
 		}
 		break;
@@ -391,12 +398,12 @@ void CMenuScreen::AttachMenuGroup(t_MenuGroup iMenuGroup)
 {
 	m_iMenuGroup = iMenuGroup;
 
-	InterfaceScreen->DetachAll();
+	//InterfaceScreen.DetachAll();
 
 	if (iMenuGroup != MenuGroup_None)
 	{
 		XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[iMenuGroup])
-			InterfaceScreen->Attach(*ppMenuLink);
+			InterfaceScreen.Attach(*ppMenuLink);
 	}
 }
 

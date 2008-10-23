@@ -118,9 +118,9 @@ public:
 	virtual void OnRender();
 
 	// Get the base screen element that all other elements should attach to.
-	CScreenElement* GetScreen()
+	CScreenElement& GetScreen()
 	{
-		return m_pScreen;
+		return *m_pScreen;
 	}
 
 	// Get a list of all existing elements.

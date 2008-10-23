@@ -78,7 +78,7 @@ public:
 	friend CMenuScreen;
 
 	// Constructor.
-	CMenuLink(xuint iGroupIndex, CFontMetadata* pFont, const xchar* pText, t_fpLinkSelectedCallback fpCallback = NULL);
+	CMenuLink(xuint iGroupIndex, CFontMetadata* pFont, const xchar* pText, t_OnClickCallback fpCallback = NULL);
 
 	// Destructor.
 	virtual ~CMenuLink() {}
@@ -145,7 +145,10 @@ protected:
 	virtual void OnRender();
 
 	// Called when a game-specific event is executed when active.
-	virtual void OnNotify(xuint iEventType, void* pEventInfo) {}
+	virtual xbool OnEvent(xint iEventType, void* pEventInfo) 
+	{
+		return false;
+	}
 
 	// OnUpdate the transition in/out state.
 	void UpdateTransition(xbool bTransitionIn);
