@@ -58,6 +58,11 @@ typedef xlist<CRenderable*> t_RenderableList;
 //                                 RENDERABLE
 //
 //##############################################################################
+
+// TODO:
+// Add Object.h/.cpp - CObject CObjectManager.
+// Combine CRenderable and CObject into CRenderableObject for convenience.
+
 class CRenderable
 {
 public:
@@ -67,11 +72,8 @@ public:
 	// Destructor.
 	virtual ~CRenderable() {}
 
-	// Update the object ready for rendering.
-	virtual void Update() {}
-
 	// Render the object.
-	virtual void Render() = 0;
+	virtual void OnRender() = 0;
 
 	// Get the renderable type assigned to this renderable.
 	xuint GetRenderableType()
@@ -159,40 +161,33 @@ public:
 	// Initialise.
 	virtual void OnInitialise();
 
-	// Update.
-	virtual void OnUpdate();
-
 	// Render.
-	virtual void OnRender();
+	void Render();
 
 	// Remove all existing renderables.
 	void Reset();
 
 	// Add a renderable to the system on the specified layer (0 to RENDERER_MAXLAYERS-1).
 	// ~note Lower layers are obscured by higher layers.
-	void Add(xuint iLayer, CRenderable* pRenderable);
+	void Add(xint iLayer, CRenderable* pRenderable);
 
 	// Find and remove a renderable from the system.
 	void Remove(CRenderable* pRenderable);
 
-	// Enable a layer and allow update/rendering. Layers are enabled by default.
-	void EnableLayer(xuint iLayer);
-
-	// Disable a layer and stop update/rendering. Layers are enabled by default.
-	void DisableLayer(xuint iLayer);
+	// Enable/disable a layer to allow rendering. Layers are enabled by default.
+	void SetLayerEnabled(xint iLayer, xbool bEnabled);
 
 	// Check if a specific layer is enabled.
-	xbool IsLayerEnabled(xuint iLayer);
+	xbool IsLayerEnabled(xint iLayer);
 
 	// Specify a function to override the render process for each renderable on a specific layer.
-	// ~note Renderables must have Render() called within the override for the object to appear.
-	void SetRenderCallback(xuint iLayer, t_RenderCallback fpCallback);
+	void SetRenderCallback(xint iLayer, t_RenderCallback fpCallback);
 
 	// Set the transformation for a specific layer. The transformation will be applied to all renderables on the layer.
-	void SetTransformation(xuint iLayer, xpoint xPosition = xpoint(), xfloat fRotation = 0.f, xfloat fHorizontalScale = 1.f, xfloat fVerticalScale = 1.f);
+	void SetTransformation(xint iLayer, xpoint xPosition = xpoint(), xfloat fRotation = 0.f, xfloat fHorizontalScale = 1.f, xfloat fVerticalScale = 1.f);
 
 	// Get the currently applied transformation params for a specific layer.
-	CRenderTransformation& GetTransformation(xuint iLayer);
+	CRenderTransformation& GetTransformation(xint iLayer);
 
 	// Render a box to the specified rect dimensions.
 	// ~bFilled Specifies if the box should be filled or just a border.

@@ -251,8 +251,11 @@ xbool Application::OnRender()
 	{
 		s_pInterface->Gfx_BeginScene();
 
-		ModuleManager.Render();
+		RenderManager.Render();
 
+		// TODO: 
+		// Move this to a render layer so objects can be rendered on top.
+		// CScreenOverlay (Overlay.h/.cpp) with RenderLayer_ScreenOverlay
 		if (Global.m_fScreenAlpha != 1.f)
 		{
 			xfloat fAlpha = (1.f - Math::Clamp(Global.m_fScreenAlpha, 0.f, 1.f)) * 255.f;

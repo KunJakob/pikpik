@@ -294,7 +294,7 @@ public:
 	CSprite(CSpriteMetadata* pMetadata);
 
 	// Render the sprite with all current attributes.
-	virtual void Render();
+	virtual void OnRender();
 
 	// Set the current area to render.
 	void SetArea(CSpriteMetadata::CArea* pArea)

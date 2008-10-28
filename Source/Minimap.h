@@ -63,7 +63,7 @@ public:
 	virtual ~CMinimap();
 
 	// Render the minimap.
-	virtual void Render();
+	virtual void OnRender();
 
 	// Generate a minimap with the specified t_MinimapElement mask.
 	HTEXTURE Generate(xuint iElementMask);

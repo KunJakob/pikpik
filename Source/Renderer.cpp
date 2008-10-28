@@ -65,21 +65,6 @@ void CRenderManager::OnInitialise()
 // =============================================================================
 // Nat Ryall                                                         28-Jul-2008
 // =============================================================================
-void CRenderManager::OnUpdate()
-{
-	for (xuint iA = 0; iA < RENDERER_MAXLAYERS; ++iA)
-	{
-		if (!m_xLayers[iA].m_bEnabled)
-			continue;
-
-		XEN_LIST_FOREACH(t_RenderableList, ppRenderable, m_xLayers[iA].m_lpRenderables)
-			(*ppRenderable)->Update();
-	}
-}
-
-// =============================================================================
-// Nat Ryall                                                         28-Jul-2008
-// =============================================================================
 void CRenderManager::OnRender()
 {
 	for (xuint iA = 0; iA < RENDERER_MAXLAYERS; ++iA)
@@ -137,19 +122,10 @@ void CRenderManager::Remove(CRenderable* pRenderable)
 // =============================================================================
 // Nat Ryall                                                         14-Apr-2008
 // =============================================================================
-void CRenderManager::EnableLayer(xuint iLayer)
+void CRenderManager::SetLayerEnabled(xuint iLayer, xbool bEnabled)
 {
 	XMASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
-	m_xLayers[iLayer].m_bEnabled = true;
-}
-
-// =============================================================================
-// Nat Ryall                                                         14-Apr-2008
-// =============================================================================
-void CRenderManager::DisableLayer(xuint iLayer)
-{
-	XMASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
-	m_xLayers[iLayer].m_bEnabled = false;
+	m_xLayers[iLayer].m_bEnabled = bEnabled;
 }
 
 // =============================================================================
