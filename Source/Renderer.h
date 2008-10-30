@@ -19,8 +19,6 @@
 #include <Global.h>
 
 //##############################################################################
-
-//##############################################################################
 //
 //                                   MACROS
 //
@@ -28,13 +26,6 @@
 
 // Shortcuts.
 #define RenderManager CRenderManager::Get()
-
-// The maximum number of layers allowed in the renderer.
-#define RENDERER_MAXLAYERS 16
-
-//##############################################################################
-
-//##############################################################################
 
 //##############################################################################
 //
@@ -44,14 +35,14 @@
 
 // Predeclare.
 class CRenderable;
+class CRenderLayer;
 
 // Callbacks.
-typedef xfunction(1)<CRenderable* /*Renderable*/> t_RenderCallback;
+typedef xfunction(1)<CRenderLayer* /*Layer*/> t_RenderOverrideCallback;
 
 // Lists.
-typedef xlist<CRenderable*> t_RenderableList;
-
-//##############################################################################
+typedef xvlist<CRenderable*> t_RenderableList;
+typedef xvlist<CRenderLayer*> t_RenderLayerList;
 
 //##############################################################################
 //
@@ -67,11 +58,8 @@ public:
 	// Destructor.
 	virtual ~CRenderable() {}
 
-	// Update the object ready for rendering.
-	virtual void Update() {}
-
 	// Render the object.
-	virtual void Render() = 0;
+	virtual void OnRender() = 0;
 
 	// Get the renderable type assigned to this renderable.
 	xuint GetRenderableType()
@@ -85,8 +73,6 @@ protected:
 };
 
 //##############################################################################
-
-//##############################################################################
 //
 //                           RENDER TRANSFORMATION
 //
@@ -94,6 +80,9 @@ protected:
 class CRenderTransformation
 {
 public:
+	// Constructor.
+	CRenderTransformation();
+
 	// Reset the transformation to nothing.
 	void Reset();
 
@@ -114,8 +103,6 @@ public:
 };
 
 //##############################################################################
-
-//##############################################################################
 //
 //                                RENDER LAYER
 //
@@ -123,14 +110,64 @@ public:
 class CRenderLayer
 {
 public:
+	// Constructor.
+	CRenderLayer(xuint iLayerIndex);
+
+	// Get the local layer index.
+	xuint GetLayerIndex()
+	{
+		return m_iLayerIndex;
+	}
+
+	// Detach all renderables.
+	void ClearRenderables();
+
+	// Add a renderable to the layer.
+	// ~note Renderables will be drawn in the order they are added unless manually overriden.
+	// ~note Lower layers are obscured by higher layers.
+	void AttachRenderable(xuint iLayer, CRenderable* pRenderable);
+
+	// Find and remove a renderable from the layer.
+	void DetachRenderable(CRenderable* pRenderable);
+
+	// Determine if the specified renderable is attached to the layer.
+	xbool IsRenderableAttached(CRenderable* pRenderable);
+
+	// Get the number of renderables being managed by this layer.
+	xint GetRenderableCount();
+
+	// Get a specific renderable by index.
+	CRenderable* GetRenderable(xint iIndex);
+
+	// Enable/disable rendering for this layer. 
+	// ~note Layers are enabled by default.
+	void SetEnabled(xbool bEnabled);
+
+	// Check if this layer is enabled.
+	// ~note Layers are enabled by default.
+	xbool IsEnabled();
+
+	// Specify a function to override the default render process for this layer.
+	void SetRenderOverride(t_RenderOverrideCallback fpCallback);
+
+	// Set the transformation to be applied to all renderables on the layer.
+	void SetTransformation(xpoint xPosition = xpoint(), xfloat fRotation = 0.f, xfloat fHorizontalScale = 1.f, xfloat fVerticalScale = 1.f);
+
+	// Get the currently applied transformation params for a specific layer.
+	CRenderTransformation& GetTransformation();
+
+	// Activate the transformation and render using the render override or using the default render pipeline.
+	void Render();
+
+private:
 	// The layer index.
-	xuint m_iLayer;
+	xuint m_iLayerIndex;
 
 	// The enabled/disabled status of this layer.
 	xbool m_bEnabled;
 
 	// The render override callback.
-	t_RenderCallback m_fpRenderCallback;
+	t_RenderOverrideCallback m_fpRenderOverrideCallback;
 
 	// The renderable list for this layer.
 	t_RenderableList m_lpRenderables;
@@ -138,8 +175,6 @@ public:
 	// The render layer transformation.
 	CRenderTransformation m_xTransformation;
 };
-
-//##############################################################################
 
 //##############################################################################
 //
@@ -159,40 +194,20 @@ public:
 	// Initialise.
 	virtual void OnInitialise();
 
-	// Update.
-	virtual void OnUpdate();
+	// Deinitialise.
+	virtual void OnDeinitialise();
 
-	// Render.
-	virtual void OnRender();
+	// Destroy all existing layers and create the specified number of new layers.
+	void ResetLayers(xint iLayerCount);
 
-	// Remove all existing renderables.
-	void Reset();
+	// Get the number of active layers in the system.
+	xint GetLayerCount();
 
-	// Add a renderable to the system on the specified layer (0 to RENDERER_MAXLAYERS-1).
-	// ~note Lower layers are obscured by higher layers.
-	void Add(xuint iLayer, CRenderable* pRenderable);
+	// Get a specific render layer by index.
+	CRenderLayer* GetLayer(xint iIndex);
 
-	// Find and remove a renderable from the system.
-	void Remove(CRenderable* pRenderable);
-
-	// Enable a layer and allow update/rendering. Layers are enabled by default.
-	void EnableLayer(xuint iLayer);
-
-	// Disable a layer and stop update/rendering. Layers are enabled by default.
-	void DisableLayer(xuint iLayer);
-
-	// Check if a specific layer is enabled.
-	xbool IsLayerEnabled(xuint iLayer);
-
-	// Specify a function to override the render process for each renderable on a specific layer.
-	// ~note Renderables must have Render() called within the override for the object to appear.
-	void SetRenderCallback(xuint iLayer, t_RenderCallback fpCallback);
-
-	// Set the transformation for a specific layer. The transformation will be applied to all renderables on the layer.
-	void SetTransformation(xuint iLayer, xpoint xPosition = xpoint(), xfloat fRotation = 0.f, xfloat fHorizontalScale = 1.f, xfloat fVerticalScale = 1.f);
-
-	// Get the currently applied transformation params for a specific layer.
-	CRenderTransformation& GetTransformation(xuint iLayer);
+	// Called to render all enabled render layers and objects.
+	void Render();
 
 	// Render a box to the specified rect dimensions.
 	// ~bFilled Specifies if the box should be filled or just a border.
@@ -200,7 +215,7 @@ public:
 
 protected:
 	// The renderable list.
-	CRenderLayer m_xLayers[RENDERER_MAXLAYERS];
+	t_RenderLayerList m_lpLayerList;
 };
 
 //##############################################################################

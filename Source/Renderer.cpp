@@ -11,12 +11,18 @@
 #include <Renderer.h>
 
 //##############################################################################
-
-//##############################################################################
 //
 //                           RENDER TRANSFORMATION
 //
 //##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                         30-Oct-2008
+// =============================================================================
+CRenderTransformation::CRenderTransformation()
+{
+	Reset();
+}
 
 // =============================================================================
 // Nat Ryall                                                         18-Sep-2008
@@ -47,6 +53,136 @@ void CRenderTransformation::Apply()
 }
 
 //##############################################################################
+//
+//                                RENDER LAYER
+//
+//##############################################################################
+
+// =============================================================================
+// Nat Ryall                                                         30-Oct-2008
+// =============================================================================
+CRenderLayer::CRenderLayer(xuint iLayerIndex) :
+	m_iLayerIndex(iLayerIndex),
+	m_bEnabled(true),
+	m_fpRenderOverrideCallback(NULL)
+{
+}
+
+// =============================================================================
+// Nat Ryall                                                         30-Oct-2008
+// =============================================================================
+void CRenderLayer::ClearRenderables()
+{
+	m_lpRenderables.clear();
+}
+
+// =============================================================================
+// Nat Ryall                                                          8-Apr-2008
+// =============================================================================
+void CRenderLayer::AttachRenderable(CRenderable* pRenderable)
+{
+	m_lpRenderables.push_back(pRenderable);
+}
+
+// =============================================================================
+// Nat Ryall                                                          8-Apr-2008
+// =============================================================================
+void CRenderLayer::DetachRenderable(CRenderable* pRenderable)
+{
+	m_lpRenderables.remove(pRenderable);
+}
+
+// =============================================================================
+// Nat Ryall                                                         30-Oct-2008
+// =============================================================================
+xbool CRenderLayer::IsRenderableAttached(CRenderable* pRenderable)
+{
+	XLISTFOREACH(t_RenderableList, ppRenderable, m_lpRenderables)
+	{
+		if (*ppRenderable == pRenderable)
+			return true;
+	}
+
+	return false;
+}
+
+// =============================================================================
+// Nat Ryall                                                         30-Oct-2008
+// =============================================================================
+xint CRenderLayer::GetRenderableCount()
+{
+	return m_lpRenderables.size();
+}
+
+// =============================================================================
+// Nat Ryall                                                         30-Oct-2008
+// =============================================================================
+CRenderable* CRenderLayer::GetRenderable(xint iIndex)
+{
+	XMASSERT(iIndex > (GetRenderableCount() - 1), XFORMAT("Renderable index %d is out of bounds.", iIndex));
+	return m_lpRenderables[iIndex];
+}
+
+// =============================================================================
+// Nat Ryall                                                         14-Apr-2008
+// =============================================================================
+void CRenderLayer::SetEnabled(xbool bEnabled)
+{
+	m_bEnabled = bEnabled;
+}
+
+// =============================================================================
+// Nat Ryall                                                         14-Apr-2008
+// =============================================================================
+xbool CRenderLayer::IsEnabled()
+{
+	return m_bEnabled;
+}
+
+// =============================================================================
+// Nat Ryall                                                         14-Apr-2008
+// =============================================================================
+void CRenderLayer::SetRenderOverride(t_RenderOverrideCallback fpCallback)
+{
+	m_fpRenderOverrideCallback = fpCallback;
+}
+
+// =============================================================================
+// Nat Ryall                                                         18-Sep-2008
+// =============================================================================
+void CRenderLayer::SetTransformation(xpoint xPosition, xfloat fRotation, xfloat fHorizontalScale, xfloat fVerticalScale)
+{
+	m_xTransformation.m_xPosition = xPosition;
+	m_xTransformation.m_fRotation = fRotation;
+	m_xTransformation.m_fHorizontalScale = fHorizontalScale;
+	m_xTransformation.m_fVerticalScale = fVerticalScale;
+}
+
+// =============================================================================
+// Nat Ryall                                                         18-Sep-2008
+// =============================================================================
+CRenderTransformation& CRenderLayer::GetTransformation()
+{
+	return m_xTransformation;
+}
+
+// =============================================================================
+// Nat Ryall                                                         30-Oct-2008
+// =============================================================================
+void CRenderLayer::Render()
+{
+	m_xTransformation.Apply();
+
+	if (m_fpRenderOverrideCallback)
+		m_fpRenderOverrideCallback(this);
+	else
+	{
+		XLISTFOREACH(t_RenderableList, ppRenderable, m_lpRenderables)
+		{
+			(*ppRenderable)->Render();
+		}
+	}
+}
 
 //##############################################################################
 //
@@ -59,137 +195,69 @@ void CRenderTransformation::Apply()
 // =============================================================================
 void CRenderManager::OnInitialise()
 {
-	Reset();
+}
+
+// =============================================================================
+// Nat Ryall                                                         30-Oct-2008
+// =============================================================================
+void CRenderManager::OnDeinitialise()
+{
+	ResetLayers(0);
+}
+
+// =============================================================================
+// Nat Ryall                                                         30-Oct-2008
+// =============================================================================
+void CRenderManager::ResetLayers(xint iLayerCount)
+{
+	XMASSERT(iLayerCount > -1, "Layer count must be zero or a positive value.");
+
+	// Clear the existing layers.
+	XLISTFOREACH(t_RenderLayerList, ppLayer, m_lpLayerList)
+	{
+		delete *ppLayer;
+	}
+
+	m_lpLayerList.clear();
+
+	// Create new layers.
+	for (xint iA = 0; iA < iLayerCount; ++iA)
+	{
+		m_lpLayerList.push_back(new CRenderLayer(iA));
+	}
+}
+
+// =============================================================================
+// Nat Ryall                                                         30-Oct-2008
+// =============================================================================
+xint CRenderManager::GetLayerCount()
+{
+	return m_lpLayerList.size();
+}
+
+// =============================================================================
+// Nat Ryall                                                         30-Oct-2008
+// =============================================================================
+CRenderLayer* CRenderManager::GetLayer(xint iIndex)
+{
+	XMASSERT(iIndex > (GetLayerCount() - 1), XFORMAT("Layer index %d is out of bounds.", iIndex));
+	return m_lpLayerList[iIndex];
 }
 
 // =============================================================================
 // Nat Ryall                                                         28-Jul-2008
 // =============================================================================
-void CRenderManager::OnUpdate()
+void CRenderManager::Render()
 {
-	for (xuint iA = 0; iA < RENDERER_MAXLAYERS; ++iA)
+	XLISTFOREACH(t_RenderLayerList, ppLayer, m_lpLayerList)
 	{
-		if (!m_xLayers[iA].m_bEnabled)
-			continue;
+		CRenderLayer* pLayer = *ppLayer;
 
-		XEN_LIST_FOREACH(t_RenderableList, ppRenderable, m_xLayers[iA].m_lpRenderables)
-			(*ppRenderable)->Update();
-	}
-}
-
-// =============================================================================
-// Nat Ryall                                                         28-Jul-2008
-// =============================================================================
-void CRenderManager::OnRender()
-{
-	for (xuint iA = 0; iA < RENDERER_MAXLAYERS; ++iA)
-	{
-		if (!m_xLayers[iA].m_bEnabled)
-			continue;
-
-		m_xLayers[iA].m_xTransformation.Apply();
-
-		XEN_LIST_FOREACH(t_RenderableList, ppRenderable, m_xLayers[iA].m_lpRenderables)
-		{
-			if (m_xLayers[iA].m_fpRenderCallback)
-				m_xLayers[iA].m_fpRenderCallback(*ppRenderable);
-			else
-				(*ppRenderable)->Render();
-		}
+		if (pLayer->IsEnabled())
+			pLayer->Render();
 	}
 
-	_HGE->Gfx_SetTransform();
-}
-
-// =============================================================================
-// Nat Ryall                                                          8-Apr-2008
-// =============================================================================
-void CRenderManager::Reset()
-{
-	for (xuint iA = 0; iA < RENDERER_MAXLAYERS; ++iA)
-	{
-		m_xLayers[iA].m_iLayer = iA;
-		m_xLayers[iA].m_bEnabled = true;
-		m_xLayers[iA].m_fpRenderCallback = NULL;
-		m_xLayers[iA].m_lpRenderables.clear();
-		m_xLayers[iA].m_xTransformation.Reset();
-	}
-}
-
-// =============================================================================
-// Nat Ryall                                                          8-Apr-2008
-// =============================================================================
-void CRenderManager::Add(xuint iLayer, CRenderable* pRenderable)
-{
-	XMASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
-	m_xLayers[iLayer].m_lpRenderables.push_back(pRenderable);
-}
-
-// =============================================================================
-// Nat Ryall                                                          8-Apr-2008
-// =============================================================================
-void CRenderManager::Remove(CRenderable* pRenderable)
-{
-	for (xuint iA = 0; iA < RENDERER_MAXLAYERS; ++iA)
-		m_xLayers[iA].m_lpRenderables.remove(pRenderable);
-}
-
-// =============================================================================
-// Nat Ryall                                                         14-Apr-2008
-// =============================================================================
-void CRenderManager::EnableLayer(xuint iLayer)
-{
-	XMASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
-	m_xLayers[iLayer].m_bEnabled = true;
-}
-
-// =============================================================================
-// Nat Ryall                                                         14-Apr-2008
-// =============================================================================
-void CRenderManager::DisableLayer(xuint iLayer)
-{
-	XMASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
-	m_xLayers[iLayer].m_bEnabled = false;
-}
-
-// =============================================================================
-// Nat Ryall                                                         14-Apr-2008
-// =============================================================================
-xbool CRenderManager::IsLayerEnabled(xuint iLayer)
-{
-	XMASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
-	return m_xLayers[iLayer].m_bEnabled;
-}
-
-// =============================================================================
-// Nat Ryall                                                         14-Apr-2008
-// =============================================================================
-void CRenderManager::SetRenderCallback(xuint iLayer, t_RenderCallback fpCallback)
-{
-	XMASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
-	m_xLayers[iLayer].m_fpRenderCallback = fpCallback;
-}
-
-// =============================================================================
-// Nat Ryall                                                         18-Sep-2008
-// =============================================================================
-void CRenderManager::SetTransformation(xuint iLayer, xpoint xPosition, xfloat fRotation, xfloat fHorizontalScale, xfloat fVerticalScale)
-{
-	XMASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
-
-	m_xLayers[iLayer].m_xTransformation.m_xPosition = xPosition;
-	m_xLayers[iLayer].m_xTransformation.m_fRotation = fRotation;
-	m_xLayers[iLayer].m_xTransformation.m_fHorizontalScale = fHorizontalScale;
-	m_xLayers[iLayer].m_xTransformation.m_fVerticalScale = fVerticalScale;
-}
-
-// =============================================================================
-// Nat Ryall                                                         18-Sep-2008
-// =============================================================================
-CRenderTransformation& CRenderManager::GetTransformation(xuint iLayer)
-{
-	XMASSERT(iLayer < RENDERER_MAXLAYERS, "Layer index out of bounds.");
-	return m_xLayers[iLayer].m_xTransformation;
+	_HGE->Gfx_SetTransform(0.f, 0.f, 0.f, 0.f, 0.f, 1.f, 1.f);
 }
 
 // =============================================================================

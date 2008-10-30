@@ -251,7 +251,7 @@ xbool Application::OnRender()
 	{
 		s_pInterface->Gfx_BeginScene();
 
-		ModuleManager.Render();
+		RenderManager.Render();
 
 		if (Global.m_fScreenAlpha != 1.f)
 		{
@@ -310,5 +310,6 @@ xuint Application::GetTimeDelta()
 }
 
 //##############################################################################
+
 
 
