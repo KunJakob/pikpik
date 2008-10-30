@@ -60,8 +60,8 @@ protected:
 	// Called to update the screen (updates the parent screen by default).
 	virtual void OnUpdate();
 
-	// Called to render the next screen frame (renders the parent screen by default).
-	virtual void OnRender();
+	// Called to pre-render the next screen frame.
+	virtual void OnPreRender();
 
 	// OnActivate the currently active map.
 	void LoadMap();

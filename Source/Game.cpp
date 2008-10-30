@@ -158,13 +158,13 @@ void CGameScreen::OnUpdate()
 // =============================================================================
 // Nat Ryall                                                         11-Apr-2008
 // =============================================================================
-void CGameScreen::OnRender()
+void CGameScreen::OnPreRender()
 {
 	// Set the transformations.
 	xpoint xOffset = (Global.m_pLocalPlayer->GetSprite()->GetPosition() - xpoint(_HSWIDTH, _HSHEIGHT)) * -1;
 
-	RenderManager.SetTransformation(LayerIndex_Map, xOffset);
-	RenderManager.SetTransformation(LayerIndex_Player, xOffset);
+	RenderManager.GetLayer(LayerIndex_Map)->SetTransformation(xOffset);
+	RenderManager.GetLayer(LayerIndex_Player)->SetTransformation(xOffset);
 }
 
 //##############################################################################

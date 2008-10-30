@@ -251,8 +251,11 @@ xbool Application::OnRender()
 	{
 		s_pInterface->Gfx_BeginScene();
 
+		ScreenManager.PreRender();
 		RenderManager.Render();
+		ScreenManager.PostRender();
 
+		// TODO: This should be moved to a layer (CFadeOverlay).
 		if (Global.m_fScreenAlpha != 1.f)
 		{
 			xfloat fAlpha = (1.f - Math::Clamp(Global.m_fScreenAlpha, 0.f, 1.f)) * 255.f;
