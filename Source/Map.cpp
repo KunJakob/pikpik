@@ -92,6 +92,13 @@ static const t_BlockType s_iBlockTypeLookup[TileType_Max] =
 //##############################################################################
 
 // =============================================================================
+// Nat Ryall                                                         23-Jun-2008
+// =============================================================================
+void CMapBlock::Update()
+{
+}
+
+// =============================================================================
 // Nat Ryall                                                         17-Apr-2008
 // =============================================================================
 xbool CMapBlock::IsVisible(CPlayer* pPlayer)
@@ -342,7 +349,7 @@ void CMap::AddVisiblePaths(CMapBlock* pBase, xfloat fVisibility)
 // =============================================================================
 // Nat Ryall                                                         10-Apr-2008
 // =============================================================================
-void CMap::OnRender()
+void CMap::Render()
 {
 	// Blend the colours based on the music energy.
 	/*const static xfloat s_fMinColour = 0.2f;

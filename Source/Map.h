@@ -96,6 +96,9 @@ public:
 	// Friends.
 	friend CMap;
 
+	// Update this block each frame.
+	void Update();
+
 	// Check if the block is a wall tile.
 	xbool IsWall()
 	{
@@ -208,7 +211,7 @@ public:
 	virtual void Update();
 
 	// Render the map.
-	virtual void OnRender();
+	virtual void Render();
 
 	// Determine if the map instance is currently loaded into memory.
 	inline xbool IsLoaded()

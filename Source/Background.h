@@ -36,7 +36,7 @@ public:
 	/**
 	* Render the background.
 	*/
-	virtual void OnRender()
+	virtual void Render()
 	{
 		_HGE->Gfx_Clear(iBackgroundColour);
 	}

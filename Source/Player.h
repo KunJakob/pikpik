@@ -84,7 +84,7 @@ public:
 	virtual void Update();
 
 	// Render the object.
-	virtual void OnRender();
+	virtual void Render();
 
 	// Get the type of the player.
 	t_PlayerType GetType()
