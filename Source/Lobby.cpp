@@ -148,10 +148,16 @@ void CLobbyScreen::OnUpdate()
 // =============================================================================
 // Nat Ryall                                                         09-Jun-2008
 // =============================================================================
-void CLobbyScreen::OnRender()
+void CLobbyScreen::OnPreRender()
 {
-	Parent_OnRender();
+	Parent_OnPreRender();
+}
 
+// =============================================================================
+// Nat Ryall                                                         09-Jun-2008
+// =============================================================================
+void CLobbyScreen::OnPostRender()
+{
 	switch (m_iState)
 	{
 	case LobbyState_Lobby:

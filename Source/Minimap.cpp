@@ -62,7 +62,7 @@ CMinimap::~CMinimap()
 // =============================================================================
 // Nat Ryall                                                         24-Jul-2008
 // =============================================================================
-void CMinimap::Render()
+void CMinimap::OnRender()
 {
 	_HGE->System_SetState(HGE_TEXTUREFILTER, false);
 		

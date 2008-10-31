@@ -89,7 +89,7 @@ void CRenderLayer::AttachRenderable(CRenderable* pRenderable)
 // =============================================================================
 void CRenderLayer::DetachRenderable(CRenderable* pRenderable)
 {
-	m_lpRenderables.remove(pRenderable);
+	XLISTREMOVE(t_RenderableList, m_lpRenderables, pRenderable);
 }
 
 // =============================================================================
@@ -179,7 +179,7 @@ void CRenderLayer::Render()
 	{
 		XLISTFOREACH(t_RenderableList, ppRenderable, m_lpRenderables)
 		{
-			(*ppRenderable)->Render();
+			(*ppRenderable)->OnRender();
 		}
 	}
 }
@@ -210,7 +210,11 @@ void CRenderManager::OnDeinitialise()
 // =============================================================================
 void CRenderManager::ResetLayers(xint iLayerCount)
 {
-	XMASSERT(iLayerCount > -1, "Layer count must be zero or a positive value.");
+	XMASSERT(iLayerCount >= -1, "Layer count must be zero or a positive value or -1 for the current number of layers.");
+
+	// Use -1 for the current number of layers.
+	if (iLayerCount == -1)
+		iLayerCount = GetLayerCount();
 
 	// Clear the existing layers.
 	XLISTFOREACH(t_RenderLayerList, ppLayer, m_lpLayerList)

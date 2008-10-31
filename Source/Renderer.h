@@ -125,7 +125,7 @@ public:
 	// Add a renderable to the layer.
 	// ~note Renderables will be drawn in the order they are added unless manually overriden.
 	// ~note Lower layers are obscured by higher layers.
-	void AttachRenderable(xuint iLayer, CRenderable* pRenderable);
+	void AttachRenderable(CRenderable* pRenderable);
 
 	// Find and remove a renderable from the layer.
 	void DetachRenderable(CRenderable* pRenderable);
@@ -198,7 +198,8 @@ public:
 	virtual void OnDeinitialise();
 
 	// Destroy all existing layers and create the specified number of new layers.
-	void ResetLayers(xint iLayerCount);
+	// ~iLayerCount The number of layers to create after resetting the system. Set to -1 for the current number of layers.
+	void ResetLayers(xint iLayerCount = -1);
 
 	// Get the number of active layers in the system.
 	xint GetLayerCount();

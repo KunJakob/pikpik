@@ -349,7 +349,7 @@ void CMap::AddVisiblePaths(CMapBlock* pBase, xfloat fVisibility)
 // =============================================================================
 // Nat Ryall                                                         10-Apr-2008
 // =============================================================================
-void CMap::Render()
+void CMap::OnRender()
 {
 	// Blend the colours based on the music energy.
 	/*const static xfloat s_fMinColour = 0.2f;

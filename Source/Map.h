@@ -208,10 +208,10 @@ public:
 	void Unload();
 
 	// Update the map.
-	virtual void Update();
+	void Update();
 
 	// Render the map.
-	virtual void Render();
+	virtual void OnRender();
 
 	// Determine if the map instance is currently loaded into memory.
 	inline xbool IsLoaded()

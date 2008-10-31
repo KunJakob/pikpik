@@ -45,10 +45,10 @@ void CGameScreen::OnActivate()
 
 	InitialisePlayers();
 
-	RenderManager.Add(LayerIndex_Background, &m_xBackground);
+	RenderManager.GetLayer(LayerIndex_Background)->AttachRenderable(&m_xBackground);
 
 	m_pMinimap = new CMinimap(Global.m_pActiveMap);
-	RenderManager.Add(LayerIndex_Radar, m_pMinimap);
+	RenderManager.GetLayer(LayerIndex_Radar)->AttachRenderable(m_pMinimap);
 }
 
 // =============================================================================
@@ -56,7 +56,7 @@ void CGameScreen::OnActivate()
 // =============================================================================
 void CGameScreen::LoadMap()
 {
-	RenderManager.Add(LayerIndex_Map, Global.m_pActiveMap);
+	RenderManager.GetLayer(LayerIndex_Map)->AttachRenderable(Global.m_pActiveMap);
 }
 
 // =============================================================================
@@ -85,7 +85,7 @@ void CGameScreen::InitialisePlayers()
 
 	// Add all active players to the player render layer.
 	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
-		RenderManager.Add(LayerIndex_Player, *ppPlayer);
+		RenderManager.GetLayer(LayerIndex_Player)->AttachRenderable(*ppPlayer);
 }
 
 // =============================================================================
@@ -97,7 +97,7 @@ void CGameScreen::OnDeactivate()
 
 	//m_pMusic->release();
 
-	RenderManager.Reset();
+	RenderManager.ResetLayers();
 	CollisionManager.Reset();
 
 	InterfaceManager.SetCursorVisible(true);

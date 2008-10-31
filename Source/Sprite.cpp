@@ -261,7 +261,7 @@ CSprite::CSprite(CSpriteMetadata* pMetadata) : CBasicSprite(pMetadata), CRendera
 // =============================================================================
 // Author: Nat Ryall                                           Date: 12-Feb-2008
 // =============================================================================
-void CSprite::Render()
+void CSprite::OnRender()
 {
 	CBasicSprite::Render(m_xPosition, m_xAnchor, m_pArea ? m_pArea->m_xRect : GetImageRect(), m_fAlpha, m_fAngle);
 }
@@ -315,9 +315,9 @@ void CAnimatedSprite::Update()
 // =============================================================================
 // Nat Ryall                                                         16-Apr-2008
 // =============================================================================
-void CAnimatedSprite::Render()
+void CAnimatedSprite::OnRender()
 {
-	CSprite::Render();
+	CSprite::OnRender();
 }
 
 // =============================================================================

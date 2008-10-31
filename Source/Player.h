@@ -84,7 +84,7 @@ public:
 	virtual void Update();
 
 	// Render the object.
-	virtual void Render();
+	virtual void OnRender();
 
 	// Get the type of the player.
 	t_PlayerType GetType()
@@ -275,7 +275,7 @@ public:
 	virtual void Update();
 
 	// Render the object.
-	virtual void Render();
+	virtual void OnRender();
 
 	// Called to change the state of the player object.
 	virtual void SetState(t_PlayerState iState);

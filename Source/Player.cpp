@@ -189,7 +189,7 @@ void CPlayer::Update()
 // =============================================================================
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
-void CPlayer::Render()
+void CPlayer::OnRender()
 {
 	m_pSprite->Render();
 }
@@ -530,11 +530,11 @@ void CGhost::Update()
 // =============================================================================
 // Nat Ryall                                                         16-Apr-2008
 // =============================================================================
-void CGhost::Render()
+void CGhost::OnRender()
 {
 	m_pSprite->GetMetadata()->GetSprite()->SetColor(m_iColour);
 
-	CPlayer::Render();
+	CPlayer::OnRender();
 
 	m_pEyes->SetPosition(m_pSprite->GetPosition());
 

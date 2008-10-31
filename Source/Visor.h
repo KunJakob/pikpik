@@ -52,24 +52,6 @@ public:
 	void SetText(const xchar* pText, const xchar* pSubText = NULL);
 
 protected:
-	// Called to load the screen resources.
-	virtual void OnLoad();
-
-	// Called to unload the screen resources.
-	virtual void OnUnload();
-
-	// Called when the screen is added to the screen stack.
-	virtual void OnActivate();
-
-	// Called when the screen is removed from the screen stack.
-	virtual void OnDeactivate();
-
-	// Called to update the screen (updates the parent screen by default).
-	virtual void OnUpdate();
-
-	// Called to render the next screen frame (renders the parent screen by default).
-	virtual void OnRender();
-
 	// The visor transition state.
 	t_VisorTransitionState m_iState;
 	

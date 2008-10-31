@@ -293,8 +293,14 @@ public:
 	// Constructor.
 	CSprite(CSpriteMetadata* pMetadata);
 
-	// Render the sprite with all current attributes.
-	virtual void Render();
+	// Render the sprite manually with all current attributes.
+	virtual void Render()
+	{
+		OnRender();
+	}
+
+	// Automatic render called by the render manager.
+	virtual void OnRender();
 
 	// Set the current area to render.
 	void SetArea(CSpriteMetadata::CArea* pArea)
@@ -436,8 +442,14 @@ public:
 	// Update the sprite to the current animation frame.
 	virtual void Update();
 
-	// Render the sprite with all current attributes using the current animation frame.
-	virtual void Render();
+	// Render the sprite manually with all current attributes using the current animation frame.
+	virtual void Render()
+	{
+		OnRender();
+	}
+
+	// Automatic render called by the render manager.
+	virtual void OnRender();
 
 	// Jump to a specific animation frame in the current animation.
 	void SetFrame(CSpriteMetadata::CFrame* pFrame);

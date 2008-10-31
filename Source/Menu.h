@@ -141,8 +141,11 @@ protected:
 	// Called each frame to update the screen when active.
 	virtual void OnUpdate();
 
-	// Called each frame to render the screen when active.
-	virtual void OnRender();
+	// Called immediately before the render manager is executed.	
+	virtual void OnPreRender();
+
+	// Called immediately after the render manager has executed.	
+	virtual void OnPostRender();
 
 	// Called when a game-specific event is executed when active.
 	virtual xbool OnEvent(xint iEventType, void* pEventInfo) 
