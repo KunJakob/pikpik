@@ -53,6 +53,16 @@ void CLogoScreen::OnWake()
 	CFadeScreen::Reset();
 
 	m_pSound->Play();
+
+	RenderManager.SetRenderOverride(xbind(this, &CLogoScreen::Render));
+}
+
+// =============================================================================
+// Nat Ryall                                                          3-Nov-2008
+// =============================================================================
+void CLogoScreen::OnSleep()
+{
+	RenderManager.SetRenderOverride(NULL);
 }
 
 // =============================================================================
@@ -116,7 +126,7 @@ void CLogoScreen::OnUpdate()
 // =============================================================================
 // Nat Ryall                                                          6-Apr-2008
 // =============================================================================
-void CLogoScreen::OnRender()
+void CLogoScreen::Render()
 {
 	xfloat fColour = m_fAlpha * .08f;
 	_HGE->Gfx_Clear(_ARGBF(1.f, fColour, fColour, fColour));
@@ -141,6 +151,22 @@ void CLogoScreen::OnFadeComplete()
 //##############################################################################
 
 // =============================================================================
+// Nat Ryall                                                          3-Nov-2008
+// =============================================================================
+void CWarningScreen::OnWake()
+{
+	RenderManager.SetRenderOverride(xbind(this, &CWarningScreen::Render));
+}
+
+// =============================================================================
+// Nat Ryall                                                          3-Nov-2008
+// =============================================================================
+void CWarningScreen::OnSleep()
+{
+	RenderManager.SetRenderOverride(NULL);
+}
+
+// =============================================================================
 // Nat Ryall                                                          6-Apr-2008
 // =============================================================================
 xbool CWarningScreen::OnEvent(xint iEventType, void* pEventInfo)
@@ -162,7 +188,7 @@ xbool CWarningScreen::OnEvent(xint iEventType, void* pEventInfo)
 // =============================================================================
 // Nat Ryall                                                          4-Jun-2008
 // =============================================================================
-void CWarningScreen::OnRender()
+void CWarningScreen::Render()
 {
 	xfloat fColour = m_fAlpha * .08f;
 	_HGE->Gfx_Clear(_ARGBF(1.f, fColour, fColour, fColour));

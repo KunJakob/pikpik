@@ -25,8 +25,8 @@
 // Nat Ryall                                                         21-Apr-2008
 // =============================================================================
 CBackgroundImage::CBackgroundImage(const xchar* pSpriteName) :
-	iScrollInterval(25),
-	xScrollVector(xpoint(1, 1)),
+	m_iScrollInterval(25),
+	m_xScrollVector(xpoint(1, 1)),
 	m_pSprite(NULL),
 	m_iTimer(0)
 {
@@ -49,10 +49,10 @@ void CBackgroundImage::Update()
 {
 	m_iTimer += _TIMEDELTA;
 
-	if (m_iTimer > iScrollInterval)
+	if (m_iTimer > m_iScrollInterval)
 	{
-		m_iTimer %= iScrollInterval;
-		m_xOffset += xScrollVector;
+		m_iTimer %= m_iScrollInterval;
+		m_xOffset += m_xScrollVector;
 
 		if (m_xOffset.iX < 0)
 			m_xOffset.iX += m_pSprite->GetImageWidth();
@@ -69,7 +69,7 @@ void CBackgroundImage::Update()
 // =============================================================================
 // Nat Ryall                                                         21-Apr-2008
 // =============================================================================
-void CBackgroundImage::Render()
+void CBackgroundImage::OnRender()
 {
 	m_pSprite->Render(m_xOffset * -1, m_xArea);
 }

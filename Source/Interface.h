@@ -115,7 +115,7 @@ public:
 	virtual void OnUpdate();
 
 	// Called to render elements.
-	virtual void OnRender();
+	void Render(CRenderLayer* pLayer);
 
 	// Get the base screen element that all other elements should attach to.
 	CScreenElement& GetScreen()

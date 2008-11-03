@@ -23,19 +23,13 @@
 class CBackground : public CRenderable
 {
 public:
-	/**
-	* Constructor.
-	*/
+	// Constructor.
 	CBackground() : CRenderable(RenderableType_Background), iBackgroundColour(0xFF000000) {}
 
-	/**
-	* Destructor.
-	*/
+	// Destructor.
 	virtual ~CBackground() {}
 
-	/**
-	* Render the background.
-	*/
+	// Render the background.
 	virtual void OnRender()
 	{
 		_HGE->Gfx_Clear(iBackgroundColour);
@@ -55,31 +49,24 @@ public:
 class CBackgroundImage : public CBackground
 {
 public:
-	/**
-	* Constructor.
-	*/
+	// Constructor.
 	CBackgroundImage(const xchar* pSpriteName);
 
-	/**
-	* Destructor.
-	*/
+	// Destructor.
 	virtual ~CBackgroundImage();
 
-	/**
-	* Update the background.
-	*/
-	virtual void Update();
+	// Update the background.
+	void Update();
 
-	/**
-	* Render the background.
-	*/
-	virtual void Render();
+	// Render the background.
+	virtual void OnRender();
 
-	// The interval to scroll at.
-	xuint iScrollInterval;
-
-	// The background scrolling speed.
-	xpoint xScrollVector;
+	// Set the scrolling properties.
+	inline void SetScroll(xuint iScrollInterval, xpoint xScrollVector)
+	{
+		m_iScrollInterval = iScrollInterval;
+		m_xScrollVector = xScrollVector;
+	}
 
 protected:
 	// The background sprite.
@@ -93,6 +80,12 @@ protected:
 
 	// The menu scrolling offset.
 	xpoint m_xOffset;
+
+	// The interval to scroll at.
+	xuint m_iScrollInterval;
+
+	// The background scrolling speed.
+	xpoint m_xScrollVector;
 };
 
 //##############################################################################

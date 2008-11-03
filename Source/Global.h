@@ -149,15 +149,21 @@ enum t_ScreenIndex
 enum t_LayerIndex
 {
 	// Menu.
-	LayerIndex_Background			= 0,
-	LayerIndex_Elements				= 1,
+	LayerIndex_Background,
+	LayerIndex_Elements,
 
 	// Game.
-	LayerIndex_Map					= 0,
-	LayerIndex_Items				= 1,
-	LayerIndex_Player				= 2,
-	LayerIndex_Effects				= 3,
-	LayerIndex_Radar				= 4,
+	LayerIndex_Map,
+	LayerIndex_Items,
+	LayerIndex_Player,
+	LayerIndex_Effects,
+	LayerIndex_Radar,
+
+	// Overlays.
+	LayerIndex_Interface,
+
+	// Max.
+	LayerIndex_Max,
 };
 
 // Renderable types.

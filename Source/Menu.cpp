@@ -175,6 +175,12 @@ void CMenuScreen::OnActivate()
 	m_iLastMenuGroup = MenuGroup_Main;
 	m_iNextScreen = ScreenIndex_Invalid;
 	m_iLobbyMode = LobbyStartMode_CreatePrivate;
+
+	// Initialise the layers.
+	RenderManager.ReinitLayers(LayerIndex_Max);
+
+	RenderLayer(LayerIndex_Background)->AttachRenderable(m_pBackground);
+	RenderLayer(LayerIndex_Interface)->SetRenderOverride(xbind(&InterfaceManager, &CInterfaceManager::Render));
 }
 
 // =============================================================================
@@ -182,6 +188,7 @@ void CMenuScreen::OnActivate()
 // =============================================================================
 void CMenuScreen::OnDeactivate()
 {
+	RenderManager.ClearLayers();
 }
 
 // =============================================================================
@@ -200,7 +207,6 @@ void CMenuScreen::OnWake()
 // =============================================================================
 void CMenuScreen::OnSleep()
 {
-	int i = 0;
 }
 
 // =============================================================================
@@ -281,7 +287,6 @@ void CMenuScreen::UpdateTransition(xbool bTransitionIn)
 // =============================================================================
 void CMenuScreen::OnPreRender()
 {
-	m_pBackground->Render();
 }
 
 // =============================================================================

@@ -41,14 +41,17 @@ public:
 	// Called once when the screen is placed at the top of the stack.
 	virtual void OnWake();
 
+	// Called when the screen is no longer the immediate screen in the stack but is still active.
+	virtual void OnSleep();
+
 	// Called when a game-specific event is executed when active.
 	virtual xbool OnEvent(xint iEventType, void* pEventInfo);
 
 	// Called each frame to update the screen when active.
 	virtual void OnUpdate();
 
-	// Called each frame to render the screen when active.
-	virtual void OnRender();
+	// Render override.
+	void Render();
 
 	// Called when the fade has completed.
 	virtual void OnFadeComplete();
@@ -77,11 +80,17 @@ public:
 	// Destructor.
 	virtual ~CWarningScreen() {}
 
+	// Called once when the screen is placed at the top of the stack.
+	virtual void OnWake();
+
+	// Called when the screen is no longer the immediate screen in the stack but is still active.
+	virtual void OnSleep();
+
 	// Called when a game-specific event is executed when active.
 	virtual xbool OnEvent(xint iEventType, void* pEventInfo);
 
-	// Called each frame to render the screen when active.
-	virtual void OnRender();
+	// Render override.
+	void Render();
 
 	// Called when the fade has completed.
 	virtual void OnFadeComplete();

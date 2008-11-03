@@ -135,7 +135,7 @@ void CInterfaceManager::OnUpdate()
 // =============================================================================
 // Nat Ryall                                                          1-May-2008
 // =============================================================================
-void CInterfaceManager::OnRender()
+void CInterfaceManager::Render(CRenderLayer* pLayer)
 {
 	RenderElement(m_pScreen);
 

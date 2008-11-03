@@ -142,7 +142,7 @@ xbool CRenderLayer::IsEnabled()
 // =============================================================================
 // Nat Ryall                                                         14-Apr-2008
 // =============================================================================
-void CRenderLayer::SetRenderOverride(t_RenderOverrideCallback fpCallback)
+void CRenderLayer::SetRenderOverride(t_RenderLayerOverrideCallback fpCallback)
 {
 	m_fpRenderOverrideCallback = fpCallback;
 }
@@ -195,6 +195,7 @@ void CRenderLayer::Render()
 // =============================================================================
 void CRenderManager::OnInitialise()
 {
+	m_fpRenderOverrideCallback = NULL;
 }
 
 // =============================================================================
@@ -202,15 +203,23 @@ void CRenderManager::OnInitialise()
 // =============================================================================
 void CRenderManager::OnDeinitialise()
 {
-	ResetLayers(0);
+	ClearLayers();
+}
+
+// =============================================================================
+// Nat Ryall                                                          3-Nov-2008
+// =============================================================================
+void CRenderManager::SetRenderOverride(t_RenderOverrideCallback fpCallback)
+{
+	m_fpRenderOverrideCallback = fpCallback;
 }
 
 // =============================================================================
 // Nat Ryall                                                         30-Oct-2008
 // =============================================================================
-void CRenderManager::ResetLayers(xint iLayerCount)
+void CRenderManager::ReinitLayers(xint iLayerCount)
 {
-	XMASSERT(iLayerCount >= -1, "Layer count must be zero or a positive value or -1 for the current number of layers.");
+	XMASSERT(iLayerCount >= -1 && GetLayerCount() > -1, "Layer count must be zero or a positive value or -1 for the current number of layers.");
 
 	// Use -1 for the current number of layers.
 	if (iLayerCount == -1)
@@ -232,6 +241,14 @@ void CRenderManager::ResetLayers(xint iLayerCount)
 }
 
 // =============================================================================
+// Nat Ryall                                                          3-Nov-2008
+// =============================================================================
+void CRenderManager::ClearLayers()
+{
+	ReinitLayers(0);
+}
+
+// =============================================================================
 // Nat Ryall                                                         30-Oct-2008
 // =============================================================================
 xint CRenderManager::GetLayerCount()
@@ -244,7 +261,7 @@ xint CRenderManager::GetLayerCount()
 // =============================================================================
 CRenderLayer* CRenderManager::GetLayer(xint iIndex)
 {
-	XMASSERT(iIndex > (GetLayerCount() - 1), XFORMAT("Layer index %d is out of bounds.", iIndex));
+	XMASSERT(iIndex < GetLayerCount(), XFORMAT("Layer index %d is out of bounds.", iIndex));
 	return m_lpLayerList[iIndex];
 }
 
@@ -253,15 +270,20 @@ CRenderLayer* CRenderManager::GetLayer(xint iIndex)
 // =============================================================================
 void CRenderManager::Render()
 {
-	XLISTFOREACH(t_RenderLayerList, ppLayer, m_lpLayerList)
+	if (m_fpRenderOverrideCallback)
+		m_fpRenderOverrideCallback();
+	else
 	{
-		CRenderLayer* pLayer = *ppLayer;
+		XLISTFOREACH(t_RenderLayerList, ppLayer, m_lpLayerList)
+		{
+			CRenderLayer* pLayer = *ppLayer;
 
-		if (pLayer->IsEnabled())
-			pLayer->Render();
+			if (pLayer->IsEnabled())
+				pLayer->Render();
+		}
+
+		_HGE->Gfx_SetTransform(0.f, 0.f, 0.f, 0.f, 0.f, 1.f, 1.f);
 	}
-
-	_HGE->Gfx_SetTransform(0.f, 0.f, 0.f, 0.f, 0.f, 1.f, 1.f);
 }
 
 // =============================================================================
