@@ -28,3 +28,22 @@ Gameplay Objectives: Melody Mode
      - The next level starts.
    - If all levels were played:
      - The game moves on to the scoreboard.
+
+v2:
+ - The whole map is visible 100% of the time.
+ - Increase resolution to 1024x768 with eventual scaling capability.
+ 
+ - Fade in from black/loading screen.
+ - Map is in full view with players at random starting locations.
+ - PikPiks play their warming up animations.
+ - A focus ring is shown around the local player (spinning - like a target).
+ - There is a crystal in the middle.
+ - Wait 1 second or until input.
+ - The level intro transition comes on.
+ - Wait 3 seconds or until input.
+ - The level intro transition goes off.
+ - Input is awarded to the player.
+ - Each second a shooting star enters the map, one of each colour.
+ - Stars have a trail of mini star particles and explode in light when they land (mario galaxy).
+ - When a player collects a coloured star, a new one shoots onto the map at a random location.
+ - TBC
