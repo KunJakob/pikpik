@@ -139,6 +139,7 @@ void CInterfaceManager::Render(CRenderLayer* pLayer)
 {
 	RenderElement(m_pScreen);
 
+#if !XRETAIL
 	// Render debug boxes over the interface to show the active and focused elements.
 	if (m_bDebugRender && m_pScreen->IsVisible())
 	{
@@ -153,11 +154,12 @@ void CInterfaceManager::Render(CRenderLayer* pLayer)
 		if (m_pFocusedElement)
 		{
 			xrect xRect = m_pFocusedElement->GetFocusArea() + xrect(2, 2, -1, -1);
-			xuint iColour = ARGB(255, 255, 0, 0);
+			xuint iColour = ARGB(128, 255, 0, 0);
 
 			RenderManager.RenderBox(false, xRect, iColour);
 		}
 	}
+#endif
 
 	// Render the cursor.
 	if (m_bCursorVisible && _HGE->Input_IsMouseOver() && m_pCursor[ElementType_Unknown])
@@ -179,6 +181,20 @@ void CInterfaceManager::Render(CRenderLayer* pLayer)
 
 		pCursor->Render(m_xMousePos);
 	}
+}
+
+// =============================================================================
+// Nat Ryall                                                          5-Nov-2008
+// =============================================================================
+CInterfaceElement* CInterfaceManager::FindElement(const xchar* pName)
+{
+	XLISTFOREACH(t_InterfaceElementList, ppElement, m_lpElements)
+	{
+		if ((*ppElement)->GetName() && String::IsMatch((*ppElement)->GetName(), pName))
+			return *ppElement;
+	}
+
+	return NULL;
 }
 
 // =============================================================================
@@ -301,7 +317,8 @@ CInterfaceElement::CInterfaceElement(t_ElementType iType) :
 	m_pParent(NULL),
 	m_iType(iType),
 	m_bVisible(true),
-	m_bEnabled(true)
+	m_bEnabled(true),
+	m_pName(NULL)
 {
 }
 
@@ -310,6 +327,26 @@ CInterfaceElement::CInterfaceElement(t_ElementType iType) :
 // =============================================================================
 CInterfaceElement::~CInterfaceElement()
 {
+}
+
+// =============================================================================
+// Nat Ryall                                                          5-Nov-2008
+// =============================================================================
+CInterfaceElement* CInterfaceElement::FindChild(const xchar* pName)
+{
+	XLISTFOREACH(t_InterfaceElementList, ppElement, m_lpChildElements)
+	{
+		if ((*ppElement)->GetName() && String::IsMatch((*ppElement)->GetName(), pName))
+			return *ppElement;
+
+		if ((*ppElement)->m_lpChildElements.size())
+		{
+			if (CInterfaceElement* pElement = (*ppElement)->FindChild(pName))
+				return pElement;
+		}
+	}
+
+	return NULL;
 }
 
 // =============================================================================

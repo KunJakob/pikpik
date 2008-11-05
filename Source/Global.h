@@ -67,10 +67,10 @@
 //##############################################################################
 
 // Screen options.
-#define _SWIDTH					800
-#define _SHEIGHT				600
-#define _HSWIDTH				400
-#define _HSHEIGHT				300
+#define _SWIDTH					1024
+#define _SHEIGHT				768
+#define _HSWIDTH				512
+#define _HSHEIGHT				384
 #define _SRECT					xrect(0, 0, _SWIDTH, _SHEIGHT)
 
 // Game options.
@@ -206,7 +206,7 @@ enum t_CollisionGroup
 // Common list types.
 typedef xlist<CMetadata*> t_MetadataList;
 typedef xlist<CSprite*> t_SpriteList;
-typedef xvlist<CPlayer*> t_PlayerList;
+typedef xarray<CPlayer*> t_PlayerList;
 
 //##############################################################################
 

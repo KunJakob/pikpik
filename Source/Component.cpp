@@ -481,7 +481,8 @@ void CGroupComponent::OnRender()
 CCheckComponent::CCheckComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont) : CCheckElement(ElementType_Check, pMetaSprite),
 	m_iCheckState(CheckState_Normal),
 	m_pFont(NULL),
-	m_fpOnCheckCallback(NULL)
+	m_fpOnCheckCallback(NULL),
+	m_fpCheckBinding(NULL)
 {
 	m_pBox[CheckState_Normal]		= pMetaSprite->FindArea("Normal"); 
 	m_pBox[CheckState_Over]			= pMetaSprite->FindArea("Over"); 
@@ -531,6 +532,9 @@ void CCheckComponent::OnMouseUp(xpoint xPosition)
 
 	if (m_fpOnCheckCallback)
 		m_fpOnCheckCallback(this, m_bChecked);
+
+	if (m_fpCheckBinding)
+		m_fpCheckBinding(m_bChecked);
 }
 
 //##############################################################################
@@ -616,6 +620,9 @@ CWindowComponent* CComponentFactory::CreateWindow(CMetadata* pMetadata, const ch
 // =============================================================================
 void CComponentFactory::GetBasicProperties(CInterfaceElement* pElement, CDataset* pDataset)
 {
+	if (const xchar* pName = pDataset->GetName())
+		pElement->SetName(pName);
+
 	if (_PROPERTY_EXISTS(pDataset, "Enabled"))
 		pElement->SetEnabled(_PROPERTY_VALUE->GetBool());
 
@@ -673,6 +680,9 @@ void CComponentFactory::GetContainerProperties(CContainerElement* pElement, CDat
 {
 	if (_DATASET_EXISTS(pDataset, "AutoArrange"))
 	{
+		XASSERT(_DATASET_VALUE->GetProperty("Padding"));
+		XASSERT(_DATASET_VALUE->GetProperty("Spacing"));
+
 		pElement->SetElementPadding(_DATASET_VALUE->GetProperty("Padding")->GetRect());
 		pElement->SetElementSpacing(_DATASET_VALUE->GetProperty("Spacing")->GetInt());
 

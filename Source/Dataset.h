@@ -142,8 +142,8 @@ public:
 
 protected:
 	// Lists.
-	typedef xvlist<CDataset*> t_DatasetList;
-	typedef xvlist<CProperty*> t_PropertyList;
+	typedef xarray<CDataset*> t_DatasetList;
+	typedef xarray<CProperty*> t_PropertyList;
 
 	// The parent dataset.
 	CDataset* m_pParent;

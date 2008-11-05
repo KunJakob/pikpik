@@ -114,7 +114,7 @@ public:
 	// Called to update and fire events for elements.
 	virtual void OnUpdate();
 
-	// Called to render elements.
+	// Render the interface elements.
 	void Render(CRenderLayer* pLayer);
 
 	// Get the base screen element that all other elements should attach to.
@@ -123,11 +123,21 @@ public:
 		return *m_pScreen;
 	}
 
+	// Get the number of existing elements.
+	inline xint GetElementCount()
+	{
+		return m_lpElements.size();
+	}
+
 	// Get a list of all existing elements.
 	inline t_InterfaceElementList& GetElementList()
 	{
 		return m_lpElements;
 	}
+
+	// Find any element by name in the element list.
+	// ~note This is potentially very slow and should be avoided if possible. Individual elements also provide sub-search functions.
+	CInterfaceElement* FindElement(const xchar* pName);
 
 	// Set the cursor image for a specific element type.
 	void SetCursor(t_ElementType iType, CSpriteMetadata* pMetadata);
@@ -271,6 +281,10 @@ public:
 	// Virtual destructor to ensure proper cleanup of all child classes.
 	virtual ~CInterfaceElement();
 
+	// Find a child element by name.
+	// ~return The element object or NULL if no element with the specified name was found.
+	CInterfaceElement* FindChild(const xchar* pName);
+
 	// Get the parent element that this element belongs to. Returns NULL if top-level.
 	CInterfaceElement* GetParent() 
 	{ 
@@ -281,6 +295,19 @@ public:
 	inline xuint GetType()
 	{
 		return m_iType;
+	}
+
+	// Set the name of the element for future reference.
+	inline void SetName(const xchar* pName)
+	{
+		m_pName = pName;
+	}
+
+	// Get the name of the element.
+	// ~return The element name or NULL if no name has been assigned.
+	inline const xchar* GetName()
+	{
+		return m_pName;
 	}
 
 	// Set the visibility of the element. This will also disable the element when invisible.
@@ -429,6 +456,9 @@ protected:
 	t_InterfaceElementList m_lpChildElements;
 
 private:
+	// The element name (can be NULL).
+	const xchar* m_pName;
+
 	// The screen position of the element.
 	xpoint m_xPosition;
 };

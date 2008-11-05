@@ -533,6 +533,7 @@ class CCheckComponent : public CCheckElement
 public:
 	// Callbacks
 	typedef xfunction(2)<CCheckComponent* /*Component*/, xbool /*Checked*/> t_OnCheckCallback;
+	typedef xfunction(1)<xbool /*Checked*/> t_CheckBinding;
 
 	// Initialise the element.
 	CCheckComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont = NULL);
@@ -574,6 +575,12 @@ public:
 	inline void SetCheckCallback(t_OnCheckCallback fpCallback)
 	{
 		m_fpOnCheckCallback = fpCallback;
+	}
+
+	// Set the check-state binding function.
+	inline void SetCheckBinding(t_CheckBinding fpBinding)
+	{
+		m_fpCheckBinding = fpBinding;
 	}
 
 protected:
@@ -622,6 +629,9 @@ protected:
 
 	// The callback to execute when the check component is checked or unchecked.
 	t_OnCheckCallback m_fpOnCheckCallback; 
+
+	// The binding to allow direct binding to another function passing in the checked state.
+	t_CheckBinding m_fpCheckBinding;
 };
 
 //##############################################################################

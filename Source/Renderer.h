@@ -43,8 +43,8 @@ typedef xfunction(0)<> t_RenderOverrideCallback;
 typedef xfunction(1)<CRenderLayer* /*Layer*/> t_RenderLayerOverrideCallback;
 
 // Lists.
-typedef xvlist<CRenderable*> t_RenderableList;
-typedef xvlist<CRenderLayer*> t_RenderLayerList;
+typedef xarray<CRenderable*> t_RenderableList;
+typedef xarray<CRenderLayer*> t_RenderLayerList;
 
 //##############################################################################
 //

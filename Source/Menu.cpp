@@ -153,6 +153,11 @@ void CMenuScreen::OnLoad()
 	// Test: Interface factory.
 	CWindowComponent* pWindow = ComponentFactory.CreateWindow(_METADATA("Interface"), "Window-Password");
 	InterfaceScreen.Attach(pWindow);
+
+	CCheckComponent* pCheckBox = (CCheckComponent*)pWindow->FindChild("CheckBox-Hide");
+	CInputComponent* pInputBox = (CInputComponent*)pWindow->FindChild("InputBox-Password");
+
+	pCheckBox->SetCheckBinding(xbind(pInputBox, &CInputComponent::SetMasked));
 }
 
 // =============================================================================

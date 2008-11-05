@@ -80,8 +80,8 @@ enum t_AdjacentDirection
 };
 
 // Lists.
-typedef xvlist<CMapBlock*> t_MapBlockList;
-typedef xvlist<CMap*> t_MapList;
+typedef xarray<CMapBlock*> t_MapBlockList;
+typedef xarray<CMap*> t_MapList;
 
 //##############################################################################
 

@@ -125,7 +125,7 @@ public:
 
 protected:
 	// Lists.
-	typedef xvlist<xchar*> t_lpString;
+	typedef xarray<xchar*> t_lpString;
 
 	// Load in the file contents.
 	void UpdateLoad(xuint iChunkSize);

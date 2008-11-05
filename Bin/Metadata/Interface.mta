@@ -12,7 +12,7 @@
 		.Spacing	8
 	}
 	
-	.Group "Group-Radio"
+	.Group
 	{
 		.Sprite			"Test-Group"
 		.Font			"Test-GroupFont"
@@ -24,7 +24,7 @@
 			.Spacing	8
 		}
 		
-		.Radio "RadioBox-1"
+		.Radio
 		{
 			.Sprite		"Test-Radio"
 			.Font		"Test-Font"
@@ -33,7 +33,7 @@
 			.Checked	true
 		}
 		
-		.Radio "RadioBox-2"
+		.Radio
 		{
 			.Sprite		"Test-Radio"
 			.Font		"Test-Font"
@@ -41,7 +41,7 @@
 			.Group		1
 		}
 			
-		.Radio "RadioBox-3"
+		.Radio
 		{
 			.Sprite		"Test-Radio"
 			.Font		"Test-Font"
@@ -49,7 +49,7 @@
 			.Group		1
 		}
 		
-		.Radio "RadioBox-4"
+		.Radio
 		{
 			.Sprite		"Test-Radio"
 			.Font		"Test-Font"
@@ -57,7 +57,7 @@
 			.Group		2
 		}
 			
-		.Radio "RadioBox-5"
+		.Radio
 		{
 			.Sprite		"Test-Radio"
 			.Font		"Test-Font"
@@ -67,7 +67,7 @@
 		}
 	}
 
-	.Group "Group-Password"
+	.Group
 	{
 		.Sprite			"Test-Group"
 		.Font			"Test-GroupFont"
@@ -113,7 +113,7 @@
 		.Width		100
 	}
 	
-	.Progress "Progress-123"
+	.Progress
 	{
 		.Sprite		"Test-Progress"
 		.Progress	0.75
