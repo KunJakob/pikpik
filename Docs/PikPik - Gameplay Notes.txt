@@ -47,3 +47,10 @@ v2:
  - Stars have a trail of mini star particles and explode in light when they land (mario galaxy).
  - When a player collects a coloured star, a new one shoots onto the map at a random location.
  - TBC
+
+ - Game screen is 19x27 and each tile is 32x32 with a 32x32 border.
+ - Grid without border: 864x608.
+ - Grid with border: 929x672.
+ - Resolution: 1024x768.
+ - Character max size: 32x32.
+ - Height overlap: on pillars: 12.
