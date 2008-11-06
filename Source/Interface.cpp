@@ -236,39 +236,36 @@ xbool CInterfaceManager::IsMouseOver(CInterfaceElement* pElement)
 // =============================================================================
 void CInterfaceManager::UpdateElement(CInterfaceElement* pElement)
 {
-	if (pElement->IsEnabled())
+	if (pElement->IsEnabled() && pElement->IsVisible())
 	{
 		// Iterate through all children in reverse-render order.
 		XEN_LIST_FOREACH_R(t_InterfaceElementList, ppElement, pElement->m_lpChildElements)
 			UpdateElement(*ppElement);
 
-		if (pElement->IsVisible())
+		if (Math::IsIntersecting(m_xMousePos, pElement->GetArea()))
 		{
-			if (Math::IsIntersecting(m_xMousePos, pElement->GetArea()))
+			// If we are the first element intersecting, we become the active element.
+			if (!m_bFoundActive)
 			{
-				// If we are the first element intersecting, we become the active element.
-				if (!m_bFoundActive)
+				m_bFoundActive = true;
+
+				if (m_pActiveElement && m_pActiveElement != pElement)
+					m_pActiveElement->OnMouseLeave();
+
+				m_pActiveElement = pElement;
+				m_pActiveElement->OnMouseEnter();
+			}
+
+			// If we're the active element, check for mouse clicks.
+			if (m_pActiveElement == pElement)
+			{
+				if (_HGE->Input_KeyDown(HGEK_LBUTTON))
 				{
-					m_bFoundActive = true;
-
-					if (m_pActiveElement && m_pActiveElement != pElement)
-						m_pActiveElement->OnMouseLeave();
-
-					m_pActiveElement = pElement;
-					m_pActiveElement->OnMouseEnter();
+					SetFocus(pElement);
+					pElement->OnMouseDown(m_xMousePos);
 				}
-
-				// If we're the active element, check for mouse clicks.
-				if (m_pActiveElement == pElement)
-				{
-					if (_HGE->Input_KeyDown(HGEK_LBUTTON))
-					{
-						SetFocus(pElement);
-						pElement->OnMouseDown(m_xMousePos);
-					}
-					else if (_HGE->Input_KeyUp(HGEK_LBUTTON))
-						pElement->OnMouseUp(m_xMousePos);
-				}
+				else if (_HGE->Input_KeyUp(HGEK_LBUTTON))
+					pElement->OnMouseUp(m_xMousePos);
 			}
 		}
 
