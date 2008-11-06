@@ -290,14 +290,10 @@ protected:
 class CSprite : public CBasicSprite, public CRenderable
 {
 public:
+	using CRenderable::Render;
+
 	// Constructor.
 	CSprite(CSpriteMetadata* pMetadata);
-
-	// Render the sprite manually with all current attributes.
-	virtual void Render()
-	{
-		OnRender();
-	}
 
 	// Automatic render called by the render manager.
 	virtual void OnRender();
@@ -441,12 +437,6 @@ public:
 
 	// Update the sprite to the current animation frame.
 	virtual void Update();
-
-	// Render the sprite manually with all current attributes using the current animation frame.
-	virtual void Render()
-	{
-		OnRender();
-	}
 
 	// Automatic render called by the render manager.
 	virtual void OnRender();

@@ -60,7 +60,13 @@ public:
 	// Destructor.
 	virtual ~CRenderable() {}
 
-	// Render the object.
+	// Render the object immediately.
+	void Render()
+	{
+		OnRender();
+	}
+
+	// Called when the render manager is ready to render the object.
 	virtual void OnRender() = 0;
 
 	// Get the renderable type assigned to this renderable.

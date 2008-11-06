@@ -1,13 +1,31 @@
+//##############################################################################
+//
+//                                   FONTS
+//
+//##############################################################################
+
+//
+// Root.
+//
+
 .Font "Default"
 {
 	.File "Font\MyriadProLight_14.fnt"
 	.Spacing 1.25
 }
 
+//
+// Menu.
+//
+
 .Font "Menu-Default"
 {
 	.File "Font\Bambino_36.fnt"
-	.Shadow { .Offset 2 2 }
+	
+	.Shadow 
+	{ 
+		.Offset 2 2 
+	}
 }
 
 .Font "Menu-Highlighted"
@@ -22,100 +40,35 @@
 	}
 }
 
-.Font "Lobby-Title"
+.Font "Menu-Disabled"
 {
 	.File "Font\Bambino_36.fnt"
-	.Colour 228 217 191
-	
-	.Shadow 
-	{ 
-		.Offset 2 2
-	}
+	.Colour 128 100 100
 }
 
-.Font "Lobby-Peer"
-{
-	.File "Font\Bambino_36.fnt"
-	
-	.Shadow 
-	{
-		.Offset 2 2
-	}
-}
-
-.Font "Menu-Button"
-{
-	.File "Font\ShowcardGothic_36.fnt"
-	.Colour 228 217 191
-	
-	.Shadow 
-	{ 
-		.Colour 71 59 33
-		.Offset 2 2
-	}
-}
-
-.Font "Menu-Input"
-{
-	.File "Font\ShowcardGothic_36.fnt"
-	.Colour 71 59 33
-	
-	.Shadow 
-	{ 
-		.Colour 156 140 105
-		.Offset 2 2
-	}
-}
-
-.Font "Menu-Status"
-{
-	.File "Font\ShowcardGothic_36.fnt"
-	.Colour 228 217 191
-	
-	.Shadow 
-	{ 
-		.Colour 71 59 33
-		.Offset 2 2
-	}
-}
-
-.Font "Menu-Session-Title"
-{
-	.File "Font\ShowcardGothic_36.fnt"
-	.Scale 0.67
-	.Colour 228 217 191
-	
-	.Shadow 
-	{ 
-		.Colour 71 59 33
-		.Offset 2 2
-	}
-}
-
-.Font "Menu-Session-Info"
-{
-	.File "Font\ShowcardGothic_36.fnt"
-	.Scale 0.36
-	.Colour 71 59 33
-}
+//##############################################################################
+//
+//                                   DEBUG
+//
+//##############################################################################
 
 //
-// *** INTERFACE ***
+// Interface.
 //
 
-.Font "Test-Font"
+.Font "Debug-Interface"
 {
 	.File "Font\Arial_11.fnt"
 	.Colour 0 0 0
 }
 
-.Font "Test-WindowFont"
+.Font "Debug-Interface-Window"
 {
 	.File "Font\Arial_11.fnt"
 	.Colour 255 255 255
 }
 
-.Font "Test-GroupFont"
+.Font "Debug-Interface-Group"
 {
 	.File "Font\Arial_11.fnt"
 	.Colour 0 70 213

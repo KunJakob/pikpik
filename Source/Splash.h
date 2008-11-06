@@ -13,7 +13,6 @@
 #include <Fade.h>
 #include <Resource.h>
 #include <Sprite.h>
-#include <Map.h>
 #include <Sound.h>
 
 //##############################################################################

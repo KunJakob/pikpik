@@ -25,7 +25,6 @@
 #include <Interface.h>
 #include <Component.h>
 
-
 //##############################################################################
 
 //##############################################################################
@@ -43,11 +42,8 @@ enum t_MenuGroup
 {
 	MenuGroup_None = -1,
 	MenuGroup_Main,
-	MenuGroup_Online,
-	MenuGroup_Join,
-	MenuGroup_Create,
-	MenuGroup_Levels,
-	/*MAX*/MenuGroup_Max,
+	
+	MenuGroup_Max,
 };
 
 // The menu states.
@@ -57,6 +53,8 @@ enum t_MenuState
 	MenuState_TransitionIn,
 	MenuState_Idle,
 	MenuState_TransitionOut,
+
+	MenuState_Max,
 };
 
 // Lists.
@@ -147,12 +145,6 @@ protected:
 	// Called immediately after the render manager has executed.	
 	virtual void OnPostRender();
 
-	// Called when a game-specific event is executed when active.
-	virtual xbool OnEvent(xint iEventType, void* pEventInfo) 
-	{
-		return false;
-	}
-
 	// OnUpdate the transition in/out state.
 	void UpdateTransition(xbool bTransitionIn);
 
@@ -176,14 +168,6 @@ protected:
 
 	// Menu link actions.
 	void Callback_ShowMainMenu();
-	void Callback_ShowOnlineMenu();
-	void Callback_ShowJoinMenu();
-	void Callback_ShowCreateMenu();
-	void Callback_JoinPublic();
-	void Callback_JoinPrivate();
-	void Callback_CreatePublic();
-	void Callback_CreatePrivate();
-	void Callback_ShowLevelsMenu();
 	void Callback_StartGame();
 	void Callback_QuitGame();
 
@@ -192,9 +176,8 @@ protected:
 
 	// The font metadata to render the links with.
 	CFontMetadata* m_pMenuDefault;
-
-	// The highlight font metadata to highlight key links with.
 	CFontMetadata* m_pMenuHighlight;
+	CFontMetadata* m_pMenuDisabled;
 
 	// A list of all the menu elements.
 	t_MenuLinkList m_lpMenuLinks[MenuGroup_Max];
@@ -216,9 +199,6 @@ protected:
 
 	// The next screen to process.
 	t_ScreenIndex m_iNextScreen;
-
-	// The lobby start mode.
-	t_LobbyStartMode m_iLobbyMode;
 };
 
 //##############################################################################

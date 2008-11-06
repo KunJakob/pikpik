@@ -31,8 +31,6 @@
 //                                 FONT FILE
 //
 //##############################################################################
-
-// The sprite resource file.
 class CFontFile : public CResourceFile
 {
 public:
@@ -171,14 +169,14 @@ protected:
 //                                    TEXT
 //
 //##############################################################################
-class CText : public CFont
+class CText : public CFont, public CRenderable
 {
 public:
 	// Constructor.
 	CText(CFontMetadata* pMetadata);
 
-	// Render the font with all current attributes.
-	virtual void Render();
+	// Automatic render called by the render manager.
+	virtual void OnRender();
 
 	// Set the text string to render.
 	void SetString(const xchar* pString)

@@ -10,21 +10,17 @@
 // Local.
 #include <Main.h>
 
+// System.
+#include <Windows.h>
+
 // Other.
+#include <Resource.h>
+#include <Collision.h>
+#include <Crypt.h>
+#include <Sound.h>
 #include <Splash.h>
 #include <Menu.h>
 #include <Game.h>
-#include <Lobby.h>
-#include <Windows.h>
-#include <Resource.h>
-#include <Network.h>
-#include <Character.h>
-#include <Match.h>
-#include <Collision.h>
-#include <Player.h>
-#include <Visor.h>
-#include <Crypt.h>
-#include <Sound.h>
 
 // Crypto.
 #include <Crypto/cryptlib.h>
@@ -79,7 +75,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	s_pInterface->System_SetState(HGE_RENDERFUNC, &Application::OnRender);
 	s_pInterface->System_SetState(HGE_FOCUSLOSTFUNC, &Application::OnBlur);
 	s_pInterface->System_SetState(HGE_FOCUSGAINFUNC, &Application::OnFocus);
-	s_pInterface->System_SetState(HGE_TITLE, "PikPik");
+	s_pInterface->System_SetState(HGE_TITLE, "PikPik - Pre-Release - Copyright (c) SAPIAN 2008");
 	s_pInterface->System_SetState(HGE_USESOUND, false);
 	s_pInterface->System_SetState(HGE_WINDOWED, true);
 	s_pInterface->System_SetState(HGE_SCREENWIDTH, _SWIDTH);
@@ -143,21 +139,14 @@ void Application::Initialise()
 
 	// Initialise global vars.
 	Global.m_bWindowFocused = true;
-	Global.m_fScreenAlpha = 1.f;
-	Global.m_pActiveMap = NULL;
-	Global.m_pLocalPlayer = NULL;
-	Global.m_fMusicEnergy = 0.f;
 
 	// Add all required modules to the game.
 	XMODULE(&SoundManager);
+	XMODULE(&RenderManager);
 	XMODULE(&ResourceManager);
-	XMODULE(&NetworkManager);
-	XMODULE(&MatchManager);
-	XMODULE(&MapManager);
-	XMODULE(&ScreenManager);
 	XMODULE(&InterfaceManager);
 	XMODULE(&CollisionManager);
-	XMODULE(&RenderManager);
+	XMODULE(&ScreenManager);
 	
 	// Initialise all modules.
 	ModuleManager.Initialise();
@@ -178,21 +167,10 @@ void Application::Initialise()
 	s_lpScreens.push_back(new CWarningScreen);
 	s_lpScreens.push_back(new CMenuScreen);
 	s_lpScreens.push_back(new CGameScreen);
-	s_lpScreens.push_back(new CLobbyScreen);
-	s_lpScreens.push_back(new CCharacterScreen);
-	s_lpScreens.push_back(new CVisorScreen);
 
 	// Load all screen instances and set go to the logo screen.
 	ScreenManager.LoadScreens();
 	ScreenManager.Set(ScreenIndex_LogoScreen, true);
-
-	// Create all the available players.
-	Global.m_lpPlayers.push_back(new CPacman());
-	Global.m_lpPlayers.push_back(new CGhost(0xFF40F0F0));
-	Global.m_lpPlayers.push_back(new CGhost(0xFFF04040));
-	Global.m_lpPlayers.push_back(new CGhost(0xFF4040F0));
-	Global.m_lpPlayers.push_back(new CGhost(0xFFF0F040));
-	Global.m_lpPlayers.push_back(new CGhost(0xFFF040F0));
 	
 	// Execute the first frame update.
 	OnUpdate();
@@ -217,9 +195,6 @@ void Application::Deinitialise()
 
 	// Free all screen instances.
 	XEN_LIST_ERASE_ALL(s_lpScreens);
-
-	// Free all the players.
-	XEN_LIST_ERASE_ALL(Global.m_lpPlayers);
 }
 
 // =============================================================================
@@ -256,11 +231,11 @@ xbool Application::OnRender()
 		ScreenManager.PostRender();
 
 		// TODO: This should be moved to a layer (CFadeOverlay).
-		if (Global.m_fScreenAlpha != 1.f)
-		{
-			xfloat fAlpha = (1.f - Math::Clamp(Global.m_fScreenAlpha, 0.f, 1.f)) * 255.f;
-			RenderManager.RenderBox(true, xrect(0, 0, _SWIDTH, _SHEIGHT), _ARGB((xuchar)fAlpha, 0, 0, 0));
-		}
+		//if (Global.m_fScreenAlpha != 1.f)
+		//{
+		//	xfloat fAlpha = (1.f - Math::Clamp(Global.m_fScreenAlpha, 0.f, 1.f)) * 255.f;
+		//	RenderManager.RenderBox(true, xrect(0, 0, _SWIDTH, _SHEIGHT), _ARGB((xuchar)fAlpha, 0, 0, 0));
+		//}
 
 		s_pInterface->Gfx_EndScene();
 	}
@@ -313,6 +288,3 @@ xuint Application::GetTimeDelta()
 }
 
 //##############################################################################
-
-
-

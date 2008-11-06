@@ -153,7 +153,7 @@ void CFont::Render(const xchar* pString, xrect xRect, xuint iAlign, xfloat fAlph
 // =============================================================================
 // Nat Ryall                                                         24-Apr-2008
 // =============================================================================
-CText::CText(CFontMetadata* pMetadata) : CFont(pMetadata),
+CText::CText(CFontMetadata* pMetadata) : CFont(pMetadata), CRenderable(RenderableType_Text),
 	m_iAlignment(HGETEXT_LEFT)
 {
 }
@@ -161,7 +161,7 @@ CText::CText(CFontMetadata* pMetadata) : CFont(pMetadata),
 // =============================================================================
 // Nat Ryall                                                         24-Apr-2008
 // =============================================================================
-void CText::Render()
+void CText::OnRender()
 {
 	CFont::Render(m_xString.c_str(), m_xPosition, m_iAlignment);
 }

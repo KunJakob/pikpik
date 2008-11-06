@@ -1,122 +1,31 @@
-.Window "Window-Password"
+.Window "Debug-RenderLayers"
 {
-	.Sprite			"Test-Window"
-	.Font			"Test-WindowFont"
-	.Title			"Password View"
-	.Position		10 10
+	.Sprite			"Debug-Interface-Window"
+	.Font			"Debug-Interface-Window"
+	
+	.Title			"[Debug] Render Layers"
+	.Position		1 1
 	.Moveable		true
-
+	
 	.AutoArrange
 	{
-		.Padding	10 12 10 12
-		.Spacing	8
+		.Padding	8 10 8 10
+		.Spacing	6
 	}
 	
-	.Group
+	.Check "L-Background"
 	{
-		.Sprite			"Test-Group"
-		.Font			"Test-GroupFont"
-		.Title			"Radio Buttons"
-		
-		.AutoArrange
-		{
-			.Padding	10 8 10 8
-			.Spacing	8
-		}
-		
-		.Radio
-		{
-			.Sprite		"Test-Radio"
-			.Font		"Test-Font"
-			.Text		"Option A"
-			.Group		1
-			.Checked	true
-		}
-		
-		.Radio
-		{
-			.Sprite		"Test-Radio"
-			.Font		"Test-Font"
-			.Text		"Option B"
-			.Group		1
-		}
-			
-		.Radio
-		{
-			.Sprite		"Test-Radio"
-			.Font		"Test-Font"
-			.Text		"Option C"
-			.Group		1
-		}
-		
-		.Radio
-		{
-			.Sprite		"Test-Radio"
-			.Font		"Test-Font"
-			.Text		"Option X"
-			.Group		2
-		}
-			
-		.Radio
-		{
-			.Sprite		"Test-Radio"
-			.Font		"Test-Font"
-			.Text		"Option Y"
-			.Group		2
-			.Checked	true
-		}
-	}
-
-	.Group
-	{
-		.Sprite			"Test-Group"
-		.Font			"Test-GroupFont"
-		.Title			"Password"
-		
-		.AutoArrange
-		{
-			.Padding	10 8 10 8
-			.Spacing	8
-		}
-		
-		.Input "InputBox-Username"
-		{
-			.Sprite		"Test-Input"
-			.Font		"Test-Font"
-			.Text		"Krakken"
-			.Width		100
-		}
-	
-		.Input "InputBox-Password"
-		{
-			.Sprite		"Test-Input"
-			.Font		"Test-Font"
-			.Text		"passwd"
-			.Masked		true
-			.Width		100
-		}
-
-		.Check "CheckBox-Hide"
-		{
-			.Sprite		"Test-Check"
-			.Font		"Test-Font"
-			.Text		"&Input_String"
-			.Checked	true
-		}
-	}
-
-	.Button "Button-Close"
-	{
-		.Sprite		"Test-Button"
-		.Font		"Test-Font"
-		.Text		"Close"
-		.Width		100
+		.Sprite		"Debug-Interface-Check"
+		.Font		"Debug-Interface-Font"
+		.Text		"Background"
+		.Checked	true
 	}
 	
-	.Progress
+	.Check "L-Interface"
 	{
-		.Sprite		"Test-Progress"
-		.Progress	0.75
-		.Width		100
+		.Sprite		"Debug-Interface-Check"
+		.Font		"Debug-Interface-Font"
+		.Text		"Interface"
+		.Checked	true
 	}
 }

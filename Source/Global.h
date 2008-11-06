@@ -15,12 +15,14 @@
 //##############################################################################
 
 // RakNet.
+/*
 #include <RakNet/TCPInterface.h>
 #include <RakNet/HTTPConnection.h>
 #include <RakNet/RakNetworkFactory.h>
 #include <RakNet/RakPeerInterface.h>
 #include <RakNet/MessageIdentifiers.h>
 #include <RakNet/BitStream.h>
+*/
 
 // Main.
 #include <Main.h>
@@ -117,19 +119,7 @@
 // Predeclare.
 class CMetadata;
 class CSprite;
-class CPlayer;
-class CMenuScreen;
-class CMap;
 class CFont;
-class CLobbyScreen;
-
-// The player identifier type.
-enum t_PlayerType
-{
-	PlayerType_Ghost,
-	PlayerType_Pacman,
-	/*MAX*/PlayerType_Max,
-};
 
 // Screen index.
 enum t_ScreenIndex
@@ -139,31 +129,23 @@ enum t_ScreenIndex
 	ScreenIndex_WarningScreen,
 	ScreenIndex_MenuScreen,
 	ScreenIndex_GameScreen,
-	ScreenIndex_SelectionScreen,
-	ScreenIndex_LobbyScreen,
-	ScreenIndex_CharacterScreen,
-	ScreenIndex_VisorScreen,
+
+	ScreenIndex_Max,
 };
 
-// Layer index.
-enum t_LayerIndex
+// Menu layer index list.
+enum t_MenuLayerIndex
 {
-	// Menu.
-	LayerIndex_Background,
-	LayerIndex_Elements,
+	MenuLayerIndex_Background,
+	MenuLayerIndex_Interface,
 
-	// Game.
-	LayerIndex_Map,
-	LayerIndex_Items,
-	LayerIndex_Player,
-	LayerIndex_Effects,
-	LayerIndex_Radar,
+	MenuLayerIndex_Max,
+};
 
-	// Overlays.
-	LayerIndex_Interface,
-
-	// Max.
-	LayerIndex_Max,
+// Game layer index list.
+enum t_GameLayerIndex
+{
+	GameLayerIndex_Max,
 };
 
 // Renderable types.
@@ -171,42 +153,20 @@ enum t_RenderableType
 {
 	RenderableType_Background,
 	RenderableType_Sprite,
-	RenderableType_Map,
-	RenderableType_Player,
 	RenderableType_Text,
-	RenderableType_Dialog,
-	RenderableType_Minimap,
-};
 
-// Network packet types.
-enum t_NetworkStreamType
-{
-	NetworkStreamType_PlayerInfo,
-	NetworkStreamType_StartGame,
-	NetworkStreamType_PlayerUpdate,
-};
-
-// The lobby start mode.
-enum t_LobbyStartMode
-{
-	LobbyStartMode_JoinPublic,
-	LobbyStartMode_JoinPrivate,
-	LobbyStartMode_CreatePublic,
-	LobbyStartMode_CreatePrivate,
+	RenderableType_Max,
 };
 
 // The collision groups in the game.
 enum t_CollisionGroup
 {
-	CollisionGroup_Player,
-	CollisionGroup_Trap,
-	CollisionGroup_Power,
+	CollisionGroup_Max,
 };
 
 // Common list types.
 typedef xlist<CMetadata*> t_MetadataList;
 typedef xlist<CSprite*> t_SpriteList;
-typedef xarray<CPlayer*> t_PlayerList;
 
 //##############################################################################
 
@@ -235,38 +195,17 @@ public:
 		return s_Instance;
 	}
 
-	// Convert a locale variable string to it's locale counterpart or return the original string otherwise.
-	const xchar* TranslateLocale(const xchar* pString);
-
-	// Determine the list of players for the active map and position them.
-	void ResetActivePlayers();
+	// Process and substitute if the string is a variable.
+	const xchar* ProcessLocale(const xchar* pString);
 
 	// The current focus status of the game window.
 	xbool m_bWindowFocused;
-
-	// The overall screen alpha.
-	xfloat m_fScreenAlpha;
 
 	// The global game font.
 	CFont* m_pGameFont;
 
 	// The global game strings.
 	CMetadata* m_pLocale;
-
-	// The currently active map.
-	CMap* m_pActiveMap;
-
-	// The list of all players available to the game.
-	t_PlayerList m_lpPlayers;
-
-	// The list of all active players in the current game.
-	t_PlayerList m_lpActivePlayers;
-
-	// The currently active player on the local machine.
-	CPlayer* m_pLocalPlayer;
-
-	// The music spectrum energy to determine how fast colours transition.
-	xfloat m_fMusicEnergy;
 };
 
 //##############################################################################

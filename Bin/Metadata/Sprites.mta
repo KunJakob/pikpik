@@ -1,29 +1,25 @@
+//##############################################################################
+//
+//                                   SPRITES
+//
+//##############################################################################
+
+//
+// Core.
+//
+
 .Sprite "Missing"
 {
 	.File "Surfaces\Missing.png"
 }
 
+//
+// Logos.
+//
+
 .Sprite "Logo-SAPIAN"
 {
 	.File "Surfaces\Logo-SAPIAN.png"
-}
-
-.Sprite "Map-Tiles"
-{
-	.File "Surfaces\Map-Blocks.png"
-	
-	.Area "Blank"			{ .Rect 0   0 48  48 }
-	.Area "Pellet"			{ .Rect 48  0 96  48 }
-	.Area "Power"			{ .Rect 96  0 144 48 }
-	.Area "Eaten"			{ .Rect 144 0 192 48 }
-	.Area "Solo"			{ .Rect 192 0 240 48 }
-	.Area "Tunnel"			{ .Rect 240 0 288 48 }
-	.Area "Cap"				{ .Rect 288 0 336 48 }
-	.Area "Corner"			{ .Rect 336 0 384 48 }
-	.Area "Junction"		{ .Rect 384 0 432 48 }
-	.Area "Intersection"	{ .Rect 432 0 480 48 }
-	.Area "Entrance"		{ .Rect 480 0 528 48 }
-	.Area "Base"			{ .Rect 528 0 576 48 }
 }
 
 .Sprite "Menu-Background"
@@ -31,74 +27,9 @@
 	.File "Surfaces\Menu-Background.png"
 }
 
-.Sprite "Player-Pacman"
-{
-	.File "Surfaces\Player-Pacman.png"
-	
-	.Area "F1"				{ .Rect 0  0 46  46 }
-	.Area "F2"				{ .Rect 46 0 92  46 }
-	.Area "F3"				{ .Rect 92 0 138 46 }
-	
-	.Animation "Idle"
-	{
-		.Frame { .Area "F2" }
-	}
-	
-	.Animation "Move"
-	{
-		.Delay 50
-		
-		.Frame { .Area "F2" }
-		.Frame { .Area "F3" }
-		.Frame { .Area "F2" }
-		.Frame { .Area "F1" .Event "Eat" .Loop }
-	}
-}
-
-.Sprite "Player-Ghost"
-{
-	.File "Surfaces\Player-Ghost.png"
-	
-	.Area "F1"				{ .Rect 0  0 46 46 }
-	.Area "F2"				{ .Rect 46 0 92 46 }
-	
-	.Animation "Idle"
-	{
-		.Delay 100
-	
-		.Frame { .Area "F1" }
-		.Frame { .Area "F2" .Loop }
-	}
-}
-
-.Sprite "Player-Ghost-Eyes"
-{
-	.File "Surfaces\Player-Ghost-Eyes.png"
-	
-	.Area "F1"				{ .Rect 0   0 46  46 }
-	.Area "F3"				{ .Rect 46  0 92  46 }
-	.Area "F2"				{ .Rect 92  0 138 46 }
-	.Area "F4"				{ .Rect 138 0 184 46 }
-}
-
-
-.Sprite "Power-Icons"
-{
-	.File "Surfaces\Power-Icons.png"
-	
-	.Area "Beacon"			{ .Rect 0  0 32  32 }
-	.Area "Hacker"			{ .Rect 32 0 64  32 }
-	.Area "Blind"			{ .Rect 64 0 92  32 }
-	.Area "Dizzy"			{ .Rect 92 0 128 32 }
-}
-
-.Sprite "Trap-Icons"
-{
-	.File "Surfaces\Trap-Tiles.png"
-	
-	.Area "Blind"			{ .Rect 0  0 46 46 }
-	.Area "Dizzy"			{ .Rect 46 0 92 46 }
-}
+//
+// Interface.
+//
 
 .Sprite "Cursor-Main"
 {
@@ -115,55 +46,19 @@
 	.File "Surfaces\Cursor-Click.png"
 }
 
-.Sprite "Menu-Input"
-{
-	.File "Surfaces\Menu-Input.png"
-	
-	.Area "Left"			{ .Rect 0  0 32  96 }
-	.Area "Centre"			{ .Rect 32 0 96  96 }
-	.Area "Right"			{ .Rect 96 0 128 96 }	
-}
-
-.Sprite "Menu-Button"
-{
-	.File "Surfaces\Menu-Button.png"
-	
-	.Area "NormalLeft"		{ .Rect 0   0 32  96 }
-	.Area "NormalCentre"	{ .Rect 32  0 96  96 }
-	.Area "NormalRight"		{ .Rect 96  0 128 96 }
-	.Area "OverLeft"		{ .Rect 128 0 160 96 }
-	.Area "OverCentre"		{ .Rect 160 0 224 96 }
-	.Area "OverRight"		{ .Rect 224 0 256 96 }
-	.Area "DownLeft"		{ .Rect 256 0 288 96 }
-	.Area "DownCentre"		{ .Rect 288 0 352 96 }
-	.Area "DownRight"		{ .Rect 352 0 384 96 }
-}
-
-.Sprite "Menu-Status"
-{
-	.File "Surfaces\Menu-Status.png"
-	
-	.Area "Left"			{ .Rect 0  0 32  152 }
-	.Area "Centre"			{ .Rect 32 0 96  152 }
-	.Area "Right"			{ .Rect 96 0 128 152 }	
-	.Area "Progress"		{ .Rect 32 0 96  152 }
-}
-
-.Sprite "Menu-Session"
-{
-	.File "Surfaces\Menu-Session.png"
-	
-	.Area "Title"			{ .Rect 20  7 490 35 }
-	.Area "Info"			{ .Rect 20 45 490 61 }
-}
+//##############################################################################
+//
+//                                   DEBUG
+//
+//##############################################################################
 
 //
-// *** INTERFACE ***
+// Interface.
 //
 
-.Sprite "Test-Window"
+.Sprite "Debug-Interface-Window"
 {
-	.File "Surfaces\Interface\Test-Dialog.png"
+	.File "Surfaces\Interface\Debug-Window.png"
 	
 	.Area "TopLeft"			{ .Size 0  0  3  17 }
 	.Area "TopCentre"		{ .Size 3  0  58 17 }
@@ -176,9 +71,9 @@
 	.Area "BottomRight"		{ .Size 61 75 3  3  }
 }
 
-.Sprite "Test-Group"
+.Sprite "Debug-Interface-Group"
 {
-	.File "Surfaces\Interface\Test-Group.png"
+	.File "Surfaces\Interface\Debug-Group.png"
 	
 	.Area "TopLeft"			{ .Rect 0  0  7  7  }
 	.Area "TopCentre"		{ .Rect 7  0  35 7  }
@@ -191,9 +86,9 @@
 	.Area "BottomRight"		{ .Rect 35 35 42 42 }
 }
 
-.Sprite "Test-Button"
+.Sprite "Debug-Interface-Button"
 {
-	.File "Surfaces\Interface\Test-Button.png"
+	.File "Surfaces\Interface\Debug-Button.png"
 	
 	.Area "NormalLeft"		{ .Size 0   0 4   20 }
 	.Area "NormalCentre"	{ .Size 4   0 100 20 }
@@ -206,18 +101,18 @@
 	.Area "DownRight"		{ .Size 320 0 4   20 }
 }
 
-.Sprite "Test-Input"
+.Sprite "Debug-Interface-Input"
 {
-	.File "Surfaces\Interface\Test-InputBox.png"
+	.File "Surfaces\Interface\Debug-Input.png"
 	
 	.Area "Left"			{ .Size 0  0 3  20 }
 	.Area "Centre"			{ .Size 1  0 62 20 }
 	.Area "Right"			{ .Size 61 0 3  20 }
 }
 
-.Sprite "Test-Check"
+.Sprite "Debug-Interface-Check"
 {
-	.File "Surfaces\Interface\Test-CheckBox.png"
+	.File "Surfaces\Interface\Debug-Check.png"
 	
 	.Area "Normal"			{ .Tile 0 13 13 }
 	.Area "Over"			{ .Tile 1 13 13 }
@@ -225,9 +120,9 @@
 	.Area "Check"			{ .Tile 3 13 13 }
 }
 
-.Sprite "Test-Radio"
+.Sprite "Debug-Interface-Radio"
 {
-	.File "Surfaces\Interface\Test-RadioButton.png"
+	.File "Surfaces\Interface\Debug-Radio.png"
 	
 	.Area "Normal"			{ .Tile 0 13 13 }
 	.Area "Over"			{ .Tile 1 13 13 }
@@ -235,9 +130,9 @@
 	.Area "Check"			{ .Tile 3 13 13 }
 }
 
-.Sprite "Test-Progress"
+.Sprite "Debug-Interface-Progress"
 {
-	.File "Surfaces\Interface\Test-Progress.png"
+	.File "Surfaces\Interface\Debug-Progress.png"
 	
 	.Area "Left"			{ .Size 0  0 4  17 }
 	.Area "Centre"			{ .Size 4  0 44 17 }

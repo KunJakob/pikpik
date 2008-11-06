@@ -639,7 +639,7 @@ void CComponentFactory::GetBasicProperties(CInterfaceElement* pElement, CDataset
 void CComponentFactory::GetLabelProperties(CLabelElement* pElement, CDataset* pDataset)
 {
 	if (_PROPERTY_EXISTS(pDataset, "Text"))
-		pElement->SetText(Global.TranslateLocale(_PROPERTY_VALUE->GetString()));
+		pElement->SetText(Global.ProcessLocale(_PROPERTY_VALUE->GetString()));
 
 	if (_PROPERTY_EXISTS(pDataset, "Alignment"))
 	{
@@ -816,7 +816,7 @@ CButtonComponent* CComponentFactory::CreateButton(CDataset* pDataset)
 	GetBasicProperties(pButton, pDataset);
 
 	if (_PROPERTY_EXISTS(pDataset, "Text"))
-		pButton->SetText(Global.TranslateLocale(_PROPERTY_VALUE->GetString()));
+		pButton->SetText(Global.ProcessLocale(_PROPERTY_VALUE->GetString()));
 
 	GetStripProperties(pButton, pDataset);
 
@@ -839,7 +839,7 @@ CInputComponent* CComponentFactory::CreateInput(CDataset* pDataset)
 	GetBasicProperties(pInput, pDataset);
 
 	if (_PROPERTY_EXISTS(pDataset, "Text"))
-		pInput->SetText(Global.TranslateLocale(_PROPERTY_VALUE->GetString()));
+		pInput->SetText(Global.ProcessLocale(_PROPERTY_VALUE->GetString()));
 
 	if (_PROPERTY_EXISTS(pDataset, "Masked"))
 		pInput->SetMasked(_PROPERTY_VALUE->GetBool());
@@ -889,7 +889,7 @@ CWindowComponent* CComponentFactory::CreateWindow(CDataset* pDataset)
 	GetBasicProperties(pWindow, pDataset);
 
 	if (_PROPERTY_EXISTS(pDataset, "Title"))
-		pWindow->SetTitle(Global.TranslateLocale(_PROPERTY_VALUE->GetString()));
+		pWindow->SetTitle(Global.ProcessLocale(_PROPERTY_VALUE->GetString()));
 
 	if (_PROPERTY_EXISTS(pDataset, "Moveable"))
 		pWindow->SetMoveable(_PROPERTY_VALUE->GetBool());
@@ -917,7 +917,7 @@ CGroupComponent* CComponentFactory::CreateGroup(CDataset* pDataset)
 	GetBasicProperties(pGroup, pDataset);
 
 	if (_PROPERTY_EXISTS(pDataset, "Title"))
-		pGroup->SetTitle(Global.TranslateLocale(_PROPERTY_VALUE->GetString()));
+		pGroup->SetTitle(Global.ProcessLocale(_PROPERTY_VALUE->GetString()));
 
 	AttachChildren(pGroup, pDataset);
 
@@ -950,7 +950,7 @@ CCheckComponent* CComponentFactory::CreateCheck(CDataset* pDataset)
 	GetBasicProperties(pCheck, pDataset);
 
 	if (_PROPERTY_EXISTS(pDataset, "Text"))
-		pCheck->SetText(Global.TranslateLocale(_PROPERTY_VALUE->GetString()));
+		pCheck->SetText(Global.ProcessLocale(_PROPERTY_VALUE->GetString()));
 
 	GetCheckProperties(pCheck, pDataset);
 
@@ -975,7 +975,7 @@ CRadioComponent* CComponentFactory::CreateRadio(CDataset* pDataset)
 	GetBasicProperties(pRadio, pDataset);
 	
 	if (_PROPERTY_EXISTS(pDataset, "Text"))
-		pRadio->SetText(Global.TranslateLocale(_PROPERTY_VALUE->GetString()));
+		pRadio->SetText(Global.ProcessLocale(_PROPERTY_VALUE->GetString()));
 
 	GetCheckProperties(pRadio, pDataset);
 
