@@ -136,6 +136,10 @@ protected:
 	// Called once when the screen goes out of scope either through destruction or another screen is placed above this on the stack.
 	virtual void OnSleep();
 
+	// Called when a specific event is executed.
+	// ~return Specifies if the event was consumed.
+	virtual xbool OnEvent(xint iEventType, void* pEventInfo);
+
 	// Called each frame to update the screen when active.
 	virtual void OnUpdate();
 

@@ -206,6 +206,11 @@ public:
 
 	// The global game strings.
 	CMetadata* m_pLocale;
+
+#if !XRETAIL
+	// The debug controls metadata.
+	CMetadata* m_pDebugMetadata;
+#endif
 };
 
 //##############################################################################

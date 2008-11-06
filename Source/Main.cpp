@@ -159,6 +159,9 @@ void Application::Initialise()
 	// Load the locale.
 	Global.m_pLocale = _METADATA("Strings");
 
+	// Load the debug metadata.
+	Global.m_pDebugMetadata = _METADATA("Interface");
+
 	// Initialise the game font.
 	Global.m_pGameFont = new CFont(_FONT("Default"));
 
@@ -171,7 +174,7 @@ void Application::Initialise()
 	// Load all screen instances and set go to the logo screen.
 	ScreenManager.LoadScreens();
 	ScreenManager.Set(ScreenIndex_LogoScreen, true);
-	
+
 	// Execute the first frame update.
 	OnUpdate();
 }
@@ -183,6 +186,9 @@ void Application::Deinitialise()
 {
 	// Free the string metadata.
 	delete Global.m_pLocale;
+
+	// Free the debug metadata.
+	delete Global.m_pDebugMetadata;
 
 	// Free the font.
 	delete Global.m_pGameFont;

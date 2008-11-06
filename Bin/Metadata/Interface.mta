@@ -3,10 +3,12 @@
 	.Sprite			"Debug-Interface-Window"
 	.Font			"Debug-Interface-Window"
 	
-	.Title			"[Debug] Render Layers"
-	.Position		1 1
-	.Moveable		true
+	.Title			"Render Layers"
+	.Position		5 5
 	
+	.Moveable		true
+	.Visible		false
+		
 	.AutoArrange
 	{
 		.Padding	8 10 8 10
@@ -16,7 +18,7 @@
 	.Check "L-Background"
 	{
 		.Sprite		"Debug-Interface-Check"
-		.Font		"Debug-Interface-Font"
+		.Font		"Debug-Interface"
 		.Text		"Background"
 		.Checked	true
 	}
@@ -24,8 +26,16 @@
 	.Check "L-Interface"
 	{
 		.Sprite		"Debug-Interface-Check"
-		.Font		"Debug-Interface-Font"
+		.Font		"Debug-Interface"
 		.Text		"Interface"
 		.Checked	true
+	}
+	
+	.Check "L-InterfaceDebug"
+	{
+		.Sprite		"Debug-Interface-Check"
+		.Font		"Debug-Interface"
+		.Text		"Interface (Debug)"
+		.Checked	false
 	}
 }

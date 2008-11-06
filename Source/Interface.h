@@ -389,7 +389,7 @@ public:
 	virtual void Detach(CInterfaceElement* pElement);
 
 	// Detach all child elements from this element.
-	void DetachAll();
+	void Clear();
 
 	// Check if the specified element is attached.
 	xbool IsAttached(CInterfaceElement* pElement);

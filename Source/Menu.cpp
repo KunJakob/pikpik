@@ -100,9 +100,9 @@ void CMenuScreen::OnLoad()
 		// Main.
 		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Offline"),		xbind(this, &CMenuScreen::Callback_StartGame)),
 		new CMenuLink(MenuGroup_Main,		m_pMenuDisabled,	_LOCALE("Menu_Online"),			NULL),
-		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Tutorial"),		NULL),
-		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Options"),		NULL),
-		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Credits"),		NULL),
+		new CMenuLink(MenuGroup_Main,		m_pMenuDisabled,	_LOCALE("Menu_Tutorial"),		NULL),
+		new CMenuLink(MenuGroup_Main,		m_pMenuDisabled,	_LOCALE("Menu_Options"),		NULL),
+		new CMenuLink(MenuGroup_Main,		m_pMenuDisabled,	_LOCALE("Menu_Credits"),		NULL),
 		new CMenuLink(MenuGroup_Main,		m_pMenuHighlight,	_LOCALE("Menu_Exit"),			xbind(this, &CMenuScreen::Callback_QuitGame)),
 	};
 
@@ -143,6 +143,15 @@ void CMenuScreen::OnActivate()
 
 	RenderLayer(MenuLayerIndex_Background)->AttachRenderable(m_pBackground);
 	RenderLayer(MenuLayerIndex_Interface)->SetRenderOverride(xbind(&InterfaceManager, &CInterfaceManager::Render));
+
+	// Initialise the debug windows.
+	CWindowComponent* pWindow = (CWindowComponent*)ComponentFactory.CreateWindow(Global.m_pDebugMetadata, "Debug-RenderLayers");
+	
+	InterfaceScreen.Attach(pWindow);
+
+	((CCheckComponent*)pWindow->FindChild("L-Background"))->SetCheckBinding(xbind(RenderLayer(MenuLayerIndex_Background), &CRenderLayer::SetEnabled));
+	((CCheckComponent*)pWindow->FindChild("L-Interface"))->SetCheckBinding(xbind(RenderLayer(MenuLayerIndex_Interface), &CRenderLayer::SetEnabled));
+	((CCheckComponent*)pWindow->FindChild("L-InterfaceDebug"))->SetCheckBinding(xbind(&InterfaceManager, &CInterfaceManager::SetDebugRender));
 }
 
 // =============================================================================
@@ -169,21 +178,64 @@ void CMenuScreen::OnSleep()
 }
 
 // =============================================================================
+// Nat Ryall                                                         06-Nov-2008
+// =============================================================================
+xbool CMenuScreen::OnEvent(xint iEventType, void* pEventInfo)
+{
+	hgeInputEvent* pEvent = (hgeInputEvent*)pEventInfo;
+
+	switch (iEventType)
+	{
+	// Key Up.
+	case INPUT_KEYUP:
+		{
+			switch (pEvent->key)
+			{
+			// ESCAPE.
+			case HGEK_ESCAPE:
+				{
+					// Exit the game.
+					if (m_iState == MenuState_Idle)
+					{
+						switch (m_iMenuGroup)
+						{
+						case MenuGroup_Main:
+							{
+								_TERMINATE;
+								return true;
+							}
+							break;
+						}
+					}
+				}
+				break;
+
+			// F1.
+			case HGEK_F1:
+				{
+					// Show/hide debug window.
+					CWindowComponent* pWindow = (CWindowComponent*)InterfaceScreen.FindChild("Debug-RenderLayers");
+
+					if (pWindow)
+					{
+						pWindow->SetVisible(!pWindow->IsVisible());
+						return true;
+					}
+				}
+				break;
+			}
+		}
+		break;
+	}
+
+	return false;
+}
+
+// =============================================================================
 // Nat Ryall                                                         13-Apr-2008
 // =============================================================================
 void CMenuScreen::OnUpdate()
 {
-	// Allow "ESC" to exit the game.
-	if (m_iState == MenuState_Idle && _HGE->Input_KeyUp(HGEK_ESCAPE))
-	{
-		switch (m_iMenuGroup)
-		{
-		case MenuGroup_Main:
-			_TERMINATE;
-			return;
-		}
-	}
-
 	// Update based on the state.
 	switch (m_iState)
 	{
@@ -349,7 +401,7 @@ void CMenuScreen::AttachMenuGroup(t_MenuGroup iMenuGroup)
 {
 	m_iMenuGroup = iMenuGroup;
 
-	//InterfaceScreen.DetachGroup();
+	//InterfaceScreen.Clear();
 
 	if (iMenuGroup != MenuGroup_None)
 	{

@@ -58,7 +58,7 @@ void CInterfaceManager::Reset()
 	m_pActiveElement = NULL;
 	m_pFocusedElement = NULL;
 
-	m_pScreen->DetachAll();
+	m_pScreen->Clear();
 
 	for (xint iA = 0; iA < ElementType_Max; ++iA)
 	{
@@ -143,7 +143,7 @@ void CInterfaceManager::Render(CRenderLayer* pLayer)
 	// Render debug boxes over the interface to show the active and focused elements.
 	if (m_bDebugRender && m_pScreen->IsVisible())
 	{
-		if (m_pActiveElement)
+		if (m_pActiveElement && m_pActiveElement != m_pScreen)
 		{
 			xrect xRect = m_pActiveElement->GetArea();
 			xuint iColour = ARGB(128, 32, 32, 32);
@@ -153,8 +153,8 @@ void CInterfaceManager::Render(CRenderLayer* pLayer)
 
 		if (m_pFocusedElement)
 		{
-			xrect xRect = m_pFocusedElement->GetFocusArea() + xrect(2, 2, -1, -1);
-			xuint iColour = ARGB(128, 255, 0, 0);
+			xrect xRect = m_pFocusedElement->GetFocusArea() + xrect(1, 1, 0, 0);
+			xuint iColour = ARGB(255, 255, 0, 0);
 
 			RenderManager.RenderBox(false, xRect, iColour);
 		}
@@ -393,7 +393,7 @@ void CInterfaceElement::Detach(CInterfaceElement* pElement)
 // =============================================================================
 // Nat Ryall                                                         15-Jun-2008
 // =============================================================================
-void CInterfaceElement::DetachAll()
+void CInterfaceElement::Clear()
 {
 	while (m_lpChildElements.size())
 		Detach(m_lpChildElements.front());
