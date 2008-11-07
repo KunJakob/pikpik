@@ -186,7 +186,6 @@ xbool CMenuScreen::OnEvent(xint iEventType, void* pEventInfo)
 
 	switch (iEventType)
 	{
-	// Key Up.
 	case INPUT_KEYUP:
 		{
 			switch (pEvent->key)

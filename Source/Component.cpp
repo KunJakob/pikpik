@@ -64,6 +64,17 @@ void CHyperlinkComponent::OnRender()
 	CLabelElement::Render();
 }
 
+// =============================================================================
+// Nat Ryall                                                         07-Nov-2008
+// =============================================================================
+xbool CHyperlinkComponent::OnMouseUp(xpoint xPosition)
+{
+	if (m_fpOnClickCallback)
+		m_fpOnClickCallback();
+
+	return true;
+}
+
 //##############################################################################
 
 //##############################################################################
@@ -146,6 +157,29 @@ void CButtonComponent::OnRender()
 		m_pFont->Render(m_xText.c_str(), xrect(0, 0, GetSize()) + GetPosition(), HGETEXT_CENTER | HGETEXT_MIDDLE);
 }
 
+// =============================================================================
+// Nat Ryall                                                         07-Nov-2008
+// =============================================================================
+xbool CButtonComponent::OnMouseDown(xpoint xPosition)
+{
+	m_iButtonState = ButtonState_Down;
+
+	return true;
+}
+
+// =============================================================================
+// Nat Ryall                                                         07-Nov-2008
+// =============================================================================
+xbool CButtonComponent::OnMouseUp(xpoint xPosition)
+{
+	m_iButtonState = ButtonState_Over;
+
+	if (m_fpOnClickCallback)
+		m_fpOnClickCallback(this, InterfaceManager.GetMousePosition() - GetPosition());
+
+	return true;
+}
+
 //##############################################################################
 
 //##############################################################################
@@ -223,7 +257,7 @@ void CInputComponent::OnRender()
 // =============================================================================
 // Nat Ryall                                                          4-May-2008
 // =============================================================================
-void CInputComponent::OnMouseDown(xpoint xPosition)
+xbool CInputComponent::OnMouseDown(xpoint xPosition)
 {
 	if (m_xText.length())
 	{
@@ -249,12 +283,14 @@ void CInputComponent::OnMouseDown(xpoint xPosition)
 		else
 			m_iCharOffset = (xint)xCheckString.length();
 	}
+
+	return true;
 }
 
 // =============================================================================
 // Nat Ryall                                                          4-May-2008
 // =============================================================================
-void CInputComponent::OnKeyDown(xint iVirtualKey)
+xbool CInputComponent::OnKeyDown(xint iVirtualKey)
 {
 	switch (iVirtualKey)
 	{
@@ -262,6 +298,8 @@ void CInputComponent::OnKeyDown(xint iVirtualKey)
 		{
 			if (m_iCharOffset)
 				m_xText.erase(--m_iCharOffset, 1);
+
+			return true;
 		}
 		break;
 
@@ -269,6 +307,8 @@ void CInputComponent::OnKeyDown(xint iVirtualKey)
 		{
 			if (m_iCharOffset)
 				m_iCharOffset--;
+
+			return true;
 		}
 		break;
 
@@ -276,11 +316,15 @@ void CInputComponent::OnKeyDown(xint iVirtualKey)
 		{
 			if (m_iCharOffset < (xint)m_xText.length())
 				m_iCharOffset++;
+
+			return true;
 		}
 		break;
 	}
 
 	m_iFlashTimer = 0;
+
+	return false;
 }
 
 // =============================================================================
@@ -391,6 +435,36 @@ void CWindowComponent::OnRender()
 	// Render the window title.
 	if (m_pFont)
 		m_pFont->Render(m_xTitle.c_str(), xrect(m_xFrameSize.iLeft + 2, 0, m_xFrameSize.iLeft + m_iWidth, m_xFrameSize.iTop) + GetPosition(), HGETEXT_LEFT | HGETEXT_MIDDLE);
+}
+
+// =============================================================================
+// Nat Ryall                                                         07-Nov-2008
+// =============================================================================
+xbool CWindowComponent::OnMouseDown(xpoint xPosition)
+{
+	if (m_bMoveable && Math::IsIntersecting(xPosition, xrect(m_xFrameSize.iLeft, 0, GetInnerWidth(), m_xFrameSize.iTop) + GetPosition()))
+		m_bDragging = true;
+
+	return true;
+}
+
+// =============================================================================
+// Nat Ryall                                                         07-Nov-2008
+// =============================================================================
+xbool CWindowComponent::OnMouseUp(xpoint xPosition)
+{
+	m_bDragging = false;
+
+	return true;
+}
+
+// =============================================================================
+// Nat Ryall                                                         07-Nov-2008
+// =============================================================================
+void CWindowComponent::OnMouseMove(xpoint xDifference, xbool bMouseDown)
+{
+	if (m_bDragging)
+		Move(xDifference);
 }
 
 //##############################################################################
@@ -523,9 +597,19 @@ void CCheckComponent::OnRender()
 }
 
 // =============================================================================
+// Nat Ryall                                                         07-Nov-2008
+// =============================================================================
+xbool CCheckComponent::OnMouseDown(xpoint xPosition)
+{
+	m_iCheckState = CheckState_Down;
+
+	return true;
+}
+
+// =============================================================================
 // Nat Ryall                                                         16-May-2008
 // =============================================================================
-void CCheckComponent::OnMouseUp(xpoint xPosition)
+xbool CCheckComponent::OnMouseUp(xpoint xPosition)
 {
 	m_bChecked = !m_bChecked;
 	m_iCheckState = CheckState_Over;
@@ -535,6 +619,8 @@ void CCheckComponent::OnMouseUp(xpoint xPosition)
 
 	if (m_fpCheckBinding)
 		m_fpCheckBinding(m_bChecked);
+
+	return true;
 }
 
 //##############################################################################
@@ -564,7 +650,7 @@ CRadioComponent::~CRadioComponent()
 // =============================================================================
 // Nat Ryall                                                         13-May-2008
 // =============================================================================
-void CRadioComponent::OnMouseUp(xpoint xPosition)
+xbool CRadioComponent::OnMouseUp(xpoint xPosition)
 {
 	CRadioComponent* pRadio = GetChecked(m_iRadioGroup);
 
@@ -573,6 +659,8 @@ void CRadioComponent::OnMouseUp(xpoint xPosition)
 
 	m_bChecked = true;
 	m_iCheckState = CheckState_Over;
+
+	return true;
 }
 
 // =============================================================================

@@ -423,19 +423,19 @@ protected:
 	virtual void OnMouseLeave() {}
 
 	// Triggered when the left mouse-button is pressed within the element area.
-	virtual void OnMouseDown(xpoint xPosition) {}
+	virtual xbool OnMouseDown(xpoint xPosition) { return false; }
 
 	// Triggered when the left mouse-button is released within the element area.
-	virtual void OnMouseUp(xpoint xPosition) {}
+	virtual xbool OnMouseUp(xpoint xPosition) { return false; }
 
 	// Triggered when the mouse is moved within the element area.
 	virtual void OnMouseMove(xpoint xDifference, xbool bMouseDown) {}
 
 	// Triggered when a keyboard key is pressed whilst the element is in focus.
-	virtual void OnKeyDown(xint iVirtualKey) {}
+	virtual xbool OnKeyDown(xint iVirtualKey) { return false; }
 
 	// Triggered when a keyboard key is released whilst the element is in focus.
-	virtual void OnKeyUp(xint iVirtualKey) {}
+	virtual xbool OnKeyUp(xint iVirtualKey) { return false; }
 
 	// Triggered when an ASCII key is input on the keyboard whilst the element is in focus.
 	virtual void OnKeyChar(xchar cChar) {}

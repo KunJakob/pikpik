@@ -89,11 +89,7 @@ public:
 
 protected:
 	// Called when the mouse is released when the element is active.
-	virtual void OnMouseUp(xpoint xPosition)
-	{
-		if (m_fpOnClickCallback)
-			m_fpOnClickCallback();
-	}
+	virtual xbool OnMouseUp(xpoint xPosition);
 
 	// The link callback.
 	t_OnClickCallback m_fpOnClickCallback;
@@ -179,19 +175,10 @@ protected:
 	}
 
 	// Triggered when the left mouse-button is pressed within the element area when the element is active.
-	virtual void OnMouseDown(xpoint xPosition)
-	{
-		m_iButtonState = ButtonState_Down;
-	}
+	virtual xbool OnMouseDown(xpoint xPosition);
 
 	// Triggered when the left mouse-button is released within the element area when the element is active.
-	virtual void OnMouseUp(xpoint xPosition) 
-	{
-		m_iButtonState = ButtonState_Over;
-
-		if (m_fpOnClickCallback)
-			m_fpOnClickCallback(this, InterfaceManager.GetMousePosition() - GetPosition());
-	}
+	virtual xbool OnMouseUp(xpoint xPosition);
 
 	// The button states.
 	enum t_ButtonState
@@ -292,10 +279,10 @@ protected:
 	}
 
 	// Triggered when the left mouse-button is pressed within the element area.
-	virtual void OnMouseDown(xpoint xPosition);
+	virtual xbool OnMouseDown(xpoint xPosition);
 
 	// Triggered when a keyboard key is pressed whilst the element is in focus.
-	virtual void OnKeyDown(xint iVirtualKey);
+	virtual xbool OnKeyDown(xint iVirtualKey);
 
 	// Triggered when an ASCII key is input on the keyboard whilst the element is in focus.
 	virtual void OnKeyChar(xchar cChar);
@@ -417,24 +404,13 @@ public:
 
 protected:
 	// Triggered when the left mouse-button is pressed within the element area.
-	virtual void OnMouseDown(xpoint xPosition) 
-	{
-		if (m_bMoveable && Math::IsIntersecting(xPosition, xrect(m_xFrameSize.iLeft, 0, GetInnerWidth(), m_xFrameSize.iTop) + GetPosition()))
-			m_bDragging = true;
-	}
+	virtual xbool OnMouseDown(xpoint xPosition);
 
 	// Triggered when the left mouse-button is released within the element area.
-	virtual void OnMouseUp(xpoint xPosition) 
-	{
-		m_bDragging = false;
-	}
+	virtual xbool OnMouseUp(xpoint xPosition);
 
 	// Triggered when the mouse is moved within the element area.
-	virtual void OnMouseMove(xpoint xDifference, xbool bMouseDown)
-	{
-		if (m_bDragging)
-			Move(xDifference);
-	}
+	virtual void OnMouseMove(xpoint xDifference, xbool bMouseDown);
 
 	// Element areas.
 	CSpriteMetadata::CArea* m_pTL;
@@ -597,13 +573,10 @@ protected:
 	}
 
 	// Triggered when the left mouse-button is pressed within the element area.
-	virtual void OnMouseDown(xpoint xPosition)
-	{
-		m_iCheckState = CheckState_Down;
-	}
+	virtual xbool OnMouseDown(xpoint xPosition);
 
 	// Triggered when the left mouse-button is released within the element area.
-	virtual void OnMouseUp(xpoint xPosition);
+	virtual xbool OnMouseUp(xpoint xPosition);
 
 	// The check states.
 	enum t_CheckState
@@ -661,7 +634,7 @@ public:
 
 protected:
 	// Triggered when the left mouse-button is released within the element area.
-	virtual void OnMouseUp(xpoint xPosition);
+	virtual xbool OnMouseUp(xpoint xPosition);
 
 	// The radio component group.
 	xint m_iRadioGroup;

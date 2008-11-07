@@ -81,8 +81,52 @@ void CInterfaceManager::Reset()
 // =============================================================================
 xbool CInterfaceManager::OnEvent(xint iEventType, void* pEventInfo)
 {
-	// TODO:
-	// Process an event instead of polling.
+	hgeInputEvent* pEvent = (hgeInputEvent*)pEventInfo;
+
+	switch (iEventType)
+	{
+	case INPUT_KEYDOWN:
+		{
+			if (m_pFocusedElement)
+			{
+				// Process the key-down.
+				return m_pFocusedElement->OnKeyDown(pEvent->key);
+			}
+		}
+		break;
+
+	case INPUT_KEYUP:
+		{
+			if (m_pFocusedElement)
+			{
+				// Check for a valid char input.
+				if (pEvent->chr && pEvent->chr >= ' ' && pEvent->chr <= '~')
+					m_pFocusedElement->OnKeyChar((xchar)pEvent->chr);
+
+				// Process the key-up.
+				return m_pFocusedElement->OnKeyUp(pEvent->key);
+			}
+		}
+		break;
+
+	case INPUT_MBUTTONDOWN:
+		{
+			// Perform a mouse-down on the active element.
+			if (m_pActiveElement)
+			{
+				SetFocus(m_pActiveElement);
+				return m_pActiveElement->OnMouseDown(m_xMousePos);
+			}
+		}
+		break;
+
+	case INPUT_MBUTTONUP:
+		{
+			// Perform a mouse-up on the active element.
+			if (m_pActiveElement)
+				return m_pActiveElement->OnMouseUp(m_xMousePos);
+		}
+	}
 
 	return false;
 }
@@ -111,30 +155,11 @@ void CInterfaceManager::OnUpdate()
 	{
 		CInterfaceElement* pElement = m_pFocusedElement;
 
-		do 
+		while (pElement) 
 		{
 			pElement->ToFront();
+			pElement = pElement->m_pParent;
 		}
-		while (pElement = pElement->m_pParent);
-	}
-
-	// Check key presses.
-	xint iChar = _HGE->Input_GetChar();
-
-	if (m_pFocusedElement && iChar)
-	{
-		if (iChar >= ' ' && iChar <= '~')
-			m_pFocusedElement->OnKeyChar((xchar)iChar);
-	}
-
-	xint iKey = _HGE->Input_GetKey();
-
-	if (m_pFocusedElement && iKey)
-	{
-		if (_HGE->Input_GetKeyState(iKey))
-			m_pFocusedElement->OnKeyDown(iKey);
-		else
-			m_pFocusedElement->OnKeyUp(iKey);
 	}
 }
 
@@ -245,7 +270,7 @@ void CInterfaceManager::UpdateElement(CInterfaceElement* pElement)
 	if (pElement->IsEnabled() && pElement->IsVisible())
 	{
 		// Iterate through all children in reverse-render order.
-		XEN_LIST_FOREACH_R(t_InterfaceElementList, ppElement, pElement->m_lpChildElements)
+		XLISTFOREACH_R(t_InterfaceElementList, ppElement, pElement->m_lpChildElements)
 			UpdateElement(*ppElement);
 
 		if (Math::IsIntersecting(m_xMousePos, pElement->GetArea()))
@@ -260,18 +285,6 @@ void CInterfaceManager::UpdateElement(CInterfaceElement* pElement)
 
 				m_pActiveElement = pElement;
 				m_pActiveElement->OnMouseEnter();
-			}
-
-			// If we're the active element, check for mouse clicks.
-			if (m_pActiveElement == pElement)
-			{
-				if (_HGE->Input_KeyDown(HGEK_LBUTTON))
-				{
-					SetFocus(pElement);
-					pElement->OnMouseDown(m_xMousePos);
-				}
-				else if (_HGE->Input_KeyUp(HGEK_LBUTTON))
-					pElement->OnMouseUp(m_xMousePos);
 			}
 		}
 
@@ -288,7 +301,7 @@ void CInterfaceManager::RenderElement(CInterfaceElement* pElement)
 	{
 		pElement->OnRender();
 
-		XEN_LIST_FOREACH(t_InterfaceElementList, ppElement, pElement->m_lpChildElements)
+		XLISTFOREACH(t_InterfaceElementList, ppElement, pElement->m_lpChildElements)
 			RenderElement(*ppElement);
 	}
 }
@@ -301,7 +314,7 @@ void CInterfaceManager::DeregisterElement(CInterfaceElement* pElement)
 	if (CInterfaceElement* pParent = pElement->m_pParent)
 		pParent->Detach(pElement);
 
-	XEN_LIST_REMOVE(t_InterfaceElementList, m_lpElements, pElement);
+	XLISTREMOVE(t_InterfaceElementList, m_lpElements, pElement);
 }
 
 //##############################################################################
@@ -359,7 +372,7 @@ void CInterfaceElement::Move(xpoint xOffset)
 {
 	m_xPosition += xOffset;
 
-	XEN_LIST_FOREACH(t_InterfaceElementList, ppElement, m_lpChildElements)
+	XLISTFOREACH(t_InterfaceElementList, ppElement, m_lpChildElements)
 		(*ppElement)->Move(xOffset);
 }
 
@@ -382,7 +395,7 @@ void CInterfaceElement::Detach(CInterfaceElement* pElement)
 {
 	pElement->m_pParent = NULL;
 
-	XEN_LIST_REMOVE(t_InterfaceElementList, m_lpChildElements, pElement);
+	XLISTREMOVE(t_InterfaceElementList, m_lpChildElements, pElement);
 
 	if (pElement == InterfaceManager.m_pActiveElement)
 		InterfaceManager.m_pActiveElement = NULL;
@@ -407,7 +420,7 @@ void CInterfaceElement::Clear()
 // =============================================================================
 xbool CInterfaceElement::IsAttached(CInterfaceElement* pElement)
 {
-	XEN_LIST_FOREACH(t_InterfaceElementList, ppElement, m_lpChildElements)
+	XLISTFOREACH(t_InterfaceElementList, ppElement, m_lpChildElements)
 	{
 		if (pElement == *ppElement)
 			return true;
@@ -423,7 +436,7 @@ void CInterfaceElement::ToFront()
 {
 	if (m_pParent)
 	{
-		XEN_LIST_REMOVE(t_InterfaceElementList, m_pParent->m_lpChildElements, this);
+		XLISTREMOVE(t_InterfaceElementList, m_pParent->m_lpChildElements, this);
 		m_pParent->m_lpChildElements.push_back(this);
 	}
 }
