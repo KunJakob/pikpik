@@ -33,6 +33,12 @@ CInterfaceManager::CInterfaceManager() :
 	m_bDebugRender(false)
 {
 	m_pScreen = new CScreenElement();
+
+	for (xint iA = 0; iA < ElementType_Max; ++iA)
+	{
+		m_pCursor[iA] = NULL;
+	}
+
 	Reset();
 }
 
