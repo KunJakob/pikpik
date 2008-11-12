@@ -88,14 +88,14 @@ CSoundMetadata::CSoundMetadata(CDataset* pDataset) : CResourceMetadata(ResourceT
 	m_iGroup = SoundGroup_Unknown;
 	m_fVolume = 1.f;
 
-	if (_PROPERTY_EXISTS(pDataset, "Group"))
-		m_iGroup = (t_SoundGroup)_PROPERTY_VALUE->GetInt();
+	if (XMETAEXISTS_P(pDataset, "Group"))
+		m_iGroup = (t_SoundGroup)XMETAVAL_P->GetInt();
 
-	if (_PROPERTY_EXISTS(pDataset, "Volume"))
-		m_fVolume = _PROPERTY_VALUE->GetFloat();
+	if (XMETAEXISTS_P(pDataset, "Volume"))
+		m_fVolume = XMETAVAL_P->GetFloat();
 
 	// Markers.
-	_DATASET_FOREACH(pMarkerDataset, pDataset, "Marker", NULL)
+	XMETAFOREACH_D(pMarkerDataset, pDataset, "Marker", NULL)
 	{
 		CMarker* pMarker = new CMarker;
 		m_lpMarkers.push_back(pMarker);
@@ -103,8 +103,8 @@ CSoundMetadata::CSoundMetadata(CDataset* pDataset) : CResourceMetadata(ResourceT
 		pMarker->m_pName = pMarkerDataset->GetName();
 		pMarker->m_iTime = 0;
 
-		if (_PROPERTY_EXISTS(pMarkerDataset, "Time"))
-			pMarker->m_iTime = (xuint)_PROPERTY_VALUE->GetInt();
+		if (XMETAEXISTS_P(pMarkerDataset, "Time"))
+			pMarker->m_iTime = (xuint)XMETAVAL_P->GetInt();
 	}
 }
 

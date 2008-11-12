@@ -22,7 +22,6 @@
 #include <Global.h>
 
 // Other.
-#include <Metadata.h>
 #include <Resource.h>
 #include <Renderer.h>
 
