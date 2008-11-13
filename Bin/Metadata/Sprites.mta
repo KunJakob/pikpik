@@ -1,59 +1,55 @@
 //##############################################################################
 //
-//                                   SPRITES
+//                                   SYSTEM
 //
 //##############################################################################
-
-//
-// Core.
-//
-
 .Sprite "Missing"
 {
 	.File "Surfaces\Missing.png"
 }
 
+//##############################################################################
 //
-// Logos.
+//                                   LOGOS
 //
-
+//##############################################################################
 .Sprite "Logo-SAPIAN"
 {
-	.File "Surfaces\Logo-SAPIAN.png"
+	.File "Surfaces\Logo\Logo-SAPIAN.png"
 }
 
+//##############################################################################
+//
+//                                    MENU
+//
+//##############################################################################
 .Sprite "Menu-Background"
 {
-	.File "Surfaces\Menu-Background.png"
+	.File "Surfaces\Menu\Menu-Background.png"
 }
 
+//##############################################################################
 //
-// Interface.
+//                                 INTERFACE
 //
-
+//##############################################################################
 .Sprite "Cursor-Main"
 {
-	.File "Surfaces\Cursor-Default.png"
+	.File "Surfaces\Interface\Cursor-Default.png"
 }
 
 .Sprite "Cursor-Write"
 {
-	.File "Surfaces\Cursor-Write.png"
+	.File "Surfaces\Interface\Cursor-Write.png"
 }
 
 .Sprite "Cursor-Click"
 {
-	.File "Surfaces\Cursor-Click.png"
+	.File "Surfaces\Interface\Cursor-Click.png"
 }
 
-//##############################################################################
 //
-//                                   DEBUG
-//
-//##############################################################################
-
-//
-// Interface.
+// Debug.
 //
 
 .Sprite "Debug-Interface-Window"

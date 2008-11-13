@@ -19,22 +19,36 @@
 //##############################################################################
 
 // =============================================================================
+// Nat Ryall                                                         13-Nov-2008
+// =============================================================================
+const xchar* CGlobal::GetLocale(const xchar* pName)
+{
+	if (m_pLocale)
+	{
+		if (METADATA_PROPERTY_EXISTS(m_pLocale, pName))
+			return METADATA_PROPERTY_VALUE->GetString();
+	}
+
+	return pName;
+}
+
+// =============================================================================
 // Nat Ryall                                                         23-Oct-2008
 // =============================================================================
-const xchar* CGlobal::ProcessLocale(const xchar* pString)
+const xchar* CGlobal::GetLocaleFromVar(const xchar* pInput)
 {
 	// Check if we have a locale string: "&NAME". 
-	if (pString && String::Length(pString) > 1 && pString[0] == '&')
+	if (pInput && String::Length(pInput) > 1 && pInput[0] == '&')
 	{
 		// If we see "&&" it means we want to use '&'.
-		if (pString[1] == '&')
-			return &pString[1];
+		if (pInput[1] == '&')
+			return &pInput[1];
 		
-		return _LOCALE(&pString[1]);
+		return GetLocale(&pInput[1]);
 	}
 
 	// We should just return the string otherwise.
-	return pString;
+	return pInput;
 }
 
 //##############################################################################

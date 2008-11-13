@@ -53,23 +53,23 @@ CSpriteMetadata::CSpriteMetadata(CDataset* pDataset) : CResourceMetadata(Resourc
 	m_pFile = (CSpriteFile*)ResourceManager.CreateResourceFile(ResourceType_Sprite, pDataset->GetProperty("File")->GetString());
 
 	// Areas.
-	META_DATASET_FOREACH(pAreaDataset, pDataset, "Area", NULL)
+	METADATA_DATASET_FOREACH(pAreaDataset, pDataset, "Area", NULL)
 	{
 		CArea* pArea = new CArea;
 		m_lpAreas.push_back(pArea);
 
 		pArea->m_pName = pAreaDataset->GetName();
 
-		if (META_PROPERTY_EXISTS(pAreaDataset, "Rect"))
-			pArea->m_xRect = META_PROPERTY_VALUE->GetRect();
-		else if (META_PROPERTY_EXISTS(pAreaDataset, "Size"))
-			pArea->m_xRect = xrect(META_PROPERTY_VALUE->GetPoint(0), META_PROPERTY_VALUE->GetPoint(0) + META_PROPERTY_VALUE->GetPoint(1));
-		else if (META_PROPERTY_EXISTS(pAreaDataset, "Tile"))
-			pArea->m_xRect = xrect(META_PROPERTY_VALUE->GetInt(0) * META_PROPERTY_VALUE->GetInt(1), 0, (META_PROPERTY_VALUE->GetInt(0) + 1) * META_PROPERTY_VALUE->GetInt(1), META_PROPERTY_VALUE->GetInt(2));
+		if (METADATA_PROPERTY_EXISTS(pAreaDataset, "Rect"))
+			pArea->m_xRect = METADATA_PROPERTY_VALUE->GetRect();
+		else if (METADATA_PROPERTY_EXISTS(pAreaDataset, "Size"))
+			pArea->m_xRect = xrect(METADATA_PROPERTY_VALUE->GetPoint(0), METADATA_PROPERTY_VALUE->GetPoint(0) + METADATA_PROPERTY_VALUE->GetPoint(1));
+		else if (METADATA_PROPERTY_EXISTS(pAreaDataset, "Tile"))
+			pArea->m_xRect = xrect(METADATA_PROPERTY_VALUE->GetInt(0) * METADATA_PROPERTY_VALUE->GetInt(1), 0, (METADATA_PROPERTY_VALUE->GetInt(0) + 1) * METADATA_PROPERTY_VALUE->GetInt(1), METADATA_PROPERTY_VALUE->GetInt(2));
 	}
 
 	// Animations.
-	META_DATASET_FOREACH(pAnimationDataset, pDataset, "Animation", NULL)
+	METADATA_DATASET_FOREACH(pAnimationDataset, pDataset, "Animation", NULL)
 	{
 		CAnimation* pAnimation = new CAnimation;
 		m_lpAnimations.push_back(pAnimation);
@@ -79,13 +79,13 @@ CSpriteMetadata::CSpriteMetadata(CDataset* pDataset) : CResourceMetadata(Resourc
 
 		xuint iAnimationDelay = 0;
 
-		if (META_PROPERTY_EXISTS(pAnimationDataset, "Delay"))
-			iAnimationDelay = META_PROPERTY_VALUE->GetInt();
+		if (METADATA_PROPERTY_EXISTS(pAnimationDataset, "Delay"))
+			iAnimationDelay = METADATA_PROPERTY_VALUE->GetInt();
 
 		CFrame* pPrevFrame = NULL;
 
 		// Frames.
-		META_DATASET_FOREACH(pFrameDataset, pAnimationDataset, "Frame", NULL)
+		METADATA_DATASET_FOREACH(pFrameDataset, pAnimationDataset, "Frame", NULL)
 		{
 			CFrame* pFrame = new CFrame;
 			pAnimation->m_lpFrames.push_back(pFrame);
@@ -100,11 +100,11 @@ CSpriteMetadata::CSpriteMetadata(CDataset* pDataset) : CResourceMetadata(Resourc
 
 			pFrame->m_pArea = FindArea(pFrameDataset->GetProperty("Area")->GetString());
 
-			if (META_PROPERTY_EXISTS(pAnimationDataset, "Delay"))
-				pFrame->m_iDelay = (xuint)META_PROPERTY_VALUE->GetInt();
+			if (METADATA_PROPERTY_EXISTS(pAnimationDataset, "Delay"))
+				pFrame->m_iDelay = (xuint)METADATA_PROPERTY_VALUE->GetInt();
 
-			if (META_PROPERTY_EXISTS(pFrameDataset, "Event"))
-				pFrame->m_pEvent = META_PROPERTY_VALUE->GetString();
+			if (METADATA_PROPERTY_EXISTS(pFrameDataset, "Event"))
+				pFrame->m_pEvent = METADATA_PROPERTY_VALUE->GetString();
 
 			if (pPrevFrame && pPrevFrame->m_pNextFrame == NULL)
 				pPrevFrame->m_pNextFrame = pFrame;
@@ -112,10 +112,10 @@ CSpriteMetadata::CSpriteMetadata(CDataset* pDataset) : CResourceMetadata(Resourc
 			pFrame->m_pNextFrame = NULL;
 			pPrevFrame = pFrame;
 
-			if (META_PROPERTY_EXISTS(pFrameDataset, "Loop"))
+			if (METADATA_PROPERTY_EXISTS(pFrameDataset, "Loop"))
 				pFrame->m_pNextFrame = pAnimation->m_lpFrames.front();
-			else if (META_PROPERTY_EXISTS(pFrameDataset, "Goto"))
-				pFrame->m_pNextFrame = FindFrame(pAnimation, META_PROPERTY_VALUE->GetString());
+			else if (METADATA_PROPERTY_EXISTS(pFrameDataset, "Goto"))
+				pFrame->m_pNextFrame = FindFrame(pAnimation, METADATA_PROPERTY_VALUE->GetString());
 
 			pAnimation->m_iAnimationTime += pFrame->m_iDelay;
 		}

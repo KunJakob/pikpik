@@ -1,17 +1,18 @@
-.Input_String
-"Mask Password?"
-
-// --------------------------------------------------------------------------------
-// Splash
-// --------------------------------------------------------------------------------
+//##############################################################################
+//
+//                               SPLASH SCREEN
+//
+//##############################################################################
 .Splash_PhotoWarning 
 "This game contains flashing images and colours. If you, or anyone in your family, have an epileptic condition, consult your physician prior to playing. We take no responsibility for any symptoms you may experience whilst playing this game."
 
-// --------------------------------------------------------------------------------
-// Menu
-// --------------------------------------------------------------------------------
+//##############################################################################
+//
+//                                    MENU
+//
+//##############################################################################
 .Menu_Offline
-"Offline"
+"Play"
 
 .Menu_Online
 "Online"
@@ -30,87 +31,3 @@
 
 .Menu_Back
 "Back"
-
-.Menu_OnlineJoin
-"Join Game"
-
-.Menu_OnlineCreate
-"Create Game"
-
-.Menu_JoinPublic
-"Search"
-
-.Menu_JoinPrivate
-"Specify IP"
-
-.Menu_CreatePublic
-"Public"
-
-.Menu_CreatePrivate
-"Private"
-
-// --------------------------------------------------------------------------------
-// Button
-// --------------------------------------------------------------------------------
-.Button_Join
-"Join"
-
-.Button_Back
-"Back"
-
-// --------------------------------------------------------------------------------
-// Status
-// --------------------------------------------------------------------------------
-.Status_Searching
-"Searching"
-
-.Status_Creating
-"Creating"
-
-.Status_Connecting
-"Connecting"
-
-.Status_Verifying
-"Verifying"
-
-.Status_Joining
-"Joining"
-
-.Status_Leaving
-"Leaving"
-
-.Status_Closing
-"Closing"
-
-// --------------------------------------------------------------------------------
-// Error
-// --------------------------------------------------------------------------------
-.Error_Unknown
-"An unknown error has occured."
-
-.Error_OwnerExists
-"There is already an active session for this server."
-
-.Error_SessionExists
-"There is already a session with this session ID."
-
-.Error_InvalidSession
-"The session ID specified does not exist."
-
-.Error_InvalidPassword
-"The password specified does not match the session ID specified."
-
-.Error_ConnectFailed
-"Could not connect to %s."
-
-.Error_ConnectionLost
-"The connection to the server was lost."
-
-.Error_EveryoneLeft
-"All other players have left the game."
-
-// --------------------------------------------------------------------------------
-// Confirmation
-// --------------------------------------------------------------------------------
-.Confirmation_SetNickname
-"You currently have no nickname set. Would you like to set one now?"

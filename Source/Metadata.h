@@ -28,23 +28,23 @@
 //                                   MACROS
 //
 //##############################################################################
-#define META_PROPERTY_VALUE \
-		_pProperty
-
-#define META_DATASET_VALUE \
+#define METADATA_DATASET_VALUE \
 		_pDataset
 
-#define META_PROPERTY_FOREACH(ITER, DATASET, NAME) \
-		for (CProperty* ITER = NULL; ITER = DATASET->GetProperty(ITER, NAME);)
+#define METADATA_PROPERTY_VALUE \
+		_pProperty
 
-#define META_DATASET_FOREACH(ITER, DATASET, TYPE, NAME) \
+#define METADATA_DATASET_FOREACH(ITER, DATASET, TYPE, NAME) \
 		for (CDataset* ITER = NULL; ITER = DATASET->GetDataset(ITER, TYPE, NAME);)
 
-#define META_PROPERTY_EXISTS(DATASET, PROPERTYNAME) \
-		CProperty* META_PROPERTY_VALUE = DATASET->GetProperty(PROPERTYNAME)
+#define METADATA_PROPERTY_FOREACH(ITER, DATASET, NAME) \
+		for (CProperty* ITER = NULL; ITER = DATASET->GetProperty(ITER, NAME);)
 
-#define META_DATASET_EXISTS(DATASET, DATASETNAME) \
-		CDataset* META_DATASET_VALUE = DATASET->GetDataset(DATASETNAME)
+#define METADATA_DATASET_EXISTS(DATASET, DATASETNAME) \
+		CDataset* METADATA_DATASET_VALUE = DATASET->GetDataset(DATASETNAME)
+
+#define METADATA_PROPERTY_EXISTS(DATASET, PROPERTYNAME) \
+		CProperty* METADATA_PROPERTY_VALUE = DATASET->GetProperty(PROPERTYNAME)
 
 //##############################################################################
 

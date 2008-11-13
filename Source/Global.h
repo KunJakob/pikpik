@@ -89,7 +89,7 @@
 #define _TIMEMS					GetTickCount()
 #define _TIMEDELTA				Application::GetTimeDelta()
 #define _TIMEDELTAF				_HGE->Timer_GetDelta()
-#define _LOCALE(NAME)			Global.m_pLocale->GetProperty(NAME)->GetString()
+#define _LOCALE(NAME)			Global.GetLocale(NAME)
 
 // Colour manipulations.
 #define _ARGB(A, R, G, B)		ARGB(A, R, G, B)
@@ -195,8 +195,12 @@ public:
 		return s_Instance;
 	}
 
-	// Process and substitute if the string is a variable.
-	const xchar* ProcessLocale(const xchar* pString);
+	// Get a locale string by name.
+	// ~return The locale string or the identifier name if the locale cannot be found.
+	const xchar* GetLocale(const xchar* pName);
+
+	// Process and substitute a string if it is a locale variable.
+	const xchar* GetLocaleFromVar(const xchar* pInput);
 
 	// The current focus status of the game window.
 	xbool m_bWindowFocused;

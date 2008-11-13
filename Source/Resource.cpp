@@ -85,13 +85,13 @@ void CResourceManager::Clear()
 // =============================================================================
 void CResourceManager::Load(CMetadata* pMetadata)
 {
-	META_DATASET_FOREACH(pDataset, pMetadata, "Sprite", NULL)
+	METADATA_DATASET_FOREACH(pDataset, pMetadata, "Sprite", NULL)
 		m_lpResourceMetadata[ResourceType_Sprite].push_back(new CSpriteMetadata(pDataset));
 
-	META_DATASET_FOREACH(pDataset, pMetadata, "Font", NULL)
+	METADATA_DATASET_FOREACH(pDataset, pMetadata, "Font", NULL)
 		m_lpResourceMetadata[ResourceType_Font].push_back(new CFontMetadata(pDataset));
 
-	META_DATASET_FOREACH(pDataset, pMetadata, "Sound", NULL)
+	METADATA_DATASET_FOREACH(pDataset, pMetadata, "Sound", NULL)
 		m_lpResourceMetadata[ResourceType_Sound].push_back(new CSoundMetadata(pDataset));
 }
 
