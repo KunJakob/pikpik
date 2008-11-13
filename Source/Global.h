@@ -31,7 +31,6 @@
 #include <Tools.h>
 
 // Xen.
-#define XEN_CRYPT
 #include <Xen/Xen.h>
 
 // HGE.
@@ -118,6 +117,7 @@
 //##############################################################################
 
 // Predeclare.
+class CMetadata;
 class CSprite;
 class CFont;
 

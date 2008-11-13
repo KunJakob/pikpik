@@ -58,25 +58,25 @@ CFontMetadata::CFontMetadata(CDataset* pDataset) : CResourceMetadata(ResourceTyp
 	m_xShadowOffset = xpoint();
 	m_iShadowColour = 0xFF000000;
 
-	if (XMETAEXISTS_P(pDataset, "Scale"))
-		m_fScale = XMETAVAL_P->GetFloat();
+	if (_PROPERTY_EXISTS(pDataset, "Scale"))
+		m_fScale = _PROPERTY_VALUE->GetFloat();
 
-	if (XMETAEXISTS_P(pDataset, "Colour"))
-		m_iColour = ARGB(255, XMETAVAL_P->GetInt(0), XMETAVAL_P->GetInt(1), XMETAVAL_P->GetInt(2));
+	if (_PROPERTY_EXISTS(pDataset, "Colour"))
+		m_iColour = ARGB(255, _PROPERTY_VALUE->GetInt(0), _PROPERTY_VALUE->GetInt(1), _PROPERTY_VALUE->GetInt(2));
 
-	if (XMETAEXISTS_P(pDataset, "Spacing"))
-		m_fSpacing = XMETAVAL_P->GetFloat();
+	if (_PROPERTY_EXISTS(pDataset, "Spacing"))
+		m_fSpacing = _PROPERTY_VALUE->GetFloat();
 
-	if (XMETAEXISTS_P(pDataset, "Tracking"))
-		m_fTracking = XMETAVAL_P->GetFloat();
+	if (_PROPERTY_EXISTS(pDataset, "Tracking"))
+		m_fTracking = _PROPERTY_VALUE->GetFloat();
 
 	if (CDataset* pShadowDataset = pDataset->GetDataset("Shadow"))
 	{
-		if (XMETAEXISTS_P(pShadowDataset, "Offset"))
-			m_xShadowOffset = XMETAVAL_P->GetPoint();
+		if (_PROPERTY_EXISTS(pShadowDataset, "Offset"))
+			m_xShadowOffset = _PROPERTY_VALUE->GetPoint();
 
-		if (XMETAEXISTS_P(pShadowDataset, "Colour"))
-			m_iShadowColour = ARGB(255, XMETAVAL_P->GetInt(0), XMETAVAL_P->GetInt(1), XMETAVAL_P->GetInt(2));
+		if (_PROPERTY_EXISTS(pShadowDataset, "Colour"))
+			m_iShadowColour = ARGB(255, _PROPERTY_VALUE->GetInt(0), _PROPERTY_VALUE->GetInt(1), _PROPERTY_VALUE->GetInt(2));
 	}
 }
 

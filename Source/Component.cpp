@@ -711,14 +711,14 @@ void CComponentFactory::GetBasicProperties(CInterfaceElement* pElement, CDataset
 	if (const xchar* pName = pDataset->GetName())
 		pElement->SetName(pName);
 
-	if (XMETAEXISTS_P(pDataset, "Enabled"))
-		pElement->SetEnabled(XMETAVAL_P->GetBool());
+	if (_PROPERTY_EXISTS(pDataset, "Enabled"))
+		pElement->SetEnabled(_PROPERTY_VALUE->GetBool());
 
-	if (XMETAEXISTS_P(pDataset, "Visible"))
-		pElement->SetVisible(XMETAVAL_P->GetBool());
+	if (_PROPERTY_EXISTS(pDataset, "Visible"))
+		pElement->SetVisible(_PROPERTY_VALUE->GetBool());
 
-	if (XMETAEXISTS_P(pDataset, "Position"))
-		pElement->SetPosition(XMETAVAL_P->GetPoint());
+	if (_PROPERTY_EXISTS(pDataset, "Position"))
+		pElement->SetPosition(_PROPERTY_VALUE->GetPoint());
 }
 
 // =============================================================================
@@ -726,18 +726,18 @@ void CComponentFactory::GetBasicProperties(CInterfaceElement* pElement, CDataset
 // =============================================================================
 void CComponentFactory::GetLabelProperties(CLabelElement* pElement, CDataset* pDataset)
 {
-	if (XMETAEXISTS_P(pDataset, "Text"))
-		pElement->SetText(Global.ProcessLocale(XMETAVAL_P->GetString()));
+	if (_PROPERTY_EXISTS(pDataset, "Text"))
+		pElement->SetText(Global.ProcessLocale(_PROPERTY_VALUE->GetString()));
 
-	if (XMETAEXISTS_P(pDataset, "Alignment"))
+	if (_PROPERTY_EXISTS(pDataset, "Alignment"))
 	{
-		if (String::IsMatch(XMETAVAL_P->GetString(), "Left"))
+		if (String::IsMatch(_PROPERTY_VALUE->GetString(), "Left"))
 			pElement->SetAlignment(HGETEXT_LEFT);
 
-		else if (String::IsMatch(XMETAVAL_P->GetString(), "Centre"))
+		else if (String::IsMatch(_PROPERTY_VALUE->GetString(), "Centre"))
 			pElement->SetAlignment(HGETEXT_CENTER);
 
-		else if (String::IsMatch(XMETAVAL_P->GetString(), "Right"))
+		else if (String::IsMatch(_PROPERTY_VALUE->GetString(), "Right"))
 			pElement->SetAlignment(HGETEXT_RIGHT);
 	}
 }
@@ -754,11 +754,11 @@ void CComponentFactory::GetImageProperties(CImageElement* pElement, CDataset* pD
 // =============================================================================
 void CComponentFactory::GetStripProperties(CStripElement* pElement, CDataset* pDataset)
 {
-	if (XMETAEXISTS_P(pDataset, "Width"))
-		pElement->SetWidth(XMETAVAL_P->GetInt());
+	if (_PROPERTY_EXISTS(pDataset, "Width"))
+		pElement->SetWidth(_PROPERTY_VALUE->GetInt());
 
-	else if (XMETAEXISTS_P(pDataset, "InnerWidth"))
-		pElement->SetInnerWidth(XMETAVAL_P->GetInt());
+	else if (_PROPERTY_EXISTS(pDataset, "InnerWidth"))
+		pElement->SetInnerWidth(_PROPERTY_VALUE->GetInt());
 }
 
 // =============================================================================
@@ -766,23 +766,23 @@ void CComponentFactory::GetStripProperties(CStripElement* pElement, CDataset* pD
 // =============================================================================
 void CComponentFactory::GetContainerProperties(CContainerElement* pElement, CDataset* pDataset)
 {
-	if (XMETAEXISTS_D(pDataset, "AutoArrange"))
+	if (_DATASET_EXISTS(pDataset, "AutoArrange"))
 	{
-		XASSERT(XMETAVAL_D->GetProperty("Padding"));
-		XASSERT(XMETAVAL_D->GetProperty("Spacing"));
+		XASSERT(_DATASET_VALUE->GetProperty("Padding"));
+		XASSERT(_DATASET_VALUE->GetProperty("Spacing"));
 
-		pElement->SetElementPadding(XMETAVAL_D->GetProperty("Padding")->GetRect());
-		pElement->SetElementSpacing(XMETAVAL_D->GetProperty("Spacing")->GetInt());
+		pElement->SetElementPadding(_DATASET_VALUE->GetProperty("Padding")->GetRect());
+		pElement->SetElementSpacing(_DATASET_VALUE->GetProperty("Spacing")->GetInt());
 
 		pElement->ArrangeChildren();
 	}
 	else
 	{
-		if (XMETAEXISTS_P(pDataset, "Size"))
-			pElement->SetSize(XMETAVAL_P->GetPoint());
+		if (_PROPERTY_EXISTS(pDataset, "Size"))
+			pElement->SetSize(_PROPERTY_VALUE->GetPoint());
 
-		else if (XMETAEXISTS_P(pDataset, "InnerSize"))
-			pElement->SetInnerSize(XMETAVAL_P->GetPoint());
+		else if (_PROPERTY_EXISTS(pDataset, "InnerSize"))
+			pElement->SetInnerSize(_PROPERTY_VALUE->GetPoint());
 	}
 }
 
@@ -791,8 +791,8 @@ void CComponentFactory::GetContainerProperties(CContainerElement* pElement, CDat
 // =============================================================================
 void CComponentFactory::GetCheckProperties(CCheckElement* pElement, CDataset* pDataset)
 {
-	if (XMETAEXISTS_P(pDataset, "Checked"))
-		pElement->SetChecked(XMETAVAL_P->GetBool());
+	if (_PROPERTY_EXISTS(pDataset, "Checked"))
+		pElement->SetChecked(_PROPERTY_VALUE->GetBool());
 }
 
 // =============================================================================
@@ -800,7 +800,7 @@ void CComponentFactory::GetCheckProperties(CCheckElement* pElement, CDataset* pD
 // =============================================================================
 void CComponentFactory::AttachChildren(CInterfaceElement* pElement, CDataset* pDataset)
 {
-	for (xint iA = 0; iA < pDataset->GetDatasetCount(); ++iA)
+	for (xuint iA = 0; iA < pDataset->GetDatasetCount(); ++iA)
 	{
 		CDataset* pWorkingDataset = pDataset->GetDataset(iA);
 		const xchar* pType = pWorkingDataset->GetType();
@@ -903,8 +903,8 @@ CButtonComponent* CComponentFactory::CreateButton(CDataset* pDataset)
 
 	GetBasicProperties(pButton, pDataset);
 
-	if (XMETAEXISTS_P(pDataset, "Text"))
-		pButton->SetText(Global.ProcessLocale(XMETAVAL_P->GetString()));
+	if (_PROPERTY_EXISTS(pDataset, "Text"))
+		pButton->SetText(Global.ProcessLocale(_PROPERTY_VALUE->GetString()));
 
 	GetStripProperties(pButton, pDataset);
 
@@ -926,14 +926,14 @@ CInputComponent* CComponentFactory::CreateInput(CDataset* pDataset)
 
 	GetBasicProperties(pInput, pDataset);
 
-	if (XMETAEXISTS_P(pDataset, "Text"))
-		pInput->SetText(Global.ProcessLocale(XMETAVAL_P->GetString()));
+	if (_PROPERTY_EXISTS(pDataset, "Text"))
+		pInput->SetText(Global.ProcessLocale(_PROPERTY_VALUE->GetString()));
 
-	if (XMETAEXISTS_P(pDataset, "Masked"))
-		pInput->SetMasked(XMETAVAL_P->GetBool());
+	if (_PROPERTY_EXISTS(pDataset, "Masked"))
+		pInput->SetMasked(_PROPERTY_VALUE->GetBool());
 
-	if (XMETAEXISTS_P(pDataset, "Limit"))
-		pInput->SetCharacterLimit(XMETAVAL_P->GetInt());
+	if (_PROPERTY_EXISTS(pDataset, "Limit"))
+		pInput->SetCharacterLimit(_PROPERTY_VALUE->GetInt());
 
 	GetStripProperties(pInput, pDataset);
 
@@ -953,8 +953,8 @@ CProgressComponent* CComponentFactory::CreateProgress(CDataset* pDataset)
 
 	GetBasicProperties(pProgress, pDataset);
 
-	if (XMETAEXISTS_P(pDataset, "Progress"))
-		pProgress->SetProgress(XMETAVAL_P->GetFloat());
+	if (_PROPERTY_EXISTS(pDataset, "Progress"))
+		pProgress->SetProgress(_PROPERTY_VALUE->GetFloat());
 
 	GetStripProperties(pProgress, pDataset);
 
@@ -976,11 +976,11 @@ CWindowComponent* CComponentFactory::CreateWindow(CDataset* pDataset)
 
 	GetBasicProperties(pWindow, pDataset);
 
-	if (XMETAEXISTS_P(pDataset, "Title"))
-		pWindow->SetTitle(Global.ProcessLocale(XMETAVAL_P->GetString()));
+	if (_PROPERTY_EXISTS(pDataset, "Title"))
+		pWindow->SetTitle(Global.ProcessLocale(_PROPERTY_VALUE->GetString()));
 
-	if (XMETAEXISTS_P(pDataset, "Moveable"))
-		pWindow->SetMoveable(XMETAVAL_P->GetBool());
+	if (_PROPERTY_EXISTS(pDataset, "Moveable"))
+		pWindow->SetMoveable(_PROPERTY_VALUE->GetBool());
 
 	AttachChildren(pWindow, pDataset);
 
@@ -1004,8 +1004,8 @@ CGroupComponent* CComponentFactory::CreateGroup(CDataset* pDataset)
 
 	GetBasicProperties(pGroup, pDataset);
 
-	if (XMETAEXISTS_P(pDataset, "Title"))
-		pGroup->SetTitle(Global.ProcessLocale(XMETAVAL_P->GetString()));
+	if (_PROPERTY_EXISTS(pDataset, "Title"))
+		pGroup->SetTitle(Global.ProcessLocale(_PROPERTY_VALUE->GetString()));
 
 	AttachChildren(pGroup, pDataset);
 
@@ -1037,8 +1037,8 @@ CCheckComponent* CComponentFactory::CreateCheck(CDataset* pDataset)
 
 	GetBasicProperties(pCheck, pDataset);
 
-	if (XMETAEXISTS_P(pDataset, "Text"))
-		pCheck->SetText(Global.ProcessLocale(XMETAVAL_P->GetString()));
+	if (_PROPERTY_EXISTS(pDataset, "Text"))
+		pCheck->SetText(Global.ProcessLocale(_PROPERTY_VALUE->GetString()));
 
 	GetCheckProperties(pCheck, pDataset);
 
@@ -1062,8 +1062,8 @@ CRadioComponent* CComponentFactory::CreateRadio(CDataset* pDataset)
 
 	GetBasicProperties(pRadio, pDataset);
 	
-	if (XMETAEXISTS_P(pDataset, "Text"))
-		pRadio->SetText(Global.ProcessLocale(XMETAVAL_P->GetString()));
+	if (_PROPERTY_EXISTS(pDataset, "Text"))
+		pRadio->SetText(Global.ProcessLocale(_PROPERTY_VALUE->GetString()));
 
 	GetCheckProperties(pRadio, pDataset);
 

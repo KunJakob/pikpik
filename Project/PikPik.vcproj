@@ -301,6 +301,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Source\Dataset.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Dataset.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\Element.cpp"
 				>
 			</File>
@@ -362,6 +370,22 @@
 			</File>
 			<File
 				RelativePath="..\Source\Menu.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Metadata.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Metadata.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Property.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Property.h"
 				>
 			</File>
 			<File
@@ -436,14 +460,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\Xen\Dataset.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\Xen\Dataset.h"
-					>
-				</File>
-				<File
 					RelativePath="..\Xen\Engine.h"
 					>
 				</File>
@@ -480,14 +496,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\Xen\Metadata.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\Xen\Metadata.h"
-					>
-				</File>
-				<File
 					RelativePath="..\Xen\Module.cpp"
 					>
 				</File>
@@ -497,14 +505,6 @@
 				</File>
 				<File
 					RelativePath="..\Xen\Point.h"
-					>
-				</File>
-				<File
-					RelativePath="..\Xen\Property.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\Xen\Property.h"
 					>
 				</File>
 				<File

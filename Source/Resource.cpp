@@ -11,6 +11,8 @@
 #include <Resource.h>
 
 // Other.
+#include <Metadata.h>
+#include <Dataset.h>
 #include <Sprite.h>
 #include <Font.h>
 #include <Sound.h>
@@ -83,13 +85,13 @@ void CResourceManager::Clear()
 // =============================================================================
 void CResourceManager::Load(CMetadata* pMetadata)
 {
-	XMETAFOREACH_D(pDataset, pMetadata, "Sprite", NULL)
+	_DATASET_FOREACH(pDataset, pMetadata, "Sprite", NULL)
 		m_lpResourceMetadata[ResourceType_Sprite].push_back(new CSpriteMetadata(pDataset));
 
-	XMETAFOREACH_D(pDataset, pMetadata, "Font", NULL)
+	_DATASET_FOREACH(pDataset, pMetadata, "Font", NULL)
 		m_lpResourceMetadata[ResourceType_Font].push_back(new CFontMetadata(pDataset));
 
-	XMETAFOREACH_D(pDataset, pMetadata, "Sound", NULL)
+	_DATASET_FOREACH(pDataset, pMetadata, "Sound", NULL)
 		m_lpResourceMetadata[ResourceType_Sound].push_back(new CSoundMetadata(pDataset));
 }
 
