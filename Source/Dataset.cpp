@@ -30,13 +30,13 @@ CDataset::~CDataset()
 // =============================================================================
 // Author: Nat Ryall                                            Date: 1-Feb-2008
 // =============================================================================
-xuint CDataset::GetDatasetCount(const xchar* pType)
+xint CDataset::GetDatasetCount(const xchar* pType)
 {
 	if (!pType)
-		return (xuint)m_lpDatasets.size();
+		return (xint)m_lpDatasets.size();
 	else
 	{
-		xuint iCount = 0;
+		xint iCount = 0;
 
 		XEN_LIST_FOREACH(t_DatasetList, ppDataset, m_lpDatasets)
 		{
@@ -82,13 +82,13 @@ CDataset* CDataset::GetDataset(CDataset* pPrev, const xchar* pType, const xchar*
 // =============================================================================
 // Author: Nat Ryall                                            Date: 1-Feb-2008
 // =============================================================================
-xuint CDataset::GetPropertyCount(const xchar* pType)
+xint CDataset::GetPropertyCount(const xchar* pType)
 {
 	if (!pType)
-		return (xuint)m_lpProperties.size();
+		return (xint)m_lpProperties.size();
 	else
 	{
-		xuint iCount = 0;
+		xint iCount = 0;
 
 		XEN_LIST_FOREACH(t_PropertyList, ppProperty, m_lpProperties)
 		{

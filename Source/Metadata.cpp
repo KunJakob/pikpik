@@ -73,7 +73,7 @@ CMetadata::CMetadata(const xchar* pMetadataFile, const xchar* pEncryptionKey, xb
 // =============================================================================
 // Nat Ryall                                                         29-Jan-2008
 // =============================================================================
-void CMetadata::Update(xuint iTargetTime, xuint iChunkSize)
+void CMetadata::Update(xint iTargetTime, xint iChunkSize)
 {
 	xuint32 iTimeout = GetTickCount() + iTargetTime;
 
@@ -106,7 +106,7 @@ void CMetadata::Update(xuint iTargetTime, xuint iChunkSize)
 // =============================================================================
 // Nat Ryall                                                         29-Jan-2008
 // =============================================================================
-xuint CMetadata::GetProgress()
+xint CMetadata::GetProgress()
 {
 	switch (m_iTask)
 	{
@@ -129,7 +129,7 @@ xuint CMetadata::GetProgress()
 // =============================================================================
 // Nat Ryall                                                         29-Jan-2008
 // =============================================================================
-void CMetadata::UpdateLoad(xuint iChunkSize)
+void CMetadata::UpdateLoad(xint iChunkSize)
 {
 	// Initialise the file.
 	if (m_hFile == INVALID_HANDLE_VALUE)
@@ -189,7 +189,7 @@ void CMetadata::UpdateLoad(xuint iChunkSize)
 // =============================================================================
 // Nat Ryall                                                         20-Aug-2008
 // =============================================================================
-void CMetadata::UpdateDecrypt(xuint iChunkSize)
+void CMetadata::UpdateDecrypt(xint iChunkSize)
 {
 	// The first block of bytes in the file is the IV.
 	xchar* pIV = m_pData;

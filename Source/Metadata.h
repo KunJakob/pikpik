@@ -5,7 +5,7 @@
 * @author Nat Ryall
 * @date 29/01/2008
 *
-* Copyright © Creative Disorder
+* Copyright © SAPIAN
 */
 
 //##############################################################################
@@ -28,23 +28,23 @@
 //                                   MACROS
 //
 //##############################################################################
-#define _PROPERTY_VALUE \
+#define META_PROPERTY_VALUE \
 		_pProperty
 
-#define _DATASET_VALUE \
+#define META_DATASET_VALUE \
 		_pDataset
 
-#define _PROPERTY_FOREACH(ITER, DATASET, NAME) \
+#define META_PROPERTY_FOREACH(ITER, DATASET, NAME) \
 		for (CProperty* ITER = NULL; ITER = DATASET->GetProperty(ITER, NAME);)
 
-#define _DATASET_FOREACH(ITER, DATASET, TYPE, NAME) \
+#define META_DATASET_FOREACH(ITER, DATASET, TYPE, NAME) \
 		for (CDataset* ITER = NULL; ITER = DATASET->GetDataset(ITER, TYPE, NAME);)
 
-#define _PROPERTY_EXISTS(DATASET, PROPERTYNAME) \
-		CProperty* _PROPERTY_VALUE = DATASET->GetProperty(PROPERTYNAME)
+#define META_PROPERTY_EXISTS(DATASET, PROPERTYNAME) \
+		CProperty* META_PROPERTY_VALUE = DATASET->GetProperty(PROPERTYNAME)
 
-#define _DATASET_EXISTS(DATASET, DATASETNAME) \
-		CDataset* _DATASET_VALUE = DATASET->GetDataset(DATASETNAME)
+#define META_DATASET_EXISTS(DATASET, DATASETNAME) \
+		CDataset* META_DATASET_VALUE = DATASET->GetDataset(DATASETNAME)
 
 //##############################################################################
 
@@ -89,36 +89,37 @@ public:
 	// ~pMetadataFile The file path to the signed-encrypted metadata file.
 	// ~pEncryptionKey The AES key used to encrypt the metadata. Specify NULL if the metadata is not encrypted.
 	// ~bExecute Specify true to process the metadata synchronously in the constructor.
+	// ~note 'XEN_CRYPT' must be defined to enable encryption.
 	CMetadata(const xchar* pMetadataFile, const xchar* pEncryptionKey, xbool bProcessImmediately);
 
 	// Update the metadata processing. This should be called every frame and will run up to iMaxTime milliseconds. Check IsCompleted to see if the metadata is ready to be used.
 	// ~iTargetTime The target time, in milliseconds, allowed for the update. This keeps the metadata asychronous and fast.
 	// ~iChunkSize The number of bytes to read each cycle. This number of bytes will be read in chunks until iMaxTime.
-	void Update(xuint iTargetTime = 20, xuint iChunkSize = 64);
+	void Update(xint iTargetTime = 20, xint iChunkSize = 64);
 
 	// Get the current task being executed by the metadata.
-	t_MetadataTask GetCurrentTask()
+	inline t_MetadataTask GetCurrentTask()
 	{
 		return m_iTask;
 	}
 
 	// Get the progress of the current task as a percentage (0 to 100).
-	xuint GetProgress();
+	xint GetProgress();
 
 	// Get the global/averaged progress of the metadata processing.
-	xuint GetGlobalProgress()
+	inline xint GetGlobalProgress()
 	{
-		return (((xuint)GetCurrentTask() * 100) + GetProgress()) / 3;
+		return (((xint)GetCurrentTask() * 100) + GetProgress()) / 3;
 	}
 
 	// Check if the metadata has finished processing all data and is ready to be used.
-	xbool IsCompleted()
+	inline xbool IsCompleted()
 	{
 		return m_iTask == MetadataTask_Completed || m_iTask == MetadataTask_Error;
 	}
 
 	// Get a demetadataion of the last error that occured. Valid when GetCurrentTask() == ST_Error.
-	const xchar* GetError()
+	inline const xchar* GetError()
 	{
 		return m_pError;
 	}
@@ -128,14 +129,14 @@ protected:
 	typedef xarray<xchar*> t_lpString;
 
 	// Load in the file contents.
-	void UpdateLoad(xuint iChunkSize);
+	void UpdateLoad(xint iChunkSize);
 
 	// Decrypt the file contents.
-	void UpdateDecrypt(xuint iChunkSize);
+	void UpdateDecrypt(xint iChunkSize);
 
 	// Tokenise the metadata.
 	void UpdateTokenise();
-	
+
 	// Process the metadata into structures.
 	void UpdateParse();
 
@@ -156,7 +157,7 @@ protected:
 	t_MetadataTask m_iTask;
 
 	// The completion status of the current metadata task (0-100).
-	xuint m_iPercent;
+	xint m_iPercent;
 
 	// The error string. Valid when m_iTask == ST_Error.
 	xchar* m_pError;
@@ -172,10 +173,10 @@ protected:
 	HANDLE m_hFile;
 
 	// The size of the file being loaded.
-	xuint m_iFileSize;
+	xint m_iFileSize;
 
 	// The number of bytes read in so far.
-	xuint m_iBytesRead;
+	xint m_iBytesRead;
 
 	// The metadata data.
 	xchar* m_pData;
@@ -192,7 +193,7 @@ protected:
 	*/
 
 	// The current offset.
-	xuint m_iTokenOffset;
+	xint m_iTokenOffset;
 
 	// A list of metadata tokens.
 	t_lpString m_lpTokens;
@@ -202,7 +203,7 @@ protected:
 	*/
 
 	// The current token offset.
-	xuint m_iTokenIndex;
+	xint m_iTokenIndex;
 
 	// The current dataset that we're working with.
 	CDataset* m_pDataset;

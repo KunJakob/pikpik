@@ -21,7 +21,7 @@
 // =============================================================================
 // Nat Ryall                                                         10-Apr-2008
 // =============================================================================
-xchar CProperty::GetChar(xuint iIndex)
+xchar CProperty::GetChar(xint iIndex)
 {
 	return m_lpValues[iIndex][0];
 }
@@ -29,23 +29,23 @@ xchar CProperty::GetChar(xuint iIndex)
 // =============================================================================
 // Author: Nat Ryall                                           Date: 30-Jan-2008
 // =============================================================================
-xint CProperty::GetInt(xuint iIndex)
+xint CProperty::GetInt(xint iIndex)
 {
-	return atoi(m_lpValues[iIndex]);
+	return String::ToInt(m_lpValues[iIndex]);
 }
 
 // =============================================================================
 // Author: Nat Ryall                                           Date: 30-Jan-2008
 // =============================================================================
-xfloat CProperty::GetFloat(xuint iIndex)
+xfloat CProperty::GetFloat(xint iIndex)
 {
-	return (float)atof(m_lpValues[iIndex]);
+	return String::ToFloat(m_lpValues[iIndex]);
 }
 
 // =============================================================================
 // Author: Nat Ryall                                           Date: 30-Jan-2008
 // =============================================================================
-xbool CProperty::GetBool(xuint iIndex)
+xbool CProperty::GetBool(xint iIndex)
 {
 	return (String::IsMatch(GetString(iIndex), "false") || String::IsMatch(GetString(iIndex), "0")) ? false : true;
 }
@@ -53,7 +53,7 @@ xbool CProperty::GetBool(xuint iIndex)
 // =============================================================================
 // Author: Nat Ryall                                           Date: 30-Jan-2008
 // =============================================================================
-const xchar* CProperty::GetString(xuint iIndex)
+const xchar* CProperty::GetString(xint iIndex)
 {
 	return (const xchar*)m_lpValues[iIndex];
 }
