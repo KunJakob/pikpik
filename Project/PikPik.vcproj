@@ -476,6 +476,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Xen\File.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Xen\File.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Xen\Log.cpp"
 					>
 				</File>
