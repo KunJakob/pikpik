@@ -6,7 +6,7 @@
 * @date 25/02/2008
 * @brief Manages collisions for all object types.
 *
-* Copyright © Krome Studios
+* Copyright © SAPIAN
 */
 
 //##############################################################################

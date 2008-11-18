@@ -98,12 +98,12 @@ void CMenuScreen::OnLoad()
 	CMenuLink* pLinkList[] = 
 	{
 		// Main.
-		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Offline"),		xbind(this, &CMenuScreen::Callback_StartGame)),
+		new CMenuLink(MenuGroup_Main,		m_pMenuHighlight,	_LOCALE("Menu_Offline"),		xbind(this, &CMenuScreen::Callback_StartGame)),
 		new CMenuLink(MenuGroup_Main,		m_pMenuDisabled,	_LOCALE("Menu_Online"),			NULL),
-		new CMenuLink(MenuGroup_Main,		m_pMenuDisabled,	_LOCALE("Menu_Tutorial"),		NULL),
-		new CMenuLink(MenuGroup_Main,		m_pMenuDisabled,	_LOCALE("Menu_Options"),		NULL),
-		new CMenuLink(MenuGroup_Main,		m_pMenuDisabled,	_LOCALE("Menu_Credits"),		NULL),
-		new CMenuLink(MenuGroup_Main,		m_pMenuHighlight,	_LOCALE("Menu_Exit"),			xbind(this, &CMenuScreen::Callback_QuitGame)),
+		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Tutorial"),		NULL),
+		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Options"),		NULL),
+		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Credits"),		NULL),
+		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Exit"),			xbind(this, &CMenuScreen::Callback_QuitGame)),
 	};
 
 	for (xuint iA = 0; iA < (sizeof(pLinkList) / sizeof(CMenuLink*)); ++iA)
