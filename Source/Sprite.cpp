@@ -100,7 +100,7 @@ CSpriteMetadata::CSpriteMetadata(CDataset* pDataset) : CResourceMetadata(Resourc
 
 			pFrame->m_pArea = FindArea(pFrameDataset->GetProperty("Area")->GetString());
 
-			if (METADATA_PROPERTY_EXISTS(pAnimationDataset, "Delay"))
+			if (METADATA_PROPERTY_EXISTS(pFrameDataset, "Delay"))
 				pFrame->m_iDelay = (xuint)METADATA_PROPERTY_VALUE->GetInt();
 
 			if (METADATA_PROPERTY_EXISTS(pFrameDataset, "Event"))
