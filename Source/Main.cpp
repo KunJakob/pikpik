@@ -99,8 +99,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		{
 			_TERMINATE;
 
-			MessageBox(hWindow, xException.GetDetailedMessage().c_str(), "Application Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
-			XLOG(xException.GetDetailedMessage().c_str());
+		#if XRETAIL
+			MessageBox(hWindow, xException.GetMessage(), "Application Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
+		#endif
 		}
 		catch (CryptoPP::Exception xException)
 		{

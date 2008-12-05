@@ -117,7 +117,6 @@
 //##############################################################################
 
 // Predeclare.
-class CMetadata;
 class CSprite;
 class CFont;
 

@@ -7,9 +7,6 @@
 // Global.
 #include <Global.h>
 
-// Other.
-#include <Metadata.h>
-
 //##############################################################################
 
 //##############################################################################
@@ -25,8 +22,8 @@ const xchar* CGlobal::GetLocale(const xchar* pName)
 {
 	if (m_pLocale)
 	{
-		if (METADATA_PROPERTY_EXISTS(m_pLocale, pName))
-			return METADATA_PROPERTY_VALUE->GetString();
+		if (XEN_METADATA_PROPERTY_EXISTS(m_pLocale, pName))
+			return XEN_METADATA_PROPERTY->GetString();
 	}
 
 	return pName;
