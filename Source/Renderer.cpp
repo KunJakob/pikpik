@@ -44,8 +44,8 @@ void CRenderTransformation::Apply()
 	(
 		0.f,
 		0.f,
-		(xfloat)m_xPosition.iX,
-		(xfloat)m_xPosition.iY,
+		(xfloat)m_xPosition.m_tX,
+		(xfloat)m_xPosition.m_tY,
 		m_fRotation,
 		m_fHorizontalScale,
 		m_fVerticalScale
@@ -298,14 +298,14 @@ void CRenderManager::RenderBox(xbool bFilled, xrect xRect, xuint iColour)
 
 		xQuad.blend = BLEND_DEFAULT;
 
-		xQuad.v[0].x = (xfloat)xRect.iLeft;
-		xQuad.v[0].y = (xfloat)xRect.iTop;
-		xQuad.v[1].x = (xfloat)xRect.iRight;
-		xQuad.v[1].y = (xfloat)xRect.iTop;
-		xQuad.v[3].x = (xfloat)xRect.iLeft;
-		xQuad.v[3].y = (xfloat)xRect.iBottom;
-		xQuad.v[2].x = (xfloat)xRect.iRight;
-		xQuad.v[2].y = (xfloat)xRect.iBottom;
+		xQuad.v[0].x = (xfloat)xRect.m_tLeft;
+		xQuad.v[0].y = (xfloat)xRect.m_tTop;
+		xQuad.v[1].x = (xfloat)xRect.m_tRight;
+		xQuad.v[1].y = (xfloat)xRect.m_tTop;
+		xQuad.v[3].x = (xfloat)xRect.m_tLeft;
+		xQuad.v[3].y = (xfloat)xRect.m_tBottom;
+		xQuad.v[2].x = (xfloat)xRect.m_tRight;
+		xQuad.v[2].y = (xfloat)xRect.m_tBottom;
 
 		xQuad.v[0].col = xQuad.v[1].col = xQuad.v[2].col = xQuad.v[3].col = iColour;
 
@@ -313,10 +313,10 @@ void CRenderManager::RenderBox(xbool bFilled, xrect xRect, xuint iColour)
 	}
 	else
 	{
-		_HGE->Gfx_RenderLine((xfloat)xRect.iLeft, (xfloat)xRect.iTop, (xfloat)xRect.iRight, (xfloat)xRect.iTop, iColour);
-		_HGE->Gfx_RenderLine((xfloat)xRect.iRight, (xfloat)xRect.iTop, (xfloat)xRect.iRight, (xfloat)xRect.iBottom, iColour);
-		_HGE->Gfx_RenderLine((xfloat)xRect.iRight, (xfloat)xRect.iBottom, (xfloat)xRect.iLeft, (xfloat)xRect.iBottom, iColour);
-		_HGE->Gfx_RenderLine((xfloat)xRect.iLeft, (xfloat)xRect.iBottom, (xfloat)xRect.iLeft, (xfloat)xRect.iTop, iColour);
+		_HGE->Gfx_RenderLine((xfloat)xRect.m_tLeft, (xfloat)xRect.m_tTop, (xfloat)xRect.m_tRight, (xfloat)xRect.m_tTop, iColour);
+		_HGE->Gfx_RenderLine((xfloat)xRect.m_tRight, (xfloat)xRect.m_tTop, (xfloat)xRect.m_tRight, (xfloat)xRect.m_tBottom, iColour);
+		_HGE->Gfx_RenderLine((xfloat)xRect.m_tRight, (xfloat)xRect.m_tBottom, (xfloat)xRect.m_tLeft, (xfloat)xRect.m_tBottom, iColour);
+		_HGE->Gfx_RenderLine((xfloat)xRect.m_tLeft, (xfloat)xRect.m_tBottom, (xfloat)xRect.m_tLeft, (xfloat)xRect.m_tTop, iColour);
 	}
 }
 

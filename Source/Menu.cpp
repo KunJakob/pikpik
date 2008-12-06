@@ -423,7 +423,7 @@ void CMenuScreen::InitTransition(xbool bTransitionIn)
 		pMenuLink->m_xStartTimer.ExpireAfter(MENU_TRANSITION_DELAY * pMenuLink->m_iElementIndex);
 
 		if (bTransitionIn)
-			pMenuLink->SetPosition(xpoint(pMenuLink->m_xLinkPosition.iX, -pMenuLink->GetHeight()));
+			pMenuLink->SetPosition(xpoint(pMenuLink->m_xLinkPosition.m_tX, -pMenuLink->GetHeight()));
 		else
 			pMenuLink->m_bTransitionRight = !pMenuLink->m_bTransitionRight;
 	}

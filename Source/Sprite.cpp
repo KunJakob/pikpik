@@ -197,14 +197,14 @@ void CBasicSprite::Render(xpoint xPosition, xpoint xAnchor, xrect xArea, xfloat 
 {
 	hgeSprite* pSprite = m_pMetadata->GetSprite();
 
-	pSprite->SetHotSpot((float)xAnchor.iX, (float)xAnchor.iY);
+	pSprite->SetHotSpot((float)xAnchor.m_tX, (float)xAnchor.m_tY);
 	pSprite->SetColor(SETA(pSprite->GetColor(), (xchar)(fAlpha * 255.f)));
-	pSprite->SetTextureRect((float)xArea.iLeft, (float)xArea.iTop, (float)xArea.Width(), (float)xArea.Height());
+	pSprite->SetTextureRect((float)xArea.m_tLeft, (float)xArea.m_tTop, (float)xArea.GetWidth(), (float)xArea.GetHeight());
 
 	if (fAngle)
-		pSprite->RenderEx((float)xPosition.iX, (float)xPosition.iY, fAngle);
+		pSprite->RenderEx((float)xPosition.m_tX, (float)xPosition.m_tY, fAngle);
 	else
-		pSprite->Render((float)xPosition.iX, (float)xPosition.iY);
+		pSprite->Render((float)xPosition.m_tX, (float)xPosition.m_tY);
 };
 
 // =============================================================================
@@ -215,28 +215,28 @@ void CBasicSprite::RenderTiled(xpoint xPosition, xpoint xSize, xpoint xAnchor, x
 	xpoint xOffset;
 	xpoint xTile;
 
-	if (xSize.iY == 0)
-		xSize.iY = xArea.Height();
+	if (xSize.m_tY == 0)
+		xSize.m_tY = xArea.GetHeight();
 
-	if (xSize.iX == 0)
-		xSize.iX = xArea.Width();
+	if (xSize.m_tX == 0)
+		xSize.m_tX = xArea.GetWidth();
 
-	while (xOffset.iY < xSize.iY)
+	while (xOffset.m_tY < xSize.m_tY)
 	{
-		xTile.iY = Math::Clamp<xint>(xSize.iY - xOffset.iY, 0, xArea.Height());
+		xTile.m_tY = Math::Clamp<xint>(xSize.m_tY - xOffset.m_tY, 0, xArea.GetHeight());
 
-		while (xOffset.iX < xSize.iX)
+		while (xOffset.m_tX < xSize.m_tX)
 		{
-			xTile.iX = Math::Clamp<xint>(xSize.iX - xOffset.iX, 0, xArea.Width());
+			xTile.m_tX = Math::Clamp<xint>(xSize.m_tX - xOffset.m_tX, 0, xArea.GetWidth());
 
-			xrect xTileArea = xArea + xrect(0, 0, xTile.iX - xArea.Width(), xTile.iY - xArea.Height());
+			xrect xTileArea = xArea + xrect(0, 0, xTile.m_tX - xArea.GetWidth(), xTile.m_tY - xArea.GetHeight());
 			Render(xPosition + xOffset, xAnchor, xTileArea, fAlpha, 0.f);
 
-			xOffset.iX += xTile.iX;
+			xOffset.m_tX += xTile.m_tX;
 		}
 
-		xOffset.iX = 0;
-		xOffset.iY += xTile.iY;
+		xOffset.m_tX = 0;
+		xOffset.m_tY += xTile.m_tY;
 	}
 }
 

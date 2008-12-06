@@ -379,13 +379,13 @@ public:
 	// Get the width of the current area or the entire image if there is no active area.
 	xint GetAreaWidth()
 	{
-		return m_pArea ? m_pArea->m_xRect.Width() : GetImageWidth();
+		return m_pArea ? m_pArea->m_xRect.GetWidth() : GetImageWidth();
 	}
 
 	// Get the height of the current area or the entire image if there is no active area.
 	xint GetAreaHeight()
 	{
-		return m_pArea ? m_pArea->m_xRect.Height() : GetImageHeight();
+		return m_pArea ? m_pArea->m_xRect.GetHeight() : GetImageHeight();
 	}
 
 	// Get the centre point of the current area of the sprite.
@@ -398,7 +398,7 @@ public:
 	xrect GetScreenRect()
 	{
 		xpoint xTopLeft = m_xPosition - m_xAnchor;
-		return xrect(xTopLeft.iX, xTopLeft.iY, xTopLeft.iX + GetAreaWidth(), xTopLeft.iY + GetAreaHeight());
+		return xrect(xTopLeft.m_tX, xTopLeft.m_tY, xTopLeft.m_tX + GetAreaWidth(), xTopLeft.m_tY + GetAreaHeight());
 	}
 
 protected:

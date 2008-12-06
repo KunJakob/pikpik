@@ -105,13 +105,13 @@ public:
 	// Get the width including all borders.
 	virtual xint GetWidth()
 	{
-		return m_pArea ? m_pArea->m_xRect.Width() : m_pSprite->GetImageWidth();
+		return m_pArea ? m_pArea->m_xRect.GetWidth() : m_pSprite->GetImageWidth();
 	}
 
 	// Get the height including all borders.
 	virtual xint GetHeight()
 	{
-		return m_pArea ? m_pArea->m_xRect.Height() : m_pSprite->GetImageHeight();
+		return m_pArea ? m_pArea->m_xRect.GetHeight() : m_pSprite->GetImageHeight();
 	}
 
 protected:
@@ -159,7 +159,7 @@ public:
 	// Get the border width including both the left and right borders.
 	inline xint GetBorderWidth()
 	{
-		return m_xFrameSize.iLeft + m_xFrameSize.iRight;
+		return m_xFrameSize.m_tLeft + m_xFrameSize.m_tRight;
 	}
 
 	// Get the width and height as a border inclusive size.
@@ -231,13 +231,13 @@ public:
 	// Get the border width including both the left and right borders.
 	inline xint GetBorderWidth()
 	{
-		return m_xFrameSize.iLeft + m_xFrameSize.iRight;
+		return m_xFrameSize.m_tLeft + m_xFrameSize.m_tRight;
 	}
 
 	// Get the border height including both the top and bottom borders.
 	inline xint GetBorderHeight()
 	{
-		return m_xFrameSize.iTop + m_xFrameSize.iBottom;
+		return m_xFrameSize.m_tTop + m_xFrameSize.m_tBottom;
 	}
 
 	// Get the inner width and height as a border exclusive size.
@@ -249,7 +249,7 @@ public:
 	// Get the screen position of the inner-area.
 	inline xpoint GetInnerPosition()
 	{
-		return GetPosition() + xpoint(m_xFrameSize.iLeft, m_xFrameSize.iTop);
+		return GetPosition() + xpoint(m_xFrameSize.m_tLeft, m_xFrameSize.m_tTop);
 	}
 
 	// Set the height using a border inclusive size.
@@ -274,7 +274,7 @@ public:
 	// Set the width and height using a border inclusive size.
 	inline void SetSize(xpoint xSize)
 	{
-		SetSize(xSize.iX, xSize.iY);
+		SetSize(xSize.m_tX, xSize.m_tY);
 	}
 
 	// Set the inner width and height using a border exclusive size.
@@ -287,7 +287,7 @@ public:
 	// Set the inner width and height using a border exclusive size.
 	inline void SetInnerSize(xpoint xSize)
 	{
-		SetInnerSize(xSize.iX, xSize.iY);
+		SetInnerSize(xSize.m_tX, xSize.m_tY);
 	}
 
 	// Get the screen rect for the inner, focus area.

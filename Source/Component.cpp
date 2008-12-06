@@ -131,7 +131,7 @@ CButtonComponent::CButtonComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* 
 	m_pC[ButtonState_Down]			= pMetaSprite->FindArea("DownCentre"); 
 	m_pR[ButtonState_Down]			= pMetaSprite->FindArea("DownRight");
 
-	m_xFrameSize = xrect(m_pL[0]->m_xRect.Width(), 0, m_pR[0]->m_xRect.Width(), 0);
+	m_xFrameSize = xrect(m_pL[0]->m_xRect.GetWidth(), 0, m_pR[0]->m_xRect.GetWidth(), 0);
 
 	if (pMetaFont)
 		m_pFont = new CFont(pMetaFont);
@@ -201,7 +201,7 @@ CInputComponent::CInputComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pM
 	m_pC = pMetaSprite->FindArea("Centre"); 
 	m_pR = pMetaSprite->FindArea("Right");
 
-	m_xFrameSize = xrect(m_pL->m_xRect.Width(), 0, m_pR->m_xRect.Width(), 0);
+	m_xFrameSize = xrect(m_pL->m_xRect.GetWidth(), 0, m_pR->m_xRect.GetWidth(), 0);
 
 	m_pFont = new CFont(pMetaFont);
 }
@@ -237,7 +237,7 @@ void CInputComponent::OnRender()
 	if (m_bMasked)
 		xRenderText.replace(0, xRenderText.length(), xRenderText.length(), '*');
 
-	xpoint xTextOffset(m_xFrameSize.iLeft + 1, (GetHeight() - m_pFont->GetFontHeight()) / 2);
+	xpoint xTextOffset(m_xFrameSize.m_tLeft + 1, (GetHeight() - m_pFont->GetFontHeight()) / 2);
 
 	// Render the text.
 	m_pFont->Render(xRenderText.c_str(), GetPosition() + xTextOffset, HGETEXT_LEFT);
@@ -247,10 +247,10 @@ void CInputComponent::OnRender()
 	{
 		xRenderText = xRenderText.substr(0, m_iCharOffset);
 
-		xint iCursorX = xTextOffset.iX + m_pFont->GetStringWidth(xRenderText.c_str());
-		xrect iLinePoints = xrect(iCursorX, xTextOffset.iY, iCursorX, GetHeight() - xTextOffset.iY) + GetPosition();
+		xint iCursorX = xTextOffset.m_tX + m_pFont->GetStringWidth(xRenderText.c_str());
+		xrect iLinePoints = xrect(iCursorX, xTextOffset.m_tY, iCursorX, GetHeight() - xTextOffset.m_tY) + GetPosition();
 
-		_HGE->Gfx_RenderLine((float)iLinePoints.iLeft, (float)iLinePoints.iTop, (float)iLinePoints.iRight, (float)iLinePoints.iBottom, 0xFF000000); 
+		_HGE->Gfx_RenderLine((float)iLinePoints.m_tLeft, (float)iLinePoints.m_tTop, (float)iLinePoints.m_tRight, (float)iLinePoints.m_tBottom, 0xFF000000); 
 	}
 }
 
@@ -263,14 +263,14 @@ xbool CInputComponent::OnMouseDown(xpoint xPosition)
 	{
 		xstring xCheckString;
 
-		xint iTarget = xPosition.iX - GetPosition().iX;
+		xint iTarget = xPosition.m_tX - GetPosition().m_tX;
 		xint iWidth = 0;
 		xint iLastWidth = 0;
 
 		for (xint iA = 0; iA < (xint)m_xText.length(); ++iA)
 		{
 			xCheckString += m_bMasked ? '*' : m_xText[iA];
-			iWidth = m_pFont->GetStringWidth(xCheckString.c_str()) + m_pL->m_xRect.Width();
+			iWidth = m_pFont->GetStringWidth(xCheckString.c_str()) + m_pL->m_xRect.GetWidth();
 
 			if (iWidth > iTarget)
 				break;
@@ -356,7 +356,7 @@ CProgressComponent::CProgressComponent(CSpriteMetadata* pMetaSprite) : CStripEle
 
 	m_pProgress = pMetaSprite->FindArea("Progress");
 
-	m_xFrameSize = xrect(m_pL->m_xRect.Width(), 0, m_pR->m_xRect.Width(), 0);
+	m_xFrameSize = xrect(m_pL->m_xRect.GetWidth(), 0, m_pR->m_xRect.GetWidth(), 0);
 }
 
 // =============================================================================
@@ -374,7 +374,7 @@ void CProgressComponent::OnRender()
 	CStripElement::Render(m_pL->m_xRect, m_pC->m_xRect, m_pR->m_xRect);
 
 	if (m_fProgress)
-		m_pSprite->RenderTiled(GetPosition() + xpoint(m_xFrameSize.iLeft, 0), xpoint((xint)((xfloat)m_iWidth * m_fProgress), 0), m_pProgress->m_xRect);
+		m_pSprite->RenderTiled(GetPosition() + xpoint(m_xFrameSize.m_tLeft, 0), xpoint((xint)((xfloat)m_iWidth * m_fProgress), 0), m_pProgress->m_xRect);
 }
 
 //##############################################################################
@@ -405,10 +405,10 @@ CWindowComponent::CWindowComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* 
 
 	m_xFrameSize = xrect
 	(
-		m_pML->m_xRect.Width(),
-		m_pTC->m_xRect.Height(),
-		m_pMR->m_xRect.Width(),
-		m_pBC->m_xRect.Height()
+		m_pML->m_xRect.GetWidth(),
+		m_pTC->m_xRect.GetHeight(),
+		m_pMR->m_xRect.GetWidth(),
+		m_pBC->m_xRect.GetHeight()
 	);
 
 	if (pMetaFont)
@@ -434,7 +434,7 @@ void CWindowComponent::OnRender()
 
 	// Render the window title.
 	if (m_pFont)
-		m_pFont->Render(m_xTitle.c_str(), xrect(m_xFrameSize.iLeft + 2, 0, m_xFrameSize.iLeft + m_iWidth, m_xFrameSize.iTop) + GetPosition(), HGETEXT_LEFT | HGETEXT_MIDDLE);
+		m_pFont->Render(m_xTitle.c_str(), xrect(m_xFrameSize.m_tLeft + 2, 0, m_xFrameSize.m_tLeft + m_iWidth, m_xFrameSize.m_tTop) + GetPosition(), HGETEXT_LEFT | HGETEXT_MIDDLE);
 }
 
 // =============================================================================
@@ -442,7 +442,7 @@ void CWindowComponent::OnRender()
 // =============================================================================
 xbool CWindowComponent::OnMouseDown(xpoint xPosition)
 {
-	if (m_bMoveable && Math::IsIntersecting(xPosition, xrect(m_xFrameSize.iLeft, 0, GetInnerWidth(), m_xFrameSize.iTop) + GetPosition()))
+	if (m_bMoveable && Math::IsIntersecting(xPosition, xrect(m_xFrameSize.m_tLeft, 0, GetInnerWidth(), m_xFrameSize.m_tTop) + GetPosition()))
 		m_bDragging = true;
 
 	return true;
@@ -493,10 +493,10 @@ CGroupComponent::CGroupComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pM
 
 	m_xFrameSize = xrect
 	(
-		m_pML->m_xRect.Width(),
-		m_pTC->m_xRect.Height(),
-		m_pMR->m_xRect.Width(),
-		m_pBC->m_xRect.Height()
+		m_pML->m_xRect.GetWidth(),
+		m_pTC->m_xRect.GetHeight(),
+		m_pMR->m_xRect.GetWidth(),
+		m_pBC->m_xRect.GetHeight()
 	);
 
 	if (pMetaFont)
@@ -526,10 +526,10 @@ void CGroupComponent::OnRender()
 	if (bTitle)
 	{
 		xint iTitleWidth = m_pFont->GetStringWidth(m_xTitle.c_str()) + 3;
-		xint iTitleHeight = max(m_xFrameSize.Height(), m_pFont->GetFontHeight()) / 2;
+		xint iTitleHeight = max(m_xFrameSize.GetHeight(), m_pFont->GetFontHeight()) / 2;
 
-		m_pFont->Render(m_xTitle.c_str(), GetPosition() + xpoint(m_xFrameSize.iLeft + 2, -iTitleHeight), HGETEXT_LEFT);
-		m_pSprite->RenderTiled(GetPosition() + xpoint(m_xFrameSize.iLeft + iTitleWidth, 0), xpoint(m_iWidth - iTitleWidth, 0), m_pTC->m_xRect);
+		m_pFont->Render(m_xTitle.c_str(), GetPosition() + xpoint(m_xFrameSize.m_tLeft + 2, -iTitleHeight), HGETEXT_LEFT);
+		m_pSprite->RenderTiled(GetPosition() + xpoint(m_xFrameSize.m_tLeft + iTitleWidth, 0), xpoint(m_iWidth - iTitleWidth, 0), m_pTC->m_xRect);
 	}
 }
 
@@ -591,8 +591,8 @@ void CCheckComponent::OnRender()
 
 	if (m_pFont)
 	{		
-		xint iX = xArea.Width() + (xArea.Width() / 2);
-		m_pFont->Render(m_xText.c_str(), xrect(iX, 0, iX + m_pFont->GetStringWidth(m_xText.c_str()), xArea.Height()) + GetPosition(), HGETEXT_LEFT | HGETEXT_MIDDLE);
+		xint iX = xArea.GetWidth() + (xArea.GetWidth() / 2);
+		m_pFont->Render(m_xText.c_str(), xrect(iX, 0, iX + m_pFont->GetStringWidth(m_xText.c_str()), xArea.GetHeight()) + GetPosition(), HGETEXT_LEFT | HGETEXT_MIDDLE);
 	}
 }
 

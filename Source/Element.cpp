@@ -116,8 +116,8 @@ CStripElement::~CStripElement()
 void CStripElement::Render(xrect& xLeft, xrect& xCentre, xrect& xRight)
 {
 	m_pSprite->Render(GetPosition(), xLeft);
-	m_pSprite->Render(GetPosition() + xpoint(m_xFrameSize.iLeft + m_iWidth, 0), xRight);
-	m_pSprite->RenderTiled(GetPosition() + xpoint(m_xFrameSize.iLeft, 0), xpoint(m_iWidth, 0), xCentre);
+	m_pSprite->Render(GetPosition() + xpoint(m_xFrameSize.m_tLeft + m_iWidth, 0), xRight);
+	m_pSprite->RenderTiled(GetPosition() + xpoint(m_xFrameSize.m_tLeft, 0), xpoint(m_iWidth, 0), xCentre);
 }
 
 //##############################################################################
@@ -153,22 +153,22 @@ void CContainerElement::Render(xrect& xTL, xrect& xTC, xrect& xTR, xrect& xML, x
 
 	// Top.
 	m_pSprite->Render(xPosition, xTL);
-	m_pSprite->RenderTiled(xPosition + xpoint(m_xFrameSize.iLeft, 0), xpoint(m_iWidth, 0), xTC);
-	m_pSprite->Render(xPosition + xpoint(m_xFrameSize.iLeft + m_iWidth, 0), xTR);
+	m_pSprite->RenderTiled(xPosition + xpoint(m_xFrameSize.m_tLeft, 0), xpoint(m_iWidth, 0), xTC);
+	m_pSprite->Render(xPosition + xpoint(m_xFrameSize.m_tLeft + m_iWidth, 0), xTR);
 
-	xPosition.iY += m_xFrameSize.iTop;
+	xPosition.m_tY += m_xFrameSize.m_tTop;
 
 	// Middle
 	m_pSprite->RenderTiled(xPosition, xpoint(0, m_iHeight), xML);
-	m_pSprite->RenderTiled(xPosition + xpoint(m_xFrameSize.iLeft, 0), xpoint(m_iWidth, m_iHeight), xMC);
-	m_pSprite->RenderTiled(xPosition + xpoint(m_xFrameSize.iLeft + m_iWidth, 0), xpoint(0, m_iHeight), xMR);
+	m_pSprite->RenderTiled(xPosition + xpoint(m_xFrameSize.m_tLeft, 0), xpoint(m_iWidth, m_iHeight), xMC);
+	m_pSprite->RenderTiled(xPosition + xpoint(m_xFrameSize.m_tLeft + m_iWidth, 0), xpoint(0, m_iHeight), xMR);
 
-	xPosition.iY += m_iHeight;
+	xPosition.m_tY += m_iHeight;
 
 	// Bottom.
 	m_pSprite->Render(xPosition, xBL);
-	m_pSprite->RenderTiled(xPosition + xpoint(m_xFrameSize.iLeft, 0), xpoint(m_iWidth, 0), xBC);
-	m_pSprite->Render(xPosition + xpoint(m_xFrameSize.iLeft + m_iWidth, 0), xBR);
+	m_pSprite->RenderTiled(xPosition + xpoint(m_xFrameSize.m_tLeft, 0), xpoint(m_iWidth, 0), xBC);
+	m_pSprite->Render(xPosition + xpoint(m_xFrameSize.m_tLeft + m_iWidth, 0), xBR);
 }
 
 // =============================================================================
@@ -184,20 +184,20 @@ void CContainerElement::ArrangeChildren()
 		CInterfaceElement* pElement = *ppElement;
 
 		// Re-position the element.
-		pElement->SetPosition(GetInnerPosition() + m_xElementPadding.TopLeft() + xpoint(0, iContainerHeight));
+		pElement->SetPosition(GetInnerPosition() + m_xElementPadding.GetTopLeft() + xpoint(0, iContainerHeight));
 
 		// Determine the width of the container based on the element area and increase the offset.
 		xrect xArea = pElement->GetArea();
 
-		iContainerWidth = Math::Max(iContainerWidth, xArea.Width());
-		iContainerHeight += m_iElementSpacing + xArea.Height();
+		iContainerWidth = Math::Max(iContainerWidth, xArea.GetWidth());
+		iContainerHeight += m_iElementSpacing + xArea.GetHeight();
 	}
 
 	// Resize the container to the size of the elements.
 	if (iContainerHeight != 0)
 		iContainerHeight -= m_iElementSpacing;
 
-	SetInnerSize(iContainerWidth + m_xElementPadding.iLeft + m_xElementPadding.iRight, iContainerHeight + m_xElementPadding.iTop + m_xElementPadding.iBottom);
+	SetInnerSize(iContainerWidth + m_xElementPadding.m_tLeft + m_xElementPadding.m_tRight, iContainerHeight + m_xElementPadding.m_tTop + m_xElementPadding.m_tBottom);
 }
 
 //##############################################################################

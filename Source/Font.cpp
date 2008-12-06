@@ -112,11 +112,11 @@ void CFont::Render(const xchar* pString, xpoint xPosition, xuint iAlign, xfloat 
 		xpoint xShadowPosition = xPosition + m_pMetadata->m_xShadowOffset;
 
 		pFont->SetColor(SETA(m_pMetadata->m_iShadowColour, (xchar)(fAlpha * 255.f)));
-		pFont->Render((xfloat)xShadowPosition.iX, (xfloat)xShadowPosition.iY, iAlign, pString);
+		pFont->Render((xfloat)xShadowPosition.m_tX, (xfloat)xShadowPosition.m_tY, iAlign, pString);
 	}
 
 	pFont->SetColor(SETA(m_pMetadata->m_iColour, (xchar)(fAlpha * 255.f)));
-	pFont->Render((xfloat)xPosition.iX, (xfloat)xPosition.iY, iAlign, pString);
+	pFont->Render((xfloat)xPosition.m_tX, (xfloat)xPosition.m_tY, iAlign, pString);
 }
 
 // =============================================================================
@@ -135,11 +135,11 @@ void CFont::Render(const xchar* pString, xrect xRect, xuint iAlign, xfloat fAlph
 		xrect xShadowRect = xRect + m_pMetadata->m_xShadowOffset;
 
 		pFont->SetColor(SETA(m_pMetadata->m_iShadowColour, (xchar)(fAlpha * 255.f)));
-		pFont->printfb((xfloat)xShadowRect.iLeft, (xfloat)xShadowRect.iTop, (xfloat)xShadowRect.Width(), (xfloat)xShadowRect.Height(), iAlign, pString);
+		pFont->printfb((xfloat)xShadowRect.m_tLeft, (xfloat)xShadowRect.m_tTop, (xfloat)xShadowRect.GetWidth(), (xfloat)xShadowRect.GetHeight(), iAlign, pString);
 	}
 
 	pFont->SetColor(SETA(m_pMetadata->m_iColour, (xchar)(fAlpha * 255.f)));
-	pFont->printfb((xfloat)xRect.iLeft, (xfloat)xRect.iTop, (xfloat)xRect.Width(), (xfloat)xRect.Height(), iAlign, pString);
+	pFont->printfb((xfloat)xRect.m_tLeft, (xfloat)xRect.m_tTop, (xfloat)xRect.GetWidth(), (xfloat)xRect.GetHeight(), iAlign, pString);
 }
 
 //##############################################################################
