@@ -75,7 +75,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	s_pInterface->System_SetState(HGE_RENDERFUNC, &Application::OnRender);
 	s_pInterface->System_SetState(HGE_FOCUSLOSTFUNC, &Application::OnBlur);
 	s_pInterface->System_SetState(HGE_FOCUSGAINFUNC, &Application::OnFocus);
-	s_pInterface->System_SetState(HGE_TITLE, "PikPik - Pre-Release - Copyright (c) SAPIAN 2008");
+	s_pInterface->System_SetState(HGE_TITLE, "PikPik - Pre-Release - Copyright (c) Sketch Spark 2010");
 	s_pInterface->System_SetState(HGE_USESOUND, false);
 	s_pInterface->System_SetState(HGE_WINDOWED, true);
 	s_pInterface->System_SetState(HGE_SCREENWIDTH, _SWIDTH);
