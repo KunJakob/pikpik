@@ -53,11 +53,17 @@ protected:
 	// Called to pre-render the next screen frame.
 	virtual void OnPreRender();
 
-	// OnActivate the currently active map.
-	void LoadMap();
-
 	// Initialise all players in the game.
 	void InitialisePlayers();
+
+	// Generate a field mask texture for ghost vision.
+	HTEXTURE GenerateGhostMask(xint iInnerRadius, xint iOuterRadius);
+
+	// Render the ghost mask.
+	void RenderGhostMask(CRenderLayer* pLayer);
+
+	// Calculate the "energy" for the music to determine background colour fading.
+	void CalculateMusicEnergy(FMOD::Channel* pChannel);
 
 	// The screen's render view.
 	CRenderView* m_xRenderView;
@@ -66,7 +72,7 @@ protected:
 	CBackground m_xBackground;
 
 	// The field mask.
-	hgeSprite* m_pFieldMask;
+	hgeSprite* m_pGhostMask;
 
 	// The background music.
 	FMOD::Sound* m_pMusic;

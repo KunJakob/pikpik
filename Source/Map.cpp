@@ -169,8 +169,8 @@ void CMap::Load()
 				pBlock->m_iTileType = TileType_Blank;
 				pBlock->m_fAngle = 0.f;
 				pBlock->m_xPosition = xpoint(iX, iY);
-				pBlock->m_fVisibility = 1.f;
-				pBlock->m_fPlayerVisibility = 1.f;
+				pBlock->m_fVisibility = 0.f;
+				pBlock->m_fPlayerVisibility = 0.f;
 				pBlock->m_bEaten = false;
 				pBlock->m_pPower = NULL;
 				pBlock->m_pTrap = NULL;
@@ -312,7 +312,7 @@ void CMap::AddVisiblePaths(CMapBlock* pBase, xfloat fVisibility)
 void CMap::OnRender()
 {
 	// Blend the colours based on the music energy.
-	/*const static xfloat s_fMinColour = 0.2f;
+	const static xfloat s_fMinColour = 0.2f;
 	const static xfloat s_fMaxColour = 1.0f;
 
 	for (xint iA = 0; iA < 3; ++iA)
@@ -331,7 +331,7 @@ void CMap::OnRender()
 		}
 
 		m_fChannels[iA] = Math::Clamp(m_fChannels[iA], s_fMinColour, s_fMaxColour);
-	}*/
+	}
 
 	// Draw the map.
 	for (xint iA = 0; iA < m_iBlockCount; ++iA)

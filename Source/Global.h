@@ -72,7 +72,7 @@
 
 // Shortcuts.
 #define _HGE					Application::GetInterface()
-#define _FMOD					SoundManager.GetSoundSystem()
+#define _FMOD					CSoundManager::Get().GetSoundSystem()
 #define _TERMINATE				Application::Terminate()
 #define _TIMEMS					GetTickCount()
 #define _TIMEDELTA				Application::GetTimeDelta()
@@ -167,6 +167,7 @@ enum t_GameLayerIndex
 	GameLayerIndex_Items,
 	GameLayerIndex_Player,
 	GameLayerIndex_Effects,
+	GameLayerIndex_GhostMask,
 	GameLayerIndex_Radar,
 
 	GameLayerIndex_Max,
