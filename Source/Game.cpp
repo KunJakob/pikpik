@@ -25,7 +25,7 @@
 // =============================================================================
 void CGameScreen::OnActivate()
 {
-	Global.m_fScreenAlpha = 1.f;
+	Global.m_fMapAlpha = 1.f;
 	Global.m_fMusicEnergy = 0.f;
 
 	// Initialise the render manager for the game.
@@ -98,7 +98,7 @@ void CGameScreen::OnUpdate()
 					ppPlayer++;
 
 				Global.m_pLocalPlayer = *ppPlayer;
-				Global.m_fScreenAlpha = 1.f;
+				Global.m_fMapAlpha = 1.f;
 
 				break;
 			}

@@ -135,7 +135,7 @@ void CPlayer::Update()
 			m_pSprite->SetPosition(m_pCurrentBlock->GetScreenPosition() + xOffset);
 
 			if (Global.m_pLocalPlayer == this)
-				Global.m_fScreenAlpha = Math::Clamp(1.f - m_fTransition, 0.f, 1.f);
+				Global.m_fMapAlpha = Math::Clamp(1.f - m_fTransition, 0.f, 1.f);
 		}
 		break;
 

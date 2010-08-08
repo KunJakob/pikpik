@@ -248,7 +248,7 @@ public:
 	xbool m_bWindowFocused;
 
 	// The overall screen alpha.
-	xfloat m_fScreenAlpha;
+	xfloat m_fMapAlpha;
 
 	// The global game font.
 	CFont* m_pGameFont;

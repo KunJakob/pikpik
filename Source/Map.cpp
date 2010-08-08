@@ -350,7 +350,7 @@ void CMap::OnRender()
 			m_xBlocks[iA].GetScreenPosition(), 
 			s_xCentrePoint, 
 			m_pTileAreas[iTileType]->m_xRect,
-			m_xBlocks[iA].m_fVisibility, 
+			m_xBlocks[iA].m_fVisibility * Global.m_fMapAlpha, 
 			Math::Radians(m_xBlocks[iA].m_fAngle)
 		);
 	}
