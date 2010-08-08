@@ -143,25 +143,19 @@ void CRenderLayer::Render()
 //##############################################################################
 
 // =============================================================================
-void CRenderManager::OnInitialise()
+CRenderView::CRenderView(xint iLayerCount)
 {
-	m_fpRenderOverrideCallback = NULL;
+	ReinitLayers(iLayerCount);
 }
 
 // =============================================================================
-void CRenderManager::OnDeinitialise()
+CRenderView::~CRenderView()
 {
 	ClearLayers();
 }
 
 // =============================================================================
-void CRenderManager::SetRenderOverride(t_RenderOverrideCallback fpCallback)
-{
-	m_fpRenderOverrideCallback = fpCallback;
-}
-
-// =============================================================================
-void CRenderManager::ReinitLayers(xint iLayerCount)
+void CRenderView::ReinitLayers(xint iLayerCount)
 {
 	XMASSERT(iLayerCount >= -1 && GetLayerCount() > -1, "Layer count must be zero or a positive value or -1 for the current number of layers.");
 
@@ -185,22 +179,50 @@ void CRenderManager::ReinitLayers(xint iLayerCount)
 }
 
 // =============================================================================
-void CRenderManager::ClearLayers()
+void CRenderView::ClearLayers()
 {
 	ReinitLayers(0);
 }
 
 // =============================================================================
-xint CRenderManager::GetLayerCount()
+xint CRenderView::GetLayerCount()
 {
 	return m_lpLayerList.size();
 }
 
 // =============================================================================
-CRenderLayer* CRenderManager::GetLayer(xint iIndex)
+CRenderLayer* CRenderView::GetLayer(xint iIndex)
 {
 	XMASSERT(iIndex < GetLayerCount(), XFORMAT("Layer index %d is out of bounds.", iIndex));
 	return m_lpLayerList[iIndex];
+}
+
+//##############################################################################
+
+// =============================================================================
+void CRenderManager::OnInitialise()
+{
+	m_fpRenderOverrideCallback = NULL;
+	m_pRenderView = NULL;
+}
+
+// =============================================================================
+void CRenderManager::OnDeinitialise()
+{
+}
+
+// =============================================================================
+void CRenderManager::SetRenderOverride(t_RenderOverrideCallback fpCallback)
+{
+	m_fpRenderOverrideCallback = fpCallback;
+	m_pRenderView = NULL;
+}
+
+// =============================================================================
+void CRenderManager::SetRenderView(CRenderView* pRenderView)
+{
+	m_pRenderView = pRenderView;
+	m_fpRenderOverrideCallback = NULL;
 }
 
 // =============================================================================
@@ -208,9 +230,9 @@ void CRenderManager::Render()
 {
 	if (m_fpRenderOverrideCallback)
 		m_fpRenderOverrideCallback();
-	else
+	else if (m_pRenderView)
 	{
-		XLISTFOREACH(t_RenderLayerList, ppLayer, m_lpLayerList)
+		XLISTFOREACH(t_RenderLayerList, ppLayer, m_pRenderView->m_lpLayerList)
 		{
 			CRenderLayer* pLayer = *ppLayer;
 

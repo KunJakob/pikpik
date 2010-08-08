@@ -248,7 +248,7 @@ public:
 	// Get a map block by block position.
 	inline CMapBlock* GetBlock(xpoint xBlockPos)
 	{
-		return GetBlock(xBlockPos.m_tX + (xBlockPos.m_tX * GetWidth()));
+		return GetBlock(xBlockPos.m_tX + (xBlockPos.m_tY * GetWidth()));
 	}
 
 	// Get a random player spawn block.

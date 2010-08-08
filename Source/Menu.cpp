@@ -19,6 +19,7 @@
 #include <Resource.h>
 #include <Font.h>
 #include <Component.h>
+#include <Lobby.h>
 
 //##############################################################################
 
@@ -69,13 +70,28 @@ void CMenuScreen::OnLoad()
 	// Initialise the menu links.
 	CMenuLink* pLinkList[] = 
 	{
-		// Main.
-		new CMenuLink(MenuGroup_Main,		m_pMenuHighlight,	_LOCALE("Menu_Offline"),		xbind(this, &CMenuScreen::Callback_StartGame)),
-		new CMenuLink(MenuGroup_Main,		m_pMenuDisabled,	_LOCALE("Menu_Online"),			NULL),
-		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Tutorial"),		NULL),
-		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Options"),		NULL),
-		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Credits"),		NULL),
+		// Main
+		new CMenuLink(MenuGroup_Main,		m_pMenuHighlight,	_LOCALE("Menu_Online"),			xbind(this, &CMenuScreen::Callback_ShowOnlineMenu)),
+		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Offline"),		xbind(this, &CMenuScreen::Callback_ShowLevelsMenu)),
+		new CMenuLink(MenuGroup_Main,		m_pMenuDisabled,	_LOCALE("Menu_Tutorial"),		NULL),
+		new CMenuLink(MenuGroup_Main,		m_pMenuDisabled,	_LOCALE("Menu_Options"),		NULL),
+		new CMenuLink(MenuGroup_Main,		m_pMenuDisabled,	_LOCALE("Menu_Credits"),		NULL),
 		new CMenuLink(MenuGroup_Main,		m_pMenuDefault,		_LOCALE("Menu_Exit"),			xbind(this, &CMenuScreen::Callback_QuitGame)),
+
+		// Online
+		new CMenuLink(MenuGroup_Online,		m_pMenuDefault,		_LOCALE("Menu_OnlineJoin"),		xbind(this, &CMenuScreen::Callback_ShowJoinMenu)),
+		new CMenuLink(MenuGroup_Online,		m_pMenuDefault,		_LOCALE("Menu_OnlineCreate"),	xbind(this, &CMenuScreen::Callback_ShowCreateMenu)),
+		new CMenuLink(MenuGroup_Online,		m_pMenuHighlight,	_LOCALE("Menu_Back"),			xbind(this, &CMenuScreen::Callback_ShowMainMenu)),
+
+		// Find
+		new CMenuLink(MenuGroup_Join,		m_pMenuDefault,		_LOCALE("Menu_JoinPublic"),		xbind(this, &CMenuScreen::Callback_JoinPublic)),
+		new CMenuLink(MenuGroup_Join,		m_pMenuDefault,		_LOCALE("Menu_JoinPrivate"),	xbind(this, &CMenuScreen::Callback_JoinPrivate)),
+		new CMenuLink(MenuGroup_Join,		m_pMenuHighlight,	_LOCALE("Menu_Back"),			xbind(this, &CMenuScreen::Callback_ShowOnlineMenu)),
+
+		// Create
+		new CMenuLink(MenuGroup_Create,		m_pMenuDefault,		_LOCALE("Menu_CreatePublic"),	xbind(this, &CMenuScreen::Callback_CreatePublic)),
+		new CMenuLink(MenuGroup_Create,		m_pMenuDefault,		_LOCALE("Menu_CreatePrivate"),	xbind(this, &CMenuScreen::Callback_CreatePrivate)),
+		new CMenuLink(MenuGroup_Create,		m_pMenuHighlight,	_LOCALE("Menu_Back"),			xbind(this, &CMenuScreen::Callback_ShowOnlineMenu)),
 	};
 
 	for (xuint iA = 0; iA < (sizeof(pLinkList) / sizeof(CMenuLink*)); ++iA)
@@ -88,6 +104,21 @@ void CMenuScreen::OnLoad()
 		XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[iGroup])
 			(*ppMenuLink)->RePosition(iElement++, (xuint)m_lpMenuLinks[iGroup].size());
 	}
+
+	// Create a list of maps.
+	for (int iA = 0; iA < MapManager.GetMapCount(); ++iA)
+	{
+		CMap* pMap = MapManager.GetMap(iA);
+		CMenuLink* pMenuLink = new CMenuLink(MenuGroup_Levels, m_pMenuDefault, pMap->GetName(), xbind(this, &CMenuScreen::Callback_StartGame));
+
+		pMenuLink->RePosition(iA, MapManager.GetMapCount() + 1);
+		m_lpMenuLinks[MenuGroup_Levels].push_back(pMenuLink);
+	}
+
+	CMenuLink* pMenuLink = new CMenuLink(MenuGroup_Levels, m_pMenuHighlight, _LOCALE("Menu_Back"), xbind(this, &CMenuScreen::Callback_ShowMainMenu));
+
+	pMenuLink->RePosition(MapManager.GetMapCount(), MapManager.GetMapCount() + 1);
+	m_lpMenuLinks[MenuGroup_Levels].push_back(pMenuLink);
 }
 
 // =============================================================================
@@ -107,36 +138,48 @@ void CMenuScreen::OnActivate()
 	m_iNextScreen = ScreenIndex_Invalid;
 
 	// Initialise the layers.
-	RenderManager.ReinitLayers(MenuLayerIndex_Max);
+	m_xRenderView = new CRenderView(MenuLayerIndex_Max);
 
-	RenderLayer(MenuLayerIndex_Background)->AttachRenderable(m_pBackground);
-	RenderLayer(MenuLayerIndex_Interface)->SetRenderOverride(xbind(&InterfaceManager, &CInterfaceManager::Render));
+	m_xRenderView->GetLayer(MenuLayerIndex_Background)->AttachRenderable(m_pBackground);
+	m_xRenderView->GetLayer(MenuLayerIndex_Interface)->SetRenderOverride(xbind(&InterfaceManager, &CInterfaceManager::Render));
 
 	// Initialise the debug windows.
-	CWindowComponent* pWindow = (CWindowComponent*)ComponentFactory.CreateWindow(Global.m_pDebugMetadata, "Debug-RenderLayers");
+	m_pDebugWindow = (CWindowComponent*)ComponentFactory.CreateWindow(Global.m_pDebugMetadata, "Debug-RenderLayers");
 	
-	InterfaceScreen.Attach(pWindow);
+	((CCheckComponent*)m_pDebugWindow->FindChild("L-Background"))->SetCheckBinding(xbind(m_xRenderView->GetLayer(MenuLayerIndex_Background), &CRenderLayer::SetEnabled));
+	((CCheckComponent*)m_pDebugWindow->FindChild("L-Interface"))->SetCheckBinding(xbind(m_xRenderView->GetLayer(MenuLayerIndex_Interface), &CRenderLayer::SetEnabled));
+	((CCheckComponent*)m_pDebugWindow->FindChild("L-InterfaceDebug"))->SetCheckBinding(xbind(&InterfaceManager, &CInterfaceManager::SetDebugRender));
 
-	((CCheckComponent*)pWindow->FindChild("L-Background"))->SetCheckBinding(xbind(RenderLayer(MenuLayerIndex_Background), &CRenderLayer::SetEnabled));
-	((CCheckComponent*)pWindow->FindChild("L-Interface"))->SetCheckBinding(xbind(RenderLayer(MenuLayerIndex_Interface), &CRenderLayer::SetEnabled));
-	((CCheckComponent*)pWindow->FindChild("L-InterfaceDebug"))->SetCheckBinding(xbind(&InterfaceManager, &CInterfaceManager::SetDebugRender));
+	InterfaceScreen.Attach(m_pDebugWindow);
 }
 
 // =============================================================================
 void CMenuScreen::OnDeactivate()
 {
-	RenderManager.ClearLayers();
+	InterfaceScreen.Detach(m_pDebugWindow);
+	delete m_pDebugWindow;
+
+	delete m_xRenderView;
+	m_xRenderView = NULL;
 }
 
 // =============================================================================
 void CMenuScreen::OnWake()
 {
+	RenderManager.SetRenderView(m_xRenderView);
+
+	InterfaceManager.SetCursorVisible(true);
+
+	// Show the last state.
 	SetMenuGroup(m_iLastMenuGroup);
 }
 
 // =============================================================================
 void CMenuScreen::OnSleep()
 {
+	InterfaceManager.SetCursorVisible(false);
+
+	RenderManager.ClearRenderView();
 }
 
 // =============================================================================
@@ -302,6 +345,16 @@ void CMenuScreen::ShowNextScreen()
 	{
 		ScreenManager.Push(m_iNextScreen, true);
 
+		switch (m_iNextScreen)
+		{
+		case ScreenIndex_LobbyScreen:
+			{
+				CLobbyScreen* pLobby = (CLobbyScreen*)ScreenManager.FindScreen(ScreenIndex_LobbyScreen);
+				pLobby->Start(m_iLobbyMode);
+			}
+			break;
+		}
+
 		m_iNextScreen = ScreenIndex_Invalid;
 
 		return;
@@ -378,6 +431,11 @@ void CMenuScreen::Callback_ShowMainMenu()
 // =============================================================================
 void CMenuScreen::Callback_StartGame()
 {
+	CMenuLink* pLink = (CMenuLink*)InterfaceManager.GetActiveElement();
+
+	Global.m_pActiveMap = MapManager.GetMap(pLink->m_iElementIndex);
+	Global.m_pActiveMap->Load();
+
 	SetNextScreen(ScreenIndex_GameScreen);
 }
 
@@ -385,6 +443,58 @@ void CMenuScreen::Callback_StartGame()
 void CMenuScreen::Callback_QuitGame()
 {
 	_TERMINATE;
+}
+
+// =============================================================================
+void CMenuScreen::Callback_ShowOnlineMenu()
+{
+	SetMenuGroup(MenuGroup_Online);
+}
+
+// =============================================================================
+void CMenuScreen::Callback_ShowJoinMenu()
+{
+	SetMenuGroup(MenuGroup_Join);
+}
+
+// =============================================================================
+void CMenuScreen::Callback_ShowCreateMenu()
+{
+	SetMenuGroup(MenuGroup_Create);
+}
+
+// =============================================================================
+void CMenuScreen::Callback_ShowLevelsMenu()
+{
+	SetMenuGroup(MenuGroup_Levels);
+}
+
+// =============================================================================
+void CMenuScreen::Callback_JoinPublic()
+{
+	SetNextScreen(ScreenIndex_LobbyScreen);
+	m_iLobbyMode = LobbyStartMode_JoinPublic;
+}
+
+// =============================================================================
+void CMenuScreen::Callback_JoinPrivate()
+{
+	SetNextScreen(ScreenIndex_LobbyScreen);
+	m_iLobbyMode = LobbyStartMode_JoinPrivate;
+}
+
+// =============================================================================
+void CMenuScreen::Callback_CreatePublic()
+{
+	SetNextScreen(ScreenIndex_LobbyScreen);
+	m_iLobbyMode = LobbyStartMode_CreatePublic;
+}
+
+// =============================================================================
+void CMenuScreen::Callback_CreatePrivate()
+{
+	SetNextScreen(ScreenIndex_LobbyScreen);
+	m_iLobbyMode = LobbyStartMode_CreatePrivate;
 }
 
 //##############################################################################

@@ -101,10 +101,8 @@
 // Predeclare.
 class CSprite;
 class CPlayer;
-class CMenuScreen;
 class CMap;
 class CFont;
-class CLobbyScreen;
 
 // The player identifier type.
 enum t_PlayerType
@@ -164,6 +162,7 @@ enum t_MenuLayerIndex
 // Game layer index list.
 enum t_GameLayerIndex
 {
+	GameLayerIndex_Background,
 	GameLayerIndex_Map,
 	GameLayerIndex_Items,
 	GameLayerIndex_Player,

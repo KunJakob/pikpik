@@ -592,6 +592,7 @@
   <ItemGroup>
     <None Include="..\Bin\Metadata\Fonts.mta" />
     <None Include="..\Bin\Metadata\Interface.mta" />
+    <None Include="..\Bin\Metadata\Maps.mta" />
     <None Include="..\Bin\Metadata\Sounds.mta" />
     <None Include="..\Bin\Metadata\Sprites.mta" />
     <None Include="..\Bin\Metadata\Strings.mta" />

@@ -169,9 +169,11 @@ void CMap::Load()
 				pBlock->m_iTileType = TileType_Blank;
 				pBlock->m_fAngle = 0.f;
 				pBlock->m_xPosition = xpoint(iX, iY);
-				pBlock->m_fVisibility = 0.f;
-				pBlock->m_fPlayerVisibility = 0.f;
+				pBlock->m_fVisibility = 1.f;
+				pBlock->m_fPlayerVisibility = 1.f;
 				pBlock->m_bEaten = false;
+				pBlock->m_pPower = NULL;
+				pBlock->m_pTrap = NULL;
 
 				pBlock->m_pAdjacents[AdjacentDirection_Left]	= (iIndex % m_iWidth > 0) ? &m_xBlocks[iIndex - 1] : NULL;
 				pBlock->m_pAdjacents[AdjacentDirection_Up]		= (iIndex >= m_iWidth) ? &m_xBlocks[iIndex - m_iWidth] : NULL;
@@ -400,11 +402,11 @@ CMapBlock* CMap::GetSpawnBlock(t_PlayerType iPlayerType)
 // =============================================================================
 void CMapManager::OnInitialise()
 {
-	/*m_pMetadata = _METADATA("Maps");
+	m_pMetadata = _METADATA("Maps");
 
 	// Create a map instance for each map in metadata.
-	_DATASET_FOREACH(pDataset, m_pMetadata, "Map", NULL)
-		m_lpMaps.push_back(new CMap(pDataset));*/
+	XEN_METADATA_DATASET_FOREACH(pDataset, m_pMetadata, "Map", NULL)
+		m_lpMaps.push_back(new CMap(pDataset));
 }
 
 // =============================================================================

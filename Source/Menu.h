@@ -32,6 +32,10 @@ enum t_MenuGroup
 {
 	MenuGroup_None = -1,
 	MenuGroup_Main,
+	MenuGroup_Online,
+	MenuGroup_Join,
+	MenuGroup_Create,
+	MenuGroup_Levels,
 	
 	MenuGroup_Max,
 };
@@ -152,6 +156,14 @@ protected:
 	void Callback_ShowMainMenu();
 	void Callback_StartGame();
 	void Callback_QuitGame();
+	void Callback_ShowOnlineMenu();
+	void Callback_ShowJoinMenu();
+	void Callback_ShowCreateMenu();
+	void Callback_ShowLevelsMenu();
+	void Callback_JoinPublic();
+	void Callback_JoinPrivate();
+	void Callback_CreatePublic();
+	void Callback_CreatePrivate();
 
 	// The current menu state.
 	t_MenuState m_iState;
@@ -170,6 +182,9 @@ protected:
 	// The cursor image to use.
 	CBasicSprite* m_pCursor;
 
+	// The debug controls window.
+	CWindowComponent* m_pDebugWindow;
+
 	// The currently active menu group.
 	t_MenuGroup m_iMenuGroup;
 
@@ -181,6 +196,12 @@ protected:
 
 	// The next screen to process.
 	t_ScreenIndex m_iNextScreen;
+
+	// The lobby start mode.
+	t_LobbyStartMode m_iLobbyMode;
+
+	// The screen's render view.
+	CRenderView* m_xRenderView;
 };
 
 //##############################################################################

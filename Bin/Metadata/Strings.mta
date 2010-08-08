@@ -9,6 +9,24 @@
 .Menu_Online
 "Online"
 
+.Menu_OnlineJoin
+"Join"
+
+.Menu_OnlineCreate
+"Create"
+
+.Menu_JoinPublic
+"Search"
+
+.Menu_JoinPrivate
+"Enter IP"
+
+.Menu_CreatePublic
+"Public"
+
+.Menu_CreatePrivate
+"Private"
+
 .Menu_Tutorial
 "Tutorial"
 

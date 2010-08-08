@@ -93,8 +93,8 @@ void CLobbyScreen::OnSleep()
 // =============================================================================
 void CLobbyScreen::OnUpdate()
 {
-	if (_HGE->Input_KeyUp(HGEK_ESCAPE))
-		Stop();
+	/*if (_HGE->Input_KeyUp(HGEK_ESCAPE))
+		Stop();*/
 
 	ParentUpdate();
 

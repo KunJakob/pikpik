@@ -18,13 +18,15 @@
 
 // Shortcuts.
 #define RenderManager CRenderManager::Get()
-#define RenderLayer(LAYERINDEX) CRenderManager::Get().GetLayer(LAYERINDEX)
+#define RenderView CRenderManager::Get().GetRenderView()
+#define RenderLayer(LAYERINDEX) RenderView->GetLayer(LAYERINDEX)
 
 //##############################################################################
 
 // Predeclare.
 class CRenderable;
 class CRenderLayer;
+class CRenderManager;
 
 // Callbacks.
 typedef xfunction(0)<> t_RenderOverrideCallback;
@@ -161,6 +163,38 @@ private:
 };
 
 //##############################################################################
+class CRenderView
+{
+public:
+	// Friend.
+	friend CRenderManager;
+
+	// Constructor.
+	// ~iLayerCount The number of layers to create for this view.
+	CRenderView(xint iLayerCount = 1);
+
+	// Destructor.
+	virtual ~CRenderView();
+
+	// Destroy all existing layers and create the specified number of new layers.
+	// ~iLayerCount The number of layers to create after resetting the system. Set to -1 for the current number of layers.
+	void ReinitLayers(xint iLayerCount = -1);
+
+	// Destroy all existing layers.
+	void ClearLayers();
+
+	// Get the number of active layers in the system.
+	xint GetLayerCount();
+
+	// Get a specific render layer by index.
+	CRenderLayer* GetLayer(xint iIndex);
+
+protected:
+	// The managed layer list.
+	t_RenderLayerList m_lpLayerList;
+};
+
+//##############################################################################
 class CRenderManager : public CModule
 {
 public:
@@ -180,18 +214,26 @@ public:
 	// Specify a function to override the default render process.
 	void SetRenderOverride(t_RenderOverrideCallback fpCallback);
 
-	// Destroy all existing layers and create the specified number of new layers.
-	// ~iLayerCount The number of layers to create after resetting the system. Set to -1 for the current number of layers.
-	void ReinitLayers(xint iLayerCount = -1);
+	// Clear the render override.
+	void ClearRenderOverride() 
+	{
+		SetRenderOverride(NULL); 
+	}
 
-	// Destroy all existing layers.
-	void ClearLayers();
+	// Set the render view.
+	void SetRenderView(CRenderView* pRenderView);
 
-	// Get the number of active layers in the system.
-	xint GetLayerCount();
+	// Get the current render view.
+	CRenderView* GetRenderView()
+	{
+		return m_pRenderView;
+	}
 
-	// Get a specific render layer by index.
-	CRenderLayer* GetLayer(xint iIndex);
+	// Clear the render view.
+	void ClearRenderView() 
+	{ 
+		SetRenderView(NULL); 
+	}
 
 	// Called to render all enabled render layers and objects.
 	void Render();
@@ -204,8 +246,8 @@ protected:
 	// The global render override. This is used to bypass the render manager completely.
 	t_RenderOverrideCallback m_fpRenderOverrideCallback;
 
-	// The renderable list.
-	t_RenderLayerList m_lpLayerList;
+	// The current render view being used.
+	CRenderView* m_pRenderView;
 };
 
 //##############################################################################

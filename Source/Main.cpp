@@ -17,6 +17,8 @@
 #include <Splash.h>
 #include <Menu.h>
 #include <Game.h>
+#include <Map.h>
+#include <Lobby.h>
 
 // Crypto.
 #include <Crypto/cryptlib.h>
@@ -116,6 +118,7 @@ void Application::Initialise()
 	XMODULE(&InterfaceManager);
 	XMODULE(&CollisionManager);
 	XMODULE(&ScreenManager);
+	XMODULE(&MapManager);
 	
 	// Initialise all modules.
 	ModuleManager.Initialise();
@@ -139,10 +142,19 @@ void Application::Initialise()
 	s_lpScreens.push_back(new CWarningScreen);
 	s_lpScreens.push_back(new CMenuScreen);
 	s_lpScreens.push_back(new CGameScreen);
+	s_lpScreens.push_back(new CLobbyScreen);
 
 	// Load all screen instances and set go to the logo screen.
 	ScreenManager.LoadScreens();
 	ScreenManager.Set(ScreenIndex_LogoScreen, true);
+
+	// Create all the available players.
+	Global.m_lpPlayers.push_back(new CPacman());
+	Global.m_lpPlayers.push_back(new CGhost(0xFF40F0F0));
+	Global.m_lpPlayers.push_back(new CGhost(0xFFF04040));
+	Global.m_lpPlayers.push_back(new CGhost(0xFF4040F0));
+	Global.m_lpPlayers.push_back(new CGhost(0xFFF0F040));
+	Global.m_lpPlayers.push_back(new CGhost(0xFFF040F0));
 
 	// Execute the first frame update.
 	OnUpdate();
