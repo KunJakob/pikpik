@@ -1,8 +1,4 @@
 //##############################################################################
-//
-//                                   INCLUDE
-//
-//##############################################################################
 
 // Global.
 #include <Global.h>
@@ -12,28 +8,16 @@
 
 //##############################################################################
 
-//##############################################################################
-//
-//                                   LABEL
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         13-May-2008
 // =============================================================================
 CLabelComponent::CLabelComponent(CFontMetadata* pMetaFont) : CLabelElement(ElementType_Label, pMetaFont)
 {
 }
 
 // =============================================================================
-// Nat Ryall                                                         13-May-2008
-// =============================================================================
 CLabelComponent::~CLabelComponent()
 {
 }
 
-// =============================================================================
-// Nat Ryall                                                         13-May-2008
 // =============================================================================
 void CLabelComponent::OnRender()
 {
@@ -42,14 +26,6 @@ void CLabelComponent::OnRender()
 
 //##############################################################################
 
-//##############################################################################
-//
-//                                  HYPERLINK
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         10-Jul-2008
 // =============================================================================
 CHyperlinkComponent::CHyperlinkComponent(CFontMetadata* pFont) : CLabelElement(ElementType_Hyperlink, pFont),
 	m_fpOnClickCallback(NULL)
@@ -57,15 +33,11 @@ CHyperlinkComponent::CHyperlinkComponent(CFontMetadata* pFont) : CLabelElement(E
 }
 
 // =============================================================================
-// Nat Ryall                                                         10-Jul-2008
-// =============================================================================
 void CHyperlinkComponent::OnRender()
 {
 	CLabelElement::Render();
 }
 
-// =============================================================================
-// Nat Ryall                                                         07-Nov-2008
 // =============================================================================
 xbool CHyperlinkComponent::OnMouseUp(xpoint xPosition)
 {
@@ -77,28 +49,16 @@ xbool CHyperlinkComponent::OnMouseUp(xpoint xPosition)
 
 //##############################################################################
 
-//##############################################################################
-//
-//                                 IMAGE BOX
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         13-May-2008
 // =============================================================================
 CImageComponent::CImageComponent(CSpriteMetadata* pMetaSprite) : CImageElement(ElementType_Image, pMetaSprite)
 {
 }
 
 // =============================================================================
-// Nat Ryall                                                         13-May-2008
-// =============================================================================
 CImageComponent::~CImageComponent()
 {
 }
 
-// =============================================================================
-// Nat Ryall                                                         13-May-2008
 // =============================================================================
 void CImageComponent::OnRender()
 {
@@ -107,14 +67,6 @@ void CImageComponent::OnRender()
 
 //##############################################################################
 
-//##############################################################################
-//
-//                                   BUTTON
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         11-May-2008
 // =============================================================================
 CButtonComponent::CButtonComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont) : CStripElement(ElementType_Button, pMetaSprite),
 	m_iButtonState(ButtonState_Normal),
@@ -138,16 +90,12 @@ CButtonComponent::CButtonComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* 
 }
 
 // =============================================================================
-// Nat Ryall                                                         11-May-2008
-// =============================================================================
 CButtonComponent::~CButtonComponent()
 {
 	if (m_pFont)
 		delete m_pFont;
 }
 
-// =============================================================================
-// Nat Ryall                                                         11-May-2008
 // =============================================================================
 void CButtonComponent::OnRender()
 {
@@ -158,8 +106,6 @@ void CButtonComponent::OnRender()
 }
 
 // =============================================================================
-// Nat Ryall                                                         07-Nov-2008
-// =============================================================================
 xbool CButtonComponent::OnMouseDown(xpoint xPosition)
 {
 	m_iButtonState = ButtonState_Down;
@@ -167,8 +113,6 @@ xbool CButtonComponent::OnMouseDown(xpoint xPosition)
 	return true;
 }
 
-// =============================================================================
-// Nat Ryall                                                         07-Nov-2008
 // =============================================================================
 xbool CButtonComponent::OnMouseUp(xpoint xPosition)
 {
@@ -182,14 +126,6 @@ xbool CButtonComponent::OnMouseUp(xpoint xPosition)
 
 //##############################################################################
 
-//##############################################################################
-//
-//                                  TEXT BOX
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         12-May-2008
 // =============================================================================
 CInputComponent::CInputComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont) : CStripElement(ElementType_Input, pMetaSprite),
 	m_bMasked(false),
@@ -207,8 +143,6 @@ CInputComponent::CInputComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pM
 }
 
 // =============================================================================
-// Nat Ryall                                                         12-May-2008
-// =============================================================================
 CInputComponent::~CInputComponent()
 {
 	if (m_pFont)
@@ -216,15 +150,11 @@ CInputComponent::~CInputComponent()
 }
 
 // =============================================================================
-// Nat Ryall                                                         12-May-2008
-// =============================================================================
 void CInputComponent::OnUpdate()
 {
 	m_iFlashTimer = (m_iFlashTimer + _TIMEDELTA) % 1000;
 }
 
-// =============================================================================
-// Nat Ryall                                                         12-May-2008
 // =============================================================================
 void CInputComponent::OnRender()
 {
@@ -254,8 +184,6 @@ void CInputComponent::OnRender()
 	}
 }
 
-// =============================================================================
-// Nat Ryall                                                          4-May-2008
 // =============================================================================
 xbool CInputComponent::OnMouseDown(xpoint xPosition)
 {
@@ -287,8 +215,6 @@ xbool CInputComponent::OnMouseDown(xpoint xPosition)
 	return true;
 }
 
-// =============================================================================
-// Nat Ryall                                                          4-May-2008
 // =============================================================================
 xbool CInputComponent::OnKeyDown(xint iVirtualKey)
 {
@@ -328,8 +254,6 @@ xbool CInputComponent::OnKeyDown(xint iVirtualKey)
 }
 
 // =============================================================================
-// Nat Ryall                                                          4-May-2008
-// =============================================================================
 void CInputComponent::OnKeyChar(xchar cChar)
 {
 	if (m_iCharLimit > (xint)m_xText.length())
@@ -338,14 +262,6 @@ void CInputComponent::OnKeyChar(xchar cChar)
 
 //##############################################################################
 
-//##############################################################################
-//
-//                                PROGRESS BAR
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         13-May-2008
 // =============================================================================
 CProgressComponent::CProgressComponent(CSpriteMetadata* pMetaSprite) : CStripElement(ElementType_Progress, pMetaSprite),
 	m_fProgress(0.f)
@@ -360,14 +276,10 @@ CProgressComponent::CProgressComponent(CSpriteMetadata* pMetaSprite) : CStripEle
 }
 
 // =============================================================================
-// Nat Ryall                                                         13-May-2008
-// =============================================================================
 CProgressComponent::~CProgressComponent()
 {
 }
 
-// =============================================================================
-// Nat Ryall                                                         13-May-2008
 // =============================================================================
 void CProgressComponent::OnRender()
 {
@@ -379,14 +291,6 @@ void CProgressComponent::OnRender()
 
 //##############################################################################
 
-//##############################################################################
-//
-//                                   WINDOW
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         11-May-2008
 // =============================================================================
 CWindowComponent::CWindowComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont) : CContainerElement(ElementType_Window, pMetaSprite),
 	m_pFont(NULL),
@@ -416,16 +320,12 @@ CWindowComponent::CWindowComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* 
 }
 
 // =============================================================================
-// Nat Ryall                                                         11-May-2008
-// =============================================================================
 CWindowComponent::~CWindowComponent()
 {
 	if (m_pFont)
 		delete m_pFont;
 }
 
-// =============================================================================
-// Nat Ryall                                                         11-May-2008
 // =============================================================================
 void CWindowComponent::OnRender()
 {
@@ -438,8 +338,6 @@ void CWindowComponent::OnRender()
 }
 
 // =============================================================================
-// Nat Ryall                                                         07-Nov-2008
-// =============================================================================
 xbool CWindowComponent::OnMouseDown(xpoint xPosition)
 {
 	if (m_bMoveable && Math::IsIntersecting(xPosition, xrect(m_xFrameSize.m_tLeft, 0, GetInnerWidth(), m_xFrameSize.m_tTop) + GetPosition()))
@@ -449,8 +347,6 @@ xbool CWindowComponent::OnMouseDown(xpoint xPosition)
 }
 
 // =============================================================================
-// Nat Ryall                                                         07-Nov-2008
-// =============================================================================
 xbool CWindowComponent::OnMouseUp(xpoint xPosition)
 {
 	m_bDragging = false;
@@ -458,8 +354,6 @@ xbool CWindowComponent::OnMouseUp(xpoint xPosition)
 	return true;
 }
 
-// =============================================================================
-// Nat Ryall                                                         07-Nov-2008
 // =============================================================================
 void CWindowComponent::OnMouseMove(xpoint xDifference, xbool bMouseDown)
 {
@@ -469,14 +363,6 @@ void CWindowComponent::OnMouseMove(xpoint xDifference, xbool bMouseDown)
 
 //##############################################################################
 
-//##############################################################################
-//
-//                                 GROUP BOX
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         20-May-2008
 // =============================================================================
 CGroupComponent::CGroupComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont) : CContainerElement(ElementType_Group, pMetaSprite),
 	m_pFont(NULL)
@@ -504,16 +390,12 @@ CGroupComponent::CGroupComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pM
 }
 
 // =============================================================================
-// Nat Ryall                                                         20-May-2008
-// =============================================================================
 CGroupComponent::~CGroupComponent()
 {
 	if (m_pFont)
 		delete m_pFont;
 }
 
-// =============================================================================
-// Nat Ryall                                                         20-May-2008
 // =============================================================================
 void CGroupComponent::OnRender()
 {
@@ -535,22 +417,6 @@ void CGroupComponent::OnRender()
 
 //##############################################################################
 
-//##############################################################################
-//
-//                                  LIST BOX
-//
-//##############################################################################
-
-//##############################################################################
-
-//##############################################################################
-//
-//                                 CHECK BOX
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         13-May-2008
 // =============================================================================
 CCheckComponent::CCheckComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pMetaFont) : CCheckElement(ElementType_Check, pMetaSprite),
 	m_iCheckState(CheckState_Normal),
@@ -569,16 +435,12 @@ CCheckComponent::CCheckComponent(CSpriteMetadata* pMetaSprite, CFontMetadata* pM
 }
 
 // =============================================================================
-// Nat Ryall                                                         13-May-2008
-// =============================================================================
 CCheckComponent::~CCheckComponent()
 {
 	if (m_pFont)
 		delete m_pFont;
 }
 
-// =============================================================================
-// Nat Ryall                                                         13-May-2008
 // =============================================================================
 void CCheckComponent::OnRender()
 {
@@ -597,8 +459,6 @@ void CCheckComponent::OnRender()
 }
 
 // =============================================================================
-// Nat Ryall                                                         07-Nov-2008
-// =============================================================================
 xbool CCheckComponent::OnMouseDown(xpoint xPosition)
 {
 	m_iCheckState = CheckState_Down;
@@ -606,8 +466,6 @@ xbool CCheckComponent::OnMouseDown(xpoint xPosition)
 	return true;
 }
 
-// =============================================================================
-// Nat Ryall                                                         16-May-2008
 // =============================================================================
 xbool CCheckComponent::OnMouseUp(xpoint xPosition)
 {
@@ -625,14 +483,6 @@ xbool CCheckComponent::OnMouseUp(xpoint xPosition)
 
 //##############################################################################
 
-//##############################################################################
-//
-//                                RADIO BUTTON
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         13-May-2008
 // =============================================================================
 CRadioComponent::CRadioComponent(xint iRadioGroup, CSpriteMetadata* pSprite, CFontMetadata* pFont) : CCheckComponent(pSprite, pFont),
 	m_iRadioGroup(iRadioGroup)
@@ -641,14 +491,10 @@ CRadioComponent::CRadioComponent(xint iRadioGroup, CSpriteMetadata* pSprite, CFo
 }
 
 // =============================================================================
-// Nat Ryall                                                         13-May-2008
-// =============================================================================
 CRadioComponent::~CRadioComponent()
 {
 }
 
-// =============================================================================
-// Nat Ryall                                                         13-May-2008
 // =============================================================================
 xbool CRadioComponent::OnMouseUp(xpoint xPosition)
 {
@@ -663,8 +509,6 @@ xbool CRadioComponent::OnMouseUp(xpoint xPosition)
 	return true;
 }
 
-// =============================================================================
-// Nat Ryall                                                         21-May-2008
 // =============================================================================
 CRadioComponent* CRadioComponent::GetChecked(xint iRadioGroup)
 {
@@ -684,14 +528,6 @@ CRadioComponent* CRadioComponent::GetChecked(xint iRadioGroup)
 
 //##############################################################################
 
-//##############################################################################
-//
-//                             COMPONENT FACTORY
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         23-Oct-2008
 // =============================================================================
 CWindowComponent* CComponentFactory::CreateWindow(CMetadata* pMetadata, const char* pName)
 {
@@ -703,8 +539,6 @@ CWindowComponent* CComponentFactory::CreateWindow(CMetadata* pMetadata, const ch
 	return NULL;
 }
 
-// =============================================================================
-// Nat Ryall                                                         23-Oct-2008
 // =============================================================================
 void CComponentFactory::GetBasicProperties(CInterfaceElement* pElement, CDataset* pDataset)
 {
@@ -721,8 +555,6 @@ void CComponentFactory::GetBasicProperties(CInterfaceElement* pElement, CDataset
 		pElement->SetPosition(XEN_METADATA_PROPERTY->GetPoint());
 }
 
-// =============================================================================
-// Nat Ryall                                                         23-Oct-2008
 // =============================================================================
 void CComponentFactory::GetLabelProperties(CLabelElement* pElement, CDataset* pDataset)
 {
@@ -743,14 +575,10 @@ void CComponentFactory::GetLabelProperties(CLabelElement* pElement, CDataset* pD
 }
 
 // =============================================================================
-// Nat Ryall                                                         23-Oct-2008
-// =============================================================================
 void CComponentFactory::GetImageProperties(CImageElement* pElement, CDataset* pDataset)
 {
 }
 
-// =============================================================================
-// Nat Ryall                                                         23-Oct-2008
 // =============================================================================
 void CComponentFactory::GetStripProperties(CStripElement* pElement, CDataset* pDataset)
 {
@@ -761,8 +589,6 @@ void CComponentFactory::GetStripProperties(CStripElement* pElement, CDataset* pD
 		pElement->SetInnerWidth(XEN_METADATA_PROPERTY->GetInt());
 }
 
-// =============================================================================
-// Nat Ryall                                                         23-Oct-2008
 // =============================================================================
 void CComponentFactory::GetContainerProperties(CContainerElement* pElement, CDataset* pDataset)
 {
@@ -787,16 +613,12 @@ void CComponentFactory::GetContainerProperties(CContainerElement* pElement, CDat
 }
 
 // =============================================================================
-// Nat Ryall                                                         23-Oct-2008
-// =============================================================================
 void CComponentFactory::GetCheckProperties(CCheckElement* pElement, CDataset* pDataset)
 {
 	if (XEN_METADATA_PROPERTY_EXISTS(pDataset, "Checked"))
 		pElement->SetChecked(XEN_METADATA_PROPERTY->GetBool());
 }
 
-// =============================================================================
-// Nat Ryall                                                         23-Oct-2008
 // =============================================================================
 void CComponentFactory::AttachChildren(CInterfaceElement* pElement, CDataset* pDataset)
 {
@@ -838,8 +660,6 @@ void CComponentFactory::AttachChildren(CInterfaceElement* pElement, CDataset* pD
 }
 
 // =============================================================================
-// Nat Ryall                                                         23-Oct-2008
-// =============================================================================
 CLabelComponent* CComponentFactory::CreateLabel(CDataset* pDataset)
 {
 	XASSERT(pDataset->GetProperty("Font"));
@@ -854,8 +674,6 @@ CLabelComponent* CComponentFactory::CreateLabel(CDataset* pDataset)
 	return pLabel;
 }
 
-// =============================================================================
-// Nat Ryall                                                         23-Oct-2008
 // =============================================================================
 CHyperlinkComponent* CComponentFactory::CreateHyperlink(CDataset* pDataset)
 {
@@ -872,8 +690,6 @@ CHyperlinkComponent* CComponentFactory::CreateHyperlink(CDataset* pDataset)
 }
 
 // =============================================================================
-// Nat Ryall                                                         23-Oct-2008
-// =============================================================================
 CImageComponent* CComponentFactory::CreateImage(CDataset* pDataset)
 {
 	XASSERT(pDataset->GetProperty("Sprite"));
@@ -888,8 +704,6 @@ CImageComponent* CComponentFactory::CreateImage(CDataset* pDataset)
 	return pImage;
 }
 
-// =============================================================================
-// Nat Ryall                                                         23-Oct-2008
 // =============================================================================
 CButtonComponent* CComponentFactory::CreateButton(CDataset* pDataset)
 {
@@ -911,8 +725,6 @@ CButtonComponent* CComponentFactory::CreateButton(CDataset* pDataset)
 	return pButton;
 }
 
-// =============================================================================
-// Nat Ryall                                                         23-Oct-2008
 // =============================================================================
 CInputComponent* CComponentFactory::CreateInput(CDataset* pDataset)
 {
@@ -941,8 +753,6 @@ CInputComponent* CComponentFactory::CreateInput(CDataset* pDataset)
 }
 
 // =============================================================================
-// Nat Ryall                                                         23-Oct-2008
-// =============================================================================
 CProgressComponent* CComponentFactory::CreateProgress(CDataset* pDataset)
 {
 	XASSERT(pDataset->GetProperty("Sprite"));
@@ -961,8 +771,6 @@ CProgressComponent* CComponentFactory::CreateProgress(CDataset* pDataset)
 	return pProgress;
 }
 
-// =============================================================================
-// Nat Ryall                                                         23-Oct-2008
 // =============================================================================
 CWindowComponent* CComponentFactory::CreateWindow(CDataset* pDataset)
 {
@@ -990,8 +798,6 @@ CWindowComponent* CComponentFactory::CreateWindow(CDataset* pDataset)
 }
 
 // =============================================================================
-// Nat Ryall                                                         23-Oct-2008
-// =============================================================================
 CGroupComponent* CComponentFactory::CreateGroup(CDataset* pDataset)
 {
 	XASSERT(pDataset->GetProperty("Sprite"));
@@ -1015,15 +821,11 @@ CGroupComponent* CComponentFactory::CreateGroup(CDataset* pDataset)
 }
 
 // =============================================================================
-// Nat Ryall                                                         23-Oct-2008
-// =============================================================================
 CListComponent* CComponentFactory::CreateList(CDataset* pDataset)
 {
 	return NULL;
 }
 
-// =============================================================================
-// Nat Ryall                                                         23-Oct-2008
 // =============================================================================
 CCheckComponent* CComponentFactory::CreateCheck(CDataset* pDataset)
 {
@@ -1045,8 +847,6 @@ CCheckComponent* CComponentFactory::CreateCheck(CDataset* pDataset)
 	return pCheck;
 }
 
-// =============================================================================
-// Nat Ryall                                                         23-Oct-2008
 // =============================================================================
 CRadioComponent* CComponentFactory::CreateRadio(CDataset* pDataset)
 {

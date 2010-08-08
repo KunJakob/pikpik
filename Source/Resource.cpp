@@ -1,8 +1,4 @@
 //##############################################################################
-//
-//                                   INCLUDE
-//
-//##############################################################################
 
 // Global.
 #include <Global.h>
@@ -17,14 +13,6 @@
 
 //##############################################################################
 
-//##############################################################################
-//
-//                               RESOURCE FILE
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         22-Apr-2008
 // =============================================================================
 CResourceFile::CResourceFile(t_ResourceType iResourceType, const xchar* pResourceFile) :
 	m_iType(iResourceType),
@@ -36,14 +24,6 @@ CResourceFile::CResourceFile(t_ResourceType iResourceType, const xchar* pResourc
 
 //##############################################################################
 
-//##############################################################################
-//
-//                             RESOURCE METADATA
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         22-Apr-2008
 // =============================================================================
 CResourceMetadata::CResourceMetadata(t_ResourceType iResourceType, CDataset* pDataset) :
 	m_iType(iResourceType),
@@ -53,22 +33,12 @@ CResourceMetadata::CResourceMetadata(t_ResourceType iResourceType, CDataset* pDa
 
 //##############################################################################
 
-//##############################################################################
-//
-//                              RESOURCE MANAGER
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         22-Apr-2008
 // =============================================================================
 void CResourceManager::OnDeinitialise()
 {
 	Clear();
 }
 
-// =============================================================================
-// Nat Ryall                                                         04-Sep-2008
 // =============================================================================
 void CResourceManager::Clear()
 {
@@ -78,8 +48,6 @@ void CResourceManager::Clear()
 	}
 }
 
-// =============================================================================
-// Nat Ryall                                                         22-Apr-2008
 // =============================================================================
 void CResourceManager::Load(CMetadata* pMetadata)
 {
@@ -94,15 +62,11 @@ void CResourceManager::Load(CMetadata* pMetadata)
 }
 
 // =============================================================================
-// Nat Ryall                                                         04-Sep-2008
-// =============================================================================
 void CResourceManager::Unload(CMetadata* pMetadata)
 {
 	XMASSERT(false, "This feature is not yet implemented.");
 }
 
-// =============================================================================
-// Nat Ryall                                                         22-Apr-2008
 // =============================================================================
 CResourceFile* CResourceManager::CreateResourceFile(t_ResourceType iType, const xchar* pFile)
 {
@@ -151,8 +115,6 @@ CResourceFile* CResourceManager::CreateResourceFile(t_ResourceType iType, const 
 }
 
 // =============================================================================
-// Nat Ryall                                                         22-Apr-2008
-// =============================================================================
 void CResourceManager::ReleaseResourceFile(CResourceFile* pFile)
 {
 	XEN_LIST_FOREACH(t_ResourceFileList, ppResourceFile, m_lpResourceFiles[pFile->m_iType])
@@ -170,8 +132,6 @@ void CResourceManager::ReleaseResourceFile(CResourceFile* pFile)
 	}
 }
 
-// =============================================================================
-// Nat Ryall                                                         22-Apr-2008
 // =============================================================================
 CResourceMetadata* CResourceManager::GetResourceMetadata(t_ResourceType iType, const xchar* pName)
 {

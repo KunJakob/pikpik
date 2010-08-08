@@ -1,8 +1,4 @@
 //##############################################################################
-//
-//                                   INCLUDE
-//
-//##############################################################################
 
 // Global.
 #include <Global.h>
@@ -12,14 +8,6 @@
 
 //##############################################################################
 
-//##############################################################################
-//
-//                                 COLLIDABLE
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         25-Feb-2008
 // =============================================================================
 CCollidable::CCollidable(xint iCollisionGroup, t_CollisionType iCollisionType) :
 	m_iCollisionGroup(iCollisionGroup),
@@ -29,21 +17,11 @@ CCollidable::CCollidable(xint iCollisionGroup, t_CollisionType iCollisionType) :
 
 //##############################################################################
 
-//##############################################################################
-//
-//                                 DECLARATION
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         07-Aug-2008
 // =============================================================================
 CCollisionManager::CCollisionManager()
 {
 }
 
-// =============================================================================
-// Author: Nat Ryall                                           Date: 25-Feb-2008
 // =============================================================================
 void CCollisionManager::Reset()
 {
@@ -51,8 +29,6 @@ void CCollisionManager::Reset()
 		m_lpCollidables[iA].clear();
 }
 
-// =============================================================================
-// Nat Ryall                                                         28-Jul-2008
 // =============================================================================
 void CCollisionManager::OnUpdate()
 {
@@ -81,8 +57,6 @@ void CCollisionManager::OnUpdate()
 }
 
 // =============================================================================
-// Author: Nat Ryall                                           Date: 25-Feb-2008
-// =============================================================================
 void CCollisionManager::Add(CCollidable* pCollidable, xint iCollisionLayer)
 {
 	XASSERT(iCollisionLayer > CollisionLayer_All && iCollisionLayer < CollisionLayer_Max);
@@ -90,8 +64,6 @@ void CCollisionManager::Add(CCollidable* pCollidable, xint iCollisionLayer)
 	m_lpCollidables[iCollisionLayer].push_back(pCollidable);
 }
 
-// =============================================================================
-// Author: Nat Ryall                                           Date: 25-Feb-2008
 // =============================================================================
 void CCollisionManager::Remove(CCollidable* pCollidable, xint iCollisionLayer)
 {
@@ -106,8 +78,6 @@ void CCollisionManager::Remove(CCollidable* pCollidable, xint iCollisionLayer)
 		m_lpCollidables[iCollisionLayer].remove(pCollidable);
 }
 
-// =============================================================================
-// Nat Ryall                                                         28-Jul-2008
 // =============================================================================
 xbool CCollisionManager::AreColliding(CCollidable* pA, CCollidable* pB)
 {

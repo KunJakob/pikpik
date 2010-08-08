@@ -55,6 +55,15 @@
     <Filter Include="Source\Renderables">
       <UniqueIdentifier>{85126b57-afa4-4e19-a581-5ea292c27254}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Network">
+      <UniqueIdentifier>{33f1eee3-99dc-438c-abe3-c879f7a1f00a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Game">
+      <UniqueIdentifier>{db3861f2-4508-4de6-83c6-8105daad60d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\_">
+      <UniqueIdentifier>{651537b7-5fa3-4118-9a43-02d851945b5f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Xen\Exception.cpp">
@@ -362,6 +371,48 @@
     </ClCompile>
     <ClCompile Include="..\Source\Save.cpp">
       <Filter>Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Match.cpp">
+      <Filter>Source\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Network.cpp">
+      <Filter>Source\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Lobby.cpp">
+      <Filter>Source\Screens</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Brain.cpp">
+      <Filter>Source\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Map.cpp">
+      <Filter>Source\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Minimap.cpp">
+      <Filter>Source\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Player.cpp">
+      <Filter>Source\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Character.cpp">
+      <Filter>Source\Screens</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Selection.cpp">
+      <Filter>Source\Screens</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Trap.cpp">
+      <Filter>Source\_</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Visor.cpp">
+      <Filter>Source\_</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Radar.cpp">
+      <Filter>Source\_</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Power.cpp">
+      <Filter>Source\_</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Play.cpp">
+      <Filter>Source\_</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1276,6 +1327,48 @@
     </ClInclude>
     <ClInclude Include="..\Source\Save.h">
       <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Match.h">
+      <Filter>Source\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Network.h">
+      <Filter>Source\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Lobby.h">
+      <Filter>Source\Screens</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Brain.h">
+      <Filter>Source\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Map.h">
+      <Filter>Source\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Minimap.h">
+      <Filter>Source\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Player.h">
+      <Filter>Source\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Character.h">
+      <Filter>Source\Screens</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Selection.h">
+      <Filter>Source\Screens</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Radar.h">
+      <Filter>Source\_</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Trap.h">
+      <Filter>Source\_</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Visor.h">
+      <Filter>Source\_</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Power.h">
+      <Filter>Source\_</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Play.h">
+      <Filter>Source\_</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

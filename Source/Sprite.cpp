@@ -1,8 +1,4 @@
 //##############################################################################
-//
-//                                   INCLUDE
-//
-//##############################################################################
 
 // Global.
 #include <Global.h>
@@ -12,14 +8,6 @@
 
 //##############################################################################
 
-//##############################################################################
-//
-//                                 SPRITE FILE
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         22-Apr-2008
 // =============================================================================
 CSpriteFile::CSpriteFile(const xchar* pFile) : CResourceFile(ResourceType_Sprite, pFile)
 {
@@ -27,8 +15,6 @@ CSpriteFile::CSpriteFile(const xchar* pFile) : CResourceFile(ResourceType_Sprite
 	m_pResource = new hgeSprite(hTexture, 0.0f, 0.0f, (float)_HGE->Texture_GetWidth(hTexture), (float)_HGE->Texture_GetHeight(hTexture));
 }
 
-// =============================================================================
-// Nat Ryall                                                         22-Apr-2008
 // =============================================================================
 CSpriteFile::~CSpriteFile()
 {
@@ -38,14 +24,6 @@ CSpriteFile::~CSpriteFile()
 
 //##############################################################################
 
-//##############################################################################
-//
-//                               SPRITE METADATA
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         22-Apr-2008
 // =============================================================================
 CSpriteMetadata::CSpriteMetadata(CDataset* pDataset) : CResourceMetadata(ResourceType_Sprite, pDataset)
 {
@@ -123,8 +101,6 @@ CSpriteMetadata::CSpriteMetadata(CDataset* pDataset) : CResourceMetadata(Resourc
 }
 
 // =============================================================================
-// Nat Ryall                                                         23-Apr-2008
-// =============================================================================
 CSpriteMetadata::~CSpriteMetadata()
 {
 	ResourceManager.ReleaseResourceFile(m_pFile);
@@ -141,8 +117,6 @@ CSpriteMetadata::~CSpriteMetadata()
 }
 
 // =============================================================================
-// Nat Ryall                                                         23-Apr-2008
-// =============================================================================
 CSpriteMetadata::CArea* CSpriteMetadata::FindArea(const xchar* pName)
 {
 	XEN_LIST_FOREACH(t_AreaList, ppArea, m_lpAreas)
@@ -155,8 +129,6 @@ CSpriteMetadata::CArea* CSpriteMetadata::FindArea(const xchar* pName)
 }
 
 // =============================================================================
-// Nat Ryall                                                         23-Apr-2008
-// =============================================================================
 CSpriteMetadata::CFrame* CSpriteMetadata::FindFrame(CAnimation* pAnimation, const xchar* pName)
 {
 	XEN_LIST_FOREACH(t_FrameList, ppFrame, pAnimation->m_lpFrames)
@@ -168,8 +140,6 @@ CSpriteMetadata::CFrame* CSpriteMetadata::FindFrame(CAnimation* pAnimation, cons
 	return NULL;
 }
 
-// =============================================================================
-// Nat Ryall                                                         23-Apr-2008
 // =============================================================================
 CSpriteMetadata::CAnimation* CSpriteMetadata::FindAnimation(const xchar* pName)
 {
@@ -184,14 +154,6 @@ CSpriteMetadata::CAnimation* CSpriteMetadata::FindAnimation(const xchar* pName)
 
 //##############################################################################
 
-//##############################################################################
-//
-//                                BASIC SPRITE
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         23-Apr-2008
 // =============================================================================
 void CBasicSprite::Render(xpoint xPosition, xpoint xAnchor, xrect xArea, xfloat fAlpha, xfloat fAngle)
 {
@@ -207,8 +169,6 @@ void CBasicSprite::Render(xpoint xPosition, xpoint xAnchor, xrect xArea, xfloat 
 		pSprite->Render((float)xPosition.m_tX, (float)xPosition.m_tY);
 };
 
-// =============================================================================
-// Nat Ryall                                                         21-May-2008
 // =============================================================================
 void CBasicSprite::RenderTiled(xpoint xPosition, xpoint xSize, xpoint xAnchor, xrect xArea, xfloat fAlpha)
 {
@@ -242,14 +202,6 @@ void CBasicSprite::RenderTiled(xpoint xPosition, xpoint xSize, xpoint xAnchor, x
 
 //##############################################################################
 
-//##############################################################################
-//
-//                                   SPRITE
-//
-//##############################################################################
-
-// =============================================================================
-// Author: Nat Ryall                                           Date: 19-Feb-2008
 // =============================================================================
 CSprite::CSprite(CSpriteMetadata* pMetadata) : CBasicSprite(pMetadata), CRenderable(RenderableType_Sprite),
 	m_pArea(NULL),
@@ -259,8 +211,6 @@ CSprite::CSprite(CSpriteMetadata* pMetadata) : CBasicSprite(pMetadata), CRendera
 }
 
 // =============================================================================
-// Author: Nat Ryall                                           Date: 12-Feb-2008
-// =============================================================================
 void CSprite::OnRender()
 {
 	CBasicSprite::Render(m_xPosition, m_xAnchor, m_pArea ? m_pArea->m_xRect : GetImageRect(), m_fAlpha, m_fAngle);
@@ -268,14 +218,6 @@ void CSprite::OnRender()
 
 //##############################################################################
 
-//##############################################################################
-//
-//                               ANIMATED SPRITE
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         16-Apr-2008
 // =============================================================================
 CAnimatedSprite::CAnimatedSprite(CSpriteMetadata* pMetadata) : CSprite(pMetadata),
 	m_pFrame(NULL),
@@ -286,8 +228,6 @@ CAnimatedSprite::CAnimatedSprite(CSpriteMetadata* pMetadata) : CSprite(pMetadata
 {
 }
 
-// =============================================================================
-// Nat Ryall                                                         23-Apr-2008
 // =============================================================================
 void CAnimatedSprite::Update()
 {
@@ -313,15 +253,11 @@ void CAnimatedSprite::Update()
 }
 
 // =============================================================================
-// Nat Ryall                                                         16-Apr-2008
-// =============================================================================
 void CAnimatedSprite::OnRender()
 {
 	CSprite::OnRender();
 }
 
-// =============================================================================
-// Nat Ryall                                                         16-Apr-2008
 // =============================================================================
 void CAnimatedSprite::SetFrame(CSpriteMetadata::CFrame* pFrame)
 {
@@ -332,8 +268,6 @@ void CAnimatedSprite::SetFrame(CSpriteMetadata::CFrame* pFrame)
 		m_fpEvent(this, m_pFrame->m_pEvent);
 }
 
-// =============================================================================
-// Nat Ryall                                                         16-Apr-2008
 // =============================================================================
 void CAnimatedSprite::SetAnimation(CSpriteMetadata::CAnimation* pAnimation, xbool bPlay)
 {

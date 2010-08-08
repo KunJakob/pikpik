@@ -1,8 +1,4 @@
 //##############################################################################
-//
-//                                   INCLUDE
-//
-//##############################################################################
 
 // Global.
 #include <Global.h>
@@ -15,14 +11,6 @@
 
 //##############################################################################
 
-//##############################################################################
-//
-//                             INTERFACE MANAGER
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                          1-May-2008
 // =============================================================================
 CInterfaceManager::CInterfaceManager() :
 	m_pScreen(NULL),
@@ -43,8 +31,6 @@ CInterfaceManager::CInterfaceManager() :
 }
 
 // =============================================================================
-// Nat Ryall                                                          1-May-2008
-// =============================================================================
 CInterfaceManager::~CInterfaceManager()
 {
 	delete m_pScreen;
@@ -56,8 +42,6 @@ CInterfaceManager::~CInterfaceManager()
 	}
 }
 
-// =============================================================================
-// Nat Ryall                                                          2-May-2008
 // =============================================================================
 void CInterfaceManager::Reset()
 {
@@ -76,8 +60,6 @@ void CInterfaceManager::Reset()
 	}
 }
 
-// =============================================================================
-// Nat Ryall                                                         22-Oct-2008
 // =============================================================================
 xbool CInterfaceManager::OnEvent(xint iEventType, void* pEventInfo)
 {
@@ -132,8 +114,6 @@ xbool CInterfaceManager::OnEvent(xint iEventType, void* pEventInfo)
 }
 
 // =============================================================================
-// Nat Ryall                                                          1-May-2008
-// =============================================================================
 void CInterfaceManager::OnUpdate()
 {
 	m_xLastMousePos = m_xMousePos;
@@ -163,8 +143,6 @@ void CInterfaceManager::OnUpdate()
 	}
 }
 
-// =============================================================================
-// Nat Ryall                                                          1-May-2008
 // =============================================================================
 void CInterfaceManager::Render(CRenderLayer* pLayer)
 {
@@ -215,8 +193,6 @@ void CInterfaceManager::Render(CRenderLayer* pLayer)
 }
 
 // =============================================================================
-// Nat Ryall                                                          5-Nov-2008
-// =============================================================================
 CInterfaceElement* CInterfaceManager::FindElement(const xchar* pName)
 {
 	XLISTFOREACH(t_InterfaceElementList, ppElement, m_lpElements)
@@ -229,8 +205,6 @@ CInterfaceElement* CInterfaceManager::FindElement(const xchar* pName)
 }
 
 // =============================================================================
-// Nat Ryall                                                          3-May-2008
-// =============================================================================
 void CInterfaceManager::SetCursor(t_ElementType iType, CSpriteMetadata* pMetadata)
 {
 	if (m_pCursor[iType])
@@ -239,8 +213,6 @@ void CInterfaceManager::SetCursor(t_ElementType iType, CSpriteMetadata* pMetadat
 	m_pCursor[iType] = new CBasicSprite(pMetadata);
 }
 
-// =============================================================================
-// Nat Ryall                                                          2-May-2008
 // =============================================================================
 void CInterfaceManager::SetFocus(CInterfaceElement* pElement)
 {
@@ -255,15 +227,11 @@ void CInterfaceManager::SetFocus(CInterfaceElement* pElement)
 }
 
 // =============================================================================
-// Nat Ryall                                                          2-May-2008
-// =============================================================================
 xbool CInterfaceManager::IsMouseOver(CInterfaceElement* pElement)
 {
 	return Math::IsIntersecting(m_xMousePos, pElement->GetArea());
 }
 
-// =============================================================================
-// Nat Ryall                                                          1-May-2008
 // =============================================================================
 void CInterfaceManager::UpdateElement(CInterfaceElement* pElement)
 {
@@ -293,8 +261,6 @@ void CInterfaceManager::UpdateElement(CInterfaceElement* pElement)
 }
 
 // =============================================================================
-// Nat Ryall                                                          1-May-2008
-// =============================================================================
 void CInterfaceManager::RenderElement(CInterfaceElement* pElement)
 {
 	if (pElement->IsVisible())
@@ -307,8 +273,6 @@ void CInterfaceManager::RenderElement(CInterfaceElement* pElement)
 }
 
 // =============================================================================
-// Nat Ryall                                                         09-Jun-2008
-// =============================================================================
 void CInterfaceManager::DeregisterElement(CInterfaceElement* pElement)
 {
 	if (CInterfaceElement* pParent = pElement->m_pParent)
@@ -319,14 +283,6 @@ void CInterfaceManager::DeregisterElement(CInterfaceElement* pElement)
 
 //##############################################################################
 
-//##############################################################################
-//
-//                             INTERFACE ELEMENT
-//
-//##############################################################################
-
-// =============================================================================
-// Nat Ryall                                                         30-Apr-2008
 // =============================================================================
 CInterfaceElement::CInterfaceElement(t_ElementType iType) :
 	m_pExtendedData(NULL),
@@ -339,14 +295,10 @@ CInterfaceElement::CInterfaceElement(t_ElementType iType) :
 }
 
 // =============================================================================
-// Nat Ryall                                                         13-May-2008
-// =============================================================================
 CInterfaceElement::~CInterfaceElement()
 {
 }
 
-// =============================================================================
-// Nat Ryall                                                          5-Nov-2008
 // =============================================================================
 CInterfaceElement* CInterfaceElement::FindChild(const xchar* pName)
 {
@@ -366,8 +318,6 @@ CInterfaceElement* CInterfaceElement::FindChild(const xchar* pName)
 }
 
 // =============================================================================
-// Nat Ryall                                                          2-May-2008
-// =============================================================================
 void CInterfaceElement::Move(xpoint xOffset)
 {
 	m_xPosition += xOffset;
@@ -376,8 +326,6 @@ void CInterfaceElement::Move(xpoint xOffset)
 		(*ppElement)->Move(xOffset);
 }
 
-// =============================================================================
-// Nat Ryall                                                         30-Apr-2008
 // =============================================================================
 void CInterfaceElement::Attach(CInterfaceElement* pElement)
 {
@@ -388,8 +336,6 @@ void CInterfaceElement::Attach(CInterfaceElement* pElement)
 	InterfaceManager.RegisterElement(pElement);
 }
 
-// =============================================================================
-// Nat Ryall                                                         30-Apr-2008
 // =============================================================================
 void CInterfaceElement::Detach(CInterfaceElement* pElement)
 {
@@ -407,16 +353,12 @@ void CInterfaceElement::Detach(CInterfaceElement* pElement)
 }
 
 // =============================================================================
-// Nat Ryall                                                         15-Jun-2008
-// =============================================================================
 void CInterfaceElement::Clear()
 {
 	while (m_lpChildElements.size())
 		Detach(m_lpChildElements.front());
 }
 
-// =============================================================================
-// Nat Ryall                                                         15-Jun-2008
 // =============================================================================
 xbool CInterfaceElement::IsAttached(CInterfaceElement* pElement)
 {
@@ -429,8 +371,6 @@ xbool CInterfaceElement::IsAttached(CInterfaceElement* pElement)
 	return false;
 }
 
-// =============================================================================
-// Nat Ryall                                                          2-May-2008
 // =============================================================================
 void CInterfaceElement::ToFront()
 {

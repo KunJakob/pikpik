@@ -1,15 +1,7 @@
 //##############################################################################
-//
-//                               SPLASH SCREEN
-//
-//##############################################################################
 .Splash_PhotoWarning 
 "This game contains flashing images and colours. If you, or anyone in your family, have an epileptic condition, consult your physician prior to playing. We take no responsibility for any symptoms you may experience whilst playing this game."
 
-//##############################################################################
-//
-//                                    MENU
-//
 //##############################################################################
 .Menu_Offline
 "Play"
