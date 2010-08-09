@@ -147,7 +147,7 @@ protected:
 	void UpdateLobby();
 
 	// Render the main lobby screen.
-	void RenderLobby();
+	void RenderLobby(CRenderLayer* pLayer);
 
 	// Set the internal state.
 	void SetState(t_LobbyState iState);
@@ -250,6 +250,9 @@ protected:
 
 	// The ping timer.
 	CTimer m_xPingTimer;
+
+	// The screen's render view.
+	CRenderView* m_xRenderView;
 };
 
 //##############################################################################
@@ -268,8 +271,8 @@ public:
 	// Attach all elements to the interface.
 	inline void AttachElements()
 	{
-		InterfaceScreen.Attach(m_pStatusBox);
-		InterfaceScreen.Attach(m_pLabel);
+		InterfaceCanvas.Attach(m_pStatusBox);
+		InterfaceCanvas.Attach(m_pLabel);
 	}
 
 protected:
@@ -296,8 +299,8 @@ public:
 	// Attach all elements to the interface.
 	inline void AttachElements()
 	{
-		InterfaceScreen.Attach(m_pAcceptLink);
-		InterfaceScreen.Attach(m_pCancelLink);
+		InterfaceCanvas.Attach(m_pAcceptLink);
+		InterfaceCanvas.Attach(m_pCancelLink);
 	}
 
 	// Render the message interface.
@@ -330,8 +333,8 @@ public:
 	// Attach all elements to the interface.
 	inline void AttachElements()
 	{
-		InterfaceScreen.Attach(m_pAddressBox);
-		InterfaceScreen.Attach(m_pJoinButton);
+		InterfaceCanvas.Attach(m_pAddressBox);
+		InterfaceCanvas.Attach(m_pJoinButton);
 	}
 
 protected:

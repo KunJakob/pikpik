@@ -21,7 +21,7 @@ CLabelComponent::~CLabelComponent()
 // =============================================================================
 void CLabelComponent::OnRender()
 {
-	CLabelElement::OnRender();
+	CLabelElement::Render();
 }
 
 //##############################################################################

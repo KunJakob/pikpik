@@ -47,6 +47,8 @@ void CLobbyScreen::OnLoad()
 
 	for (xint iA = 0; iA < MATCH_SESSION_LIMIT; ++iA)
 		m_pSessionBoxes[iA] = NULL;
+
+	m_pJoinInterface->m_pAddressBox->SetText("127.0.0.1");
 }
 
 // =============================================================================
@@ -63,20 +65,32 @@ void CLobbyScreen::OnUnload()
 // =============================================================================
 void CLobbyScreen::OnActivate()
 {
+	// Reset the lobby states.
 	m_iState = LobbyState_None;
 
-	m_pJoinInterface->m_pAddressBox->SetText("127.0.0.1");
+	// Initialise the layers.
+	m_xRenderView = new CRenderView(LobbyLayerIndex_Max);
+
+	m_xRenderView->GetLayer(LobbyLayerIndex_Background)->AttachRenderable(m_pBackground);
+	m_xRenderView->GetLayer(LobbyLayerIndex_Listing)->SetRenderOverride(xbind(this, &CLobbyScreen::RenderLobby));
+	m_xRenderView->GetLayer(LobbyLayerIndex_Interface)->SetRenderOverride(xbind(&InterfaceManager, &CInterfaceManager::Render));
 }
 
 // =============================================================================
 void CLobbyScreen::OnDeactivate()
 {
 	m_iState = LobbyState_None;
+
+	delete m_xRenderView;
+	m_xRenderView = NULL;
 }
 
 // =============================================================================
 void CLobbyScreen::OnWake()
 {
+	RenderManager.SetRenderView(m_xRenderView);
+	InterfaceManager.SetCursorVisible(true);
+
 	switch (m_iState)
 	{
 	case LobbyState_Game:
@@ -91,6 +105,8 @@ void CLobbyScreen::OnWake()
 // =============================================================================
 void CLobbyScreen::OnSleep()
 {
+	RenderManager.ClearRenderView();
+	InterfaceManager.SetCursorVisible(false);
 }
 
 // =============================================================================
@@ -116,6 +132,8 @@ void CLobbyScreen::OnUpdate()
 		}
 		break;
 	}
+
+	m_pBackground->Update();
 }
 
 // =============================================================================
@@ -127,14 +145,14 @@ void CLobbyScreen::OnPreRender()
 // =============================================================================
 void CLobbyScreen::OnPostRender()
 {
-	switch (m_iState)
+	/*switch (m_iState)
 	{
 	case LobbyState_Lobby:
 		{
 			RenderLobby();
 		}
 		break;
-	}
+	}*/
 }
 
 // =============================================================================
@@ -150,16 +168,16 @@ void CLobbyScreen::UpdateLobby()
 		}
 
 		// Start the game when ENTER is pressed (debug).
-		if (_HGE->Input_KeyUp(HGEK_ENTER) && NetworkManager.IsEveryoneVerified())
+		/*if (_HGE->Input_KeyUp(HGEK_ENTER) && NetworkManager.IsEveryoneVerified())
 		{
 			NetworkManager.Broadcast(NULL, NetworkStreamType_StartGame, NULL, HIGH_PRIORITY, RELIABLE_ORDERED);
 			StartGame();
-		}
+		}*/
 	}
 }
 
 // =============================================================================
-void CLobbyScreen::RenderLobby()
+void CLobbyScreen::RenderLobby(CRenderLayer* pLayer)
 {
 	xint iPeerOffset = 0;
 
@@ -167,11 +185,14 @@ void CLobbyScreen::RenderLobby()
 	{
 		CNetworkGamerCard* pCard = GetGamerCard(*ppPeer);
 		
-		m_pPeerFont->Render(XFORMAT("%s, %d", pCard->m_cNickname, pCard->m_iSeed), xpoint(50, 50 + iPeerOffset), HGETEXT_LEFT);
+		m_pPeerFont->Render(pCard->m_cNickname, xpoint(80, 100 + iPeerOffset), HGETEXT_LEFT);
 		iPeerOffset += 40;
 	}
 
-	Global.m_pGameFont->Render(XFORMAT("%d", NetworkManager.GetLastPing()), xpoint(2, 0), HGETEXT_LEFT);
+	if (NetworkManager.IsHosting())
+		m_pPeerFont->Render("You are the Host!", xpoint(10, 10), HGETEXT_LEFT);
+
+	//Global.m_pGameFont->Render(XFORMAT("%d", NetworkManager.GetLastPing()), xpoint(2, 0), HGETEXT_LEFT);
 }
 
 // =============================================================================
@@ -230,14 +251,14 @@ void CLobbyScreen::Stop()
 // =============================================================================
 void CLobbyScreen::SetState(t_LobbyState iState)
 {
-	InterfaceScreen.Clear();
+	InterfaceCanvas.Clear();
 
 	switch (iState)
 	{
 	case LobbyState_List:
 		{
 			for (int iA = 0; iA < m_iSessionCount; ++iA)
-				InterfaceScreen.Attach(m_pSessionBoxes[iA]);
+				InterfaceCanvas.Attach(m_pSessionBoxes[iA]);
 		}
 		break;
 
@@ -589,10 +610,10 @@ CStatusBox::CStatusBox()
 // =============================================================================
 CStatusBox::~CStatusBox()
 {
-	InterfaceScreen.Detach(m_pStatusBox);
+	InterfaceCanvas.Detach(m_pStatusBox);
 	delete m_pStatusBox;
 
-	InterfaceScreen.Detach(m_pLabel);
+	InterfaceCanvas.Detach(m_pLabel);
 	delete m_pLabel;
 }
 
@@ -615,10 +636,10 @@ CJoinInterface::CJoinInterface()
 // =============================================================================
 CJoinInterface::~CJoinInterface()
 {
-	InterfaceScreen.Detach(m_pAddressBox);
+	InterfaceCanvas.Detach(m_pAddressBox);
 	delete m_pAddressBox;
 
-	InterfaceScreen.Detach(m_pJoinButton);
+	InterfaceCanvas.Detach(m_pJoinButton);
 	delete m_pJoinButton;
 }
 

@@ -18,7 +18,7 @@
 
 .Sprite "Lobby-Background"
 {
-	.File "Surfaces\Menu\Menu-Background.png"
+	.File "Surfaces\Menu\Lobby-Background.png"
 }
 
 //##############################################################################

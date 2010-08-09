@@ -194,6 +194,7 @@ void hgeFont::printfb(float x, float y, float w, float h, int align, const char 
 	pbuf=buffer;
 	prevword=0;
 
+	// There is a bug in here which causes "wrap" strings with no spaces and still wider than the area to completely fuck up.
 	for(;;)
 	{
 		i=0;

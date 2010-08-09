@@ -159,6 +159,16 @@ enum t_MenuLayerIndex
 	MenuLayerIndex_Max,
 };
 
+// Lobby layer index list.
+enum t_LobbyLayerIndex
+{
+	LobbyLayerIndex_Background,
+	LobbyLayerIndex_Listing,
+	LobbyLayerIndex_Interface,
+
+	LobbyLayerIndex_Max,
+};
+
 // Game layer index list.
 enum t_GameLayerIndex
 {

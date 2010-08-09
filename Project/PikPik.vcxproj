@@ -183,6 +183,7 @@
     <ClCompile Include="..\Source\Splash.cpp" />
     <ClCompile Include="..\Source\Sprite.cpp" />
     <ClCompile Include="..\Source\Tools.cpp" />
+    <ClCompile Include="..\Source\Transition.cpp" />
     <ClCompile Include="..\Source\Trap.cpp" />
     <ClCompile Include="..\Source\Visor.cpp" />
     <ClCompile Include="..\Xen\Exception.cpp" />
@@ -268,7 +269,6 @@
     <ClCompile Include="..\RakNet\TCPInterface.cpp" />
     <ClCompile Include="..\RakNet\TelnetTransport.cpp" />
     <ClCompile Include="..\RakNet\ThreadsafePacketLogger.cpp" />
-    <ClCompile Include="Transition.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\Background.h" />
@@ -302,6 +302,7 @@
     <ClInclude Include="..\Source\Splash.h" />
     <ClInclude Include="..\Source\Sprite.h" />
     <ClInclude Include="..\Source\Tools.h" />
+    <ClInclude Include="..\Source\Transition.h" />
     <ClInclude Include="..\Source\Trap.h" />
     <ClInclude Include="..\Source\Visor.h" />
     <ClInclude Include="..\Xen\Circle.h" />
@@ -589,7 +590,6 @@
     <ClInclude Include="..\Crypto\zinflate.h" />
     <ClInclude Include="..\Crypto\zlib.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="Transition.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Bin\Metadata\Fonts.mta" />

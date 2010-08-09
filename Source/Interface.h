@@ -24,20 +24,20 @@
 
 // Shortcuts.
 #define InterfaceManager CInterfaceManager::Get()
-#define InterfaceScreen CInterfaceManager::Get().GetScreen()
+#define InterfaceCanvas CInterfaceManager::Get().GetCanvas()
 
 //##############################################################################
 
 // Predeclare.
 class CInterfaceElement;
-class CScreenElement;
+class CCanvasElement;
 
 // The types of interface elements.
 enum t_ElementType
 {
 	// Core Elements.
 	ElementType_Unknown,
-	ElementType_Screen,
+	ElementType_Canvas,
 	ElementType_Label,
 	ElementType_Hyperlink,
 	ElementType_Image,
@@ -95,10 +95,10 @@ public:
 	// Render the interface elements.
 	void Render(CRenderLayer* pLayer);
 
-	// Get the base screen element that all other elements should attach to.
-	CScreenElement& GetScreen()
+	// Get the base canvas element that all other elements should attach to.
+	CCanvasElement& GetCanvas()
 	{
-		return *m_pScreen;
+		return *m_pCanvas;
 	}
 
 	// Get the number of existing elements.
@@ -203,7 +203,7 @@ protected:
 	void RenderElement(CInterfaceElement* pElement);
 
 	// The base container object.
-	CScreenElement* m_pScreen;
+	CCanvasElement* m_pCanvas;
 
 	// The cursor sprite.
 	CBasicSprite* m_pCursor[ElementType_Max];
@@ -436,14 +436,14 @@ private:
 };
 
 //##############################################################################
-class CScreenElement : public CInterfaceElement
+class CCanvasElement : public CInterfaceElement
 {
 public:
 	// Constructor to initialise the element.
-	CScreenElement() : CInterfaceElement(ElementType_Screen) {}
+	CCanvasElement() : CInterfaceElement(ElementType_Canvas) {}
 
 	// Virtual destructor to ensure proper cleanup of all child classes.
-	virtual ~CScreenElement() {}
+	virtual ~CCanvasElement() {}
 
 	// Get the width of the element. This must be overloaded.
 	virtual xint GetWidth() 

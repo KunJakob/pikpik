@@ -18,7 +18,7 @@
 //##############################################################################
 
 // =============================================================================
-CTransitionScreen::CTransitionScreen(t_ScreenIndex iNextScreen)
+CTransitionScreen::CTransitionScreen(t_ScreenIndex iNextScreen) : CScreen(ScreenIndex_Invalid)
 {
 }
 

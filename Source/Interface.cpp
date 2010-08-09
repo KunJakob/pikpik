@@ -13,14 +13,14 @@
 
 // =============================================================================
 CInterfaceManager::CInterfaceManager() :
-	m_pScreen(NULL),
+	m_pCanvas(NULL),
 	m_bCursorVisible(true),
 	m_pActiveElement(NULL),
 	m_pFocusedElement(NULL),
 	m_bFoundActive(false),
 	m_bDebugRender(false)
 {
-	m_pScreen = new CScreenElement();
+	m_pCanvas = new CCanvasElement();
 
 	for (xint iA = 0; iA < ElementType_Max; ++iA)
 	{
@@ -33,7 +33,7 @@ CInterfaceManager::CInterfaceManager() :
 // =============================================================================
 CInterfaceManager::~CInterfaceManager()
 {
-	delete m_pScreen;
+	delete m_pCanvas;
 
 	for (xint iA = 0; iA < ElementType_Max; ++iA)
 	{
@@ -48,7 +48,7 @@ void CInterfaceManager::Reset()
 	m_pActiveElement = NULL;
 	m_pFocusedElement = NULL;
 
-	m_pScreen->Clear();
+	m_pCanvas->Clear();
 
 	for (xint iA = 0; iA < ElementType_Max; ++iA)
 	{
@@ -129,7 +129,7 @@ void CInterfaceManager::OnUpdate()
 
 	m_bFoundActive = false;
 
-	UpdateElement(m_pScreen);
+	UpdateElement(m_pCanvas);
 
 	if (m_pFocusedElement)
 	{
@@ -146,13 +146,13 @@ void CInterfaceManager::OnUpdate()
 // =============================================================================
 void CInterfaceManager::Render(CRenderLayer* pLayer)
 {
-	RenderElement(m_pScreen);
+	RenderElement(m_pCanvas);
 
 #if !XRETAIL
 	// Render debug boxes over the interface to show the active and focused elements.
-	if (m_bDebugRender && m_pScreen->IsVisible())
+	if (m_bDebugRender && m_pCanvas->IsVisible())
 	{
-		if (m_pActiveElement && m_pActiveElement != m_pScreen)
+		if (m_pActiveElement && m_pActiveElement != m_pCanvas)
 		{
 			xrect xRect = m_pActiveElement->GetArea();
 			xuint iColour = ARGB(128, 32, 32, 32);
@@ -180,7 +180,7 @@ void CInterfaceManager::Render(CRenderLayer* pLayer)
 		{
 			CInterfaceElement* pElement = m_pActiveElement;
 
-			while (pElement->IsEnabled() && pElement != m_pScreen)
+			while (pElement->IsEnabled() && pElement != m_pCanvas)
 				pElement = pElement->GetParent();
 
 			// Check that the there is nothing disabled and so blocking the custom cursor.

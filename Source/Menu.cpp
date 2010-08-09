@@ -150,16 +150,14 @@ void CMenuScreen::OnActivate()
 	((CCheckComponent*)m_pDebugWindow->FindChild("L-Interface"))->SetCheckBinding(xbind(m_xRenderView->GetLayer(MenuLayerIndex_Interface), &CRenderLayer::SetEnabled));
 	((CCheckComponent*)m_pDebugWindow->FindChild("L-InterfaceDebug"))->SetCheckBinding(xbind(&InterfaceManager, &CInterfaceManager::SetDebugRender));
 
-	InterfaceScreen.Attach(m_pDebugWindow);
+	InterfaceCanvas.Attach(m_pDebugWindow);
 }
 
 // =============================================================================
 void CMenuScreen::OnDeactivate()
 {
-	InterfaceScreen.Detach(m_pDebugWindow);
+	InterfaceCanvas.Detach(m_pDebugWindow);
 	delete m_pDebugWindow;
-
-    RenderManager.ClearRenderView();
 
 	delete m_xRenderView;
 	m_xRenderView = NULL;
@@ -179,6 +177,8 @@ void CMenuScreen::OnWake()
 // =============================================================================
 void CMenuScreen::OnSleep()
 {
+	RenderManager.ClearRenderView();
+
 	InterfaceManager.SetCursorVisible(false);
 }
 
@@ -216,7 +216,7 @@ xbool CMenuScreen::OnEvent(xint iEventType, void* pEventInfo)
 			case HGEK_F1:
 				{
 					// Show/hide debug window.
-					CWindowComponent* pWindow = (CWindowComponent*)InterfaceScreen.FindChild("Debug-RenderLayers");
+					CWindowComponent* pWindow = (CWindowComponent*)InterfaceCanvas.FindChild("Debug-RenderLayers");
 
 					if (pWindow)
 					{
@@ -300,7 +300,7 @@ void CMenuScreen::SetState(t_MenuState iState)
 	{
 	case MenuState_None:
 		{
-			InterfaceScreen.SetEnabled(true);
+			InterfaceCanvas.SetEnabled(true);
 
 			m_iLastMenuGroup = m_iMenuGroup;
 			m_iMenuGroup = MenuGroup_None;
@@ -311,20 +311,20 @@ void CMenuScreen::SetState(t_MenuState iState)
 
 	case MenuState_TransitionIn:
 		{
-			InterfaceScreen.SetEnabled(false);
+			InterfaceCanvas.SetEnabled(false);
 			InitTransition(true);
 		}
 		break;
 
 	case MenuState_Idle:
 		{
-			InterfaceScreen.SetEnabled(true);
+			InterfaceCanvas.SetEnabled(true);
 		}
 		break;
 
 	case MenuState_TransitionOut:
 		{
-			InterfaceScreen.SetEnabled(false);
+			InterfaceCanvas.SetEnabled(false);
 			InitTransition(false);
 		}
 		break;
@@ -395,12 +395,12 @@ void CMenuScreen::AttachMenuGroup(t_MenuGroup iMenuGroup)
 {
 	m_iMenuGroup = iMenuGroup;
 
-	//InterfaceScreen.Clear();
+	//InterfaceCanvas.Clear();
 
 	if (iMenuGroup != MenuGroup_None)
 	{
 		XEN_LIST_FOREACH(t_MenuLinkList, ppMenuLink, m_lpMenuLinks[iMenuGroup])
-			InterfaceScreen.Attach(*ppMenuLink);
+			InterfaceCanvas.Attach(*ppMenuLink);
 	}
 }
 

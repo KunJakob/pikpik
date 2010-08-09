@@ -119,6 +119,8 @@ void Application::Initialise()
 	XMODULE(&CollisionManager);
 	XMODULE(&ScreenManager);
 	XMODULE(&MapManager);
+	XMODULE(&MatchManager);
+	XMODULE(&NetworkManager);
 	
 	// Initialise all modules.
 	ModuleManager.Initialise();
