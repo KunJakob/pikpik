@@ -16,6 +16,11 @@
 	.File "Surfaces\Menu\Menu-Background.png"
 }
 
+.Sprite "Lobby-Background"
+{
+	.File "Surfaces\Menu\Menu-Background.png"
+}
+
 //##############################################################################
 .Sprite "Cursor-Main"
 {

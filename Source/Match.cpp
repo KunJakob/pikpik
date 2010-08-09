@@ -184,7 +184,7 @@ void CMatchManager::OnInitialise()
 		m_pTCP = new TCPInterface();
 		m_pTCP->Start(0, 64);
 
-		m_pHTTP = new HTTPConnection(*m_pTCP, "match.sapian.net");
+		m_pHTTP = new HTTPConnection(*m_pTCP, "pikpik.sketchspark.com");
 	}
 }
 
@@ -271,7 +271,7 @@ xbool CMatchManager::ListSessions(t_OnListSessionsCompleted fpCallback)
 		xQuery.AddValue("gid", _GID);
 		xQuery.AddValue("limit", MATCH_SESSION_LIMIT);
 
-		m_pHTTP->Post("/index.php?list", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
+		m_pHTTP->Post("/match/index.php?list", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
 
 		// Start the operation.
 		m_iOperation = MatchOperation_ListSessions;
@@ -312,7 +312,7 @@ CSession* CMatchManager::CreateSession(xint iTotalSlots, const xchar* pTitle, t_
 		xQuery.AddValue("uslots", 1);
 		xQuery.AddValue("info", m_pSession->m_sInfo);
 
-		m_pHTTP->Post("/index.php?create", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
+		m_pHTTP->Post("/match/index.php?create", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
 
 		// Start the operation.
 		m_iOperation = MatchOperation_CreateSession;
@@ -340,7 +340,7 @@ xbool CMatchManager::PingSession(CSession* pSession, t_OnPingSessionCompleted fp
 		xQuery.AddValue("sid", pSession->m_sSessionID);
 		xQuery.AddValue("pass", pSession->m_sPassword);
 
-		m_pHTTP->Post("/index.php?ping", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
+		m_pHTTP->Post("/match/index.php?ping", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
 
 		// Start the operation.
 		m_pSession = pSession;
@@ -372,7 +372,7 @@ xbool CMatchManager::UpdateSession(CSession* pSession, t_OnUpdateSessionComplete
 		xQuery.AddValue("uslots", pSession->m_iTotalSlots);
 		xQuery.AddValue("info", pSession->m_sInfo);
 
-		m_pHTTP->Post("/index.php?update", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
+		m_pHTTP->Post("/match/index.php?update", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
 
 		// Start the operation.
 		m_pSession = pSession;
@@ -401,7 +401,7 @@ xbool CMatchManager::CloseSession(CSession* pSession, t_OnCloseSessionCompleted 
 		xQuery.AddValue("sid", pSession->m_sSessionID);
 		xQuery.AddValue("pass", pSession->m_sPassword);
 
-		m_pHTTP->Post("/index.php?close", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
+		m_pHTTP->Post("/match/index.php?close", xQuery.GetQuery(), MATCH_ENCODING_TYPE);
 
 		// Start the operation.
 		pSession->m_iStatus = SessionStatus_Closing;

@@ -33,6 +33,9 @@ CLobbyScreen::~CLobbyScreen()
 // =============================================================================
 void CLobbyScreen::OnLoad()
 {
+    // Initialise the render resources.
+	m_pBackground = new CBackgroundImage("Lobby-Background");
+
 	// Load.
 	m_pJoinInterface = new CJoinInterface();
 	m_pStatusBox = new CStatusBox();
@@ -93,8 +96,8 @@ void CLobbyScreen::OnSleep()
 // =============================================================================
 void CLobbyScreen::OnUpdate()
 {
-	/*if (_HGE->Input_KeyUp(HGEK_ESCAPE))
-		Stop();*/
+	if (_HGE->Input_KeyUp(HGEK_ESCAPE))
+		Stop();
 
 	ParentUpdate();
 

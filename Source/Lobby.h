@@ -227,6 +227,9 @@ protected:
 	// The local gamer card.
 	CNetworkGamerCard m_xGamerCard;
 
+    // The background image to scroll.
+	CBackgroundImage* m_pBackground;
+
 	// The join interface.
 	CJoinInterface* m_pJoinInterface;
 

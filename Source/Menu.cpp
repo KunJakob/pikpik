@@ -159,6 +159,8 @@ void CMenuScreen::OnDeactivate()
 	InterfaceScreen.Detach(m_pDebugWindow);
 	delete m_pDebugWindow;
 
+    RenderManager.ClearRenderView();
+
 	delete m_xRenderView;
 	m_xRenderView = NULL;
 }
@@ -178,8 +180,6 @@ void CMenuScreen::OnWake()
 void CMenuScreen::OnSleep()
 {
 	InterfaceManager.SetCursorVisible(false);
-
-	RenderManager.ClearRenderView();
 }
 
 // =============================================================================

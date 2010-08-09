@@ -414,6 +414,7 @@
     <ClCompile Include="..\Source\Game.cpp">
       <Filter>Source\Screens</Filter>
     </ClCompile>
+    <ClCompile Include="Transition.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Xen\Circle.h">
@@ -1370,6 +1371,7 @@
     <ClInclude Include="..\Source\Game.h">
       <Filter>Source\Screens</Filter>
     </ClInclude>
+    <ClInclude Include="Transition.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Bin\Metadata\Fonts.mta">
