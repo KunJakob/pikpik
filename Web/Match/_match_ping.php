@@ -21,7 +21,7 @@
 	$query = SQL_Query
 	(
 		$mysql_database,
-		"UPDATE sessions SET expiry = $expiry WHERE sid = '$sid' AND pass = '$pass' AND state = $STATUS_ACTIVE"
+		"UPDATE matchmaking SET expiry = $expiry WHERE sid = '$sid' AND pass = '$pass' AND state = $STATUS_ACTIVE"
 	);
 	
 	if (!$query)

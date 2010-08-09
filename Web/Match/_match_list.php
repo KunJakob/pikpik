@@ -12,7 +12,7 @@
 	$query = SQL_Query
 	(
 		$mysql_database,
-		"UPDATE sessions SET state = $STATUS_TIMEOUT WHERE state = $STATUS_ACTIVE AND expiry < $current_time"
+		"UPDATE matchmaking SET state = $STATUS_TIMEOUT WHERE state = $STATUS_ACTIVE AND expiry < $current_time"
 	);
 	
 	// ==================================================
@@ -22,7 +22,7 @@
 	(
 		$mysql_database,
 		"SELECT sid, ip, title, tslots, uslots, info ". 
-		"FROM sessions ".
+		"FROM matchmaking ".
 		"WHERE gid = '$gid' ".
 		"AND state = $STATUS_ACTIVE ".
 		"AND expiry > $current_time ".

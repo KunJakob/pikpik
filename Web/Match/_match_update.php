@@ -24,7 +24,7 @@
 	$query = SQL_Query
 	(
 		$mysql_database,
-		"UPDATE sessions ".
+		"UPDATE matchmaking ".
 		"SET ".
 			"expiry = $expiry, ".
 			"state = $state, ".

@@ -54,7 +54,7 @@
 	$query = SQL_Query
 	(
 		$mysql_database,
-		"SELECT * FROM sessions WHERE owner = '$owner' AND expiry > $time AND state = $STATUS_ACTIVE LIMIT 1"
+		"SELECT * FROM matchmaking WHERE owner = '$owner' AND expiry > $time AND state = $STATUS_ACTIVE LIMIT 1"
 	);
 	
 	if (SQL_GetNumRows($query))
@@ -66,7 +66,7 @@
 	$query = SQL_Query
 	(
 		$mysql_database,
-		"SELECT * FROM sessions WHERE sid = '$sid' LIMIT 1"
+		"SELECT * FROM matchmaking WHERE sid = '$sid' LIMIT 1"
 	);
 	
 	if (SQL_GetNumRows($query))
@@ -80,15 +80,15 @@
 	$query = SQL_Query
 	(
 		$mysql_database,
-		"INSERT INTO sessions ".
+		"INSERT INTO matchmaking ".
 		"VALUES ".
 		"(".
 			"0, ".
 			"'$gid', ".
+			"'$sid', ".
 			"$time, ".
 			"$expiry, ".
 			"'$owner', ".
-			"'$sid', ".
 			"'$pass', ".
 			"'$ip', ".
 			"$port, ".

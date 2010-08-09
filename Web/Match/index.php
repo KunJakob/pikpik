@@ -9,7 +9,7 @@
 	SQL_Connect();
 	
 	// Initialise shared variables.
-	$mysql_database 	= "matchservice";
+	$mysql_database 	= "twirl_pikpik";
 	$current_time		= time();
 	
 	// Read in the stream values.

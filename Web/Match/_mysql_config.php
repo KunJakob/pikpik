@@ -1,8 +1,8 @@
 <?php
 
 	// The MySQL server address and credentials.
-	$_mysql_hostname = "mysql.sapian.net";
-	$_mysql_username = "sapian";
-	$_mysql_password = "symbol1c";
+	$_mysql_hostname = "mysql.sketchspark.com";
+	$_mysql_username = "twirl";
+	$_mysql_password = "P6JNQTDNC8RlkuWH";
 
 ?>
