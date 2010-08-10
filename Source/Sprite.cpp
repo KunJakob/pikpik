@@ -133,7 +133,7 @@ CSpriteMetadata::CFrame* CSpriteMetadata::FindFrame(CAnimation* pAnimation, cons
 {
 	XEN_LIST_FOREACH(t_FrameList, ppFrame, pAnimation->m_lpFrames)
 	{
-		if (String::IsMatch((*ppFrame)->m_pName, pName))
+		if ((*ppFrame)->m_pName && String::IsMatch((*ppFrame)->m_pName, pName))
 			return *ppFrame;
 	}
 

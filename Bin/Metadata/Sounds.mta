@@ -14,3 +14,19 @@
 	.Marker "FadePeak"	{ .Time 3400 }
 	.Marker "FadeEnd"	{ .Time 4000 }
 }
+
+//##############################################################################
+.Sound "Game-Music"
+{
+	.File "Sound\Level\Level.mp3"
+	.Stream
+	.Group 0
+	.Volume 1.0
+}
+
+.Sound "Game-Death"
+{
+	.File "Sound\Clips\Pacman-Death.mp3"
+	.Group 0
+	.Volume 1.0
+}

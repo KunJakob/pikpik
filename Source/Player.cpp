@@ -9,6 +9,7 @@
 // Other.
 #include <Resource.h>
 #include <Sprite.h>
+#include <Game.h>
 
 //##############################################################################
 
@@ -338,6 +339,11 @@ void CPlayer::OnAnimationEvent(CAnimatedSprite* pSprite, const xchar* pEvent)
 		if (m_pTargetBlock && m_pTargetBlock->IsEdible())
 			m_pTargetBlock->Eat();
 	}
+
+	if (String::IsMatch(pEvent, "Dead"))
+	{
+		Global.m_fMusicEnergy = 0.002f;
+	}
 }
 
 // =============================================================================
@@ -403,6 +409,12 @@ void CPacman::SetState(t_PlayerState iState)
 			m_iMoveTime = _MOVETIME;
 		}
 		break;
+
+	case PlayerState_Die:
+		{
+			m_pSprite->Play("Die");
+		}
+		break;
 	}
 
 	CPlayer::SetState(iState);
@@ -417,12 +429,24 @@ xcircle CPacman::GetCollisionCircle()
 // =============================================================================
 xbool CPacman::IsCollidable(CCollidable* pWith)
 {
-	return false;
+	return (dynamic_cast<CPlayer*>(pWith) != NULL) && m_iState != PlayerState_Die;
 }
 
 // =============================================================================
 void CPacman::OnCollision(CCollidable* pWith)
 {
+	// If we collided with a ghost player.
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pWith);
+
+	if (pPlayer && pPlayer->GetType() == PlayerType_Ghost)
+	{
+		CGameScreen* pGameScreen = (CGameScreen*)ScreenManager.FindScreen(ScreenIndex_GameScreen);
+
+		if (pGameScreen)
+			pGameScreen->OnPacmanDie((CGhost*)pPlayer);
+
+		SetState(PlayerState_Die);
+	}
 }
 
 //##############################################################################
@@ -504,7 +528,7 @@ xcircle CGhost::GetCollisionCircle()
 // =============================================================================
 xbool CGhost::IsCollidable(CCollidable* pWith)
 {
-	return false;
+	return true;
 }
 
 // =============================================================================

@@ -146,9 +146,14 @@
 {
 	.File "Surfaces\Game\Player-Pacman.png"
 	
-	.Area "F1"				{ .Rect 0  0 46  46 }
-	.Area "F2"				{ .Rect 46 0 92  46 }
-	.Area "F3"				{ .Rect 92 0 138 46 }
+	.Area "F1"				{ .Rect 0  0  46  46  }
+	.Area "F2"				{ .Rect 46 0  92  46  }
+	.Area "F3"				{ .Rect 92 0  138 46  }
+	.Area "F4"				{ .Rect 0  46 46  92  }
+	.Area "F5"				{ .Rect 46 46 92  92  }
+	.Area "F6"				{ .Rect 92 46 138 92  }
+	.Area "F7"				{ .Rect 0  92 46  138 }
+	.Area "F8"				{ .Rect 46 92 92  138 }
 	
 	.Animation "Idle"
 	{
@@ -163,6 +168,21 @@
 		.Frame { .Area "F3" }
 		.Frame { .Area "F2" }
 		.Frame { .Area "F1" .Event "Eat" .Loop }
+	}
+
+	.Animation "Die"
+	{
+		.Delay 300
+
+		.Frame { .Area "F1" }
+		.Frame { .Area "F2" }
+		.Frame { .Area "F3" }
+		.Frame { .Area "F4" }
+		.Frame { .Area "F5" }
+		.Frame { .Area "F6" }
+		.Frame { .Area "F6" .Delay 0 .Event "Dead" }
+		.Frame "Flash" { .Area "F7" }
+		.Frame { .Area "F8" .Goto "Flash" }
 	}
 }
 

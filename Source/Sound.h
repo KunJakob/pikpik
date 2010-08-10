@@ -53,7 +53,7 @@ class CSoundFile : public CResourceFile
 {
 public:
 	// Constructor: Initialise the file.
-	CSoundFile(const xchar* pFile);
+	CSoundFile(const xchar* pFile, CDataset* pDataset);
 
 	// Destructor: Clean up the file memory.
 	virtual ~CSoundFile();

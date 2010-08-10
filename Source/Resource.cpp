@@ -68,7 +68,7 @@ void CResourceManager::Unload(CMetadata* pMetadata)
 }
 
 // =============================================================================
-CResourceFile* CResourceManager::CreateResourceFile(t_ResourceType iType, const xchar* pFile)
+CResourceFile* CResourceManager::CreateResourceFile(t_ResourceType iType, const xchar* pFile, CDataset* pDataset)
 {
 	XMASSERT(GetFileAttributes(pFile) != INVALID_FILE_ATTRIBUTES, XFORMAT("Could not find file: %s", pFile));
 
@@ -104,7 +104,7 @@ CResourceFile* CResourceManager::CreateResourceFile(t_ResourceType iType, const 
 		break;
 
 	case ResourceType_Sound:
-		pResourceFile = new CSoundFile(pFile);
+		pResourceFile = new CSoundFile(pFile, pDataset);
 		break;
 	}
 

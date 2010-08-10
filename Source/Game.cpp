@@ -46,8 +46,11 @@ void CGameScreen::OnActivate()
 	RenderLayer(GameLayerIndex_GhostMask)->SetRenderOverride(xbind(this, &CGameScreen::RenderGhostMask));
 
 	// Load the music to associate with the map colourisation.
-	_FMOD->createStream("Sound\\Level\\Level.mp3", FMOD_SOFTWARE, 0, &m_pMusic);
-	_FMOD->playSound(FMOD_CHANNEL_FREE, m_pMusic, false, &m_pChannel);
+	m_pMusic = new CSound(_SOUND("Game-Music"));
+	m_pMusic->Play();
+
+	// Load the sound effects.
+	m_pDeathSound = new CSound(_SOUND("Game-Death"));
 }
 
 // =============================================================================
@@ -55,7 +58,8 @@ void CGameScreen::OnDeactivate()
 {
 	CollisionManager.Reset();
 
-	m_pMusic->release();
+	delete m_pMusic;
+	delete m_pDeathSound;
 
 	delete m_pMinimap;
 
@@ -68,6 +72,7 @@ void CGameScreen::OnDeactivate()
 // =============================================================================
 void CGameScreen::OnWake()
 {
+	m_iState = GameState_Playing;
 }
 
 // =============================================================================
@@ -76,46 +81,48 @@ void CGameScreen::OnSleep()
 }
 
 // =============================================================================
-void CGameScreen::OnUpdate()
+xbool CGameScreen::OnEvent(xint iEventType, void* pEventInfo)
 {
-	// Exit the game.
-	if (_HGE->Input_KeyUp(HGEK_ESCAPE))
-	{
-		ScreenManager.Pop();
-		return;
-	}
+	hgeInputEvent* pEvent = (hgeInputEvent*)pEventInfo;
 
-	// Switch between players.
-	if (_HGE->Input_KeyDown(HGEK_SPACE))
+	switch (iEventType)
 	{
-		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
+	case INPUT_KEYUP:
 		{
-			if (Global.m_pLocalPlayer == *ppPlayer)
+			switch (pEvent->key)
 			{
-				if (*ppPlayer == Global.m_lpActivePlayers.back())
-					ppPlayer = Global.m_lpActivePlayers.begin();
-				else
-					ppPlayer++;
-
-				Global.m_pLocalPlayer = *ppPlayer;
-				Global.m_fMapAlpha = 1.f;
-
+			// ESCAPE.
+			case HGEK_ESCAPE:
+				{
+					ScreenManager.Pop();
+					return true;
+				}
 				break;
 			}
 		}
+		break;
 	}
 
-	// Switch between logic types.
-	if (_HGE->Input_KeyDown(HGEK_SHIFT))
+	return false;
+}
+
+// =============================================================================
+void CGameScreen::OnUpdate()
+{
+#if XDEBUG
+	if (!NetworkManager.IsRunning())
+		DebugCharacterSwitch();
+#endif
+
+	switch (m_iState)
 	{
-		t_PlayerLogicType iLogicType = Global.m_pLocalPlayer->GetLogicType();
-
-		if (iLogicType == PlayerLogicType_Local)
-			iLogicType = PlayerLogicType_AI;
-		else
-			iLogicType = PlayerLogicType_Local;
-
-		Global.m_pLocalPlayer->SetLogicType(iLogicType);
+	case GameState_Playing:
+		{
+			// Calculate the music energy using spectrum analysis.
+			if (m_pMusic->IsPlaying())
+				CalculateMusicEnergy(m_pMusic->GetChannel());
+		}
+		break;
 	}
 
 	// Update the map.
@@ -127,20 +134,8 @@ void CGameScreen::OnUpdate()
 		(*ppPlayer)->Update();
 	}
 
-	// Calculate the music energy using spectrum analysis.
-	CalculateMusicEnergy(m_pChannel);
-
 	// Generate the minimap.
-	xuint iVisibleBlocks = MinimapElement_Walls | MinimapElement_GhostWalls | MinimapElement_GhostBase;
-	iVisibleBlocks |= (Global.m_pLocalPlayer->GetType() == PlayerType_Pacman) ? MinimapElement_Pacman : MinimapElement_Ghost;
-
-	if (Global.m_pLocalPlayer->GetType() == PlayerType_Ghost)
-	{
-		if (Global.m_pLocalPlayer->GetCurrentBlock()->IsGhostBase())
-			iVisibleBlocks |= MinimapElement_Pellets;
-	}
-
-	m_pMinimap->Generate(iVisibleBlocks);
+	GenerateMinimap();
 }
 
 // =============================================================================
@@ -250,6 +245,77 @@ void CGameScreen::CalculateMusicEnergy(FMOD::Channel* pChannel)
 	fAverageStrength /= 4.f;
 
 	Global.m_fMusicEnergy = fAverageStrength * 0.1f;
+}
+
+// =============================================================================
+void CGameScreen::OnPacmanDie(CGhost* pGhost)
+{
+	m_pMusic->Stop();
+	m_pDeathSound->Play();
+
+	Global.m_fMusicEnergy = 0.2f;
+
+	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
+	{
+		if ((*ppPlayer)->GetType() == PlayerType_Ghost)
+			(*ppPlayer)->SetLogicType(PlayerLogicType_AI);
+		else
+			(*ppPlayer)->SetLogicType(PlayerLogicType_None);
+	}
+
+	m_iState = GameState_Finished;
+}
+
+// =============================================================================
+void CGameScreen::GenerateMinimap()
+{
+	xuint iVisibleBlocks = MinimapElement_Walls | MinimapElement_GhostWalls | MinimapElement_GhostBase;
+	iVisibleBlocks |= (Global.m_pLocalPlayer->GetType() == PlayerType_Pacman) ? MinimapElement_Pacman : MinimapElement_Ghost;
+
+	if (Global.m_pLocalPlayer->GetType() == PlayerType_Ghost)
+	{
+		if (Global.m_pLocalPlayer->GetCurrentBlock()->IsGhostBase())
+			iVisibleBlocks |= MinimapElement_Pellets;
+	}
+
+	m_pMinimap->Generate(iVisibleBlocks);
+}
+
+// =============================================================================
+void CGameScreen::DebugCharacterSwitch()
+{
+	// Switch between players.
+	if (_HGE->Input_KeyDown(HGEK_SPACE))
+	{
+		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
+		{
+			if (Global.m_pLocalPlayer == *ppPlayer)
+			{
+				if (*ppPlayer == Global.m_lpActivePlayers.back())
+					ppPlayer = Global.m_lpActivePlayers.begin();
+				else
+					ppPlayer++;
+
+				Global.m_pLocalPlayer = *ppPlayer;
+				Global.m_fMapAlpha = 1.f;
+
+				break;
+			}
+		}
+	}
+
+	// Switch between logic types.
+	if (_HGE->Input_KeyDown(HGEK_SHIFT))
+	{
+		t_PlayerLogicType iLogicType = Global.m_pLocalPlayer->GetLogicType();
+
+		if (iLogicType == PlayerLogicType_Local)
+			iLogicType = PlayerLogicType_AI;
+		else
+			iLogicType = PlayerLogicType_Local;
+
+		Global.m_pLocalPlayer->SetLogicType(iLogicType);
+	}
 }
 
 //##############################################################################

@@ -61,7 +61,7 @@
     <Filter Include="Source\Game">
       <UniqueIdentifier>{db3861f2-4508-4de6-83c6-8105daad60d6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\_">
+    <Filter Include="Source\Dummy">
       <UniqueIdentifier>{651537b7-5fa3-4118-9a43-02d851945b5f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -397,19 +397,19 @@
       <Filter>Source\Screens</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Trap.cpp">
-      <Filter>Source\_</Filter>
+      <Filter>Source\Dummy</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Visor.cpp">
-      <Filter>Source\_</Filter>
+      <Filter>Source\Dummy</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Radar.cpp">
-      <Filter>Source\_</Filter>
+      <Filter>Source\Dummy</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Power.cpp">
-      <Filter>Source\_</Filter>
+      <Filter>Source\Dummy</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Play.cpp">
-      <Filter>Source\_</Filter>
+      <Filter>Source\Dummy</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Game.cpp">
       <Filter>Source\Screens</Filter>
@@ -1356,19 +1356,19 @@
       <Filter>Source\Screens</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Radar.h">
-      <Filter>Source\_</Filter>
+      <Filter>Source\Dummy</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Trap.h">
-      <Filter>Source\_</Filter>
+      <Filter>Source\Dummy</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Visor.h">
-      <Filter>Source\_</Filter>
+      <Filter>Source\Dummy</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Power.h">
-      <Filter>Source\_</Filter>
+      <Filter>Source\Dummy</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Play.h">
-      <Filter>Source\_</Filter>
+      <Filter>Source\Dummy</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Game.h">
       <Filter>Source\Screens</Filter>

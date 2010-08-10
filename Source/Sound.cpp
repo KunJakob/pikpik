@@ -18,25 +18,31 @@
 //##############################################################################
 
 // =============================================================================
-CSoundFile::CSoundFile(const xchar* pFile) : CResourceFile(ResourceType_Sound, pFile)
+CSoundFile::CSoundFile(const xchar* pFile, CDataset* pDataset) : CResourceFile(ResourceType_Sound, pFile)
 {
-	// Load compressed files into memory without decompressing. Determine this by extension.
-	static const xchar* s_pCompressedTypes[] = { "mp3", "ogg" };
-	static const xint s_iCompressedTypesCount = sizeof(s_pCompressedTypes) / sizeof(xchar*);
+	FMOD_MODE iCreationMode = FMOD_CREATESTREAM;
 
-	FMOD_MODE iCreationMode = FMOD_CREATESAMPLE;
-	xint iPathLen = String::Length(pFile);
-
-	if (iPathLen >= 3)
+	if (!pDataset->GetProperty("Stream"))
 	{
-		const xchar* pExtension = &pFile[iPathLen - 3];
+		iCreationMode = FMOD_CREATESAMPLE;
 
-		for (int iA = 0; iA < s_iCompressedTypesCount; ++iA)
+		// Load compressed files into memory without decompressing. Determine this by extension.
+		static const xchar* s_pCompressedTypes[] = { "mp3", "ogg" };
+		static const xint s_iCompressedTypesCount = sizeof(s_pCompressedTypes) / sizeof(xchar*);
+
+		xint iPathLen = String::Length(pFile);
+
+		if (iPathLen >= 3)
 		{
-			if (String::IsCaselessMatch(s_pCompressedTypes[iA], pExtension))
+			const xchar* pExtension = &pFile[iPathLen - 3];
+
+			for (int iA = 0; iA < s_iCompressedTypesCount; ++iA)
 			{
-				iCreationMode = FMOD_CREATECOMPRESSEDSAMPLE;
-				break;
+				if (String::IsCaselessMatch(s_pCompressedTypes[iA], pExtension))
+				{
+					iCreationMode = FMOD_CREATECOMPRESSEDSAMPLE;
+					break;
+				}
 			}
 		}
 	}
@@ -60,7 +66,7 @@ CSoundFile::~CSoundFile()
 CSoundMetadata::CSoundMetadata(CDataset* pDataset) : CResourceMetadata(ResourceType_Sound, pDataset)
 {
 	// File.
-	m_pFile = (CSoundFile*)ResourceManager.CreateResourceFile(ResourceType_Sound, pDataset->GetProperty("File")->GetString());
+	m_pFile = (CSoundFile*)ResourceManager.CreateResourceFile(ResourceType_Sound, pDataset->GetProperty("File")->GetString(), pDataset);
 
 	// Info.
 	m_iGroup = SoundGroup_Unknown;

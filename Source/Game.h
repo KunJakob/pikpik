@@ -20,6 +20,19 @@
 #include <Background.h>
 #include <Interface.h>
 #include <Minimap.h>
+#include <Sound.h>
+
+//##############################################################################
+
+// The game states.
+enum t_GameState
+{
+	GameState_Intro,
+	GameState_Playing,
+	GameState_Finished,
+
+	GameState_Max,
+};
 
 //##############################################################################
 class CGameScreen : public CScreen
@@ -27,6 +40,9 @@ class CGameScreen : public CScreen
 public:
 	// Constructor.
 	CGameScreen() : CScreen(ScreenIndex_GameScreen) {}
+
+	// Callback for when Pacman is captured by a ghost.
+	void OnPacmanDie(CGhost* pGhost);
 
 protected:
 	// Called to load the screen resources.
@@ -47,8 +63,18 @@ protected:
 	// Called when the screen is no longer the immediate screen in the stack but is still active.
 	virtual void OnSleep();
 
+	// Called when a specific event is executed.
+	// ~return Specifies if the event was consumed.
+	virtual xbool OnEvent(xint iEventType, void* pEventInfo);
+
 	// Called to update the screen (updates the parent screen by default).
 	virtual void OnUpdate();
+
+	// Debug controls for character switching.
+	void DebugCharacterSwitch();
+
+	// Generate the minimap for the current playing field.
+	void GenerateMinimap();
 
 	// Called to pre-render the next screen frame.
 	virtual void OnPreRender();
@@ -65,6 +91,9 @@ protected:
 	// Calculate the "energy" for the music to determine background colour fading.
 	void CalculateMusicEnergy(FMOD::Channel* pChannel);
 
+	// The current game state.
+	t_GameState m_iState;
+
 	// The screen's render view.
 	CRenderView* m_xRenderView;
 
@@ -75,7 +104,7 @@ protected:
 	hgeSprite* m_pGhostMask;
 
 	// The background music.
-	FMOD::Sound* m_pMusic;
+	CSound* m_pMusic;
 
 	// The music channel.
 	FMOD::Channel* m_pChannel;
@@ -85,6 +114,9 @@ protected:
 
 	// The game's minimap.
 	CMinimap* m_pMinimap;
+
+	// The death sound.
+	CSound* m_pDeathSound;
 };
 
 //##############################################################################
