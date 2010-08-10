@@ -145,14 +145,6 @@ void CLobbyScreen::OnPreRender()
 // =============================================================================
 void CLobbyScreen::OnPostRender()
 {
-	/*switch (m_iState)
-	{
-	case LobbyState_Lobby:
-		{
-			RenderLobby();
-		}
-		break;
-	}*/
 }
 
 // =============================================================================
@@ -168,11 +160,11 @@ void CLobbyScreen::UpdateLobby()
 		}
 
 		// Start the game when ENTER is pressed (debug).
-		/*if (_HGE->Input_KeyUp(HGEK_ENTER) && NetworkManager.IsEveryoneVerified())
+		if (_HGE->Input_KeyUp(HGEK_ENTER) && NetworkManager.IsEveryoneVerified())
 		{
 			NetworkManager.Broadcast(NULL, NetworkStreamType_StartGame, NULL, HIGH_PRIORITY, RELIABLE_ORDERED);
 			StartGame();
-		}*/
+		}
 	}
 }
 
