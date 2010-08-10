@@ -420,9 +420,6 @@
     <ClCompile Include="..\Source\Navigation.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Path.cpp">
-      <Filter>Source\Core</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Xen\Circle.h">
@@ -1383,9 +1380,6 @@
       <Filter>Source\Screens</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Navigation.h">
-      <Filter>Source\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Path.h">
       <Filter>Source\Core</Filter>
     </ClInclude>
   </ItemGroup>

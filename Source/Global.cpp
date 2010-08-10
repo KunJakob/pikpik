@@ -67,7 +67,9 @@ void CGlobal::ResetActivePlayers()
 		if (bPlaying)
 		{
 			m_lpActivePlayers.push_back(pPlayer);
+
 			pPlayer->SetCurrentBlock(m_pActiveMap->GetSpawnBlock(pPlayer->GetType()));
+			pPlayer->m_pStartingBlock = pPlayer->GetCurrentBlock();
 		}
 	}
 }

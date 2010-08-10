@@ -45,8 +45,9 @@ void CGameScreen::OnActivate()
 	m_pGhostMask = new hgeSprite(GenerateGhostMask(48 * 3, 48 * 5), 0, 0, _SWIDTH, _SHEIGHT);
 	RenderLayer(GameLayerIndex_GhostMask)->SetRenderOverride(xbind(this, &CGameScreen::RenderGhostMask));
 
-#if XDEBUG
+#if !XRETAIL
 	RenderLayer(GameLayerIndex_PathDebug)->SetRenderOverride(xbind(this, &CGameScreen::RenderPlayerPath));
+	RenderLayer(GameLayerIndex_PathDebug)->SetEnabled(false);
 #endif
 
 	// Load the music to associate with the map colourisation.
@@ -55,12 +56,6 @@ void CGameScreen::OnActivate()
 
 	// Load the sound effects.
 	m_pDeathSound = new CSound(_SOUND("Game-Death"));
-
-	// TEMP!!!
-	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
-	{
-		(*ppPlayer)->SetLogicType(PlayerLogicType_None);
-	}
 }
 
 // =============================================================================
@@ -172,27 +167,24 @@ void CGameScreen::InitialisePlayers()
 		{
 			CPlayer* pPlayer = *ppPlayer;
 
-			pPlayer->SetLogicType(PlayerLogicType_AI);
-
 			if (pPlayer->GetType() == PlayerType_Pacman)
+			{
+				pPlayer->SetLogicType(PlayerLogicType_Local);
+
 				CollisionManager.Add((CPacman*)pPlayer);
+			}
 			else if (pPlayer->GetType() == PlayerType_Ghost)
+			{
+				pPlayer->SetLogicType(PlayerLogicType_AI);
+
 				CollisionManager.Add((CGhost*)pPlayer);
+			}
 		}
 	}
 
 	// Add all active players to the player render layer.
 	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
 		RenderLayer(GameLayerIndex_Player)->AttachRenderable(*ppPlayer);
-}
-
-// =============================================================================
-void CGameScreen::InitialiseNavigation()
-{
-	//CNavigationRequest* pNavRequest = new CNavigationRequest();
-
-	//pNavRequest->m_pStart 
-	//pNavRequest->m_pMesh = Global.m_pActiveMap->GetNavMesh();
 }
 
 // =============================================================================
@@ -206,7 +198,10 @@ void CGameScreen::OnPacmanDie(CGhost* pGhost)
 	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
 	{
 		if ((*ppPlayer)->GetType() == PlayerType_Ghost)
-			(*ppPlayer)->SetLogicType(PlayerLogicType_AI);
+		{
+			(*ppPlayer)->SetLogicType(PlayerLogicType_None);
+			(*ppPlayer)->NavigateTo((*ppPlayer)->m_pStartingBlock);
+		}
 		else
 			(*ppPlayer)->SetLogicType(PlayerLogicType_None);
 	}
@@ -304,16 +299,19 @@ void CGameScreen::RenderGhostMask(CRenderLayer* pLayer)
 // =============================================================================
 void CGameScreen::RenderPlayerPath(CRenderLayer* pLayer)
 {
-	CNavigationPath* pPath = Global.m_pLocalPlayer->GetNavPath();
-
-	if (pPath)
+	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
 	{
-		for (xint iA = 0; iA < pPath->GetNodeCount(); ++iA)
-		{
-			CMapBlock* pBlock = pPath->GetNode(iA)->GetDataAs<CMapBlock>();
-			xpoint xPos = pBlock->GetScreenPosition();
+		CNavigationPath* pPath = (*ppPlayer)->GetNavPath();
 
-			RenderManager.RenderBox(false, xrect(xPos.m_tX - 5, xPos.m_tY - 5, xPos.m_tX + 5, xPos.m_tY + 5), _RGB(255, 0, 0));
+		if (pPath)
+		{
+			for (xint iA = 0; iA < pPath->GetNodeCount(); ++iA)
+			{
+				CMapBlock* pBlock = pPath->GetNode(iA)->GetDataAs<CMapBlock>();
+				xpoint xPos = pBlock->GetScreenPosition();
+
+				RenderManager.RenderBox(false, xrect(xPos.m_tX - 5, xPos.m_tY - 5, xPos.m_tX + 5, xPos.m_tY + 5), _RGB(255, 0, 0));
+			}
 		}
 	}
 }
@@ -354,22 +352,14 @@ void CGameScreen::DebugControls()
 		Global.m_pLocalPlayer->SetLogicType(iLogicType);
 	}
 
-	// Test pathfinding.
+	// Test path-finding on the local player.
 	if (_HGE->Input_KeyDown(HGEK_CTRL))
 	{
-		CNavigationRequest xRequest;
-		CNavigationPath* pPath = new CNavigationPath();
-		CMapEvaluator* pEvaluator = new CMapEvaluator(Global.m_pLocalPlayer);
-		
-		xRequest.m_pMesh = Global.m_pActiveMap->GetNavMesh();
-		xRequest.m_pEvaluator = pEvaluator;
-		xRequest.m_pStart = Global.m_pLocalPlayer->GetCurrentBlock()->m_pNavNode;
-		xRequest.m_pGoal = Global.m_pActiveMap->GetBlock(rand() % Global.m_pActiveMap->GetBlockCount())->m_pNavNode;
+		Global.m_pLocalPlayer->NavigateTo(Global.m_pActiveMap->GetBlock(rand() % Global.m_pActiveMap->GetBlockCount()));
+	}
 
-		NavigationManager.FindPath(&xRequest, *pPath);
-
-		delete pEvaluator;
-
-		Global.m_pLocalPlayer->SetNavPath(pPath);
+	if (_HGE->Input_KeyDown(HGEK_F1))
+	{
+		RenderLayer(GameLayerIndex_PathDebug)->SetEnabled(!RenderLayer(GameLayerIndex_PathDebug)->IsEnabled());
 	}
 }

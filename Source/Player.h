@@ -13,6 +13,10 @@
 
 //##############################################################################
 
+// Predeclaration.
+class CBrain;
+class CGhostBrain;
+
 // The player types.
 enum t_PlayerLogicType
 {
@@ -57,6 +61,8 @@ class CPlayer : public CRenderable
 public:
 	// Friends.
 	friend CMap;
+	friend CBrain;
+	friend CGhostBrain;
 
 	// Destructor.
 	virtual ~CPlayer();
@@ -118,6 +124,9 @@ public:
 		return m_pSprite->GetPosition();
 	}
 
+	// Navigate the player to a specific block on the map.
+	void NavigateTo(CMapBlock* pBlock);
+
 	// Set a navigation path for this player (this will override default behaviours).
 	void SetNavPath(CNavigationPath* pPath);
 
@@ -132,6 +141,9 @@ public:
 
 	// Process incoming streams.
 	static void OnReceivePlayerUpdate(CNetworkPeer* pFrom, BitStream* pStream);
+
+	// The player's starting block.
+	CMapBlock* m_pStartingBlock;
 
 protected:
 	// Constuctor.
@@ -157,9 +169,6 @@ protected:
 
 	// The logic for networked human or computer controlled players.
 	virtual void LogicRemote();
-
-	// A logic behaviour to let the player wander aimlessly.
-	void BehaviourWander();
 
 	// Check if the specified block is passable.
 	virtual xbool IsPassable(CMapBlock* pBlock)
@@ -211,6 +220,9 @@ protected:
 
 	// The current navigation path for this player (overrides other behaviours).
 	CNavigationPath* m_pNavPath;
+
+	// The player's brain!
+	CBrain* m_pBrain;
 
 private:
 	// The player's index.

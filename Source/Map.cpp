@@ -363,8 +363,6 @@ void CMap::OnRender()
 	// Draw the map.
 	for (xint iA = 0; iA < m_iBlockCount; ++iA)
 	{
-		static xpoint s_xCentrePoint = xpoint(24, 24);
-
 		if (m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsGhostWall())
 			m_pTiles->GetMetadata()->GetSprite()->SetColor(_ARGBF(1.f, m_fChannels[0], m_fChannels[1], m_fChannels[2]));
 		else
@@ -372,10 +370,12 @@ void CMap::OnRender()
 
 		t_TileType iTileType = m_xBlocks[iA].m_bEaten ? TileType_Eaten : m_xBlocks[iA].m_iTileType;
 
+		xpoint xCentrePoint = xpoint(m_pTileAreas[iTileType]->m_xRect.GetWidth(), m_pTileAreas[iTileType]->m_xRect.GetHeight()) / 2;
+
 		m_pTiles->Render
 		(
 			m_xBlocks[iA].GetScreenPosition(), 
-			s_xCentrePoint, 
+			xCentrePoint, 
 			m_pTileAreas[iTileType]->m_xRect,
 			m_xBlocks[iA].m_fVisibility * Global.m_fMapAlpha, 
 			Math::Radians(m_xBlocks[iA].m_fAngle)
@@ -429,10 +429,12 @@ CMapBlock* CMap::GetSpawnBlock(t_PlayerType iPlayerType)
 // =============================================================================
 xbool CMapEvaluator::IsAllowed(CNavigationRequest* pRequest, CNavigationNode* pNode)
 {
-	if (m_pPlayer->GetType() == PlayerType_Pacman)
-		return !pNode->GetDataAs<CMapBlock>()->IsGhostWall();
+	CMapBlock* pBlock = pNode->GetDataAs<CMapBlock>();
 
-	return true;
+	if (m_pPlayer->GetType() == PlayerType_Pacman)
+		return !pBlock->IsGhostWall();
+
+	return true;//pBlock != Global.m_pActiveMap->m_pExpensiveBlock;
 }
 
 // =============================================================================
@@ -440,6 +442,9 @@ xfloat CMapEvaluator::GetCost(CNavigationRequest* pRequest, CNavigationNode* pPa
 {
 	CMapBlock* pParentBlock = pParentNode->GetDataAs<CMapBlock>();
 	CMapBlock* pCurrentBlock = pCurrentNode->GetDataAs<CMapBlock>();
+
+	if (pParentBlock == Global.m_pActiveMap->m_pExpensiveBlock)
+		return 500.0f;
 
 	return (pCurrentBlock->IsGhostWall()) ? 3.0f : 1.0f;
 }

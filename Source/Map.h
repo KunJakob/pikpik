@@ -273,6 +273,9 @@ public:
 	// Get a block in the adjacent direction to the specified block. This will wrap around the map if on the edge.
 	CMapBlock* GetAdjacentBlock(t_AdjacentDirection iAdjacentDir, CMapBlock* pBlock);
 
+	// An expensive block to temporarily disrupt path-finding.
+	CMapBlock* m_pExpensiveBlock;
+
 protected:
 	// Add the specified visibility to all valid paths from the specified block.
 	void AddVisiblePaths(CMapBlock* pStartingBlock, xfloat fVisibility);

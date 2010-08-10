@@ -77,9 +77,6 @@ protected:
 	// Called to pre-render the next screen frame.
 	virtual void OnPreRender();
 
-	// Initialise the navigation system for this map.
-	void InitialiseNavigation();
-
 	// Initialise all players in the game.
 	void InitialisePlayers();
 
@@ -96,7 +93,7 @@ protected:
 	void RenderPlayerPath(CRenderLayer* pLayer);
 
 	// Debug controls for character switching.
-	void DebugCharacterSwitch();
+	void DebugControls();
 
 	// The current game state.
 	t_GameState m_iState;

@@ -14,27 +14,49 @@
 // Global.
 #include <Global.h>
 
+// Other.
+#include <Player.h>
+
 //##############################################################################
 class CBrain
 {
 public:
-	//xlist<CPlayer*> ScanCoridoor();
+	// Constructor.
+	CBrain(CPlayer* pPlayer);
+
+	// Execute the behavioural logic.
+	virtual void Think() = 0;
 
 protected:
+	// Execute a basic wander logic.
+	void Wander();
+
+	// Approach a specific target
+
+	// Scan a corridor for other players.
+	t_PlayerList ScanCorridor(t_PlayerDirection iDirection);
+
+	// The player object associated with this brain.
+	CPlayer* m_pPlayer;
 };
 
 //##############################################################################
 class CPacmanBrain : public CBrain
 {
-public:
-protected:
 };
 
 //##############################################################################
 class CGhostBrain : public CBrain
 {
 public:
-protected:
+	// Constructor.
+	CGhostBrain(CPlayer* pPlayer);
+
+	// Execute the behavioural logic.
+	virtual void Think();
+
+	// The last point Pacman was seen.
+	CMapBlock* m_pLastSeen;
 };
 
 //##############################################################################

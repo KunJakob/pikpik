@@ -10,6 +10,7 @@
 #include <Resource.h>
 #include <Sprite.h>
 #include <Game.h>
+#include <Brain.h>
 
 //##############################################################################
 
@@ -22,7 +23,8 @@
 CPlayer::CPlayer(t_PlayerType iType, const xchar* pSpriteName) : CRenderable(RenderableType_Player), 
 	m_iType(iType),
 	m_pSprite(NULL),
-	m_pNavPath(NULL)
+	m_pNavPath(NULL),
+	m_pBrain(NULL)
 {
 	m_iIndex = (xint)Global.m_lpPlayers.size();
 
@@ -232,49 +234,51 @@ void CPlayer::Move(t_PlayerDirection iDirection)
 // =============================================================================
 void CPlayer::Logic()
 {
-	if (m_pNavPath)
-		LogicPath();
-	else
+	switch (m_iLogicType)
 	{
-		switch (m_iLogicType)
-		{
-		case PlayerLogicType_Local:		
-			LogicLocal();		
-			break;
-		case PlayerLogicType_AI:		
-			LogicAI();			
-			break;
-		case PlayerLogicType_Remote:	
-			LogicRemote();		
-			break;
-		}
+	case PlayerLogicType_None:
+		LogicPath();
+		break;
+	case PlayerLogicType_Local:	
+		LogicLocal();		
+		break;
+	case PlayerLogicType_AI:
+		LogicPath();
+		LogicAI();			
+		break;
+	case PlayerLogicType_Remote:	
+		LogicRemote();		
+		break;
 	}
 }
 
 // =============================================================================
 void CPlayer::LogicPath()
 {
-	// If we are on our target node, move to the next node in the sequence.
-	CNavigationNode* pCurrentNode = m_pNavPath->GetCurrentNode();
-	CNavigationNode* pNextNode = m_pNavPath->GetNextNode();
-
-	if (pCurrentNode && pNextNode)
+	if (m_pNavPath)
 	{
-		CMapBlock* pCurrentBlock = pCurrentNode->GetDataAs<CMapBlock>();
-		CMapBlock* pNextBlock = pNextNode->GetDataAs<CMapBlock>();
+		// If we are on our target node, move to the next node in the sequence.
+		CNavigationNode* pCurrentNode = m_pNavPath->GetCurrentNode();
+		CNavigationNode* pNextNode = m_pNavPath->GetNextNode();
 
-		// Find the adjacent direction from the current block to the new block.
-		for (xuint iA = 0; iA < AdjacentDirection_Max; ++iA)
+		if (pCurrentNode && pNextNode)
 		{
-			if (Global.m_pActiveMap->GetAdjacentBlock((t_AdjacentDirection)iA, pCurrentBlock) == pNextBlock)
+			CMapBlock* pCurrentBlock = pCurrentNode->GetDataAs<CMapBlock>();
+			CMapBlock* pNextBlock = pNextNode->GetDataAs<CMapBlock>();
+
+			// Find the adjacent direction from the current block to the new block.
+			for (xuint iA = 0; iA < AdjacentDirection_Max; ++iA)
 			{
-				Move((t_PlayerDirection)iA);
-				return;
+				if (Global.m_pActiveMap->GetAdjacentBlock((t_AdjacentDirection)iA, pCurrentBlock) == pNextBlock)
+				{
+					Move((t_PlayerDirection)iA);
+					return;
+				}
 			}
 		}
+		else
+			ClearNavPath();
 	}
-	else
-		ClearNavPath();
 }
 
 // =============================================================================
@@ -302,8 +306,7 @@ void CPlayer::LogicLocal()
 // =============================================================================
 void CPlayer::LogicAI()
 {
-	// Check for a retreat mode/chase mode... otherwise...
-	BehaviourWander();
+	m_pBrain->Think();
 }
 
 // =============================================================================
@@ -331,65 +334,31 @@ void CPlayer::SetLogicType(t_PlayerLogicType _Value)
 }
 
 // =============================================================================
-void CPlayer::BehaviourWander()
+void CPlayer::NavigateTo(CMapBlock* pBlock)
 {
-	CMapBlock* pMoveDirection[PlayerDirection_Max];
-	t_PlayerDirection iRealDirection[PlayerDirection_Max];
-	xint iDirectionCount = 0;
+	CNavigationRequest xRequest;
+	CNavigationPath* pPath = new CNavigationPath();
+	CMapEvaluator* pEvaluator = new CMapEvaluator(this);
 
-	for (xint iA = 0; iA < PlayerDirection_Max; ++iA)
-	{
-		iRealDirection[iA] = (t_PlayerDirection)((m_iMoveDir + iA + 3) % PlayerDirection_Max);
-		pMoveDirection[iA] = Global.m_pActiveMap->GetAdjacentBlock((t_AdjacentDirection)iRealDirection[iA], m_pCurrentBlock);
+	xRequest.m_pMesh = Global.m_pActiveMap->GetNavMesh();
+	xRequest.m_pEvaluator = pEvaluator;
+	xRequest.m_pStart = m_pTargetBlock ? m_pTargetBlock->m_pNavNode : m_pCurrentBlock->m_pNavNode;
+	xRequest.m_pGoal = pBlock->m_pNavNode;
 
-		if (IsPassable(pMoveDirection[iA]))
-			iDirectionCount++;
-		else
-			pMoveDirection[iA] = NULL;		
-	}
+	NavigationManager.FindPath(&xRequest, *pPath);
 
-	// If we have no choice, 
-	if (iDirectionCount == 1)
-	{
-		for (xint iA = 0; iA < PlayerDirection_Max; ++iA)
-		{
-			if (pMoveDirection[iA])
-			{
-				Move(iRealDirection[iA]);
-				break;
-			}
-		}
-	}
-	// Otherwise pick a random path to move down.
-	else
-	{
-		xint iRandomDir = rand() % (iDirectionCount - 1);
+	delete pEvaluator;
 
-		for (xint iA = 0; iA < PlayerDirection_Max; ++iA)
-		{
-			if (pMoveDirection[iA])
-				iRandomDir--;
-
-			if (iRandomDir == -1)
-			{
-				Move(iRealDirection[iA]);
-				break;
-			}
-		}
-	}
+	SetNavPath(pPath);
 }
 
 // =============================================================================
 void CPlayer::SetNavPath(CNavigationPath* pPath)
 {
 	ClearNavPath();
-	m_pNavPath = pPath;
 
 	if (pPath->GetNodeCount())
-	{
-		SetCurrentBlock(pPath->GetNode(0)->GetDataAs<CMapBlock>());
-		m_iState = PlayerState_Idle;
-	}
+		m_pNavPath = pPath;
 }
 
 // =============================================================================
@@ -526,6 +495,8 @@ CGhost::CGhost(xuint iColour) : CPlayer(PlayerType_Ghost, "Player-Ghost"), CColl
 	m_pEyes(NULL),
 	m_iColour(iColour)
 {
+	m_pBrain = new CGhostBrain(this);
+
 	m_pEyes = new CSprite(_SPRITE("Player-Ghost-Eyes"));
 	m_pEyes->SetArea("F1");
 	m_pEyes->SetAnchor(m_pEyes->GetAreaCentre());
@@ -536,6 +507,7 @@ CGhost::CGhost(xuint iColour) : CPlayer(PlayerType_Ghost, "Player-Ghost"), CColl
 // =============================================================================
 CGhost::~CGhost()
 {
+	delete m_pBrain;
 	delete m_pEyes;
 }
 
