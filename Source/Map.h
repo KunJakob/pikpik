@@ -10,6 +10,7 @@
 #include <Renderer.h>
 #include <Trap.h>
 #include <Power.h>
+#include <Navigation.h>
 
 //##############################################################################
 
@@ -151,6 +152,9 @@ public:
 	// The block adjacents.
 	CMapBlock* m_pAdjacents[AdjacentDirection_Max];
 
+	// The navigation node attached to this block.
+	CNavigationNode* m_pNavNode;
+
 protected:
 	// Get the bit-index for the adjacent.
 	xuint GetBit(t_AdjacentDirection iAdjacentDir)
@@ -238,6 +242,12 @@ public:
 		return m_xOffset;
 	}
 
+	// Get the total count of blocks in the map.
+	inline xint GetBlockCount()
+	{
+		return m_iBlockCount;
+	}
+
 	// Get a map block by index.
 	inline CMapBlock* GetBlock(xint iBlockIndex)
 	{
@@ -249,6 +259,12 @@ public:
 	inline CMapBlock* GetBlock(xpoint xBlockPos)
 	{
 		return GetBlock(xBlockPos.m_tX + (xBlockPos.m_tY * GetWidth()));
+	}
+
+	// Get the navigation mesh for this map.
+	inline CNavigationMesh* GetNavMesh() const
+	{ 
+		return m_pNavMesh; 
 	}
 
 	// Get a random player spawn block.
@@ -311,6 +327,33 @@ protected:
 
 	// The current colour transition direction.
 	xbool m_bColouriseDir[3];
+
+	// The map's navigation mesh.
+	CNavigationMesh* m_pNavMesh;
+};
+
+//##############################################################################
+class CMapEvaluator : public CNavigationEvaluator
+{
+public:
+	// Constructor.
+	CMapEvaluator(CPlayer* pPlayer)
+	{
+		m_pPlayer = pPlayer;
+	}
+
+protected:
+	// Determine if the specified link is valid in this evaluator.
+	virtual xbool IsAllowed(CNavigationRequest* pRequest, CNavigationNode* pNode);
+
+	// Get the cost between the parent and current node.
+	virtual xfloat GetCost(CNavigationRequest* pRequest, CNavigationNode* pParentNode, CNavigationNode* pCurrentNode);
+
+	// Get the heuristic between the current and goal node.
+	virtual xfloat GetHeuristic(CNavigationRequest* pRequest, CNavigationNode* pCurrentNode, CNavigationNode* pGoalNode);
+
+	// The player for which the path is being generated.
+	CPlayer* m_pPlayer;
 };
 
 //##############################################################################

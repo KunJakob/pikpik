@@ -21,7 +21,8 @@
 // =============================================================================
 CPlayer::CPlayer(t_PlayerType iType, const xchar* pSpriteName) : CRenderable(RenderableType_Player), 
 	m_iType(iType),
-	m_pSprite(NULL)
+	m_pSprite(NULL),
+	m_pNavPath(NULL)
 {
 	m_iIndex = (xint)Global.m_lpPlayers.size();
 
@@ -37,6 +38,8 @@ CPlayer::CPlayer(t_PlayerType iType, const xchar* pSpriteName) : CRenderable(Ren
 CPlayer::~CPlayer()
 {
 	delete m_pSprite;
+
+	ClearNavPath();
 }
 
 // =============================================================================
@@ -229,12 +232,49 @@ void CPlayer::Move(t_PlayerDirection iDirection)
 // =============================================================================
 void CPlayer::Logic()
 {
-	switch (m_iLogicType)
+	if (m_pNavPath)
+		LogicPath();
+	else
 	{
-	case PlayerLogicType_Local:		LogicLocal();		break;
-	case PlayerLogicType_AI:		LogicAI();			break;
-	case PlayerLogicType_Remote:	LogicRemote();		break;
+		switch (m_iLogicType)
+		{
+		case PlayerLogicType_Local:		
+			LogicLocal();		
+			break;
+		case PlayerLogicType_AI:		
+			LogicAI();			
+			break;
+		case PlayerLogicType_Remote:	
+			LogicRemote();		
+			break;
+		}
 	}
+}
+
+// =============================================================================
+void CPlayer::LogicPath()
+{
+	// If we are on our target node, move to the next node in the sequence.
+	CNavigationNode* pCurrentNode = m_pNavPath->GetCurrentNode();
+	CNavigationNode* pNextNode = m_pNavPath->GetNextNode();
+
+	if (pCurrentNode && pNextNode)
+	{
+		CMapBlock* pCurrentBlock = pCurrentNode->GetDataAs<CMapBlock>();
+		CMapBlock* pNextBlock = pNextNode->GetDataAs<CMapBlock>();
+
+		// Find the adjacent direction from the current block to the new block.
+		for (xuint iA = 0; iA < AdjacentDirection_Max; ++iA)
+		{
+			if (Global.m_pActiveMap->GetAdjacentBlock((t_AdjacentDirection)iA, pCurrentBlock) == pNextBlock)
+			{
+				Move((t_PlayerDirection)iA);
+				return;
+			}
+		}
+	}
+	else
+		ClearNavPath();
 }
 
 // =============================================================================
@@ -280,6 +320,14 @@ void CPlayer::LogicRemote()
 		Move(m_liQueuedMoves.front());
 		m_liQueuedMoves.pop_front();
 	}
+}
+
+// =============================================================================
+void CPlayer::SetLogicType(t_PlayerLogicType _Value)
+{
+	ClearNavPath();
+
+	m_iLogicType = _Value;
 }
 
 // =============================================================================
@@ -329,6 +377,28 @@ void CPlayer::BehaviourWander()
 			}
 		}
 	}
+}
+
+// =============================================================================
+void CPlayer::SetNavPath(CNavigationPath* pPath)
+{
+	ClearNavPath();
+	m_pNavPath = pPath;
+
+	if (pPath->GetNodeCount())
+	{
+		SetCurrentBlock(pPath->GetNode(0)->GetDataAs<CMapBlock>());
+		m_iState = PlayerState_Idle;
+	}
+}
+
+// =============================================================================
+void CPlayer::ClearNavPath()
+{
+	if (m_pNavPath)
+		delete m_pNavPath;
+
+	m_pNavPath = NULL;
 }
 
 // =============================================================================
@@ -423,7 +493,7 @@ void CPacman::SetState(t_PlayerState iState)
 // =============================================================================
 xcircle CPacman::GetCollisionCircle()
 {
-	return xcircle(m_pSprite->GetPosition(), m_pSprite->GetAreaWidth() / 2);
+	return xcircle(m_pSprite->GetPosition(), m_pSprite->GetAreaWidth() / 3);
 }
 
 // =============================================================================
@@ -522,7 +592,7 @@ void CGhost::SetState(t_PlayerState iState)
 // =============================================================================
 xcircle CGhost::GetCollisionCircle()
 {
-	return xcircle(m_pSprite->GetPosition(), m_pSprite->GetAreaWidth() / 2);
+	return xcircle(m_pSprite->GetPosition(), m_pSprite->GetAreaWidth() / 3);
 }
 
 // =============================================================================

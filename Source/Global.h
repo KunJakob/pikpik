@@ -180,6 +180,8 @@ enum t_GameLayerIndex
 	GameLayerIndex_GhostMask,
 	GameLayerIndex_Radar,
 
+	GameLayerIndex_PathDebug,
+
 	GameLayerIndex_Max,
 };
 

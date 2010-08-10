@@ -174,14 +174,15 @@
 	{
 		.Delay 300
 
+		.Frame { .Area "F2" }
+		.Frame { .Area "F3" }
+		.Frame { .Area "F2" }
 		.Frame { .Area "F1" }
 		.Frame { .Area "F2" }
 		.Frame { .Area "F3" }
-		.Frame { .Area "F4" }
-		.Frame { .Area "F5" }
-		.Frame { .Area "F6" }
-		.Frame { .Area "F6" .Delay 0 .Event "Dead" }
-		.Frame "Flash" { .Area "F7" }
+		.Frame { .Area "F2" .Event "Dead" .Delay 0 }
+
+		.Frame "Flash" { .Area "F2" }
 		.Frame { .Area "F8" .Goto "Flash" }
 	}
 }

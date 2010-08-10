@@ -21,6 +21,7 @@
 #include <Interface.h>
 #include <Minimap.h>
 #include <Sound.h>
+#include <Navigation.h>
 
 //##############################################################################
 
@@ -70,14 +71,14 @@ protected:
 	// Called to update the screen (updates the parent screen by default).
 	virtual void OnUpdate();
 
-	// Debug controls for character switching.
-	void DebugCharacterSwitch();
-
 	// Generate the minimap for the current playing field.
 	void GenerateMinimap();
 
 	// Called to pre-render the next screen frame.
 	virtual void OnPreRender();
+
+	// Initialise the navigation system for this map.
+	void InitialiseNavigation();
 
 	// Initialise all players in the game.
 	void InitialisePlayers();
@@ -85,11 +86,17 @@ protected:
 	// Generate a field mask texture for ghost vision.
 	HTEXTURE GenerateGhostMask(xint iInnerRadius, xint iOuterRadius);
 
+	// Calculate the "energy" for the music to determine background colour fading.
+	void CalculateMusicEnergy(FMOD::Channel* pChannel);
+
 	// Render the ghost mask.
 	void RenderGhostMask(CRenderLayer* pLayer);
 
-	// Calculate the "energy" for the music to determine background colour fading.
-	void CalculateMusicEnergy(FMOD::Channel* pChannel);
+	// Render the local player's path on the map.
+	void RenderPlayerPath(CRenderLayer* pLayer);
+
+	// Debug controls for character switching.
+	void DebugCharacterSwitch();
 
 	// The current game state.
 	t_GameState m_iState;

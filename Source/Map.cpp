@@ -174,6 +174,7 @@ void CMap::Load()
 				pBlock->m_bEaten = false;
 				pBlock->m_pPower = NULL;
 				pBlock->m_pTrap = NULL;
+				pBlock->m_pNavNode = NULL;
 
 				pBlock->m_pAdjacents[AdjacentDirection_Left]	= (iIndex % m_iWidth > 0) ? &m_xBlocks[iIndex - 1] : NULL;
 				pBlock->m_pAdjacents[AdjacentDirection_Up]		= (iIndex >= m_iWidth) ? &m_xBlocks[iIndex - m_iWidth] : NULL;
@@ -225,6 +226,30 @@ void CMap::Load()
 			pBlock->m_iBlockType = s_iBlockTypeLookup[pBlock->m_iTileType];
 		}
 
+		// Initialise the navigation mesh from the map.
+		m_pNavMesh = new CNavigationMesh(m_iBlockCount);
+
+		for (xint iA = 0; iA < m_iBlockCount; ++iA)
+		{
+			CMapBlock* pBlock = &m_xBlocks[iA];
+			CNavigationNode* pNode = m_pNavMesh->GetNode(iA);
+
+			pBlock->m_pNavNode = pNode;
+			pNode->SetData(pBlock);
+
+			// Connect adjacent pathways.
+			if (!pBlock->IsWall())
+			{
+				for (xuint iB = 0; iB < AdjacentDirection_Max; ++iB)
+				{
+					CMapBlock* pAdjacentBlock = GetAdjacentBlock((t_AdjacentDirection)iB, pBlock);
+
+					if (pAdjacentBlock && !pAdjacentBlock->IsWall())
+						pNode->LinkTo(m_pNavMesh->GetNode(pAdjacentBlock->m_iIndex));
+				}
+			}
+		}
+
 		// Initialise the colourisation.
 		for (xint iA = 0; iA < 3; ++iA)
 		{
@@ -251,6 +276,8 @@ void CMap::Unload()
 
 		for (xint iA = 0; iA < PlayerType_Max; ++iA)
 			m_lpSpawnPoints[iA].clear();
+
+		delete m_pNavMesh;
 	}
 
 	m_bLoaded = false;
@@ -400,6 +427,37 @@ CMapBlock* CMap::GetSpawnBlock(t_PlayerType iPlayerType)
 //##############################################################################
 
 // =============================================================================
+xbool CMapEvaluator::IsAllowed(CNavigationRequest* pRequest, CNavigationNode* pNode)
+{
+	if (m_pPlayer->GetType() == PlayerType_Pacman)
+		return !pNode->GetDataAs<CMapBlock>()->IsGhostWall();
+
+	return true;
+}
+
+// =============================================================================
+xfloat CMapEvaluator::GetCost(CNavigationRequest* pRequest, CNavigationNode* pParentNode, CNavigationNode* pCurrentNode)
+{
+	CMapBlock* pParentBlock = pParentNode->GetDataAs<CMapBlock>();
+	CMapBlock* pCurrentBlock = pCurrentNode->GetDataAs<CMapBlock>();
+
+	return (pCurrentBlock->IsGhostWall()) ? 3.0f : 1.0f;
+}
+
+// =============================================================================
+xfloat CMapEvaluator::GetHeuristic(CNavigationRequest* pRequest, CNavigationNode* pCurrentNode, CNavigationNode* pGoalNode)
+{
+	CMapBlock* pCurrentBlock = pCurrentNode->GetDataAs<CMapBlock>();
+	CMapBlock* pGoalBlock = pGoalNode->GetDataAs<CMapBlock>();
+
+	xpoint xDifference = pGoalBlock->m_xPosition - pCurrentBlock->m_xPosition;
+
+	return Math::SquareRoot((xfloat)Math::SquaredMagnitude(xDifference));
+}
+
+//##############################################################################
+
+// =============================================================================
 void CMapManager::OnInitialise()
 {
 	m_pMetadata = _METADATA("Maps");
@@ -441,5 +499,3 @@ CMap* CMapManager::GetMap(const xchar* pID)
 
 	return NULL;
 }
-
-//##############################################################################

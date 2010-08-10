@@ -45,12 +45,22 @@ void CGameScreen::OnActivate()
 	m_pGhostMask = new hgeSprite(GenerateGhostMask(48 * 3, 48 * 5), 0, 0, _SWIDTH, _SHEIGHT);
 	RenderLayer(GameLayerIndex_GhostMask)->SetRenderOverride(xbind(this, &CGameScreen::RenderGhostMask));
 
+#if XDEBUG
+	RenderLayer(GameLayerIndex_PathDebug)->SetRenderOverride(xbind(this, &CGameScreen::RenderPlayerPath));
+#endif
+
 	// Load the music to associate with the map colourisation.
 	m_pMusic = new CSound(_SOUND("Game-Music"));
-	m_pMusic->Play();
+	//m_pMusic->Play();
 
 	// Load the sound effects.
 	m_pDeathSound = new CSound(_SOUND("Game-Death"));
+
+	// TEMP!!!
+	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
+	{
+		(*ppPlayer)->SetLogicType(PlayerLogicType_None);
+	}
 }
 
 // =============================================================================
@@ -111,7 +121,7 @@ void CGameScreen::OnUpdate()
 {
 #if XDEBUG
 	if (!NetworkManager.IsRunning())
-		DebugCharacterSwitch();
+		DebugControls();
 #endif
 
 	switch (m_iState)
@@ -146,6 +156,7 @@ void CGameScreen::OnPreRender()
 
 	RenderLayer(GameLayerIndex_Map)->SetTransformation(xOffset);
 	RenderLayer(GameLayerIndex_Player)->SetTransformation(xOffset);
+	RenderLayer(GameLayerIndex_PathDebug)->SetTransformation(xOffset);
 }
 
 // =============================================================================
@@ -173,6 +184,49 @@ void CGameScreen::InitialisePlayers()
 	// Add all active players to the player render layer.
 	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
 		RenderLayer(GameLayerIndex_Player)->AttachRenderable(*ppPlayer);
+}
+
+// =============================================================================
+void CGameScreen::InitialiseNavigation()
+{
+	//CNavigationRequest* pNavRequest = new CNavigationRequest();
+
+	//pNavRequest->m_pStart 
+	//pNavRequest->m_pMesh = Global.m_pActiveMap->GetNavMesh();
+}
+
+// =============================================================================
+void CGameScreen::OnPacmanDie(CGhost* pGhost)
+{
+	m_pMusic->Stop();
+	m_pDeathSound->Play();
+
+	Global.m_fMusicEnergy = 0.2f;
+
+	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
+	{
+		if ((*ppPlayer)->GetType() == PlayerType_Ghost)
+			(*ppPlayer)->SetLogicType(PlayerLogicType_AI);
+		else
+			(*ppPlayer)->SetLogicType(PlayerLogicType_None);
+	}
+
+	m_iState = GameState_Finished;
+}
+
+// =============================================================================
+void CGameScreen::GenerateMinimap()
+{
+	xuint iVisibleBlocks = MinimapElement_Walls | MinimapElement_GhostWalls | MinimapElement_GhostBase;
+	iVisibleBlocks |= (Global.m_pLocalPlayer->GetType() == PlayerType_Pacman) ? MinimapElement_Pacman : MinimapElement_Ghost;
+
+	if (Global.m_pLocalPlayer->GetType() == PlayerType_Ghost)
+	{
+		if (Global.m_pLocalPlayer->GetCurrentBlock()->IsGhostBase())
+			iVisibleBlocks |= MinimapElement_Pellets;
+	}
+
+	m_pMinimap->Generate(iVisibleBlocks);
 }
 
 // =============================================================================
@@ -215,13 +269,6 @@ HTEXTURE CGameScreen::GenerateGhostMask(xint iInnerRadius, xint iOuterRadius)
 }
 
 // =============================================================================
-void CGameScreen::RenderGhostMask(CRenderLayer* pLayer)
-{
-	if (Global.m_pLocalPlayer->GetType() == PlayerType_Ghost)
-		m_pGhostMask->Render(0.0f, 0.0f);
-}
-
-// =============================================================================
 void CGameScreen::CalculateMusicEnergy(FMOD::Channel* pChannel)
 {
 	const static xint s_iIterations = 2048;
@@ -248,41 +295,31 @@ void CGameScreen::CalculateMusicEnergy(FMOD::Channel* pChannel)
 }
 
 // =============================================================================
-void CGameScreen::OnPacmanDie(CGhost* pGhost)
+void CGameScreen::RenderGhostMask(CRenderLayer* pLayer)
 {
-	m_pMusic->Stop();
-	m_pDeathSound->Play();
-
-	Global.m_fMusicEnergy = 0.2f;
-
-	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
-	{
-		if ((*ppPlayer)->GetType() == PlayerType_Ghost)
-			(*ppPlayer)->SetLogicType(PlayerLogicType_AI);
-		else
-			(*ppPlayer)->SetLogicType(PlayerLogicType_None);
-	}
-
-	m_iState = GameState_Finished;
-}
-
-// =============================================================================
-void CGameScreen::GenerateMinimap()
-{
-	xuint iVisibleBlocks = MinimapElement_Walls | MinimapElement_GhostWalls | MinimapElement_GhostBase;
-	iVisibleBlocks |= (Global.m_pLocalPlayer->GetType() == PlayerType_Pacman) ? MinimapElement_Pacman : MinimapElement_Ghost;
-
 	if (Global.m_pLocalPlayer->GetType() == PlayerType_Ghost)
-	{
-		if (Global.m_pLocalPlayer->GetCurrentBlock()->IsGhostBase())
-			iVisibleBlocks |= MinimapElement_Pellets;
-	}
-
-	m_pMinimap->Generate(iVisibleBlocks);
+		m_pGhostMask->Render(0.0f, 0.0f);
 }
 
 // =============================================================================
-void CGameScreen::DebugCharacterSwitch()
+void CGameScreen::RenderPlayerPath(CRenderLayer* pLayer)
+{
+	CNavigationPath* pPath = Global.m_pLocalPlayer->GetNavPath();
+
+	if (pPath)
+	{
+		for (xint iA = 0; iA < pPath->GetNodeCount(); ++iA)
+		{
+			CMapBlock* pBlock = pPath->GetNode(iA)->GetDataAs<CMapBlock>();
+			xpoint xPos = pBlock->GetScreenPosition();
+
+			RenderManager.RenderBox(false, xrect(xPos.m_tX - 5, xPos.m_tY - 5, xPos.m_tX + 5, xPos.m_tY + 5), _RGB(255, 0, 0));
+		}
+	}
+}
+
+// =============================================================================
+void CGameScreen::DebugControls()
 {
 	// Switch between players.
 	if (_HGE->Input_KeyDown(HGEK_SPACE))
@@ -316,6 +353,23 @@ void CGameScreen::DebugCharacterSwitch()
 
 		Global.m_pLocalPlayer->SetLogicType(iLogicType);
 	}
-}
 
-//##############################################################################
+	// Test pathfinding.
+	if (_HGE->Input_KeyDown(HGEK_CTRL))
+	{
+		CNavigationRequest xRequest;
+		CNavigationPath* pPath = new CNavigationPath();
+		CMapEvaluator* pEvaluator = new CMapEvaluator(Global.m_pLocalPlayer);
+		
+		xRequest.m_pMesh = Global.m_pActiveMap->GetNavMesh();
+		xRequest.m_pEvaluator = pEvaluator;
+		xRequest.m_pStart = Global.m_pLocalPlayer->GetCurrentBlock()->m_pNavNode;
+		xRequest.m_pGoal = Global.m_pActiveMap->GetBlock(rand() % Global.m_pActiveMap->GetBlockCount())->m_pNavNode;
+
+		NavigationManager.FindPath(&xRequest, *pPath);
+
+		delete pEvaluator;
+
+		Global.m_pLocalPlayer->SetNavPath(pPath);
+	}
+}

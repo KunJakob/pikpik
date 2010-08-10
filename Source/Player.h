@@ -89,10 +89,7 @@ public:
 	}
 
 	// Set the player logic type.
-	inline void SetLogicType(t_PlayerLogicType _Value) 
-	{ 
-		m_iLogicType = _Value; 
-	}
+	void SetLogicType(t_PlayerLogicType _Value);
 
 	// Get the player logic type.
 	inline t_PlayerLogicType GetLogicType() 
@@ -121,6 +118,18 @@ public:
 		return m_pSprite->GetPosition();
 	}
 
+	// Set a navigation path for this player (this will override default behaviours).
+	void SetNavPath(CNavigationPath* pPath);
+
+	// Get the current navigation path for this player.
+	inline CNavigationPath* GetNavPath()
+	{
+		return m_pNavPath;
+	}
+
+	// Clear any navigation path this player might have.
+	void ClearNavPath();
+
 	// Process incoming streams.
 	static void OnReceivePlayerUpdate(CNetworkPeer* pFrom, BitStream* pStream);
 
@@ -136,6 +145,9 @@ protected:
 
 	// The player logic update where decisions are made regarding state changes.
 	virtual void Logic();
+
+	// The logic for pathfinding.
+	virtual void LogicPath();
 
 	// The logic for a local human player.
 	virtual void LogicLocal();
@@ -157,7 +169,7 @@ protected:
 
 	// Called when an animation event occurs.
 	void OnAnimationEvent(CAnimatedSprite* pSprite, const xchar* pEvent);
-
+	
 	// The type of the derived class.
 	t_PlayerType m_iType;
 
@@ -196,6 +208,9 @@ protected:
 
 	// The queued moves from the network.
 	t_PlayerDirectionList m_liQueuedMoves;
+
+	// The current navigation path for this player (overrides other behaviours).
+	CNavigationPath* m_pNavPath;
 
 private:
 	// The player's index.

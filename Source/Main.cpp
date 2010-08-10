@@ -19,6 +19,7 @@
 #include <Game.h>
 #include <Map.h>
 #include <Lobby.h>
+#include <Navigation.h>
 
 // Crypto.
 #include <Crypto/cryptlib.h>
@@ -112,6 +113,7 @@ void Application::Initialise()
 	Global.m_bWindowFocused = true;
 
 	// Add all required modules to the game.
+	XMODULE(&NetworkManager);
 	XMODULE(&SoundManager);
 	XMODULE(&RenderManager);
 	XMODULE(&ResourceManager);
@@ -120,7 +122,7 @@ void Application::Initialise()
 	XMODULE(&ScreenManager);
 	XMODULE(&MapManager);
 	XMODULE(&MatchManager);
-	XMODULE(&NetworkManager);
+	XMODULE(&NavigationManager);
 	
 	// Initialise all modules.
 	ModuleManager.Initialise();

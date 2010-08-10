@@ -170,7 +170,9 @@
     <ClCompile Include="..\Source\Match.cpp" />
     <ClCompile Include="..\Source\Menu.cpp" />
     <ClCompile Include="..\Source\Minimap.cpp" />
+    <ClCompile Include="..\Source\Navigation.cpp" />
     <ClCompile Include="..\Source\Network.cpp" />
+    <ClCompile Include="..\Source\Path.cpp" />
     <ClCompile Include="..\Source\Play.cpp" />
     <ClCompile Include="..\Source\Player.cpp" />
     <ClCompile Include="..\Source\Power.cpp" />
@@ -289,7 +291,9 @@
     <ClInclude Include="..\Source\Match.h" />
     <ClInclude Include="..\Source\Menu.h" />
     <ClInclude Include="..\Source\Minimap.h" />
+    <ClInclude Include="..\Source\Navigation.h" />
     <ClInclude Include="..\Source\Network.h" />
+    <ClInclude Include="..\Source\Path.h" />
     <ClInclude Include="..\Source\Play.h" />
     <ClInclude Include="..\Source\Player.h" />
     <ClInclude Include="..\Source\Power.h" />
