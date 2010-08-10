@@ -25,6 +25,23 @@
 
 //##############################################################################
 
+// Game layer index list.
+enum t_GameLayerIndex
+{
+	GameLayerIndex_Background,
+	GameLayerIndex_Map,
+	GameLayerIndex_Items,
+	GameLayerIndex_Player,
+	GameLayerIndex_Effects,
+	GameLayerIndex_PacmanOverlay,
+	GameLayerIndex_GhostOverlay,
+	GameLayerIndex_Radar,
+
+	GameLayerIndex_PathDebug,
+
+	GameLayerIndex_Max,
+};
+
 // The game states.
 enum t_GameState
 {
@@ -89,12 +106,15 @@ protected:
 	// Render the ghost mask.
 	void RenderGhostMask(CRenderLayer* pLayer);
 
+	// Render the beat overlay.
+	void RenderBeatOverlay(CRenderLayer* pLayer);
+
 	// Render the local player's path on the map.
 	void RenderPlayerPath(CRenderLayer* pLayer);
 
 	// Debug controls for character switching.
 	void DebugControls();
-
+	HTEXTURE GenerateBeatOverlay();
 	// The current game state.
 	t_GameState m_iState;
 
@@ -104,8 +124,11 @@ protected:
 	// The map background.
 	CBackground m_xBackground;
 
-	// The field mask.
-	hgeSprite* m_pGhostMask;
+	// The ghost overlay.
+	CSprite* m_pGhostOverlay;
+
+	// The pacman overlay.
+	CSprite* m_pPacmanOverlay;
 
 	// The background music.
 	CSound* m_pMusic;

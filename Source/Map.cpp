@@ -434,7 +434,7 @@ xbool CMapEvaluator::IsAllowed(CNavigationRequest* pRequest, CNavigationNode* pN
 	if (m_pPlayer->GetType() == PlayerType_Pacman)
 		return !pBlock->IsGhostWall();
 
-	return true;//pBlock != Global.m_pActiveMap->m_pExpensiveBlock;
+	return true;
 }
 
 // =============================================================================
@@ -442,9 +442,6 @@ xfloat CMapEvaluator::GetCost(CNavigationRequest* pRequest, CNavigationNode* pPa
 {
 	CMapBlock* pParentBlock = pParentNode->GetDataAs<CMapBlock>();
 	CMapBlock* pCurrentBlock = pCurrentNode->GetDataAs<CMapBlock>();
-
-	if (pParentBlock == Global.m_pActiveMap->m_pExpensiveBlock)
-		return 500.0f;
 
 	return (pCurrentBlock->IsGhostWall()) ? 3.0f : 1.0f;
 }

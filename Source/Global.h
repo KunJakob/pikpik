@@ -169,22 +169,6 @@ enum t_LobbyLayerIndex
 	LobbyLayerIndex_Max,
 };
 
-// Game layer index list.
-enum t_GameLayerIndex
-{
-	GameLayerIndex_Background,
-	GameLayerIndex_Map,
-	GameLayerIndex_Items,
-	GameLayerIndex_Player,
-	GameLayerIndex_Effects,
-	GameLayerIndex_GhostMask,
-	GameLayerIndex_Radar,
-
-	GameLayerIndex_PathDebug,
-
-	GameLayerIndex_Max,
-};
-
 // Renderable types.
 enum t_RenderableType
 {

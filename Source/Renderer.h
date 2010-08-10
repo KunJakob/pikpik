@@ -139,6 +139,8 @@ public:
 	// Set the transformation to be applied to all renderables on the layer.
 	void SetTransformation(xpoint xPosition = xpoint(), xfloat fRotation = 0.f, xfloat fHorizontalScale = 1.f, xfloat fVerticalScale = 1.f);
 
+	// Set the alpha
+
 	// Get the currently applied transformation params for a specific layer.
 	CRenderTransformation& GetTransformation();
 

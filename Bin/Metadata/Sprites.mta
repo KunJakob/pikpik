@@ -141,6 +141,16 @@
 	.Area "Base"			{ .Rect 528 0 576 48 }
 }
 
+.Sprite "Pacman-Overlay"
+{
+	.File "Surfaces\Overlays\Pacman-Overlay.png"
+}
+
+.Sprite "Ghost-Overlay"
+{
+	.File "Surfaces\Overlays\Ghost-Overlay.png"
+}
+
 //##############################################################################
 .Sprite "Player-Pacman"
 {
@@ -183,7 +193,7 @@
 		.Frame { .Area "F2" .Event "Dead" .Delay 0 }
 
 		.Frame "Flash" { .Area "F2" }
-		.Frame { .Area "F8" .Goto "Flash" }
+		.Frame { .Area "F7" .Goto "Flash" }
 	}
 }
 

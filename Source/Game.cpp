@@ -42,8 +42,11 @@ void CGameScreen::OnActivate()
 	m_pMinimap = new CMinimap(Global.m_pActiveMap);
 	RenderLayer(GameLayerIndex_Radar)->AttachRenderable(m_pMinimap);
 
-	m_pGhostMask = new hgeSprite(GenerateGhostMask(48 * 3, 48 * 5), 0, 0, _SWIDTH, _SHEIGHT);
-	RenderLayer(GameLayerIndex_GhostMask)->SetRenderOverride(xbind(this, &CGameScreen::RenderGhostMask));
+	m_pGhostOverlay = new CSprite(_SPRITE("Ghost-Overlay"));
+	RenderLayer(GameLayerIndex_GhostOverlay)->AttachRenderable(m_pGhostOverlay);
+
+	m_pPacmanOverlay = new CSprite(_SPRITE("Pacman-Overlay"));
+	RenderLayer(GameLayerIndex_PacmanOverlay)->AttachRenderable(m_pPacmanOverlay);
 
 #if !XRETAIL
 	RenderLayer(GameLayerIndex_PathDebug)->SetRenderOverride(xbind(this, &CGameScreen::RenderPlayerPath));
@@ -52,7 +55,7 @@ void CGameScreen::OnActivate()
 
 	// Load the music to associate with the map colourisation.
 	m_pMusic = new CSound(_SOUND("Game-Music"));
-	//m_pMusic->Play();
+	m_pMusic->Play();
 
 	// Load the sound effects.
 	m_pDeathSound = new CSound(_SOUND("Game-Death"));
@@ -62,6 +65,9 @@ void CGameScreen::OnActivate()
 void CGameScreen::OnDeactivate()
 {
 	CollisionManager.Reset();
+
+	delete m_pGhostOverlay;
+	delete m_pPacmanOverlay;
 
 	delete m_pMusic;
 	delete m_pDeathSound;
@@ -96,7 +102,7 @@ xbool CGameScreen::OnEvent(xint iEventType, void* pEventInfo)
 		{
 			switch (pEvent->key)
 			{
-			// ESCAPE.
+				// ESCAPE.
 			case HGEK_ESCAPE:
 				{
 					ScreenManager.Pop();
@@ -151,7 +157,29 @@ void CGameScreen::OnPreRender()
 
 	RenderLayer(GameLayerIndex_Map)->SetTransformation(xOffset);
 	RenderLayer(GameLayerIndex_Player)->SetTransformation(xOffset);
+
+#if !XRETAIL
 	RenderLayer(GameLayerIndex_PathDebug)->SetTransformation(xOffset);
+#endif
+
+	// Scale the overlays to the beat of the music.
+	if (m_iState == GameState_Playing)
+	{
+		xfloat fEnergy = Global.m_fMusicEnergy * 10.0f;
+		xfloat fOffsetX = ((fEnergy * ((xfloat)_SWIDTH * 1.0f)) / 2.0f) * -1.0f;
+		xfloat fOffsetY = ((fEnergy * ((xfloat)_SHEIGHT * 1.0f)) / 2.0f) * -1.0f;
+
+		RenderLayer(GameLayerIndex_GhostOverlay)->SetTransformation(xpoint(fOffsetX, fOffsetY) , 0.0f, 1.0f + fEnergy, 1.0f + fEnergy);
+
+		fEnergy = Global.m_fMusicEnergy * 2.0f;
+		fOffsetX = ((fEnergy * ((xfloat)_SWIDTH * 1.0f)) / 2.0f) * -1.0f;
+		fOffsetY = ((fEnergy * ((xfloat)_SHEIGHT * 1.0f)) / 2.0f) * -1.0f;
+
+		RenderLayer(GameLayerIndex_PacmanOverlay)->SetTransformation(xpoint(fOffsetX, fOffsetY), 0.0f, 1.0f + fEnergy, 1.0f + fEnergy);
+	}
+
+	RenderLayer(GameLayerIndex_GhostOverlay)->SetEnabled(Global.m_pLocalPlayer->GetType() == PlayerType_Ghost);
+	RenderLayer(GameLayerIndex_PacmanOverlay)->SetEnabled(Global.m_pLocalPlayer->GetType() == PlayerType_Pacman);
 }
 
 // =============================================================================
@@ -225,45 +253,6 @@ void CGameScreen::GenerateMinimap()
 }
 
 // =============================================================================
-HTEXTURE CGameScreen::GenerateGhostMask(xint iInnerRadius, xint iOuterRadius)
-{
-	xint iRadiusDifference = iOuterRadius - iInnerRadius;
-
-	static xint s_iWidth = _SWIDTH;
-	static xint s_iHeight = _SHEIGHT;
-	static xpoint s_xCentre = xpoint(_HSWIDTH, _HSHEIGHT);
-
-	HTEXTURE hFieldMask = _HGE->Texture_Create(s_iWidth, s_iHeight);
-
-	DWORD* pTexMem = _HGE->Texture_Lock(hFieldMask, false);
-	{
-		for (xint iY = 0; iY < s_iHeight; ++iY)
-		{
-			for (xint iX = 0; iX < s_iWidth; ++iX)
-			{
-				DWORD* pPixel = &pTexMem[iX + (iY * s_iWidth)];
-				xint iAlpha = 255;
-
-				xpoint xDistance = xpoint(abs(iX - s_xCentre.m_tX), abs(iY - s_xCentre.m_tY));
-				xDistance *= xDistance;
-
-				xint iDistance = (xint)sqrt((xfloat)xDistance.m_tX + (xfloat)xDistance.m_tY);
-
-				if (iDistance < iInnerRadius)
-					iAlpha = 0;
-				else if (iDistance < iOuterRadius)
-					iAlpha = ((iDistance - iInnerRadius) * 255) / iRadiusDifference;
-
-				*pPixel = ARGB(Math::Clamp<xint>(iAlpha, 0, 255), 0, 0, 0);
-			}
-		}
-	}
-	_HGE->Texture_Unlock(hFieldMask);
-
-	return hFieldMask;
-}
-
-// =============================================================================
 void CGameScreen::CalculateMusicEnergy(FMOD::Channel* pChannel)
 {
 	const static xint s_iIterations = 2048;
@@ -287,13 +276,6 @@ void CGameScreen::CalculateMusicEnergy(FMOD::Channel* pChannel)
 	fAverageStrength /= 4.f;
 
 	Global.m_fMusicEnergy = fAverageStrength * 0.1f;
-}
-
-// =============================================================================
-void CGameScreen::RenderGhostMask(CRenderLayer* pLayer)
-{
-	if (Global.m_pLocalPlayer->GetType() == PlayerType_Ghost)
-		m_pGhostMask->Render(0.0f, 0.0f);
 }
 
 // =============================================================================

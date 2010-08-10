@@ -106,21 +106,6 @@ CGhostBrain::CGhostBrain(CPlayer* pPlayer) : CBrain(pPlayer)
 // =============================================================================
 void CGhostBrain::Think()
 {
-	// If the Ghost is in the ghost base, navigate directly to Pacman if he is eating pellets.
-	/*if (m_pPlayer->m_pCurrentBlock->IsGhostBase())
-	{
-		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
-		{
-			if ((*ppPlayer)->GetType() == PlayerType_Pacman)
-			{
-				m_pLastSeen = (*ppPlayer)->m_pCurrentBlock;
-				m_pPlayer->NavigateTo(m_pLastSeen);
-
-				return;
-			}
-		}
-	}*/
-
 	// Search for Pacman and if he's found, navigate to him.
 	for (xuint iA = 0; iA < PlayerDirection_Max; ++iA)
 	{
@@ -130,28 +115,18 @@ void CGhostBrain::Think()
 		{
 			if ((*ppPlayer)->GetType() == PlayerType_Pacman)
 			{
-				//m_pLastSeen = (*ppPlayer)->m_pCurrentBlock; // Medium (often causes ghosts to carry on when changing directions).
-				m_pLastSeen = (*ppPlayer)->m_pTargetBlock ? (*ppPlayer)->m_pTargetBlock : (*ppPlayer)->m_pCurrentBlock; // Hard (often allows ghosts to predict where you are going next)
+				CMapBlock* pBlock = (*ppPlayer)->m_pCurrentBlock;
 
-				//xbool bAlternativePath = false;
-
-				// If there is a Ghost between the Ghost and Pacman, try a different route to cut Pacman off.
-				/*XEN_LIST_FOREACH(t_PlayerList, ppGhostPlayer, lxVisiblePlayers)
+				// 90% of the time, the Ghost will follow accurately round corners.
+				if ((*ppPlayer)->m_pTargetBlock)
 				{
-					if ((*ppGhostPlayer)->GetType() == PlayerType_Ghost)
-					{
-						Global.m_pActiveMap->m_pExpensiveBlock = (*ppGhostPlayer)->m_pCurrentBlock;
-						m_pPlayer->NavigateTo(m_pLastSeen);
-						//Global.m_pActiveMap->m_pExpensiveBlock = NULL;
+					if (rand() % 10 > 0)
+						pBlock = (*ppPlayer)->m_pTargetBlock;
+				}
 
-						bAlternativePath = true;
-					
-						break;
-					}
-				}*/
+				m_pLastSeen = pBlock; 
 
-				//if (!bAlternativePath)
-					m_pPlayer->NavigateTo(m_pLastSeen);
+				m_pPlayer->NavigateTo(m_pLastSeen); // AI can be dumbed down by always using current block.
 			}
 		}
 	}
