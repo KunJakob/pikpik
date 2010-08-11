@@ -33,8 +33,8 @@ enum t_GameLayerIndex
 	GameLayerIndex_Items,
 	GameLayerIndex_Player,
 	GameLayerIndex_Effects,
-	GameLayerIndex_PacmanOverlay,
 	GameLayerIndex_GhostOverlay,
+	GameLayerIndex_EdgeOverlay,
 	GameLayerIndex_Radar,
 
 	GameLayerIndex_PathDebug,
@@ -101,7 +101,7 @@ protected:
 	void CalculateMusicEnergy(FMOD::Channel* pChannel);
 
 	// Scale the specified layer to the "energy" of the music.
-	void ScaleToEnergy(t_GameLayerIndex iLayer, xfloat fMultiplier, xfloat fInitialScale);
+	void ScaleToEnergy(t_GameLayerIndex iLayer, xfloat fEnergy, xfloat fInitialScale);
 
 	// Render the local player's path on the map.
 	void RenderPlayerPath(CRenderLayer* pLayer);
@@ -122,7 +122,7 @@ protected:
 	CSprite* m_pGhostOverlay;
 
 	// The pacman overlay.
-	CSprite* m_pPacmanOverlay;
+	CSprite* m_pEdgeOverlay;
 
 	// The background music.
 	CSound* m_pMusic;

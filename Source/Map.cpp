@@ -365,14 +365,22 @@ void CMap::OnRender()
 	// Draw the map.
 	for (xint iA = 0; iA < m_iBlockCount; ++iA)
 	{
+		t_TileType iTileType = m_xBlocks[iA].m_bEaten ? TileType_Eaten : m_xBlocks[iA].m_iTileType;
+		xpoint xCentrePoint = xpoint(m_pTileAreas[iTileType]->m_xRect.GetWidth(), m_pTileAreas[iTileType]->m_xRect.GetHeight()) / 2;
+
+		m_pTiles->Render
+		(
+			m_xBlocks[iA].GetScreenPosition(), 
+			xCentrePoint, 
+			m_pTileAreas[TileType_Blank]->m_xRect,
+			Global.m_fMapAlpha, 
+			Math::Radians(m_xBlocks[iA].m_fAngle)
+		);
+
 		if (m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsGhostWall())
 			m_pTiles->GetMetadata()->GetSprite()->SetColor(_ARGBF(1.f, m_fChannels[0], m_fChannels[1], m_fChannels[2]));
 		else
 			m_pTiles->GetMetadata()->GetSprite()->SetColor(0xFFFFFFFF);
-
-		t_TileType iTileType = m_xBlocks[iA].m_bEaten ? TileType_Eaten : m_xBlocks[iA].m_iTileType;
-
-		xpoint xCentrePoint = xpoint(m_pTileAreas[iTileType]->m_xRect.GetWidth(), m_pTileAreas[iTileType]->m_xRect.GetHeight()) / 2;
 
 		m_pTiles->Render
 		(

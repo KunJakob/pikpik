@@ -82,7 +82,10 @@ t_PlayerList CBrain::ScanCorridor(t_PlayerDirection iDirection)
 	t_PlayerList xPlayerList;
 	CMapBlock* pCurrentBlock = m_pPlayer->m_pCurrentBlock->m_pAdjacents[iDirection];
 
-	while (pCurrentBlock && !pCurrentBlock->IsWall() && !pCurrentBlock->IsGhostWall())
+	static xint s_iMaxBlocks = 10;
+	xint iSearchedBlocks = 0;
+
+	while (pCurrentBlock && !pCurrentBlock->IsWall() && !pCurrentBlock->IsGhostWall() && iSearchedBlocks++ < s_iMaxBlocks)
 	{
 		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
 		{
@@ -121,10 +124,10 @@ void CGhostBrain::Think()
 
 				CMapBlock* pBlock = (*ppPlayer)->m_pCurrentBlock;
 
-				// 90% of the time, the Ghost will follow accurately round corners.
+				// 50% of the time, the Ghost will follow accurately round corners.
 				if ((*ppPlayer)->m_pTargetBlock)
 				{
-					if (rand() % 10 > 0)
+					if (rand() % 10 > 4)
 						pBlock = (*ppPlayer)->m_pTargetBlock;
 				}
 

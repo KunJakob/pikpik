@@ -125,7 +125,7 @@
 //##############################################################################
 .Sprite "Map-Tiles"
 {
-	.File "Surfaces\Maps\Map-Blocks-1.png"
+	.File "Surfaces\Maps\Map-Blocks-2.png"
 	
 	.Area "Blank"			{ .Rect 0   0 48  48 }
 	.Area "Pellet"			{ .Rect 48  0 96  48 }
@@ -141,14 +141,19 @@
 	.Area "Base"			{ .Rect 528 0 576 48 }
 }
 
-.Sprite "Pacman-Overlay"
+.Sprite "Game-Background"
 {
-	.File "Surfaces\Overlays\Pacman-Overlay.png"
+	.File "Surfaces\Backgrounds\Game-Background.jpg"
 }
 
 .Sprite "Ghost-Overlay"
 {
 	.File "Surfaces\Overlays\Ghost-Overlay.png"
+}
+
+.Sprite "Edge-Overlay"
+{
+	.File "Surfaces\Overlays\Edge-Overlay.png"
 }
 
 //##############################################################################

@@ -34,23 +34,26 @@ void CGameScreen::OnActivate()
 	RenderManager.SetRenderView(m_xRenderView);
 
 	// Initialise the render layers.
-	RenderLayer(GameLayerIndex_Background)->AttachRenderable(&m_xBackground);
+	CSprite* m_pBackground = new CSprite(_SPRITE("Game-Background"));
+	RenderLayer(GameLayerIndex_Background)->AttachRenderable(m_pBackground);
+
 	RenderLayer(GameLayerIndex_Map)->AttachRenderable(Global.m_pActiveMap);
 
 	InitialisePlayers();
+
+	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
+		RenderLayer(GameLayerIndex_Player)->AttachRenderable(*ppPlayer);
 
 	m_pMinimap = new CMinimap(Global.m_pActiveMap);
 	RenderLayer(GameLayerIndex_Radar)->AttachRenderable(m_pMinimap);
 
 	m_pGhostOverlay = new CSprite(_SPRITE("Ghost-Overlay"));
-	m_pGhostOverlay->GetMetadata()->GetSprite()->SetBlendMode(BLEND_COLORMUL | BLEND_ALPHABLEND);
-
 	RenderLayer(GameLayerIndex_GhostOverlay)->AttachRenderable(m_pGhostOverlay);
 
-	m_pPacmanOverlay = new CSprite(_SPRITE("Pacman-Overlay"));
-	m_pPacmanOverlay->GetMetadata()->GetSprite()->SetBlendMode(BLEND_COLORMUL | BLEND_ALPHABLEND);
+	m_pEdgeOverlay = new CSprite(_SPRITE("Edge-Overlay"));
+	m_pEdgeOverlay->GetMetadata()->GetSprite()->SetBlendMode(BLEND_COLORMUL | BLEND_ALPHABLEND);
 
-	RenderLayer(GameLayerIndex_PacmanOverlay)->AttachRenderable(m_pPacmanOverlay);
+	RenderLayer(GameLayerIndex_EdgeOverlay)->AttachRenderable(m_pEdgeOverlay);
 
 #if !XRETAIL
 	RenderLayer(GameLayerIndex_PathDebug)->SetRenderOverride(xbind(this, &CGameScreen::RenderPlayerPath));
@@ -60,7 +63,7 @@ void CGameScreen::OnActivate()
 	// Load the music to associate with the map colourisation.
 	m_pMusic = new CSound(_SOUND("Game-Music"));
 	m_pMusic->Play();
-	m_pMusic->GetChannel()->setVolume(0.3f);
+	m_pMusic->GetChannel()->setVolume(0.0f);
 
 	// Load the sound effects.
 	m_pDeathSound = new CSound(_SOUND("Game-Death"));
@@ -72,7 +75,7 @@ void CGameScreen::OnDeactivate()
 	CollisionManager.Reset();
 
 	delete m_pGhostOverlay;
-	delete m_pPacmanOverlay;
+	delete m_pEdgeOverlay;
 
 	delete m_pMusic;
 	delete m_pDeathSound;
@@ -170,16 +173,19 @@ void CGameScreen::OnPreRender()
 	// Scale the overlays to the beat of the music.
 	if (m_iState == GameState_Playing)
 	{
-		ScaleToEnergy(GameLayerIndex_GhostOverlay, 10.0f, 1.4f);
-		ScaleToEnergy(GameLayerIndex_PacmanOverlay, 2.0f, 1.2f);
+		if (Global.m_pLocalPlayer->GetType() == PlayerType_Pacman)
+			ScaleToEnergy(GameLayerIndex_EdgeOverlay, Global.m_fMusicEnergy * 4.0f, 1.2f);
+		else
+		{
+			ScaleToEnergy(GameLayerIndex_EdgeOverlay, 0.0f, 1.24f);
+			ScaleToEnergy(GameLayerIndex_GhostOverlay, Global.m_fMusicEnergy * 15.0f, 1.5f);
+		}
 	}
 
 	RenderLayer(GameLayerIndex_GhostOverlay)->SetEnabled(Global.m_pLocalPlayer->GetType() == PlayerType_Ghost);
-	RenderLayer(GameLayerIndex_PacmanOverlay)->SetEnabled(Global.m_pLocalPlayer->GetType() == PlayerType_Pacman);
 
 	// Colourise the overlays.
-	m_pGhostOverlay->GetMetadata()->GetSprite()->SetColor(_ARGBF(1.f, Global.m_fColourChannels[0], Global.m_fColourChannels[1], Global.m_fColourChannels[2]));
-	m_pPacmanOverlay->GetMetadata()->GetSprite()->SetColor(_ARGBF(1.0f, Global.m_fColourChannels[0], Global.m_fColourChannels[1], Global.m_fColourChannels[2]));
+	m_pEdgeOverlay->GetMetadata()->GetSprite()->SetColor(_ARGBF(1.0f, Global.m_fColourChannels[0], Global.m_fColourChannels[1], Global.m_fColourChannels[2]));
 }
 
 // =============================================================================
@@ -209,10 +215,6 @@ void CGameScreen::InitialisePlayers()
 			}
 		}
 	}
-
-	// Add all active players to the player render layer.
-	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
-		RenderLayer(GameLayerIndex_Player)->AttachRenderable(*ppPlayer);
 }
 
 // =============================================================================
@@ -279,9 +281,8 @@ void CGameScreen::CalculateMusicEnergy(FMOD::Channel* pChannel)
 }
 
 // =============================================================================
-void CGameScreen::ScaleToEnergy(t_GameLayerIndex iLayer, xfloat fMultiplier, xfloat fInitialScale)
+void CGameScreen::ScaleToEnergy(t_GameLayerIndex iLayer, xfloat fEnergy, xfloat fInitialScale)
 {
-	xfloat fEnergy = Global.m_fMusicEnergy * fMultiplier;
 	xfloat fScale = fInitialScale - fEnergy;
 
 	xfloat fOffsetX = ((fEnergy - (fInitialScale - 1.0f)) * (xfloat)_SWIDTH) * 0.5f;
@@ -356,4 +357,10 @@ void CGameScreen::DebugControls()
 	{
 		RenderLayer(GameLayerIndex_PathDebug)->SetEnabled(!RenderLayer(GameLayerIndex_PathDebug)->IsEnabled());
 	}
+
+	// Test overlays.
+	if (_HGE->Input_KeyDown(HGEK_F3))
+		RenderLayer(GameLayerIndex_EdgeOverlay)->SetEnabled(!RenderLayer(GameLayerIndex_EdgeOverlay)->IsEnabled());
+	if (_HGE->Input_KeyDown(HGEK_F4))
+		RenderLayer(GameLayerIndex_GhostOverlay)->SetEnabled(!RenderLayer(GameLayerIndex_GhostOverlay)->IsEnabled());
 }

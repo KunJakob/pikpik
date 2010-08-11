@@ -99,7 +99,7 @@ HTEXTURE CMinimap::Generate(xuint iElementMask)
 					case BlockType_Wall:
 						{
 							if (XFLAGISSET(iElementMask, MinimapElement_Walls))
-								*pPixel = 0xFF8080FF;
+								*pPixel = _ARGBF(1.0f, Global.m_fColourChannels[0], Global.m_fColourChannels[1], Global.m_fColourChannels[2]);
 						}
 						break;
 

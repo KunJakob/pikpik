@@ -166,6 +166,8 @@ void CMenuScreen::OnDeactivate()
 // =============================================================================
 void CMenuScreen::OnWake()
 {
+	EndGame();
+
 	RenderManager.SetRenderView(m_xRenderView);
 
 	InterfaceManager.SetCursorVisible(true);
@@ -423,6 +425,16 @@ void CMenuScreen::InitTransition(xbool bTransitionIn)
 }
 
 // =============================================================================
+void CMenuScreen::EndGame()
+{
+	if (Global.m_pActiveMap)
+	{
+		Global.m_pActiveMap->Unload();
+		Global.m_pActiveMap = NULL;
+	}
+}
+
+// =============================================================================
 void CMenuScreen::Callback_ShowMainMenu()
 {
 	SetMenuGroup(MenuGroup_Main);
@@ -496,5 +508,3 @@ void CMenuScreen::Callback_CreatePrivate()
 	SetNextScreen(ScreenIndex_LobbyScreen);
 	m_iLobbyMode = LobbyStartMode_CreatePrivate;
 }
-
-//##############################################################################

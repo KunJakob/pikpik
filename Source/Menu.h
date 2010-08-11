@@ -152,6 +152,9 @@ protected:
 	// Initialise the transition.
 	void InitTransition(xbool bTransitionIn);
 
+	// Clean up the game ends.
+	void EndGame();
+
 	// Menu link actions.
 	void Callback_ShowMainMenu();
 	void Callback_StartGame();

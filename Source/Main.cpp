@@ -114,12 +114,12 @@ void Application::Initialise()
 
 	// Add all required modules to the game.
 	XMODULE(&NetworkManager);
-	XMODULE(&SoundManager);
-	XMODULE(&RenderManager);
+	XMODULE(&SoundManager); // This cleans up its own memory which corrupts the resource manager so should shutdown after it.
 	XMODULE(&ResourceManager);
+	XMODULE(&RenderManager);
+	XMODULE(&ScreenManager);
 	XMODULE(&InterfaceManager);
 	XMODULE(&CollisionManager);
-	XMODULE(&ScreenManager);
 	XMODULE(&MapManager);
 	XMODULE(&MatchManager);
 	XMODULE(&NavigationManager);
