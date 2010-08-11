@@ -106,6 +106,8 @@ CGhostBrain::CGhostBrain(CPlayer* pPlayer) : CBrain(pPlayer)
 // =============================================================================
 void CGhostBrain::Think()
 {
+	xbool bFoundPacman = false;
+
 	// Search for Pacman and if he's found, navigate to him.
 	for (xuint iA = 0; iA < PlayerDirection_Max; ++iA)
 	{
@@ -115,6 +117,8 @@ void CGhostBrain::Think()
 		{
 			if ((*ppPlayer)->GetType() == PlayerType_Pacman)
 			{
+				bFoundPacman = true;
+
 				CMapBlock* pBlock = (*ppPlayer)->m_pCurrentBlock;
 
 				// 90% of the time, the Ghost will follow accurately round corners.
@@ -132,6 +136,6 @@ void CGhostBrain::Think()
 	}
 
 	// If we're not heading anywhere specific, just wander around.
-	if (!m_pPlayer->GetNavPath())	
+	if (!bFoundPacman && !m_pPlayer->GetNavPath())	
 		Wander();
 }

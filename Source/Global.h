@@ -267,6 +267,9 @@ public:
 	// The music spectrum energy to determine how fast colours transition.
 	xfloat m_fMusicEnergy;
 
+	// The channel colours being used by the map.
+	xfloat m_fColourChannels[3];
+
 #if !XRETAIL
 	// The debug controls metadata.
 	CMetadata* m_pDebugMetadata;

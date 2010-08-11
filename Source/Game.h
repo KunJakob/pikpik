@@ -97,24 +97,18 @@ protected:
 	// Initialise all players in the game.
 	void InitialisePlayers();
 
-	// Generate a field mask texture for ghost vision.
-	HTEXTURE GenerateGhostMask(xint iInnerRadius, xint iOuterRadius);
-
 	// Calculate the "energy" for the music to determine background colour fading.
 	void CalculateMusicEnergy(FMOD::Channel* pChannel);
 
-	// Render the ghost mask.
-	void RenderGhostMask(CRenderLayer* pLayer);
-
-	// Render the beat overlay.
-	void RenderBeatOverlay(CRenderLayer* pLayer);
+	// Scale the specified layer to the "energy" of the music.
+	void ScaleToEnergy(t_GameLayerIndex iLayer, xfloat fMultiplier, xfloat fInitialScale);
 
 	// Render the local player's path on the map.
 	void RenderPlayerPath(CRenderLayer* pLayer);
 
 	// Debug controls for character switching.
 	void DebugControls();
-	HTEXTURE GenerateBeatOverlay();
+
 	// The current game state.
 	t_GameState m_iState;
 

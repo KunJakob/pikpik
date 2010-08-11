@@ -358,6 +358,8 @@ void CMap::OnRender()
 		}
 
 		m_fChannels[iA] = Math::Clamp(m_fChannels[iA], s_fMinColour, s_fMaxColour);
+
+		Global.m_fColourChannels[iA] = m_fChannels[iA];
 	}
 
 	// Draw the map.

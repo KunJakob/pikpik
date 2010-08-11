@@ -43,9 +43,13 @@ void CGameScreen::OnActivate()
 	RenderLayer(GameLayerIndex_Radar)->AttachRenderable(m_pMinimap);
 
 	m_pGhostOverlay = new CSprite(_SPRITE("Ghost-Overlay"));
+	m_pGhostOverlay->GetMetadata()->GetSprite()->SetBlendMode(BLEND_COLORMUL | BLEND_ALPHABLEND);
+
 	RenderLayer(GameLayerIndex_GhostOverlay)->AttachRenderable(m_pGhostOverlay);
 
 	m_pPacmanOverlay = new CSprite(_SPRITE("Pacman-Overlay"));
+	m_pPacmanOverlay->GetMetadata()->GetSprite()->SetBlendMode(BLEND_COLORMUL | BLEND_ALPHABLEND);
+
 	RenderLayer(GameLayerIndex_PacmanOverlay)->AttachRenderable(m_pPacmanOverlay);
 
 #if !XRETAIL
@@ -56,6 +60,7 @@ void CGameScreen::OnActivate()
 	// Load the music to associate with the map colourisation.
 	m_pMusic = new CSound(_SOUND("Game-Music"));
 	m_pMusic->Play();
+	m_pMusic->GetChannel()->setVolume(0.3f);
 
 	// Load the sound effects.
 	m_pDeathSound = new CSound(_SOUND("Game-Death"));
@@ -165,21 +170,16 @@ void CGameScreen::OnPreRender()
 	// Scale the overlays to the beat of the music.
 	if (m_iState == GameState_Playing)
 	{
-		xfloat fEnergy = Global.m_fMusicEnergy * 10.0f;
-		xfloat fOffsetX = ((fEnergy * ((xfloat)_SWIDTH * 1.0f)) / 2.0f) * -1.0f;
-		xfloat fOffsetY = ((fEnergy * ((xfloat)_SHEIGHT * 1.0f)) / 2.0f) * -1.0f;
-
-		RenderLayer(GameLayerIndex_GhostOverlay)->SetTransformation(xpoint(fOffsetX, fOffsetY) , 0.0f, 1.0f + fEnergy, 1.0f + fEnergy);
-
-		fEnergy = Global.m_fMusicEnergy * 2.0f;
-		fOffsetX = ((fEnergy * ((xfloat)_SWIDTH * 1.0f)) / 2.0f) * -1.0f;
-		fOffsetY = ((fEnergy * ((xfloat)_SHEIGHT * 1.0f)) / 2.0f) * -1.0f;
-
-		RenderLayer(GameLayerIndex_PacmanOverlay)->SetTransformation(xpoint(fOffsetX, fOffsetY), 0.0f, 1.0f + fEnergy, 1.0f + fEnergy);
+		ScaleToEnergy(GameLayerIndex_GhostOverlay, 10.0f, 1.4f);
+		ScaleToEnergy(GameLayerIndex_PacmanOverlay, 2.0f, 1.2f);
 	}
 
 	RenderLayer(GameLayerIndex_GhostOverlay)->SetEnabled(Global.m_pLocalPlayer->GetType() == PlayerType_Ghost);
 	RenderLayer(GameLayerIndex_PacmanOverlay)->SetEnabled(Global.m_pLocalPlayer->GetType() == PlayerType_Pacman);
+
+	// Colourise the overlays.
+	m_pGhostOverlay->GetMetadata()->GetSprite()->SetColor(_ARGBF(1.f, Global.m_fColourChannels[0], Global.m_fColourChannels[1], Global.m_fColourChannels[2]));
+	m_pPacmanOverlay->GetMetadata()->GetSprite()->SetColor(_ARGBF(1.0f, Global.m_fColourChannels[0], Global.m_fColourChannels[1], Global.m_fColourChannels[2]));
 }
 
 // =============================================================================
@@ -276,6 +276,18 @@ void CGameScreen::CalculateMusicEnergy(FMOD::Channel* pChannel)
 	fAverageStrength /= 4.f;
 
 	Global.m_fMusicEnergy = fAverageStrength * 0.1f;
+}
+
+// =============================================================================
+void CGameScreen::ScaleToEnergy(t_GameLayerIndex iLayer, xfloat fMultiplier, xfloat fInitialScale)
+{
+	xfloat fEnergy = Global.m_fMusicEnergy * fMultiplier;
+	xfloat fScale = fInitialScale - fEnergy;
+
+	xfloat fOffsetX = ((fEnergy - (fInitialScale - 1.0f)) * (xfloat)_SWIDTH) * 0.5f;
+	xfloat fOffsetY = ((fEnergy - (fInitialScale - 1.0f)) * (xfloat)_SHEIGHT) * 0.5f;
+
+	RenderLayer(iLayer)->SetTransformation(xpoint((xint)fOffsetX, (xint)fOffsetY) , 0.0f, fScale, fScale);
 }
 
 // =============================================================================
