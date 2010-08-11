@@ -100,6 +100,9 @@ protected:
 	// Calculate the "energy" for the music to determine background colour fading.
 	void CalculateMusicEnergy(FMOD::Channel* pChannel);
 
+	// Calculate the current colourisation based on the music energy.
+	void CalculateColourisation();
+
 	// Scale the specified layer to the "energy" of the music.
 	void ScaleToEnergy(t_GameLayerIndex iLayer, xfloat fEnergy, xfloat fInitialScale);
 
@@ -116,7 +119,7 @@ protected:
 	CRenderView* m_xRenderView;
 
 	// The map background.
-	CBackground m_xBackground;
+	CSprite* m_pBackground;
 
 	// The ghost overlay.
 	CSprite* m_pGhostOverlay;
@@ -138,6 +141,9 @@ protected:
 
 	// The death sound.
 	CSound* m_pDeathSound;
+
+	// The current colour transition direction.
+	xbool m_bColouriseDir[3];
 };
 
 //##############################################################################

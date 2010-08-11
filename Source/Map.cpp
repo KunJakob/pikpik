@@ -73,6 +73,23 @@ static const t_BlockType s_iBlockTypeLookup[TileType_Max] =
 	BlockType_GhostBase,
 };
 
+// The animation/area name lookup table.
+static const xchar* s_pTileNameLookup[TileType_Max] =
+{
+	"Blank",
+	"Pellet",
+	"Power",
+	"Eaten",
+	"Solo",
+	"Tunnel",
+	"Cap",
+	"Corner",
+	"Junction",
+	"Intersection",
+	"Entrance",
+	"Base",
+};
+
 //##############################################################################
 
 // =============================================================================
@@ -105,7 +122,6 @@ CMap::CMap(CDataset* pDataset) : CRenderable(RenderableType_Map),
 	m_pDataset(pDataset),
 	m_bLoaded(false),
 	m_iPelletsEaten(0),
-	m_pTiles(NULL),
 	m_xBlocks(NULL)
 {
 	// Load the rest of the map properties.
@@ -134,22 +150,19 @@ void CMap::Load()
 	if (!m_bLoaded)
 	{
 		// Load and initialise all resources.
-		m_pTiles = new CBasicSprite(_SPRITE(m_pDataset->GetProperty("Tiles")->GetString()));
+		const xchar* pTilesMetadata = m_pDataset->GetProperty("Tiles")->GetString();
 
-		m_pTileAreas[TileType_Blank]			= m_pTiles->GetMetadata()->FindArea("Blank");
-		m_pTileAreas[TileType_Pellet]			= m_pTiles->GetMetadata()->FindArea("Pellet");
-		m_pTileAreas[TileType_Power]			= m_pTiles->GetMetadata()->FindArea("Power");
-		m_pTileAreas[TileType_Eaten]			= m_pTiles->GetMetadata()->FindArea("Eaten");
-		m_pTileAreas[TileType_Solo]				= m_pTiles->GetMetadata()->FindArea("Solo");
-		m_pTileAreas[TileType_Tunnel]			= m_pTiles->GetMetadata()->FindArea("Tunnel");
-		m_pTileAreas[TileType_Cap]				= m_pTiles->GetMetadata()->FindArea("Cap");
-		m_pTileAreas[TileType_Corner]			= m_pTiles->GetMetadata()->FindArea("Corner");
-		m_pTileAreas[TileType_Junction]			= m_pTiles->GetMetadata()->FindArea("Junction");
-		m_pTileAreas[TileType_Intersection]		= m_pTiles->GetMetadata()->FindArea("Intersection");
-		m_pTileAreas[TileType_Entrance]			= m_pTiles->GetMetadata()->FindArea("Entrance");
-		m_pTileAreas[TileType_Base]				= m_pTiles->GetMetadata()->FindArea("Base");
-
-		m_pTiles->GetMetadata()->GetSprite()->SetBlendMode(BLEND_COLORMUL | BLEND_ALPHABLEND);
+		// Load the tiles and set a default animation or area for each one.
+		for (xint iA = 0; iA < TileType_Max; ++iA)
+		{
+			m_pTiles[iA] = new CAnimatedSprite(_SPRITE(pTilesMetadata));
+			m_pTiles[iA]->GetMetadata()->GetSprite()->SetBlendMode(BLEND_COLORMUL | BLEND_ALPHABLEND);
+			
+			if (m_pTiles[iA]->HasAnimation(s_pTileNameLookup[iA]))
+				m_pTiles[iA]->Play(s_pTileNameLookup[iA]);
+			else
+				m_pTiles[iA]->SetArea(s_pTileNameLookup[iA]);
+		}
 
 		// Allocate the map block memory.
 		m_xBlocks = new CMapBlock[m_iBlockCount];
@@ -175,6 +188,7 @@ void CMap::Load()
 				pBlock->m_pPower = NULL;
 				pBlock->m_pTrap = NULL;
 				pBlock->m_pNavNode = NULL;
+				//pBlock->m_pTile = NULL;
 
 				pBlock->m_pAdjacents[AdjacentDirection_Left]	= (iIndex % m_iWidth > 0) ? &m_xBlocks[iIndex - 1] : NULL;
 				pBlock->m_pAdjacents[AdjacentDirection_Up]		= (iIndex >= m_iWidth) ? &m_xBlocks[iIndex - m_iWidth] : NULL;
@@ -207,6 +221,7 @@ void CMap::Load()
 
 					pBlock->m_iTileType = s_iTileIndexLookup[iMask];
 					pBlock->m_fAngle = s_fRotationAngleLookup[iMask];
+					//pBlock->m_pTile = m_pAnimatedTiles[TileType_];
 				}
 				break;
 
@@ -250,13 +265,6 @@ void CMap::Load()
 			}
 		}
 
-		// Initialise the colourisation.
-		for (xint iA = 0; iA < 3; ++iA)
-		{
-			m_fChannels[iA] = .5f;
-			m_bColouriseDir[iA] = (rand() % 2 == 0);
-		}
-
 		// Initialise the map properties.
 		m_iPelletsEaten = 0;
 	}
@@ -269,7 +277,8 @@ void CMap::Unload()
 {
 	if (m_bLoaded)
 	{
-		delete m_pTiles;
+		for (xint iA = 0; iA < TileType_Max; ++iA)
+			delete m_pTiles[iA];
 
 		delete[] m_xBlocks;
 		m_xBlocks = NULL;
@@ -286,6 +295,11 @@ void CMap::Unload()
 // =============================================================================
 void CMap::Update()
 {
+	// Update each tile so that animations progress.
+	for (xint iA = 0; iA < TileType_Max; ++iA)
+		m_pTiles[iA]->Update();
+
+	// Calculate the block visibility.
 	if (Global.m_pLocalPlayer->m_iType == PlayerType_Ghost)
 	{
 		for (xint iA = 0; iA < m_iBlockCount; ++iA)
@@ -338,58 +352,23 @@ void CMap::AddVisiblePaths(CMapBlock* pBase, xfloat fVisibility)
 // =============================================================================
 void CMap::OnRender()
 {
-	// Blend the colours based on the music energy.
-	const static xfloat s_fMinColour = 0.2f;
-	const static xfloat s_fMaxColour = 1.0f;
-
-	for (xint iA = 0; iA < 3; ++iA)
-	{
-		xfloat fChannelEnergy = Global.m_fMusicEnergy * (iA + 1);
-
-		if (m_bColouriseDir[iA])
-		{
-			m_fChannels[iA] += fChannelEnergy;
-			m_bColouriseDir[iA] = !(m_fChannels[iA] > s_fMaxColour);
-		}
-		else
-		{
-			m_fChannels[iA] -= fChannelEnergy;
-			m_bColouriseDir[iA] = (m_fChannels[iA] < s_fMinColour);
-		}
-
-		m_fChannels[iA] = Math::Clamp(m_fChannels[iA], s_fMinColour, s_fMaxColour);
-
-		Global.m_fColourChannels[iA] = m_fChannels[iA];
-	}
-
 	// Draw the map.
 	for (xint iA = 0; iA < m_iBlockCount; ++iA)
 	{
 		t_TileType iTileType = m_xBlocks[iA].m_bEaten ? TileType_Eaten : m_xBlocks[iA].m_iTileType;
-		xpoint xCentrePoint = xpoint(m_pTileAreas[iTileType]->m_xRect.GetWidth(), m_pTileAreas[iTileType]->m_xRect.GetHeight()) / 2;
-
-		m_pTiles->Render
-		(
-			m_xBlocks[iA].GetScreenPosition(), 
-			xCentrePoint, 
-			m_pTileAreas[TileType_Blank]->m_xRect,
-			Global.m_fMapAlpha, 
-			Math::Radians(m_xBlocks[iA].m_fAngle)
-		);
+		CAnimatedSprite* pTile = m_pTiles[iTileType];
 
 		if (m_xBlocks[iA].IsWall() || m_xBlocks[iA].IsGhostWall())
-			m_pTiles->GetMetadata()->GetSprite()->SetColor(_ARGBF(1.f, m_fChannels[0], m_fChannels[1], m_fChannels[2]));
+			pTile->GetMetadata()->GetSprite()->SetColor(_ARGBF(1.f, Global.m_fColourChannels[0], Global.m_fColourChannels[1], Global.m_fColourChannels[2]));
 		else
-			m_pTiles->GetMetadata()->GetSprite()->SetColor(0xFFFFFFFF);
+			pTile->GetMetadata()->GetSprite()->SetColor(0xFFFFFFFF);
 
-		m_pTiles->Render
-		(
-			m_xBlocks[iA].GetScreenPosition(), 
-			xCentrePoint, 
-			m_pTileAreas[iTileType]->m_xRect,
-			m_xBlocks[iA].m_fVisibility * Global.m_fMapAlpha, 
-			Math::Radians(m_xBlocks[iA].m_fAngle)
-		);
+		pTile->SetAnchor(pTile->GetAreaCentre());
+		pTile->SetPosition(m_xBlocks[iA].GetScreenPosition());
+		pTile->SetAlpha(m_xBlocks[iA].m_fVisibility * Global.m_fMapAlpha);
+		pTile->SetAngle(Math::Radians(m_xBlocks[iA].m_fAngle));
+
+		pTile->Render();
 	}
 }
 

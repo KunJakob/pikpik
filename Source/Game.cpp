@@ -34,7 +34,8 @@ void CGameScreen::OnActivate()
 	RenderManager.SetRenderView(m_xRenderView);
 
 	// Initialise the render layers.
-	CSprite* m_pBackground = new CSprite(_SPRITE("Game-Background"));
+	m_pBackground = new CSprite(_SPRITE("Game-Background"));
+	m_pBackground->GetMetadata()->GetSprite()->SetBlendMode(BLEND_COLORMUL | BLEND_ALPHABLEND);
 	RenderLayer(GameLayerIndex_Background)->AttachRenderable(m_pBackground);
 
 	RenderLayer(GameLayerIndex_Map)->AttachRenderable(Global.m_pActiveMap);
@@ -63,16 +64,26 @@ void CGameScreen::OnActivate()
 	// Load the music to associate with the map colourisation.
 	m_pMusic = new CSound(_SOUND("Game-Music"));
 	m_pMusic->Play();
-	m_pMusic->GetChannel()->setVolume(0.0f);
+	//m_pMusic->GetChannel()->setVolume(0.0f);
 
 	// Load the sound effects.
 	m_pDeathSound = new CSound(_SOUND("Game-Death"));
+
+	// Initialise the colourisation.
+	for (xint iA = 0; iA < 3; ++iA)
+	{
+		Global.m_fColourChannels[iA] = .5f;
+		m_bColouriseDir[iA] = (rand() % 2 == 0);
+	}
+
 }
 
 // =============================================================================
 void CGameScreen::OnDeactivate()
 {
 	CollisionManager.Reset();
+
+	delete m_pBackground;
 
 	delete m_pGhostOverlay;
 	delete m_pEdgeOverlay;
@@ -153,6 +164,9 @@ void CGameScreen::OnUpdate()
 		(*ppPlayer)->Update();
 	}
 
+	// Calculate the music colourisation.
+	CalculateColourisation();
+
 	// Generate the minimap.
 	GenerateMinimap();
 }
@@ -185,6 +199,7 @@ void CGameScreen::OnPreRender()
 	RenderLayer(GameLayerIndex_GhostOverlay)->SetEnabled(Global.m_pLocalPlayer->GetType() == PlayerType_Ghost);
 
 	// Colourise the overlays.
+	m_pBackground->GetMetadata()->GetSprite()->SetColor(_ARGBF(1.0f, Global.m_fColourChannels[0], Global.m_fColourChannels[1], Global.m_fColourChannels[2]));
 	m_pEdgeOverlay->GetMetadata()->GetSprite()->SetColor(_ARGBF(1.0f, Global.m_fColourChannels[0], Global.m_fColourChannels[1], Global.m_fColourChannels[2]));
 }
 
@@ -223,7 +238,7 @@ void CGameScreen::OnPacmanDie(CGhost* pGhost)
 	m_pMusic->Stop();
 	m_pDeathSound->Play();
 
-	Global.m_fMusicEnergy = 0.2f;
+	Global.m_fMusicEnergy = 0.1f;
 
 	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
 	{
@@ -278,6 +293,32 @@ void CGameScreen::CalculateMusicEnergy(FMOD::Channel* pChannel)
 	fAverageStrength /= 4.f;
 
 	Global.m_fMusicEnergy = fAverageStrength * 0.1f;
+}
+
+// =============================================================================
+void CGameScreen::CalculateColourisation()
+{
+	// Blend the colours based on the music energy.
+	const static xfloat s_fMinColour = 0.2f;
+	const static xfloat s_fMaxColour = 1.0f;
+
+	for (xint iA = 0; iA < 3; ++iA)
+	{
+		xfloat fChannelEnergy = Global.m_fMusicEnergy * (iA + 1);
+
+		if (m_bColouriseDir[iA])
+		{
+			Global.m_fColourChannels[iA] += fChannelEnergy;
+			m_bColouriseDir[iA] = !(Global.m_fColourChannels[iA] > s_fMaxColour);
+		}
+		else
+		{
+			Global.m_fColourChannels[iA] -= fChannelEnergy;
+			m_bColouriseDir[iA] = (Global.m_fColourChannels[iA] < s_fMinColour);
+		}
+
+		Global.m_fColourChannels[iA] = Math::Clamp(Global.m_fColourChannels[iA], s_fMinColour, s_fMaxColour);
+	}
 }
 
 // =============================================================================

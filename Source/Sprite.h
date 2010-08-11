@@ -263,6 +263,12 @@ public:
 	// Automatic render called by the render manager.
 	virtual void OnRender();
 
+	// Determine if the specified area exists.
+	xbool HasArea(const xchar* pName)
+	{
+		return m_pMetadata->FindArea(pName) != NULL;
+	}
+
 	// Set the current area to render.
 	void SetArea(CSpriteMetadata::CArea* pArea)
 	{
@@ -400,6 +406,12 @@ public:
 	// Automatic render called by the render manager.
 	virtual void OnRender();
 
+	// Determine if the specified animation frame exists.
+	xbool HasFrame(const xchar* pName)
+	{
+		return m_pMetadata->FindFrame(m_pAnimation, pName) != NULL;
+	}
+
 	// Jump to a specific animation frame in the current animation.
 	void SetFrame(CSpriteMetadata::CFrame* pFrame);
 
@@ -419,6 +431,12 @@ public:
 	xbool IsActiveFrame(const xchar* pName)
 	{
 		return m_pFrame && String::IsMatch(m_pFrame->m_pName, pName);
+	}
+
+	// Determine if the specified animation exists.
+	xbool HasAnimation(const xchar* pName)
+	{
+		return m_pMetadata->FindAnimation(pName) != NULL;
 	}
 
 	// Set the active animation and reset states and timings to the first animation frame.

@@ -155,6 +155,9 @@ public:
 	// The navigation node attached to this block.
 	CNavigationNode* m_pNavNode;
 
+	// The tile being used to render this block.
+	//CAnimatedSprite* m_pTile;
+
 protected:
 	// Get the bit-index for the adjacent.
 	xuint GetBit(t_AdjacentDirection iAdjacentDir)
@@ -308,7 +311,7 @@ protected:
 	xint m_iPelletsEaten;
 
 	// The tiles used for rendering the map.
-	CBasicSprite* m_pTiles;
+	CAnimatedSprite* m_pTiles[TileType_Max];
 
 	// The areas of each map tile.
 	CSpriteMetadata::CArea* m_pTileAreas[TileType_Max];
@@ -321,12 +324,6 @@ protected:
 
 	// The current map offset in pixels.
 	xpoint m_xOffset;
-
-	// The map current map colourisation channels.
-	xfloat m_fChannels[3];
-
-	// The current colour transition direction.
-	xbool m_bColouriseDir[3];
 
 	// The map's navigation mesh.
 	CNavigationMesh* m_pNavMesh;
