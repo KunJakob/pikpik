@@ -56,6 +56,9 @@ void CGameScreen::OnActivate()
 
 	RenderLayer(GameLayerIndex_EdgeOverlay)->AttachRenderable(m_pEdgeOverlay);
 
+	m_pCountdownFont = new CFont(_FONT("Game-Countdown"));
+	RenderLayer(GameLayerIndex_Countdown)->SetRenderOverride(xbind(this, &CGameScreen::RenderCountdown));
+
 #if !XRETAIL
 	RenderLayer(GameLayerIndex_PathDebug)->SetRenderOverride(xbind(this, &CGameScreen::RenderPlayerPath));
 	RenderLayer(GameLayerIndex_PathDebug)->SetEnabled(false);
@@ -63,11 +66,12 @@ void CGameScreen::OnActivate()
 
 	// Load the music to associate with the map colourisation.
 	m_pMusic = new CSound(_SOUND("Game-Music"));
-	m_pMusic->Play();
+	
 	//m_pMusic->GetChannel()->setVolume(0.0f);
 
 	// Load the sound effects.
 	m_pDeathSound = new CSound(_SOUND("Game-Death"));
+	m_pCountdownSound = new CSound(_SOUND("Countdown-Beep"));
 
 	// Initialise the colourisation.
 	for (xint iA = 0; iA < 3; ++iA)
@@ -76,12 +80,16 @@ void CGameScreen::OnActivate()
 		m_bColouriseDir[iA] = (rand() % 2 == 0);
 	}
 
+	m_iState = GameState_None;
 }
 
 // =============================================================================
 void CGameScreen::OnDeactivate()
 {
 	CollisionManager.Reset();
+
+	delete m_pCountdownFont;
+	delete m_pCountdownSound;
 
 	delete m_pBackground;
 
@@ -102,7 +110,8 @@ void CGameScreen::OnDeactivate()
 // =============================================================================
 void CGameScreen::OnWake()
 {
-	m_iState = GameState_Playing;
+	// Start the countdown.
+	SetState(GameState_Intro);
 }
 
 // =============================================================================
@@ -121,11 +130,17 @@ xbool CGameScreen::OnEvent(xint iEventType, void* pEventInfo)
 		{
 			switch (pEvent->key)
 			{
-				// ESCAPE.
 			case HGEK_ESCAPE:
 				{
 					ScreenManager.Pop();
 					return true;
+				}
+				break;
+
+			case HGEK_ENTER:
+				{
+					//if (m_iState == GameState_Finished)
+						//SetState(GameState_Intro);
 				}
 				break;
 			}
@@ -146,6 +161,12 @@ void CGameScreen::OnUpdate()
 
 	switch (m_iState)
 	{
+	case GameState_Intro:
+		{
+			UpdateIntro();
+		}
+		break;
+
 	case GameState_Playing:
 		{
 			// Calculate the music energy using spectrum analysis.
@@ -155,13 +176,19 @@ void CGameScreen::OnUpdate()
 		break;
 	}
 
+	// Set certain layer enabled/disabled statuses.
+	RenderLayer(GameLayerIndex_Countdown)->SetEnabled(m_iState == GameState_Intro);
+
 	// Update the map.
 	Global.m_pActiveMap->Update();
 
 	// Update all the players.
-	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
+	if (m_iState != GameState_Intro)
 	{
-		(*ppPlayer)->Update();
+		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
+		{
+			(*ppPlayer)->Update();
+		}
 	}
 
 	// Calculate the music colourisation.
@@ -169,6 +196,21 @@ void CGameScreen::OnUpdate()
 
 	// Generate the minimap.
 	GenerateMinimap();
+}
+
+// =============================================================================
+void CGameScreen::UpdateIntro()
+{
+	if (m_xCountdownTimer.IsExpired())
+	{
+		if (--m_iCountdown == 0)
+			SetState(GameState_Playing);
+		else
+		{
+			m_pCountdownSound->Play();
+			m_xCountdownTimer.ExpireAfter(1000);
+		}
+	}
 }
 
 // =============================================================================
@@ -199,8 +241,13 @@ void CGameScreen::OnPreRender()
 	RenderLayer(GameLayerIndex_GhostOverlay)->SetEnabled(Global.m_pLocalPlayer->GetType() == PlayerType_Ghost);
 
 	// Colourise the overlays.
-	m_pBackground->GetMetadata()->GetSprite()->SetColor(_ARGBF(1.0f, Global.m_fColourChannels[0], Global.m_fColourChannels[1], Global.m_fColourChannels[2]));
-	m_pEdgeOverlay->GetMetadata()->GetSprite()->SetColor(_ARGBF(1.0f, Global.m_fColourChannels[0], Global.m_fColourChannels[1], Global.m_fColourChannels[2]));
+	xfloat fColours[3];
+
+	for (xint iA = 0; iA < 3; ++iA)
+		fColours[iA] = Global.m_fColourChannels[iA];
+
+	m_pBackground->GetMetadata()->GetSprite()->SetColor(_ARGBF(0.2f, fColours[0], fColours[1], fColours[2]));
+	m_pEdgeOverlay->GetMetadata()->GetSprite()->SetColor(_ARGBF(1.0f, fColours[0], fColours[1], fColours[2]));
 }
 
 // =============================================================================
@@ -217,18 +264,67 @@ void CGameScreen::InitialisePlayers()
 			CPlayer* pPlayer = *ppPlayer;
 
 			if (pPlayer->GetType() == PlayerType_Pacman)
-			{
-				pPlayer->SetLogicType(PlayerLogicType_Local);
-
 				CollisionManager.Add((CPacman*)pPlayer);
-			}
 			else if (pPlayer->GetType() == PlayerType_Ghost)
-			{
-				pPlayer->SetLogicType(PlayerLogicType_AI);
-
 				CollisionManager.Add((CGhost*)pPlayer);
-			}
 		}
+	}
+}
+
+// =============================================================================
+void CGameScreen::ResetGame()
+{
+	m_iCountdown = 4;
+	m_xCountdownTimer.ExpireAfter(0);
+}
+
+// =============================================================================
+void CGameScreen::StartGame()
+{
+	m_pMusic->Play();
+
+	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
+	{
+		if ((*ppPlayer)->GetType() == PlayerType_Pacman)
+			(*ppPlayer)->SetLogicType(PlayerLogicType_Local);
+		else if ((*ppPlayer)->GetType() == PlayerType_Ghost)
+			(*ppPlayer)->SetLogicType(PlayerLogicType_AI);
+	}
+}
+
+// =============================================================================
+void CGameScreen::EndGame()
+{
+	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
+	{
+		if ((*ppPlayer)->GetType() == PlayerType_Ghost)
+		{
+			(*ppPlayer)->SetLogicType(PlayerLogicType_None);
+			(*ppPlayer)->NavigateTo((*ppPlayer)->m_pStartingBlock);
+		}
+		else
+			(*ppPlayer)->SetLogicType(PlayerLogicType_None);
+	}
+}
+
+// =============================================================================
+void CGameScreen::SetState(t_GameState iGameState)
+{
+	m_iState = iGameState;
+
+	switch (iGameState)
+	{
+	case GameState_Intro:
+		ResetGame();
+		break;
+
+	case GameState_Playing:
+		StartGame();
+		break;
+
+	case GameState_Finished:
+		EndGame();
+		break;
 	}
 }
 
@@ -240,18 +336,7 @@ void CGameScreen::OnPacmanDie(CGhost* pGhost)
 
 	Global.m_fMusicEnergy = 0.1f;
 
-	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
-	{
-		if ((*ppPlayer)->GetType() == PlayerType_Ghost)
-		{
-			(*ppPlayer)->SetLogicType(PlayerLogicType_None);
-			(*ppPlayer)->NavigateTo((*ppPlayer)->m_pStartingBlock);
-		}
-		else
-			(*ppPlayer)->SetLogicType(PlayerLogicType_None);
-	}
-
-	m_iState = GameState_Finished;
+	SetState(GameState_Finished);
 }
 
 // =============================================================================
@@ -330,6 +415,18 @@ void CGameScreen::ScaleToEnergy(t_GameLayerIndex iLayer, xfloat fEnergy, xfloat 
 	xfloat fOffsetY = ((fEnergy - (fInitialScale - 1.0f)) * (xfloat)_SHEIGHT) * 0.5f;
 
 	RenderLayer(iLayer)->SetTransformation(xpoint((xint)fOffsetX, (xint)fOffsetY) , 0.0f, fScale, fScale);
+}
+
+// =============================================================================
+void CGameScreen::RenderCountdown(CRenderLayer* pLayer)
+{
+	static xfloat s_fMaxScale = 1.f;
+	static xfloat s_fMinScale = 0.1f;
+
+	xfloat fScale = ((s_fMaxScale - s_fMinScale) * ((xfloat)m_xCountdownTimer.TimeToExpiration() / 1000.f)) + s_fMinScale;
+
+	m_pCountdownFont->GetMetadata()->m_fScale = fScale;
+	m_pCountdownFont->Render(XFORMAT("%d", m_iCountdown), xpoint(_HSWIDTH, _HSHEIGHT - (xint)(((xfloat)m_pCountdownFont->GetFontHeight() / 2.f) * fScale)), HGETEXT_CENTER | HGETEXT_MIDDLE);
 }
 
 // =============================================================================

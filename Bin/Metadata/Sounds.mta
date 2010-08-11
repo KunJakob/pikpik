@@ -30,3 +30,10 @@
 	.Group 0
 	.Volume 1.0
 }
+
+.Sound "Countdown-Beep"
+{
+	.File "Sound\Effects\Countdown-Beep.mp3"
+	.Group 0
+	.Volume 1.0
+}

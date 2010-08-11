@@ -36,6 +36,7 @@ enum t_GameLayerIndex
 	GameLayerIndex_GhostOverlay,
 	GameLayerIndex_EdgeOverlay,
 	GameLayerIndex_Radar,
+	GameLayerIndex_Countdown,
 
 	GameLayerIndex_PathDebug,
 
@@ -45,6 +46,7 @@ enum t_GameLayerIndex
 // The game states.
 enum t_GameState
 {
+	GameState_None,
 	GameState_Intro,
 	GameState_Playing,
 	GameState_Finished,
@@ -88,6 +90,9 @@ protected:
 	// Called to update the screen (updates the parent screen by default).
 	virtual void OnUpdate();
 
+	// Update the intro sequence.
+	void UpdateIntro();
+
 	// Generate the minimap for the current playing field.
 	void GenerateMinimap();
 
@@ -97,6 +102,18 @@ protected:
 	// Initialise all players in the game.
 	void InitialisePlayers();
 
+	// Reset the game.
+	void ResetGame();
+
+	// Start the game.
+	void StartGame();
+
+	// Called to end the game.
+	void EndGame();
+
+	// Set the game state.
+	void SetState(t_GameState iGameState);
+
 	// Calculate the "energy" for the music to determine background colour fading.
 	void CalculateMusicEnergy(FMOD::Channel* pChannel);
 
@@ -105,6 +122,9 @@ protected:
 
 	// Scale the specified layer to the "energy" of the music.
 	void ScaleToEnergy(t_GameLayerIndex iLayer, xfloat fEnergy, xfloat fInitialScale);
+
+	// Render the game countdown.
+	void RenderCountdown(CRenderLayer* pLayer);
 
 	// Render the local player's path on the map.
 	void RenderPlayerPath(CRenderLayer* pLayer);
@@ -144,6 +164,18 @@ protected:
 
 	// The current colour transition direction.
 	xbool m_bColouriseDir[3];
+
+	// The countdown timer.
+	CTimer m_xCountdownTimer;
+
+	// The countdown count.
+	xint m_iCountdown;
+
+	// The countdown font.
+	CFont* m_pCountdownFont;
+
+	// The countdown sound.
+	CSound* m_pCountdownSound;
 };
 
 //##############################################################################
