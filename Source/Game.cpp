@@ -25,9 +25,6 @@
 // =============================================================================
 void CGameScreen::OnActivate()
 {
-	Global.m_fMapAlpha = 1.f;
-	Global.m_fMusicEnergy = 0.f;
-
 	// Initialise the render manager for the game.
 	m_xRenderView = new CRenderView(GameLayerIndex_Max);
 
@@ -64,21 +61,9 @@ void CGameScreen::OnActivate()
 	RenderLayer(GameLayerIndex_PathDebug)->SetEnabled(false);
 #endif
 
-	// Load the music to associate with the map colourisation.
-	m_pMusic = new CSound(_SOUND("Game-Music"));
-	
-	//m_pMusic->GetChannel()->setVolume(0.0f);
-
 	// Load the sound effects.
 	m_pDeathSound = new CSound(_SOUND("Game-Death"));
 	m_pCountdownSound = new CSound(_SOUND("Countdown-Beep"));
-
-	// Initialise the colourisation.
-	for (xint iA = 0; iA < 3; ++iA)
-	{
-		Global.m_fColourChannels[iA] = .5f;
-		m_bColouriseDir[iA] = (rand() % 2 == 0);
-	}
 
 	m_iState = GameState_None;
 }
@@ -96,7 +81,10 @@ void CGameScreen::OnDeactivate()
 	delete m_pGhostOverlay;
 	delete m_pEdgeOverlay;
 
-	delete m_pMusic;
+	if (m_pMusic)
+		m_pMusic->release();
+
+	//delete m_pMusic;
 	delete m_pDeathSound;
 
 	delete m_pMinimap;
@@ -139,8 +127,8 @@ xbool CGameScreen::OnEvent(xint iEventType, void* pEventInfo)
 
 			case HGEK_ENTER:
 				{
-					//if (m_iState == GameState_Finished)
-						//SetState(GameState_Intro);
+					if (m_iState == GameState_Finished)
+						SetState(GameState_Intro);
 				}
 				break;
 			}
@@ -170,8 +158,14 @@ void CGameScreen::OnUpdate()
 	case GameState_Playing:
 		{
 			// Calculate the music energy using spectrum analysis.
-			if (m_pMusic->IsPlaying())
-				CalculateMusicEnergy(m_pMusic->GetChannel());
+			if (m_pChannel)
+			{
+				xbool bPlaying = false;
+				m_pChannel->isPlaying(&bPlaying);
+
+				if (bPlaying)
+					CalculateMusicEnergy(m_pChannel);
+			}
 		}
 		break;
 	}
@@ -274,6 +268,31 @@ void CGameScreen::InitialisePlayers()
 // =============================================================================
 void CGameScreen::ResetGame()
 {
+	// Reset the map effect control values.
+	Global.m_fMapAlpha = 1.f;
+	Global.m_fMusicEnergy = 0.f;
+
+	// Start a random track from the level music directory.
+	//m_pMusic = new CSound(_SOUND("Game-Music"));
+	//m_pMusic->GetChannel()->setVolume(0.0f);
+
+	m_pMusic = NULL;
+	m_pChannel = NULL;
+
+	t_FileScanResult lsMusicFiles = FileManager.Scan("Sound\\Level\\*.mp3");
+	xint iMusicIndex = rand() % lsMusicFiles.size();
+
+	if (lsMusicFiles.size())
+		_FMOD->createStream(XFORMAT("Sound\\Level\\%s", lsMusicFiles[iMusicIndex].c_str()), FMOD_SOFTWARE, 0, &m_pMusic);
+
+	// Initialise the colourisation.
+	for (xint iA = 0; iA < 3; ++iA)
+	{
+		Global.m_fColourChannels[iA] = .5f;
+		m_bColouriseDir[iA] = (rand() % 2 == 0);
+	}
+
+	// Reset the countdown and start it.
 	m_iCountdown = 4;
 	m_xCountdownTimer.ExpireAfter(0);
 }
@@ -281,10 +300,14 @@ void CGameScreen::ResetGame()
 // =============================================================================
 void CGameScreen::StartGame()
 {
-	m_pMusic->Play();
+	//m_pMusic->Play();
+	if (m_pMusic)
+		_FMOD->playSound(FMOD_CHANNEL_FREE, m_pMusic, false, &m_pChannel);
 
 	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
 	{
+		(*ppPlayer)->Revive();
+
 		if ((*ppPlayer)->GetType() == PlayerType_Pacman)
 			(*ppPlayer)->SetLogicType(PlayerLogicType_Local);
 		else if ((*ppPlayer)->GetType() == PlayerType_Ghost)
@@ -295,6 +318,8 @@ void CGameScreen::StartGame()
 // =============================================================================
 void CGameScreen::EndGame()
 {
+	Global.m_fMapAlpha = 1.f;
+
 	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
 	{
 		if ((*ppPlayer)->GetType() == PlayerType_Ghost)
@@ -331,7 +356,13 @@ void CGameScreen::SetState(t_GameState iGameState)
 // =============================================================================
 void CGameScreen::OnPacmanDie(CGhost* pGhost)
 {
-	m_pMusic->Stop();
+	if (m_pChannel)
+		m_pChannel->stop();
+
+	if (m_pMusic)
+		m_pMusic->release();
+
+	//m_pMusic->Stop();
 	m_pDeathSound->Play();
 
 	Global.m_fMusicEnergy = 0.1f;

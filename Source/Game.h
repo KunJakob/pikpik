@@ -148,7 +148,8 @@ protected:
 	CSprite* m_pEdgeOverlay;
 
 	// The background music.
-	CSound* m_pMusic;
+	//CSound* m_pMusic;
+	FMOD::Sound* m_pMusic;
 
 	// The music channel.
 	FMOD::Channel* m_pChannel;

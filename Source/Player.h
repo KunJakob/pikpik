@@ -70,6 +70,9 @@ public:
 	// Reset the player.
 	virtual void Reset();
 
+	// Revive the player from a dead state.
+	virtual void Revive();
+
 	// Update the object ready for rendering.
 	virtual void Update();
 

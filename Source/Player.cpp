@@ -66,6 +66,12 @@ void CPlayer::Reset()
 }
 
 // =============================================================================
+void CPlayer::Revive()
+{
+	SetState(PlayerState_Idle);
+}
+
+// =============================================================================
 void CPlayer::Update()
 {
 	const static xfloat s_fMoveDir[PlayerDirection_Max] = {-1.f, -1.f, 1.f, 1.f};
