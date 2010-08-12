@@ -5,9 +5,14 @@
 }
 
 //##############################################################################
-.Sprite "Logo-SAPIAN"
+.Sprite "Logo-SketchSpark"
 {
 	.File "Surfaces\Logo\Logo-SAPIAN.png"
+}
+
+.Sprite "Logo-PikPik"
+{
+	.File "Surfaces\Logo\Logo-PikPik.png"
 }
 
 //##############################################################################

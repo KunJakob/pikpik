@@ -126,7 +126,7 @@ HTEXTURE CMinimap::Generate(xuint iElementMask)
 		// Players.
 		if (XFLAGISSET(iElementMask, MinimapElement_Pacman) || XFLAGISSET(iElementMask, MinimapElement_Ghost))
 		{
-			XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
+			XEN_LIST_FOREACH(t_PlayerList, ppPlayer, PlayerManager.GetActivePlayers())
 			{
 				CPlayer* pPlayer = *ppPlayer;
 

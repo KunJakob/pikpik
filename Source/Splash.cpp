@@ -14,9 +14,9 @@
 //##############################################################################
 
 // =============================================================================
-void CLogoScreen::OnActivate()
+void CCompanyLogoScreen::OnActivate()
 {
-	m_pImage = new CSprite(_SPRITE("Logo-SAPIAN"));
+	m_pImage = new CSprite(_SPRITE("Logo-SketchSpark"));
 
 	m_pImage->SetAnchor(m_pImage->GetAreaCentre());
 	m_pImage->SetPosition(xpoint(_HSWIDTH, _HSHEIGHT));
@@ -25,30 +25,30 @@ void CLogoScreen::OnActivate()
 }
 
 // =============================================================================
-void CLogoScreen::OnDeactivate()
+void CCompanyLogoScreen::OnDeactivate()
 {
 	delete m_pImage;
 	delete m_pSound;
 }
 
 // =============================================================================
-void CLogoScreen::OnWake()
+void CCompanyLogoScreen::OnWake()
 {
 	CFadeScreen::Reset();
 
 	m_pSound->Play();
 
-	RenderManager.SetRenderOverride(xbind(this, &CLogoScreen::Render));
+	RenderManager.SetRenderOverride(xbind(this, &CCompanyLogoScreen::Render));
 }
 
 // =============================================================================
-void CLogoScreen::OnSleep()
+void CCompanyLogoScreen::OnSleep()
 {
 	RenderManager.SetRenderOverride(NULL);
 }
 
 // =============================================================================
-xbool CLogoScreen::OnEvent(xint iEventType, void* pEventInfo)
+xbool CCompanyLogoScreen::OnEvent(xint iEventType, void* pEventInfo)
 {
 	switch (iEventType)
 	{
@@ -65,7 +65,7 @@ xbool CLogoScreen::OnEvent(xint iEventType, void* pEventInfo)
 }
 
 // =============================================================================
-void CLogoScreen::OnUpdate()
+void CCompanyLogoScreen::OnUpdate()
 {
 	CFadeScreen::OnUpdate();
 
@@ -102,16 +102,86 @@ void CLogoScreen::OnUpdate()
 }
 
 // =============================================================================
-void CLogoScreen::Render()
+void CCompanyLogoScreen::Render()
 {
-	xfloat fColour = m_fAlpha * .08f;
+	xfloat fColour = (m_fAlpha * .08f);
 	_HGE->Gfx_Clear(_ARGBF(1.f, fColour, fColour, fColour));
 
 	m_pImage->Render();
 }
 
 // =============================================================================
-void CLogoScreen::OnFadeComplete()
+void CCompanyLogoScreen::OnFadeComplete()
+{
+	ScreenManager.Set(ScreenIndex_GameLogoScreen);
+}
+
+//##############################################################################
+
+// =============================================================================
+void CGameLogoScreen::OnActivate()
+{
+	m_pImage = new CSprite(_SPRITE("Logo-PikPik"));
+
+	m_pImage->SetAnchor(m_pImage->GetAreaCentre());
+	m_pImage->SetPosition(xpoint(_HSWIDTH, _HSHEIGHT));
+}
+
+// =============================================================================
+void CGameLogoScreen::OnDeactivate()
+{
+	delete m_pImage;
+}
+
+// =============================================================================
+void CGameLogoScreen::OnWake()
+{
+	CFadeScreen::Reset();
+
+	RenderManager.SetRenderOverride(xbind(this, &CGameLogoScreen::Render));
+}
+
+// =============================================================================
+void CGameLogoScreen::OnSleep()
+{
+	RenderManager.SetRenderOverride(NULL);
+}
+
+// =============================================================================
+xbool CGameLogoScreen::OnEvent(xint iEventType, void* pEventInfo)
+{
+	switch (iEventType)
+	{
+	case INPUT_MBUTTONUP:
+	case INPUT_KEYUP:
+		{
+			OnFadeComplete();
+			return true;
+		}
+		break;
+	}
+
+	return false;
+}
+
+// =============================================================================
+void CGameLogoScreen::OnUpdate()
+{
+	CFadeScreen::OnUpdate();
+}
+
+// =============================================================================
+void CGameLogoScreen::Render()
+{
+	xfloat fColour = m_fAlpha * .08f;
+	_HGE->Gfx_Clear(_ARGBF(1.f, fColour, fColour, fColour));
+
+	m_pImage->SetAlpha(m_fAlpha);
+	m_pImage->Render();
+}
+
+// =============================================================================
+void CGameLogoScreen::OnFadeComplete()
 {
 	ScreenManager.Set(ScreenIndex_WarningScreen);
 }

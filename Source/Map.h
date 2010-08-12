@@ -23,6 +23,7 @@
 class CPlayer;
 class CMap;
 class CMapBlock;
+class CMapManager;
 
 // Tile type.
 enum t_TileType
@@ -172,21 +173,13 @@ class CMap : public CRenderable
 public:
 	// Friends.
 	friend class CMapBlock;
+	friend class CMapManager;
 
 	// Create a new map from metadata.
 	CMap(CDataset* pDataset);
 
 	// Clean up the map data on destruction.
 	virtual ~CMap();
-
-	// Load the map into memory so that it's playable.
-	void Load();
-
-	// Unload the map from memory.
-	void Unload();
-
-	// Update the map.
-	void Update();
 
 	// Render the map.
 	virtual void OnRender();
@@ -277,6 +270,15 @@ public:
 	CMapBlock* GetAdjacentBlock(t_AdjacentDirection iAdjacentDir, CMapBlock* pBlock);
 
 protected:
+	// Load the map into memory so that it's playable.
+	void Load();
+
+	// Unload the map from memory.
+	void Unload();
+
+	// Update the map.
+	void Update();
+
 	// Add the specified visibility to all valid paths from the specified block.
 	void AddVisiblePaths(CMapBlock* pStartingBlock, xfloat fVisibility);
 
@@ -367,11 +369,14 @@ public:
 		return s_Instance;
 	}
 
-	// (Module) Load all map resources and determine available maps.
+	// Load all map resources and determine available maps.
 	virtual void OnInitialise();
 
-	// (Module) Free all map resources and any loaded maps.
+	// Free all map resources and any loaded maps.
 	virtual void OnDeinitialise();
+
+	// Update the map manager.
+	void Update();
 
 	// Get a specific map by index.
 	CMap* GetMap(xint iIndex);
@@ -379,11 +384,21 @@ public:
 	// Get a specific map by ID.
 	CMap* GetMap(const xchar* pID);
 
-    // TODO: Load and set the currently active map by ID.
-    // CMap* SetCurrentMap(const xchar* pID);
+	// Load and set the currently active map by index.
+	CMap* SetCurrentMap(xint iIndex);
 
-    // TODO: Get the active map.
-    // CMap* GetCurrentMap();
+    // Load and set the currently active map by ID.
+    CMap* SetCurrentMap(const xchar* pID);
+
+	// Unload and clear the current map.
+	void ClearCurrentMap();
+
+    // Get the active map.
+    CMap* GetCurrentMap()
+	{
+		XASSERT(m_pCurrentMap);
+		return m_pCurrentMap;
+	}
 
 	// Get the number of known maps.
 	inline xint GetMapCount()
@@ -397,6 +412,9 @@ protected:
 
 	// The list of available maps.
 	t_MapList m_lpMaps;
+
+	// The current map being used.
+	CMap* m_pCurrentMap;
 };
 
 //##############################################################################

@@ -126,7 +126,8 @@ enum t_PlayerType
 enum t_ScreenIndex
 {
 	ScreenIndex_Invalid,
-	ScreenIndex_LogoScreen,
+	ScreenIndex_CompanyLogoScreen,
+	ScreenIndex_GameLogoScreen,
 	ScreenIndex_WarningScreen,
 	ScreenIndex_MenuScreen,
 	ScreenIndex_GameScreen,
@@ -256,9 +257,6 @@ public:
 
 	// The global game strings.
 	CMetadata* m_pLocale;
-
-	// The currently active map.
-	CMap* m_pActiveMap;
 
 	// The music spectrum energy to determine how fast colours transition.
 	xfloat m_fMusicEnergy;

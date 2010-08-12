@@ -394,13 +394,29 @@ void CLobbyScreen::StartGame()
 	//SetState(LobbyState_Starting);
 
 	// Load the map.
-	Global.m_pActiveMap = MapManager.GetMap("M009");
-	Global.m_pActiveMap->Load();
+	MapManager.SetCurrentMap("M009");
 
-	srand(GetGamerCard(NetworkManager.GetVerifiedPeers().front())->m_iSeed);
+	// Initialise the players.
+	if (NetworkManager.IsHosting())
+		PlayerManager.InitialisePlayers(PlayerLogicType_AI);
+	else
+		PlayerManager.InitialisePlayers(PlayerLogicType_Remote);
 
-    PlayerManager.InitialisePlayers(PlayMode_Online);
+	xint iPlayerIndex = 0;
 
+	XEN_LIST_FOREACH(t_NetworkPeerList, ppPeer, NetworkManager.GetVerifiedPeers())
+	{
+		CNetworkPeer* pPeer = *ppPeer;
+		CNetworkPeerInfo* pInfo = GetPeerInfo(pPeer);
+
+		pInfo->m_pPlayer = PlayerManager.GetActivePlayer(iPlayerIndex++);
+		pInfo->m_pPlayer->SetLogicType(pPeer->m_bLocal ? PlayerLogicType_Local : PlayerLogicType_Remote);
+
+		if (pPeer->m_bLocal)
+			PlayerManager.SetLocalPlayer(iPlayerIndex);
+	}
+
+	// Start the game.
 	SetState(LobbyState_Game);
 	ScreenManager.Push(ScreenIndex_GameScreen);
 }
@@ -408,7 +424,7 @@ void CLobbyScreen::StartGame()
 // =============================================================================
 void CLobbyScreen::EndGame()
 {
-	Global.m_pActiveMap->Unload();
+	MapManager.ClearCurrentMap();
 }
 
 // =============================================================================
@@ -463,7 +479,7 @@ xbool CLobbyScreen::OnVerifyPeer(CNetworkPeer* pPeer, void* pData, xint iDataLen
 // =============================================================================
 void CLobbyScreen::OnNetworkStart()
 {
-#if !defined(_RELEASE)
+#if XDEBUG
 	NetworkManager.GetInterface()->ApplyNetworkSimulator(XKB(56), 80, 40);
 #endif
 }

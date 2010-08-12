@@ -41,7 +41,7 @@ void CCollisionManager::OnUpdate()
 
 			for (; ppCollideWith != m_lpCollidables[iA].end(); ppCollideWith++)
 			{
-				XMASSERT(*ppCollidable != *ppCollideWith, "Collidables should never match.");
+				XMASSERT(*ppCollidable != *ppCollideWith, "Collidable has been added more than once.");
 
 				if ((*ppCollidable)->IsCollidable(*ppCollideWith) && (*ppCollideWith)->IsCollidable(*ppCollidable))
 				{

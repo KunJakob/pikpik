@@ -427,11 +427,7 @@ void CMenuScreen::InitTransition(xbool bTransitionIn)
 // =============================================================================
 void CMenuScreen::EndGame()
 {
-	if (Global.m_pActiveMap)
-	{
-		Global.m_pActiveMap->Unload();
-		Global.m_pActiveMap = NULL;
-	}
+	MapManager.ClearCurrentMap();
 }
 
 // =============================================================================
@@ -444,9 +440,7 @@ void CMenuScreen::Callback_ShowMainMenu()
 void CMenuScreen::Callback_StartGame()
 {
 	CMenuLink* pLink = (CMenuLink*)InterfaceManager.GetActiveElement();
-
-	Global.m_pActiveMap = MapManager.GetMap(pLink->m_iElementIndex);
-	Global.m_pActiveMap->Load();
+	MapManager.SetCurrentMap(pLink->m_iElementIndex);
 
 	SetNextScreen(ScreenIndex_GameScreen);
 }

@@ -3,7 +3,7 @@
 	.Name "The Complex"
 	.Tiles "Map-Tiles"
 	.Size 31 31
-	.Gobblers 2
+	.Gobblers 1
 	.Chasers 5
 
 	.Data 
@@ -45,7 +45,7 @@
 	.Name "[Safe]"
 	.Tiles "Map-Tiles"
 	.Size 31 31
-	.Gobblers 2
+	.Gobblers 1
 	.Chasers 5
 
 	.Data 

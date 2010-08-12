@@ -37,7 +37,7 @@ void CBrain::Wander()
 	for (xint iA = 0; iA < PlayerDirection_Max; ++iA)
 	{
 		iRealDirection[iA] = (t_PlayerDirection)((m_pPlayer->m_iMoveDir + iA + 3) % PlayerDirection_Max);
-		pMoveDirection[iA] = Global.m_pActiveMap->GetAdjacentBlock((t_AdjacentDirection)iRealDirection[iA], m_pPlayer->m_pCurrentBlock);
+		pMoveDirection[iA] = MapManager.GetCurrentMap()->GetAdjacentBlock((t_AdjacentDirection)iRealDirection[iA], m_pPlayer->m_pCurrentBlock);
 
 		if (m_pPlayer->IsPassable(pMoveDirection[iA]))
 			iDirectionCount++;
@@ -87,7 +87,7 @@ t_PlayerList CBrain::ScanCorridor(t_PlayerDirection iDirection)
 
 	while (pCurrentBlock && !pCurrentBlock->IsWall() && !pCurrentBlock->IsGhostWall() && iSearchedBlocks++ < s_iMaxBlocks)
 	{
-		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
+		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, PlayerManager.GetActivePlayers())
 		{
 			if ((*ppPlayer)->m_pCurrentBlock == pCurrentBlock)
 				xPlayerList.push_back(*ppPlayer);

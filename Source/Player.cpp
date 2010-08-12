@@ -26,7 +26,7 @@ CPlayer::CPlayer(t_PlayerType iType, const xchar* pSpriteName) : CRenderable(Ren
 	m_pNavPath(NULL),
 	m_pBrain(NULL)
 {
-	m_iIndex = (xint)PlayerManager.m_lpPlayers.size();
+	m_iIndex = (xint)PlayerManager.GetPlayerCount();
 
 	m_pSprite = new CAnimatedSprite(_SPRITE(pSpriteName));
 	m_pSprite->SetAnimation("Idle");
@@ -122,7 +122,7 @@ void CPlayer::Update()
 				if (m_iTime == m_iMoveTime)
 				{
 					m_fTransition = 1.f;
-					m_pCurrentBlock = Global.m_pActiveMap->GetAdjacentBlock((t_AdjacentDirection)m_iTransitionDir, m_pCurrentBlock);
+					m_pCurrentBlock = MapManager.GetCurrentMap()->GetAdjacentBlock((t_AdjacentDirection)m_iTransitionDir, m_pCurrentBlock);
 					m_iTransitionDir = (t_PlayerDirection)((m_iTransitionDir + 2) % PlayerDirection_Max);
 					m_bLeaving = false;
 				}
@@ -294,7 +294,7 @@ void CPlayer::LogicPath()
 			// Find the adjacent direction from the current block to the new block.
 			for (xuint iA = 0; iA < AdjacentDirection_Max; ++iA)
 			{
-				if (Global.m_pActiveMap->GetAdjacentBlock((t_AdjacentDirection)iA, pCurrentBlock) == pNextBlock)
+				if (MapManager.GetCurrentMap()->GetAdjacentBlock((t_AdjacentDirection)iA, pCurrentBlock) == pNextBlock)
 				{
 					Move((t_PlayerDirection)iA);
 					return;
@@ -367,7 +367,7 @@ void CPlayer::NavigateTo(CMapBlock* pBlock)
 	CNavigationPath* pPath = new CNavigationPath();
 	CMapEvaluator* pEvaluator = new CMapEvaluator(this);
 
-	xRequest.m_pMesh = Global.m_pActiveMap->GetNavMesh();
+	xRequest.m_pMesh = MapManager.GetCurrentMap()->GetNavMesh();
 	xRequest.m_pEvaluator = pEvaluator;
 	xRequest.m_pStart = m_pTargetBlock ? m_pTargetBlock->m_pNavNode : m_pCurrentBlock->m_pNavNode;
 	xRequest.m_pGoal = pBlock->m_pNavNode;
@@ -608,8 +608,10 @@ void CGhost::OnCollision(CCollidable* pWith)
 //##############################################################################
 
 // =============================================================================
-void CPlayerManager::OnInitialise()
+void CPlayerManager::Initialise()
 {
+	m_bPlayersEnabled = true;
+
     // Create all the available players.
 	m_lpPlayers.push_back(new CPacman());
     m_lpPlayers.push_back(new CPacman());
@@ -628,42 +630,56 @@ void CPlayerManager::OnDeinitialise()
 }
 
 // =============================================================================
-void CPlayerManager::InitialisePlayers(t_PlayMode iPlayMode)
+void CPlayerManager::Update()
 {
-    switch (iPlayMode)
-    {
-    case PlayMode_Online:
-        {
-            ResetActivePlayers();
-	
-	        // Initialise all players.
-	        for (xint iA = 0; iA < GetActivePlayerCount(); ++iA)
-		        GetActivePlayer(iA)->SetLogicType(NetworkManager.GetLocalPeer()->m_bHost ? PlayerLogicType_AI : PlayerLogicType_Remote);
-
-	        // Setup all network players.
-	        xint iPlayerIndex = 0;
-
-	        XEN_LIST_FOREACH(t_NetworkPeerList, ppPeer, NetworkManager.GetVerifiedPeers())
-	        {
-		        CNetworkPeer* pPeer = *ppPeer;
-		        CNetworkPeerInfo* pInfo = GetPeerInfo(pPeer);
-
-		        pInfo->m_pPlayer = PlayerManager.GetActivePlayer(iPlayerIndex++);
-		        pInfo->m_pPlayer->SetLogicType(pPeer->m_bLocal ? PlayerLogicType_Local : PlayerLogicType_Remote);
-
-		        if (pPeer->m_bLocal)
-			        PlayerManager.GetLocalPlayer() = pInfo->m_pPlayer;
-	        }
-        }
-        break;
-    }
+	if (m_bPlayersEnabled)
+	{
+		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, PlayerManager.GetActivePlayers())
+		{
+			(*ppPlayer)->Update();
+		}
+	}
 }
 
 // =============================================================================
-void CPlayerManager::ResetActivePlayers()
+void CPlayerManager::ResetPlayers()
 {
-    xint iPacmanCount = Global.m_pActiveMap->GetPacmanCount();
-	xint iGhostCount = Global.m_pActiveMap->GetGhostCount();
+	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, GetPlayers())
+	{
+		(*ppPlayer)->Reset();
+	}
+}
+
+// =============================================================================
+void CPlayerManager::InitialisePlayers(t_PlayerLogicType iLogicType)
+{
+	ResetPlayers();
+	EstablishActivePlayers();
+
+	// Make sure there is no local player by default.
+	m_pLocalPlayer = NULL;
+
+	// Reset all players to the the default logic mode.
+	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, GetActivePlayers())
+	{
+		(*ppPlayer)->SetLogicType(iLogicType);
+	}
+
+	// Make all players collidable with each other.
+	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, GetActivePlayers())
+	{
+		if ((*ppPlayer)->GetType() == PlayerType_Pacman)
+			CollisionManager.Add((CPacman*)(*ppPlayer), CollisionGroup_Player);
+		else if ((*ppPlayer)->GetType() == PlayerType_Ghost)
+			CollisionManager.Add((CGhost*)(*ppPlayer), CollisionGroup_Player);
+	}
+}
+
+// =============================================================================
+void CPlayerManager::EstablishActivePlayers()
+{
+	xint iPacmanCount = MapManager.GetCurrentMap()->GetPacmanCount();
+	xint iGhostCount = MapManager.GetCurrentMap()->GetGhostCount();
 
 	m_lpActivePlayers.clear();
 
@@ -671,8 +687,6 @@ void CPlayerManager::ResetActivePlayers()
 	{
 		CPlayer* pPlayer = *ppPlayer;
 		xbool bPlaying = false;
-
-		pPlayer->Reset();
 
 		switch (pPlayer->GetType())
 		{
@@ -689,8 +703,15 @@ void CPlayerManager::ResetActivePlayers()
 		{
 			m_lpActivePlayers.push_back(pPlayer);
 
-			pPlayer->SetCurrentBlock(Global.m_pActiveMap->GetSpawnBlock(pPlayer->GetType()));
+			pPlayer->SetCurrentBlock(MapManager.GetCurrentMap()->GetSpawnBlock(pPlayer->GetType()));
 			pPlayer->m_pStartingBlock = pPlayer->GetCurrentBlock();
 		}
 	}
+}
+
+// =============================================================================
+void CPlayerManager::SetLocalPlayer(xint iIndex)
+{
+	m_pLocalPlayer = GetActivePlayer(iIndex);
+	m_pLocalPlayer->SetLogicType(PlayerLogicType_Local);
 }

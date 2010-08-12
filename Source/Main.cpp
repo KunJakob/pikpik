@@ -121,11 +121,11 @@ void Application::Initialise()
 	XMODULE(&ScreenManager);
 	XMODULE(&InterfaceManager);
     XMODULE(&PlayerManager);
-	XMODULE(&CollisionManager);
 	XMODULE(&MapManager);
+	XMODULE(&CollisionManager);
 	XMODULE(&MatchManager);
 	XMODULE(&NavigationManager);
-	
+
 	// Initialise all modules.
 	ModuleManager.Initialise();
 
@@ -144,15 +144,19 @@ void Application::Initialise()
 	Global.m_pGameFont = new CFont(_FONT("Default"));
 
 	// Create all the screen instances.
-	s_lpScreens.push_back(new CLogoScreen);
+	s_lpScreens.push_back(new CCompanyLogoScreen);
+	s_lpScreens.push_back(new CGameLogoScreen);
 	s_lpScreens.push_back(new CWarningScreen);
 	s_lpScreens.push_back(new CMenuScreen);
-	s_lpScreens.push_back(new CGameScreen);
 	s_lpScreens.push_back(new CLobbyScreen);
+	s_lpScreens.push_back(new CGameScreen);
+
+	// Load the players into the player manager.
+	PlayerManager.Initialise();
 
 	// Load all screen instances and set go to the logo screen.
 	ScreenManager.LoadScreens();
-	ScreenManager.Set(ScreenIndex_LogoScreen, true);
+	ScreenManager.Set(ScreenIndex_CompanyLogoScreen, true);
 
 	// Execute the first frame update.
 	OnUpdate();

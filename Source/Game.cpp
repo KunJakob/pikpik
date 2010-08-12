@@ -25,6 +25,10 @@
 // =============================================================================
 void CGameScreen::OnActivate()
 {
+	// Initialise the players.
+	PlayerManager.InitialisePlayers(PlayerLogicType_None);
+	PlayerManager.SetLocalPlayer(0);
+
 	// Initialise the render manager for the game.
 	m_xRenderView = new CRenderView(GameLayerIndex_Max);
 
@@ -35,14 +39,14 @@ void CGameScreen::OnActivate()
 	m_pBackground->GetMetadata()->GetSprite()->SetBlendMode(BLEND_COLORMUL | BLEND_ALPHABLEND);
 	RenderLayer(GameLayerIndex_Background)->AttachRenderable(m_pBackground);
 
-	RenderLayer(GameLayerIndex_Map)->AttachRenderable(Global.m_pActiveMap);
+	RenderLayer(GameLayerIndex_Map)->AttachRenderable(MapManager.GetCurrentMap());
 
-	InitialisePlayers();
+	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, PlayerManager.GetActivePlayers())
+	{
+		RenderLayer(GameLayerIndex_Player)->AttachRenderable(*ppPlayer);
+	}
 
-	for (xint iA = 0; iA < PlayerManager.GetActivePlayerCount(); ++iA)
-        RenderLayer(GameLayerIndex_Player)->AttachRenderable(PlayerManager.GetActivePlayer(iA));
-
-	m_pMinimap = new CMinimap(Global.m_pActiveMap);
+	m_pMinimap = new CMinimap(MapManager.GetCurrentMap());
 	RenderLayer(GameLayerIndex_Radar)->AttachRenderable(m_pMinimap);
 
 	m_pGhostOverlay = new CSprite(_SPRITE("Ghost-Overlay"));
@@ -173,20 +177,12 @@ void CGameScreen::OnUpdate()
 	// Set certain layer enabled/disabled statuses.
 	RenderLayer(GameLayerIndex_Countdown)->SetEnabled(m_iState == GameState_Intro);
 
-	// Update the map.
-	Global.m_pActiveMap->Update();
-
-	// Update all the players.
-	if (m_iState != GameState_Intro)
-	{
-		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
-		{
-			(*ppPlayer)->Update();
-		}
-	}
-
 	// Calculate the music colourisation.
 	CalculateColourisation();
+
+	// Update the other components.
+	MapManager.Update();
+	PlayerManager.Update();
 
 	// Generate the minimap.
 	GenerateMinimap();
@@ -245,26 +241,6 @@ void CGameScreen::OnPreRender()
 }
 
 // =============================================================================
-void CGameScreen::InitialisePlayers()
-{
-	// This is temporary until the character select screen is implemented.
-	if (!NetworkManager.IsRunning())
-	{
-		PlayerManager.ResetActivePlayers();
-		PlayerManager.GetLocalPlayer() = Global.m_lpActivePlayers.front();
-	}
-
-    // Make all players collidable.
-    XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
-	{
-		if ((*ppPlayer)->GetType() == PlayerType_Pacman)
-			CollisionManager.Add((CPacman*)(*ppPlayer));
-		else if ((*ppPlayer)->GetType() == PlayerType_Ghost)
-			CollisionManager.Add((CGhost*)(*ppPlayer));
-	}
-}
-
-// =============================================================================
 void CGameScreen::ResetGame()
 {
 	// Reset the map effect control values.
@@ -278,11 +254,11 @@ void CGameScreen::ResetGame()
 	m_pMusic = NULL;
 	m_pChannel = NULL;
 
-	//t_FileScanResult lsMusicFiles = FileManager.Scan("Sound\\Level\\*.mp3");
-	//xint iMusicIndex = rand() % lsMusicFiles.size();
+	t_FileScanResult lsMusicFiles = FileManager.Scan("Sound\\Level\\*.mp3");
+	xint iMusicIndex = rand() % lsMusicFiles.size();
 
-	//if (lsMusicFiles.size())
-	//	_FMOD->createStream(XFORMAT("Sound\\Level\\%s", lsMusicFiles[iMusicIndex].c_str()), FMOD_SOFTWARE, 0, &m_pMusic);
+	if (lsMusicFiles.size())
+		_FMOD->createStream(XFORMAT("Sound\\Level\\%s", lsMusicFiles[iMusicIndex].c_str()), FMOD_SOFTWARE, 0, &m_pMusic);
 
 	// Initialise the colourisation.
 	for (xint iA = 0; iA < 3; ++iA)
@@ -290,6 +266,9 @@ void CGameScreen::ResetGame()
 		Global.m_fColourChannels[iA] = .5f;
 		m_bColouriseDir[iA] = (rand() % 2 == 0);
 	}
+
+	// Disable the players.
+	PlayerManager.SetPlayersEnabled(false);
 
 	// Reset the countdown and start it.
 	m_iCountdown = 4;
@@ -303,7 +282,7 @@ void CGameScreen::StartGame()
 	if (m_pMusic)
 		_FMOD->playSound(FMOD_CHANNEL_FREE, m_pMusic, false, &m_pChannel);
 
-	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
+	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, PlayerManager.GetActivePlayers())
 	{
 		(*ppPlayer)->Revive();
 
@@ -312,6 +291,8 @@ void CGameScreen::StartGame()
 		else if ((*ppPlayer)->GetType() == PlayerType_Ghost)
 			(*ppPlayer)->SetLogicType(PlayerLogicType_AI);
 	}
+
+	PlayerManager.SetPlayersEnabled(true);
 }
 
 // =============================================================================
@@ -319,7 +300,7 @@ void CGameScreen::EndGame()
 {
 	Global.m_fMapAlpha = 1.f;
 
-	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
+	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, PlayerManager.GetActivePlayers())
 	{
 		if ((*ppPlayer)->GetType() == PlayerType_Ghost)
 		{
@@ -328,6 +309,12 @@ void CGameScreen::EndGame()
 		}
 		else
 			(*ppPlayer)->SetLogicType(PlayerLogicType_None);
+	}
+
+	if (m_pMusic)
+	{
+		m_pMusic->release();
+		m_pMusic = NULL;
 	}
 }
 
@@ -355,12 +342,6 @@ void CGameScreen::SetState(t_GameState iGameState)
 // =============================================================================
 void CGameScreen::OnPacmanDie(CGhost* pGhost)
 {
-	if (m_pChannel)
-		m_pChannel->stop();
-
-	if (m_pMusic)
-		m_pMusic->release();
-
 	//m_pMusic->Stop();
 	m_pDeathSound->Play();
 
@@ -462,7 +443,7 @@ void CGameScreen::RenderCountdown(CRenderLayer* pLayer)
 // =============================================================================
 void CGameScreen::RenderPlayerPath(CRenderLayer* pLayer)
 {
-	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
+	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, PlayerManager.GetActivePlayers())
 	{
 		CNavigationPath* pPath = (*ppPlayer)->GetNavPath();
 
@@ -485,16 +466,16 @@ void CGameScreen::DebugControls()
 	// Switch between players.
 	if (_HGE->Input_KeyDown(HGEK_SPACE))
 	{
-		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
+		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, PlayerManager.GetActivePlayers())
 		{
 			if (PlayerManager.GetLocalPlayer() == *ppPlayer)
 			{
-				if (*ppPlayer == Global.m_lpActivePlayers.back())
-					ppPlayer = Global.m_lpActivePlayers.begin();
+				if (*ppPlayer == PlayerManager.GetActivePlayers().back())
+					ppPlayer = PlayerManager.GetActivePlayers().begin();
 				else
 					ppPlayer++;
 
-				PlayerManager.GetLocalPlayer() = *ppPlayer;
+				PlayerManager.SetLocalPlayer(*ppPlayer);
 				Global.m_fMapAlpha = 1.f;
 
 				break;
@@ -518,7 +499,7 @@ void CGameScreen::DebugControls()
 	// Test path-finding on the local player.
 	if (_HGE->Input_KeyDown(HGEK_CTRL))
 	{
-		PlayerManager.GetLocalPlayer()->NavigateTo(Global.m_pActiveMap->GetBlock(rand() % Global.m_pActiveMap->GetBlockCount()));
+		PlayerManager.GetLocalPlayer()->NavigateTo(MapManager.GetCurrentMap()->GetBlock(rand() % MapManager.GetCurrentMap()->GetBlockCount()));
 	}
 
 	if (_HGE->Input_KeyDown(HGEK_F1))

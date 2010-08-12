@@ -111,7 +111,7 @@ void CMapBlock::Eat()
 		m_bEaten = true;
 		//xTimer.ExpireAfter(60000);
 
-		Global.m_pActiveMap->m_iPelletsEaten++;
+		MapManager.GetCurrentMap()->m_iPelletsEaten++;
 	}
 }
 
@@ -402,7 +402,7 @@ CMapBlock* CMap::GetSpawnBlock(t_PlayerType iPlayerType)
 	{
 		pBlock = m_lpSpawnPoints[iPlayerType][rand() % m_lpSpawnPoints[iPlayerType].size()];
 
-		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
+		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, PlayerManager.GetActivePlayers())
 		{
 			if ((*ppPlayer)->GetCurrentBlock() == pBlock)
 				pBlock = NULL;
@@ -456,14 +456,25 @@ void CMapManager::OnInitialise()
 	// Create a map instance for each map in metadata.
 	XEN_METADATA_DATASET_FOREACH(pDataset, m_pMetadata, "Map", NULL)
 		m_lpMaps.push_back(new CMap(pDataset));
+
+	m_pCurrentMap = NULL;
 }
 
 // =============================================================================
 void CMapManager::OnDeinitialise()
 {
+	ClearCurrentMap();
+
 	delete m_pMetadata;
 
 	XEN_LIST_ERASE_ALL(m_lpMaps);
+}
+
+// =============================================================================
+void CMapManager::Update()
+{
+	if (m_pCurrentMap)
+		m_pCurrentMap->Update();
 }
 
 // =============================================================================
@@ -489,4 +500,39 @@ CMap* CMapManager::GetMap(const xchar* pID)
 	}
 
 	return NULL;
+}
+
+// =============================================================================
+CMap* CMapManager::SetCurrentMap(xint iIndex)
+{
+	CMap* pMap = GetMap(iIndex);
+
+	if (pMap)
+		SetCurrentMap(pMap->GetID());
+
+	return m_pCurrentMap;
+}
+
+// =============================================================================
+CMap* CMapManager::SetCurrentMap(const xchar* pID)
+{
+	if (m_pCurrentMap)
+		ClearCurrentMap();
+
+	m_pCurrentMap = GetMap(pID);
+
+	if (m_pCurrentMap)
+		m_pCurrentMap->Load();
+
+	return m_pCurrentMap;
+}
+
+// =============================================================================
+void CMapManager::ClearCurrentMap()
+{
+	if (m_pCurrentMap)
+	{
+		m_pCurrentMap->Unload();
+		m_pCurrentMap = NULL;
+	}
 }

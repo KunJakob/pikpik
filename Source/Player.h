@@ -19,9 +19,9 @@
 //##############################################################################
 
 // Predeclaration.
+class CPlayerManager;
 class CBrain;
 class CGhostBrain;
-class CPlayerManager;
 
 // The player types.
 enum t_PlayerLogicType
@@ -69,10 +69,10 @@ class CPlayer : public CRenderable
 {
 public:
 	// Friends.
+	friend CPlayerManager;
 	friend CMap;
 	friend CBrain;
 	friend CGhostBrain;
-    friend CPlayerManager;
 
 	// Destructor.
 	virtual ~CPlayer();
@@ -333,27 +333,42 @@ public:
 		return s_Instance;
 	}
 
-    // (Module) Load all player resources.
-	virtual void OnInitialise();
+    // Load all player resources.
+	void Initialise();
 
-    // (Module) Free all player resources.
+    // Free all player resources.
 	virtual void OnDeinitialise();
 
+	// Update the active players.
+	void Update();
+
     // Initialise the players for play.
-    void InitialisePlayers(t_PlayMode iPlayMode);
-    
+    void InitialisePlayers(t_PlayerLogicType iLogicType);
+
+	// Enable or disable all players logic and movement.
+	void SetPlayersEnabled(xbool bEnabled)
+	{
+		m_bPlayersEnabled = bEnabled;
+	}
+
     // Get the total number of players (active and inactive) available to the game.
     xint GetPlayerCount()
     {
         return m_lpPlayers.size();
     }
 
-    // Get the list of all players (active and inactive) available to the game.
+    // Get a player by index.
     CPlayer* GetPlayer(xint iIndex)
     {
         XASSERT(iIndex < GetPlayerCount());
         return m_lpPlayers[iIndex];
     }
+
+	// Get the list of all players (active and inactive) available to the game.
+	t_PlayerList& GetPlayers()
+	{
+		return m_lpPlayers;
+	}
 
     // Get the total number of active players in the game.
     xint GetActivePlayerCount()
@@ -361,12 +376,27 @@ public:
         return m_lpActivePlayers.size();
     }
 
-    // Get the list of all active players in the game.
+    // Get an active player by index.
     CPlayer* GetActivePlayer(xint iIndex)
     {
         XASSERT(iIndex < GetActivePlayerCount());
         return m_lpActivePlayers[iIndex];
     }
+
+	// Get the list of all active players in the game.
+	t_PlayerList& GetActivePlayers()
+	{
+		return m_lpActivePlayers;
+	}
+
+	// Sets the player being controlled locally.
+	void SetLocalPlayer(CPlayer* pPlayer)
+	{
+		SetLocalPlayer(pPlayer->m_iIndex);
+	}
+
+	// Sets the player being controlled locally.
+	void SetLocalPlayer(xint iIndex);
 
     // Get the player being controlled locally.
     CPlayer* GetLocalPlayer()
@@ -375,8 +405,11 @@ public:
     }
 
 protected:
+	// Reset all players.
+	void ResetPlayers();
+
     // Determine the list of players for the active map and position them.
-	void ResetActivePlayers();
+	void EstablishActivePlayers();
 
     // The list of all players available to the game.
 	t_PlayerList m_lpPlayers;
@@ -386,4 +419,7 @@ protected:
 
 	// The currently active player on the local machine.
 	CPlayer* m_pLocalPlayer;
+
+	// Whether or not to update players.
+	xbool m_bPlayersEnabled;
 };
