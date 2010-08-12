@@ -13,6 +13,11 @@
 
 //##############################################################################
 
+// Shortcuts.
+#define PlayerManager CPlayerManager::Get()
+
+//##############################################################################
+
 // Predeclaration.
 class CBrain;
 class CGhostBrain;
@@ -39,11 +44,13 @@ enum t_PlayerState
 // The direction to move in.
 enum t_PlayerDirection
 {
+    PlayerDirection_None = -1,
 	PlayerDirection_Left = AdjacentDirection_Left,
 	PlayerDirection_Up,
 	PlayerDirection_Right,
 	PlayerDirection_Down,
-	/*MAX*/PlayerDirection_Max,
+
+	PlayerDirection_Max,
 };
 
 // The player stream types.
@@ -176,7 +183,7 @@ protected:
 	// Check if the specified block is passable.
 	virtual xbool IsPassable(CMapBlock* pBlock)
 	{
-		return !pBlock->IsWall();
+		return !pBlock || !pBlock->IsWall();
 	}
 
 	// Called when an animation event occurs.
@@ -212,6 +219,12 @@ protected:
 	// Determines if the player is leaving or entering the map.
 	xbool m_bLeaving;
 
+    // The last requested direction.
+	t_PlayerDirection m_iRequestedDir;
+
+    // The last direction we travelled.
+	t_PlayerDirection m_iLastDir;
+
 	// The movement direction.
 	t_PlayerDirection m_iMoveDir;
 
@@ -246,7 +259,7 @@ protected:
 	// Check if the specified block is passable.
 	virtual xbool IsPassable(CMapBlock* pBlock)
 	{
-		return CPlayer::IsPassable(pBlock) && pBlock->m_cChar != '=';
+		return CPlayer::IsPassable(pBlock) && (!pBlock || pBlock->m_cChar != '=');
 	}
 
 	// Called to change the state of the player object.
@@ -307,3 +320,16 @@ protected:
 };
 
 //##############################################################################
+class CPlayerManager : public CModule
+{
+public:
+    // Singleton instance.
+	static inline CPlayerManager& Get() 
+	{
+		static CPlayerManager s_Instance;
+		return s_Instance;
+	}
+
+    // Determine the list of players for the active map and position them.
+	void ResetActivePlayers();
+};

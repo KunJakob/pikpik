@@ -379,6 +379,12 @@ public:
 	// Get a specific map by ID.
 	CMap* GetMap(const xchar* pID);
 
+    // TODO: Load and set the currently active map by ID.
+    // CMap* SetCurrentMap(const xchar* pID);
+
+    // TODO: Get the active map.
+    // CMap* GetCurrentMap();
+
 	// Get the number of known maps.
 	inline xint GetMapCount()
 	{

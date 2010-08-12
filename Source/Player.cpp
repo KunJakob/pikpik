@@ -55,6 +55,8 @@ void CPlayer::Reset()
 	m_iMoveTime = 0;
 	m_fTransition = 0.f;
 	m_bLeaving = false;
+    m_iRequestedDir = PlayerDirection_None;
+    m_iLastDir = PlayerDirection_None;
 	m_iTransitionDir = PlayerDirection_Left;
 	m_iMoveDir = PlayerDirection_Left;
 	m_liQueuedMoves.clear();
@@ -159,6 +161,22 @@ void CPlayer::Update()
 		break;
 	}
 
+    // Things to do while we are alive.
+    if (m_iState != PlayerState_Die)
+    {
+        // Local players should check input every update.
+        if (m_iLogicType == PlayerLogicType_Local)
+        {
+            // Check player input for all directions.
+	        for (xuint iA = 0; iA < PlayerDirection_Max; ++iA)
+	        {
+		        if (_HGE->Input_GetKeyState(HGEK_LEFT + iA))
+                    m_iRequestedDir = (t_PlayerDirection)iA;
+            }
+        }
+    }
+
+    // Calculate visibility of local player.
 	if (this != Global.m_pLocalPlayer)
 	{
 		xfloat fVisibility = (m_pCurrentBlock->m_fPlayerVisibility * (1.f - m_fTransition));
@@ -208,6 +226,7 @@ void CPlayer::SetState(t_PlayerState iState)
 void CPlayer::Move(t_PlayerDirection iDirection)
 {
 	m_pTargetBlock = m_pCurrentBlock->m_pAdjacents[iDirection];
+    m_iLastDir = iDirection;
 	m_iMoveDir = iDirection;
 	m_iTransitionDir = iDirection;
 	m_iTime = 0;
@@ -294,19 +313,20 @@ void CPlayer::LogicLocal()
 	if (this != Global.m_pLocalPlayer || !Global.m_bWindowFocused)
 		return;
 
-	// Check player input for all directions.
-	for (xuint iA = 0; iA < PlayerDirection_Max; ++iA)
-	{
-		if (_HGE->Input_GetKeyState(HGEK_LEFT + iA))
-		{
-			// If we can move, begin the transition to the next block.
-			if (!m_pCurrentBlock->m_pAdjacents[iA] || IsPassable(m_pCurrentBlock->m_pAdjacents[iA]))
-			{
-				Move((t_PlayerDirection)iA);
-				break;
-			}
-		}
-	}
+    // If we have a pending request, try to follow it.
+    if (m_iRequestedDir != PlayerDirection_None && IsPassable(m_pCurrentBlock->m_pAdjacents[m_iRequestedDir]))
+    {
+        Move(m_iRequestedDir);
+        m_iRequestedDir = PlayerDirection_None;
+    }
+
+    // If we haven't picked a new direction...
+    if (m_iState == PlayerState_Idle)
+    {
+        // Try to continue the way we were going before.
+        if (m_iLastDir != PlayerDirection_None && IsPassable(m_pCurrentBlock->m_pAdjacents[m_iLastDir]))
+            Move(m_iLastDir);
+    }
 }
 
 // =============================================================================
@@ -586,3 +606,39 @@ void CGhost::OnCollision(CCollidable* pWith)
 }
 
 //##############################################################################
+
+// =============================================================================
+void CPlayerManager::ResetActivePlayers()
+{
+    xint iPacmanCount = Global.m_pActiveMap->GetPacmanCount();
+	xint iGhostCount = Global.m_pActiveMap->GetGhostCount();
+
+	Global.m_lpActivePlayers.clear();
+
+	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpPlayers)
+	{
+		CPlayer* pPlayer = *ppPlayer;
+		xbool bPlaying = false;
+
+		pPlayer->Reset();
+
+		switch (pPlayer->GetType())
+		{
+		case PlayerType_Ghost:
+			bPlaying = (iGhostCount-- > 0);
+			break;
+
+		case PlayerType_Pacman:
+			bPlaying = (iPacmanCount-- > 0);
+			break;
+		}
+
+		if (bPlaying)
+		{
+			Global.m_lpActivePlayers.push_back(pPlayer);
+
+			pPlayer->SetCurrentBlock(Global.m_pActiveMap->GetSpawnBlock(pPlayer->GetType()));
+			pPlayer->m_pStartingBlock = pPlayer->GetCurrentBlock();
+		}
+	}
+}

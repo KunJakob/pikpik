@@ -399,7 +399,7 @@ void CLobbyScreen::StartGame()
 
 	srand(GetGamerCard(NetworkManager.GetVerifiedPeers().front())->m_iSeed);
 
-	Global.ResetActivePlayers();
+	PlayerManager.ResetActivePlayers();
 	
 	// Initialise all players.
 	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)

@@ -237,9 +237,6 @@ public:
 	// Process and substitute a string if it is a locale variable.
 	const xchar* GetLocaleFromVar(const xchar* pInput);
 
-	// Determine the list of players for the active map and position them.
-	void ResetActivePlayers();
-
 	// The current focus status of the game window.
 	xbool m_bWindowFocused;
 

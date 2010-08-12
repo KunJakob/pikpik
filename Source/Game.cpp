@@ -250,18 +250,17 @@ void CGameScreen::InitialisePlayers()
 	// This is temporary until the character select screen is implemented.
 	if (!NetworkManager.IsRunning())
 	{
-		Global.ResetActivePlayers();
+		PlayerManager.ResetActivePlayers();
 		Global.m_pLocalPlayer = Global.m_lpActivePlayers.front();
+	}
 
-		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
-		{
-			CPlayer* pPlayer = *ppPlayer;
-
-			if (pPlayer->GetType() == PlayerType_Pacman)
-				CollisionManager.Add((CPacman*)pPlayer);
-			else if (pPlayer->GetType() == PlayerType_Ghost)
-				CollisionManager.Add((CGhost*)pPlayer);
-		}
+    // Make all players collidable.
+    XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
+	{
+		if ((*ppPlayer)->GetType() == PlayerType_Pacman)
+			CollisionManager.Add((CPacman*)(*ppPlayer));
+		else if ((*ppPlayer)->GetType() == PlayerType_Ghost)
+			CollisionManager.Add((CGhost*)(*ppPlayer));
 	}
 }
 
@@ -279,11 +278,11 @@ void CGameScreen::ResetGame()
 	m_pMusic = NULL;
 	m_pChannel = NULL;
 
-	t_FileScanResult lsMusicFiles = FileManager.Scan("Sound\\Level\\*.mp3");
-	xint iMusicIndex = rand() % lsMusicFiles.size();
+	//t_FileScanResult lsMusicFiles = FileManager.Scan("Sound\\Level\\*.mp3");
+	//xint iMusicIndex = rand() % lsMusicFiles.size();
 
-	if (lsMusicFiles.size())
-		_FMOD->createStream(XFORMAT("Sound\\Level\\%s", lsMusicFiles[iMusicIndex].c_str()), FMOD_SOFTWARE, 0, &m_pMusic);
+	//if (lsMusicFiles.size())
+	//	_FMOD->createStream(XFORMAT("Sound\\Level\\%s", lsMusicFiles[iMusicIndex].c_str()), FMOD_SOFTWARE, 0, &m_pMusic);
 
 	// Initialise the colourisation.
 	for (xint iA = 0; iA < 3; ++iA)

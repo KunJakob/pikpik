@@ -20,6 +20,7 @@
 #include <Map.h>
 #include <Lobby.h>
 #include <Navigation.h>
+#include <Player.h>
 
 // Crypto.
 #include <Crypto/cryptlib.h>
@@ -119,6 +120,7 @@ void Application::Initialise()
 	XMODULE(&RenderManager);
 	XMODULE(&ScreenManager);
 	XMODULE(&InterfaceManager);
+    XMODULE(&PlayerManager);
 	XMODULE(&CollisionManager);
 	XMODULE(&MapManager);
 	XMODULE(&MatchManager);
