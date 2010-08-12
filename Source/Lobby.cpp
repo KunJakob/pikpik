@@ -399,29 +399,7 @@ void CLobbyScreen::StartGame()
 
 	srand(GetGamerCard(NetworkManager.GetVerifiedPeers().front())->m_iSeed);
 
-	PlayerManager.ResetActivePlayers();
-	
-	// Initialise all players.
-	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
-	{
-		CPlayer* pPlayer = *ppPlayer;
-		pPlayer->SetLogicType(NetworkManager.GetLocalPeer()->m_bHost ? PlayerLogicType_AI : PlayerLogicType_Remote);
-	}
-
-	// Setup all network players.
-	xint iPlayerIndex = 0;
-
-	XEN_LIST_FOREACH(t_NetworkPeerList, ppPeer, NetworkManager.GetVerifiedPeers())
-	{
-		CNetworkPeer* pPeer = *ppPeer;
-		CNetworkPeerInfo* pInfo = GetPeerInfo(pPeer);
-
-		pInfo->m_pPlayer = Global.m_lpActivePlayers[iPlayerIndex++];
-		pInfo->m_pPlayer->SetLogicType(pPeer->m_bLocal ? PlayerLogicType_Local : PlayerLogicType_Remote);
-
-		if (pPeer->m_bLocal)
-			Global.m_pLocalPlayer = pInfo->m_pPlayer;
-	}
+    PlayerManager.InitialisePlayers(PlayMode_Online);
 
 	SetState(LobbyState_Game);
 	ScreenManager.Push(ScreenIndex_GameScreen);

@@ -39,8 +39,8 @@ void CGameScreen::OnActivate()
 
 	InitialisePlayers();
 
-	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
-		RenderLayer(GameLayerIndex_Player)->AttachRenderable(*ppPlayer);
+	for (xint iA = 0; iA < PlayerManager.GetActivePlayerCount(); ++iA)
+        RenderLayer(GameLayerIndex_Player)->AttachRenderable(PlayerManager.GetActivePlayer(iA));
 
 	m_pMinimap = new CMinimap(Global.m_pActiveMap);
 	RenderLayer(GameLayerIndex_Radar)->AttachRenderable(m_pMinimap);
@@ -211,7 +211,7 @@ void CGameScreen::UpdateIntro()
 void CGameScreen::OnPreRender()
 {
 	// Set the transformations.
-	xpoint xOffset = (Global.m_pLocalPlayer->GetSprite()->GetPosition() - xpoint(_HSWIDTH, _HSHEIGHT)) * -1;
+	xpoint xOffset = (PlayerManager.GetLocalPlayer()->GetSprite()->GetPosition() - xpoint(_HSWIDTH, _HSHEIGHT)) * -1;
 
 	RenderLayer(GameLayerIndex_Map)->SetTransformation(xOffset);
 	RenderLayer(GameLayerIndex_Player)->SetTransformation(xOffset);
@@ -223,7 +223,7 @@ void CGameScreen::OnPreRender()
 	// Scale the overlays to the beat of the music.
 	if (m_iState == GameState_Playing)
 	{
-		if (Global.m_pLocalPlayer->GetType() == PlayerType_Pacman)
+		if (PlayerManager.GetLocalPlayer()->GetType() == PlayerType_Pacman)
 			ScaleToEnergy(GameLayerIndex_EdgeOverlay, Global.m_fMusicEnergy * 4.0f, 1.2f);
 		else
 		{
@@ -232,7 +232,7 @@ void CGameScreen::OnPreRender()
 		}
 	}
 
-	RenderLayer(GameLayerIndex_GhostOverlay)->SetEnabled(Global.m_pLocalPlayer->GetType() == PlayerType_Ghost);
+	RenderLayer(GameLayerIndex_GhostOverlay)->SetEnabled(PlayerManager.GetLocalPlayer()->GetType() == PlayerType_Ghost);
 
 	// Colourise the overlays.
 	xfloat fColours[3];
@@ -251,7 +251,7 @@ void CGameScreen::InitialisePlayers()
 	if (!NetworkManager.IsRunning())
 	{
 		PlayerManager.ResetActivePlayers();
-		Global.m_pLocalPlayer = Global.m_lpActivePlayers.front();
+		PlayerManager.GetLocalPlayer() = Global.m_lpActivePlayers.front();
 	}
 
     // Make all players collidable.
@@ -373,11 +373,11 @@ void CGameScreen::OnPacmanDie(CGhost* pGhost)
 void CGameScreen::GenerateMinimap()
 {
 	xuint iVisibleBlocks = MinimapElement_Walls | MinimapElement_GhostWalls | MinimapElement_GhostBase;
-	iVisibleBlocks |= (Global.m_pLocalPlayer->GetType() == PlayerType_Pacman) ? MinimapElement_Pacman : MinimapElement_Ghost;
+	iVisibleBlocks |= (PlayerManager.GetLocalPlayer()->GetType() == PlayerType_Pacman) ? MinimapElement_Pacman : MinimapElement_Ghost;
 
-	if (Global.m_pLocalPlayer->GetType() == PlayerType_Ghost)
+	if (PlayerManager.GetLocalPlayer()->GetType() == PlayerType_Ghost)
 	{
-		if (Global.m_pLocalPlayer->GetCurrentBlock()->IsGhostBase())
+		if (PlayerManager.GetLocalPlayer()->GetCurrentBlock()->IsGhostBase())
 			iVisibleBlocks |= MinimapElement_Pellets;
 	}
 
@@ -487,14 +487,14 @@ void CGameScreen::DebugControls()
 	{
 		XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpActivePlayers)
 		{
-			if (Global.m_pLocalPlayer == *ppPlayer)
+			if (PlayerManager.GetLocalPlayer() == *ppPlayer)
 			{
 				if (*ppPlayer == Global.m_lpActivePlayers.back())
 					ppPlayer = Global.m_lpActivePlayers.begin();
 				else
 					ppPlayer++;
 
-				Global.m_pLocalPlayer = *ppPlayer;
+				PlayerManager.GetLocalPlayer() = *ppPlayer;
 				Global.m_fMapAlpha = 1.f;
 
 				break;
@@ -505,20 +505,20 @@ void CGameScreen::DebugControls()
 	// Switch between logic types.
 	if (_HGE->Input_KeyDown(HGEK_SHIFT))
 	{
-		t_PlayerLogicType iLogicType = Global.m_pLocalPlayer->GetLogicType();
+		t_PlayerLogicType iLogicType = PlayerManager.GetLocalPlayer()->GetLogicType();
 
 		if (iLogicType == PlayerLogicType_Local)
 			iLogicType = PlayerLogicType_AI;
 		else
 			iLogicType = PlayerLogicType_Local;
 
-		Global.m_pLocalPlayer->SetLogicType(iLogicType);
+		PlayerManager.GetLocalPlayer()->SetLogicType(iLogicType);
 	}
 
 	// Test path-finding on the local player.
 	if (_HGE->Input_KeyDown(HGEK_CTRL))
 	{
-		Global.m_pLocalPlayer->NavigateTo(Global.m_pActiveMap->GetBlock(rand() % Global.m_pActiveMap->GetBlockCount()));
+		PlayerManager.GetLocalPlayer()->NavigateTo(Global.m_pActiveMap->GetBlock(rand() % Global.m_pActiveMap->GetBlockCount()));
 	}
 
 	if (_HGE->Input_KeyDown(HGEK_F1))

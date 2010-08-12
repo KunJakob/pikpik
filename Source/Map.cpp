@@ -300,13 +300,13 @@ void CMap::Update()
 		m_pTiles[iA]->Update();
 
 	// Calculate the block visibility.
-	if (Global.m_pLocalPlayer->m_iType == PlayerType_Ghost)
+	if (PlayerManager.GetLocalPlayer()->m_iType == PlayerType_Ghost)
 	{
 		for (xint iA = 0; iA < m_iBlockCount; ++iA)
 			m_xBlocks[iA].m_fVisibility = 0.f;
 
-		AddVisiblePaths(Global.m_pLocalPlayer->m_pCurrentBlock, 1.0f - Global.m_pLocalPlayer->m_fTransition);
-		AddVisiblePaths(Global.m_pLocalPlayer->m_pTargetBlock, Global.m_pLocalPlayer->m_fTransition);
+		AddVisiblePaths(PlayerManager.GetLocalPlayer()->m_pCurrentBlock, 1.0f - PlayerManager.GetLocalPlayer()->m_fTransition);
+		AddVisiblePaths(PlayerManager.GetLocalPlayer()->m_pTargetBlock, PlayerManager.GetLocalPlayer()->m_fTransition);
 
 		for (xint iA = 0; iA < m_iBlockCount; ++iA)
 		{

@@ -26,7 +26,7 @@ CPlayer::CPlayer(t_PlayerType iType, const xchar* pSpriteName) : CRenderable(Ren
 	m_pNavPath(NULL),
 	m_pBrain(NULL)
 {
-	m_iIndex = (xint)Global.m_lpPlayers.size();
+	m_iIndex = (xint)PlayerManager.m_lpPlayers.size();
 
 	m_pSprite = new CAnimatedSprite(_SPRITE(pSpriteName));
 	m_pSprite->SetAnimation("Idle");
@@ -148,7 +148,7 @@ void CPlayer::Update()
 
 			m_pSprite->SetPosition(m_pCurrentBlock->GetScreenPosition() + xOffset);
 
-			if (Global.m_pLocalPlayer == this)
+			if (PlayerManager.GetLocalPlayer() == this)
 				Global.m_fMapAlpha = Math::Clamp(1.f - m_fTransition, 0.f, 1.f);
 		}
 		break;
@@ -177,7 +177,7 @@ void CPlayer::Update()
     }
 
     // Calculate visibility of local player.
-	if (this != Global.m_pLocalPlayer)
+	if (this != PlayerManager.GetLocalPlayer())
 	{
 		xfloat fVisibility = (m_pCurrentBlock->m_fPlayerVisibility * (1.f - m_fTransition));
 
@@ -310,7 +310,7 @@ void CPlayer::LogicPath()
 void CPlayer::LogicLocal()
 {
 	// Currently we can only control one player at a time.
-	if (this != Global.m_pLocalPlayer || !Global.m_bWindowFocused)
+	if (this != PlayerManager.GetLocalPlayer() || !Global.m_bWindowFocused)
 		return;
 
     // If we have a pending request, try to follow it.
@@ -421,7 +421,7 @@ void CPlayer::OnReceivePlayerUpdate(CNetworkPeer* pFrom, BitStream* pStream)
 	pStream->Read(iStreamType);
 	pStream->Read(iPlayerIndex);
 
-	CPlayer* pPlayer = (iPlayerIndex < Global.m_lpPlayers.size()) ? Global.m_lpPlayers[iPlayerIndex] : NULL;
+    CPlayer* pPlayer = (iPlayerIndex < PlayerManager.GetPlayerCount()) ? PlayerManager.GetPlayer(iPlayerIndex) : NULL;
 
 	if (pPlayer)
 	{
@@ -553,7 +553,7 @@ void CGhost::OnRender()
 
 	m_pEyes->SetPosition(m_pSprite->GetPosition());
 
-	if (Global.m_pLocalPlayer->GetType() == PlayerType_Pacman || Global.m_pLocalPlayer == this)
+	if (PlayerManager.GetLocalPlayer()->GetType() == PlayerType_Pacman || PlayerManager.GetLocalPlayer() == this)
 		m_pEyes->SetAlpha(m_pSprite->GetAlpha());
 	else
 		m_pEyes->SetAlpha(1.f);
@@ -608,14 +608,66 @@ void CGhost::OnCollision(CCollidable* pWith)
 //##############################################################################
 
 // =============================================================================
+void CPlayerManager::OnInitialise()
+{
+    // Create all the available players.
+	m_lpPlayers.push_back(new CPacman());
+    m_lpPlayers.push_back(new CPacman());
+	m_lpPlayers.push_back(new CGhost(0xFF40F0F0));
+	m_lpPlayers.push_back(new CGhost(0xFFF04040));
+	m_lpPlayers.push_back(new CGhost(0xFF4040F0));
+	m_lpPlayers.push_back(new CGhost(0xFFF0F040));
+	m_lpPlayers.push_back(new CGhost(0xFFF040F0));
+}
+
+// =============================================================================
+void CPlayerManager::OnDeinitialise()
+{
+    // Create all the available players.
+	XEN_LIST_ERASE_ALL(m_lpPlayers);
+}
+
+// =============================================================================
+void CPlayerManager::InitialisePlayers(t_PlayMode iPlayMode)
+{
+    switch (iPlayMode)
+    {
+    case PlayMode_Online:
+        {
+            ResetActivePlayers();
+	
+	        // Initialise all players.
+	        for (xint iA = 0; iA < GetActivePlayerCount(); ++iA)
+		        GetActivePlayer(iA)->SetLogicType(NetworkManager.GetLocalPeer()->m_bHost ? PlayerLogicType_AI : PlayerLogicType_Remote);
+
+	        // Setup all network players.
+	        xint iPlayerIndex = 0;
+
+	        XEN_LIST_FOREACH(t_NetworkPeerList, ppPeer, NetworkManager.GetVerifiedPeers())
+	        {
+		        CNetworkPeer* pPeer = *ppPeer;
+		        CNetworkPeerInfo* pInfo = GetPeerInfo(pPeer);
+
+		        pInfo->m_pPlayer = PlayerManager.GetActivePlayer(iPlayerIndex++);
+		        pInfo->m_pPlayer->SetLogicType(pPeer->m_bLocal ? PlayerLogicType_Local : PlayerLogicType_Remote);
+
+		        if (pPeer->m_bLocal)
+			        PlayerManager.GetLocalPlayer() = pInfo->m_pPlayer;
+	        }
+        }
+        break;
+    }
+}
+
+// =============================================================================
 void CPlayerManager::ResetActivePlayers()
 {
     xint iPacmanCount = Global.m_pActiveMap->GetPacmanCount();
 	xint iGhostCount = Global.m_pActiveMap->GetGhostCount();
 
-	Global.m_lpActivePlayers.clear();
+	m_lpActivePlayers.clear();
 
-	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, Global.m_lpPlayers)
+	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, m_lpPlayers)
 	{
 		CPlayer* pPlayer = *ppPlayer;
 		xbool bPlaying = false;
@@ -635,7 +687,7 @@ void CPlayerManager::ResetActivePlayers()
 
 		if (bPlaying)
 		{
-			Global.m_lpActivePlayers.push_back(pPlayer);
+			m_lpActivePlayers.push_back(pPlayer);
 
 			pPlayer->SetCurrentBlock(Global.m_pActiveMap->GetSpawnBlock(pPlayer->GetType()));
 			pPlayer->m_pStartingBlock = pPlayer->GetCurrentBlock();

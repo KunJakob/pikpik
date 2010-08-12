@@ -21,6 +21,7 @@
 // Predeclaration.
 class CBrain;
 class CGhostBrain;
+class CPlayerManager;
 
 // The player types.
 enum t_PlayerLogicType
@@ -60,6 +61,7 @@ enum t_PlayerStreamType
 };
 
 // Lists.
+typedef xarray<CPlayer*> t_PlayerList;
 typedef xlist<t_PlayerDirection> t_PlayerDirectionList;
 
 //##############################################################################
@@ -70,6 +72,7 @@ public:
 	friend CMap;
 	friend CBrain;
 	friend CGhostBrain;
+    friend CPlayerManager;
 
 	// Destructor.
 	virtual ~CPlayer();
@@ -330,6 +333,57 @@ public:
 		return s_Instance;
 	}
 
+    // (Module) Load all player resources.
+	virtual void OnInitialise();
+
+    // (Module) Free all player resources.
+	virtual void OnDeinitialise();
+
+    // Initialise the players for play.
+    void InitialisePlayers(t_PlayMode iPlayMode);
+    
+    // Get the total number of players (active and inactive) available to the game.
+    xint GetPlayerCount()
+    {
+        return m_lpPlayers.size();
+    }
+
+    // Get the list of all players (active and inactive) available to the game.
+    CPlayer* GetPlayer(xint iIndex)
+    {
+        XASSERT(iIndex < GetPlayerCount());
+        return m_lpPlayers[iIndex];
+    }
+
+    // Get the total number of active players in the game.
+    xint GetActivePlayerCount()
+    {
+        return m_lpActivePlayers.size();
+    }
+
+    // Get the list of all active players in the game.
+    CPlayer* GetActivePlayer(xint iIndex)
+    {
+        XASSERT(iIndex < GetActivePlayerCount());
+        return m_lpActivePlayers[iIndex];
+    }
+
+    // Get the player being controlled locally.
+    CPlayer* GetLocalPlayer()
+    {
+        return m_pLocalPlayer;
+    }
+
+protected:
     // Determine the list of players for the active map and position them.
 	void ResetActivePlayers();
+
+    // The list of all players available to the game.
+	t_PlayerList m_lpPlayers;
+
+	// The list of all active players in the current game.
+	t_PlayerList m_lpActivePlayers;
+
+	// The currently active player on the local machine.
+	CPlayer* m_pLocalPlayer;
 };

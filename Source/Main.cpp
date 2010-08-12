@@ -154,14 +154,6 @@ void Application::Initialise()
 	ScreenManager.LoadScreens();
 	ScreenManager.Set(ScreenIndex_LogoScreen, true);
 
-	// Create all the available players.
-	Global.m_lpPlayers.push_back(new CPacman());
-	Global.m_lpPlayers.push_back(new CGhost(0xFF40F0F0));
-	Global.m_lpPlayers.push_back(new CGhost(0xFFF04040));
-	Global.m_lpPlayers.push_back(new CGhost(0xFF4040F0));
-	Global.m_lpPlayers.push_back(new CGhost(0xFFF0F040));
-	Global.m_lpPlayers.push_back(new CGhost(0xFFF040F0));
-
 	// Execute the first frame update.
 	OnUpdate();
 }

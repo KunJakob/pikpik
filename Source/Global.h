@@ -104,6 +104,15 @@ class CPlayer;
 class CMap;
 class CFont;
 
+// The game playing mode.
+enum t_PlayMode
+{
+    PlayMode_Offline,
+    PlayMode_Online,
+
+    PlayMode_Max,
+};
+
 // The player identifier type.
 enum t_PlayerType
 {
@@ -213,7 +222,6 @@ enum t_CollisionGroup
 // Common list types.
 typedef xlist<CMetadata*> t_MetadataList;
 typedef xlist<CSprite*> t_SpriteList;
-typedef xarray<CPlayer*> t_PlayerList;
 
 //##############################################################################
 using namespace Xen;
@@ -251,15 +259,6 @@ public:
 
 	// The currently active map.
 	CMap* m_pActiveMap;
-
-	// The list of all players available to the game.
-	t_PlayerList m_lpPlayers;
-
-	// The list of all active players in the current game.
-	t_PlayerList m_lpActivePlayers;
-
-	// The currently active player on the local machine.
-	CPlayer* m_pLocalPlayer;
 
 	// The music spectrum energy to determine how fast colours transition.
 	xfloat m_fMusicEnergy;
