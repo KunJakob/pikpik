@@ -432,7 +432,19 @@ xfloat CMapEvaluator::GetCost(CNavigationRequest* pRequest, CNavigationNode* pPa
 	CMapBlock* pParentBlock = pParentNode->GetDataAs<CMapBlock>();
 	CMapBlock* pCurrentBlock = pCurrentNode->GetDataAs<CMapBlock>();
 
-	return (pCurrentBlock->IsGhostWall()) ? 3.0f : 1.0f;
+	xfloat fCost = (pCurrentBlock->IsGhostWall()) ? 3.0f : 1.0f;
+
+	XEN_LIST_FOREACH(t_PlayerList, ppPlayer, PlayerManager.GetActivePlayers())
+	{
+		// Try not to go down the same route as other ghosts.
+		if ((*ppPlayer)->GetCurrentBlock() == pParentBlock || (*ppPlayer)->GetCurrentBlock() == pCurrentBlock)
+		{
+			if (*ppPlayer != m_pPlayer && (*ppPlayer)->GetType() == PlayerType_Ghost)
+				fCost += 10.0f;
+		}
+	}
+
+	return fCost;
 }
 
 // =============================================================================

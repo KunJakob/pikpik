@@ -454,7 +454,10 @@ void CGameScreen::RenderPlayerPath(CRenderLayer* pLayer)
 				CMapBlock* pBlock = pPath->GetNode(iA)->GetDataAs<CMapBlock>();
 				xpoint xPos = pBlock->GetScreenPosition();
 
-				RenderManager.RenderBox(false, xrect(xPos.m_tX - 5, xPos.m_tY - 5, xPos.m_tX + 5, xPos.m_tY + 5), _RGB(255, 0, 0));
+				xint iOffset = (*ppPlayer)->GetIndex() * 2;
+				xuint iColour = ((CGhost*)*ppPlayer)->GetColour();
+
+				RenderManager.RenderBox(false, xrect(xPos.m_tX - iOffset, xPos.m_tY - iOffset, xPos.m_tX + iOffset, xPos.m_tY + iOffset), iColour);
 			}
 		}
 	}

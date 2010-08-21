@@ -89,6 +89,12 @@ public:
 	// Render the object.
 	virtual void OnRender();
 
+	// Get the player's list index.
+	xint GetIndex()
+	{
+		return m_iIndex;
+	}
+
 	// Get the type of the player.
 	t_PlayerType GetType()
 	{
@@ -191,7 +197,7 @@ protected:
 
 	// Called when an animation event occurs.
 	void OnAnimationEvent(CAnimatedSprite* pSprite, const xchar* pEvent);
-	
+
 	// The type of the derived class.
 	t_PlayerType m_iType;
 
