@@ -168,7 +168,10 @@ void CGameScreen::OnUpdate()
 				m_pChannel->isPlaying(&bPlaying);
 
 				if (bPlaying)
+				{
 					CalculateMusicEnergy(m_pChannel);
+					m_pChannel->setVolume((PlayerManager.GetLocalPlayer()->GetState() == PlayerState_Idle) ? 0.5 : 1.0);
+				}
 			}
 		}
 		break;
